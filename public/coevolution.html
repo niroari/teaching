@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>מירוץ החימוש בטבע</title>
+  <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #0d1117;
+      --surface:    #161b27;
+      --surface-2:  #1e2535;
+      --border:     #2a3145;
+      --text:       #e2e8f0;
+      --text-muted: #8896aa;
+      --accent:     #f59e0b;
+      --accent-dim: #78350f;
+    }
+
+    body {
+      font-family: 'Alef', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      direction: rtl;
+    }
+
+    .hidden { display: none !important; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── HERO ─────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      background: radial-gradient(ellipse at 50% 40%, #2d1500 0%, var(--bg) 70%);
+    }
+
+    .hero-icon {
+      font-size: 5rem;
+      margin-bottom: 1.5rem;
+      animation: float 3.5s ease-in-out infinite;
+      display: block;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-12px); }
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0.6rem;
+    }
+
+    .hero h2 {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      font-weight: 400;
+      max-width: 480px;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    .hero-notice {
+      max-width: 560px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.4rem 1.8rem;
+      margin: 0 0 2rem;
+      text-align: right;
+      line-height: 1.9;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .hero-notice strong { color: var(--text); }
+
+    .btn-start {
+      background: var(--accent);
+      color: #0d1117;
+      border: none;
+      padding: 0.9rem 2.8rem;
+      font-size: 1.2rem;
+      font-family: 'Alef', sans-serif;
+      font-weight: 700;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 32px rgba(245, 158, 11, 0.25);
+    }
+
+    .btn-start:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 48px rgba(245, 158, 11, 0.45);
+    }
+
+    /* ── STAGE VIEW ───────────────────────────────────── */
+    .stage-view { display: none; }
+    .stage-view.active { display: block; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0.8rem 1rem;
+    }
+
+    .progress-steps {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+    }
+
+    .step-wrap { display: flex; align-items: center; }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+      cursor: pointer;
+    }
+
+    .step:hover .step-dot { border-color: var(--accent); transform: scale(1.1); }
+
+    .step-dot {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      transition: all 0.3s;
+    }
+
+    .step.active .step-dot {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #0d1117;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
+    }
+
+    .step.done .step-dot {
+      background: var(--accent-dim);
+      border-color: var(--accent-dim);
+      color: #fde68a;
+    }
+
+    .step-label {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .step.active .step-label { color: var(--accent); font-weight: 700; }
+
+    .step-line {
+      width: 28px;
+      height: 2px;
+      background: var(--border);
+      margin-bottom: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .step-line.done { background: var(--accent-dim); }
+
+    .stage-content {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 2rem 1.2rem 1rem;
+    }
+
+    .stage-nav {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 1rem 1.2rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .btn-nav {
+      padding: 0.65rem 1.6rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-family: 'Alef', sans-serif;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-nav:hover:not(:disabled) { background: var(--surface-2); }
+    .btn-nav:disabled { opacity: 0.35; cursor: default; }
+
+    .btn-nav.primary {
+      background: var(--accent);
+      color: #0d1117;
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+
+    .btn-nav.primary:hover { opacity: 0.88; }
+
+    .btn-action {
+      display: inline-block;
+      background: var(--accent);
+      color: #0d1117;
+      border: none;
+      padding: 0.75rem 2rem;
+      font-size: 1rem;
+      font-family: 'Alef', sans-serif;
+      font-weight: 700;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      margin-top: 1rem;
+    }
+
+    .btn-action:hover { opacity: 0.88; }
+
+    /* ── STAGE 1: מבוא ─────────────────────────────────── */
+    .s1-pretitle {
+      font-size: 0.9rem;
+      color: var(--accent);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.5rem;
+    }
+
+    .s1-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.6rem;
+      line-height: 1.3;
+    }
+
+    .s1-sub {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .vote-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .vote-btn {
+      width: 100%;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 0.9rem 1.2rem;
+      font-family: 'Alef', sans-serif;
+      font-size: 1rem;
+      color: var(--text);
+      cursor: pointer;
+      text-align: right;
+      direction: rtl;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .vote-btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      background: var(--surface-2);
+    }
+
+    .vote-btn.chosen {
+      border-color: var(--accent);
+      background: #1c1200;
+      color: var(--accent);
+    }
+
+    .s1-reveal { animation: fadeInUp 0.5s ease; }
+
+    .reveal-tag {
+      display: inline-block;
+      background: var(--accent-dim);
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      margin-bottom: 0.8rem;
+    }
+
+    .s1-reveal h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 1.2rem;
+      line-height: 1.4;
+    }
+
+    .s1-explain {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.8rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .s1-explain p {
+      font-size: 1rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-bottom: 0.8rem;
+    }
+
+    .s1-explain p:last-child { margin-bottom: 0; }
+    .s1-explain strong { color: var(--text); }
+
+    .arms-cycle {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .arms-cycle-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.4px;
+      margin-bottom: 1.2rem;
+    }
+
+    .cycle-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-width: 380px;
+      margin: 0 auto;
+    }
+
+    .cycle-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: var(--surface);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      text-align: right;
+    }
+
+    .cycle-icon { font-size: 1.5rem; flex-shrink: 0; }
+
+    .cycle-text {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      flex: 1;
+    }
+
+    .cycle-text strong { color: var(--text); }
+
+    .cycle-arrow {
+      font-size: 1.2rem;
+      color: var(--accent);
+      text-align: center;
+    }
+
+    .s1-teaser {
+      text-align: center;
+      padding: 1.2rem;
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.7;
+      font-style: italic;
+    }
+
+    /* ── STAGE 2: טורף ונטרף ─────────────────────────── */
+    .s2-title {
+      font-size: 1.8rem; font-weight: 700;
+      color: var(--text); margin-bottom: 0.5rem;
+    }
+
+    .s2-sub {
+      font-size: 1rem; color: var(--text-muted);
+      line-height: 1.7; margin-bottom: 2rem;
+      padding: 1rem 1.3rem;
+      border-right: 3px solid var(--accent);
+      background: var(--surface); border-radius: 0 10px 10px 0;
+    }
+
+    .prey-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      animation: fadeInUp 0.4s ease;
+    }
+
+    .prey-img {
+      width: 100%; height: 220px;
+      object-fit: cover; display: block;
+    }
+
+    .prey-img-pair {
+      display: flex; height: 220px;
+    }
+
+    .prey-img-pair img {
+      width: 50%; height: 100%;
+      object-fit: cover; display: block;
+    }
+
+    .prey-img-pair img:first-child {
+      border-left: 2px solid var(--bg);
+    }
+
+    .prey-body { padding: 1.3rem 1.5rem; }
+
+    .prey-vs {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 1.1rem; font-weight: 700; color: var(--text);
+      margin-bottom: 0.8rem;
+    }
+
+    .vs-badge {
+      background: var(--accent-dim);
+      color: var(--accent);
+      font-size: 0.7rem; font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+    }
+
+    .prey-text {
+      font-size: 0.93rem; color: var(--text-muted);
+      line-height: 1.8; margin-bottom: 1rem;
+    }
+
+    .prey-text strong { color: var(--text); }
+
+    .race-badge {
+      display: inline-block;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 0.78rem; font-weight: 700;
+      color: var(--accent);
+      padding: 0.3rem 0.9rem;
+    }
+
+    /* ── STAGE 3: הסוואה וחיקוי ──────────────────────── */
+    .s3-title {
+      font-size: 1.8rem; font-weight: 700;
+      color: var(--text); margin-bottom: 0.5rem;
+    }
+
+    .s3-sub {
+      font-size: 1rem; color: var(--text-muted);
+      line-height: 1.7; margin-bottom: 2rem;
+      padding: 1rem 1.3rem;
+      border-right: 3px solid var(--accent);
+      background: var(--surface); border-radius: 0 10px 10px 0;
+    }
+
+    .s3-section-title {
+      font-size: 1.2rem; font-weight: 700;
+      color: var(--accent); margin: 2rem 0 1rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+
+    .s3-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 1.2rem;
+    }
+
+    .s3-img {
+      width: 100%; height: 240px;
+      object-fit: cover; object-position: center;
+      display: block;
+    }
+
+    .s3-card-body { padding: 1.2rem 1.5rem; }
+
+    .s3-card-title {
+      font-size: 1rem; font-weight: 700;
+      color: var(--text); margin-bottom: 0.6rem;
+    }
+
+    .s3-card-text {
+      font-size: 0.92rem; color: var(--text-muted); line-height: 1.8;
+    }
+
+    .s3-card-text strong { color: var(--text); }
+
+    /* reveal game */
+    .s3-reveal-wrap { position: relative; }
+
+    .s3-overlay {
+      position: absolute; inset: 0;
+      background: rgba(13,17,23,0.7);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1rem; cursor: pointer;
+      transition: opacity 0.4s;
+    }
+
+    .s3-overlay-text {
+      font-size: 1.05rem; font-weight: 700;
+      color: var(--text); text-align: center;
+      padding: 0 1rem;
+    }
+
+    .s3-overlay-btn {
+      background: var(--accent); color: #0d1117;
+      border: none; border-radius: 8px;
+      padding: 0.6rem 1.5rem;
+      font-family: 'Alef', sans-serif;
+      font-size: 0.95rem; font-weight: 700;
+      cursor: pointer;
+    }
+
+    .s3-overlay.hidden { opacity: 0; pointer-events: none; }
+
+    .s3-revealed-label {
+      font-size: 0.82rem; color: var(--accent);
+      font-weight: 700; margin-top: 0.6rem;
+      text-align: center;
+    }
+
+    /* butterfly pair */
+    .s3-butterfly-pair {
+      display: flex; gap: 1rem;
+      margin-bottom: 1.2rem; flex-wrap: wrap;
+    }
+
+    .s3-butterfly-card {
+      flex: 1; min-width: 200px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden;
+    }
+
+    .s3-butterfly-card img {
+      width: 100%; height: 200px;
+      object-fit: contain; display: block;
+      background: #0a0f0a;
+      padding: 0.5rem;
+    }
+
+    .s3-butterfly-body { padding: 1rem 1.2rem; }
+
+    .s3-butterfly-name {
+      font-size: 1rem; font-weight: 700;
+      color: var(--text); margin-bottom: 0.5rem;
+    }
+
+    .s3-butterfly-tag {
+      display: inline-block; font-size: 0.72rem; font-weight: 700;
+      padding: 0.2rem 0.6rem; border-radius: 10px;
+      margin-bottom: 0.6rem;
+    }
+
+    .tag-real { background: #7c3aed; color: #fff; }
+    .tag-fake { background: var(--accent-dim); color: var(--accent); }
+
+    .s3-butterfly-text {
+      font-size: 0.88rem; color: var(--text-muted); line-height: 1.7;
+    }
+
+    .s3-butterfly-text strong { color: var(--text); }
+
+    .s3-insight {
+      background: var(--surface-2);
+      border: 1px solid var(--accent-dim);
+      border-radius: 12px; padding: 1.3rem 1.5rem;
+      margin-top: 1.5rem; animation: fadeInUp 0.4s ease;
+    }
+
+    .s3-insight p {
+      font-size: 0.95rem; color: var(--text-muted); line-height: 1.8;
+    }
+
+    .s3-insight strong { color: var(--text); }
+
+    /* ── STAGE 4: שיתוף פעולה ────────────────────────── */
+    .s4-title {
+      font-size: 1.8rem; font-weight: 700;
+      color: var(--text); margin-bottom: 0.5rem;
+    }
+
+    .s4-sub {
+      font-size: 1rem; color: var(--text-muted);
+      line-height: 1.7; margin-bottom: 2rem;
+      padding: 1rem 1.3rem;
+      border-right: 3px solid var(--accent);
+      background: var(--surface); border-radius: 0 10px 10px 0;
+    }
+
+    .s4-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      animation: fadeInUp 0.4s ease;
+    }
+
+    .s4-img {
+      width: 100%; height: 240px;
+      object-fit: contain; object-position: center;
+      background: #0a0e14;
+      display: block;
+    }
+
+    .s4-body { padding: 1.3rem 1.5rem; }
+
+    .s4-card-title {
+      font-size: 1.05rem; font-weight: 700;
+      color: var(--text); margin-bottom: 0.7rem;
+    }
+
+    .s4-card-text {
+      font-size: 0.93rem; color: var(--text-muted); line-height: 1.8;
+    }
+
+    .s4-card-text strong { color: var(--text); }
+
+    .s4-mutual-badge {
+      display: inline-block;
+      background: var(--accent-dim);
+      color: var(--accent);
+      font-size: 0.75rem; font-weight: 700;
+      padding: 0.25rem 0.8rem; border-radius: 20px;
+      margin-bottom: 0.8rem;
+    }
+
+    .s4-summary {
+      background: var(--surface-2);
+      border: 1px solid var(--accent-dim);
+      border-radius: 12px; padding: 1.3rem 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .s4-summary p {
+      font-size: 0.95rem; color: var(--text-muted); line-height: 1.8;
+    }
+
+    .s4-summary strong { color: var(--text); }
+
+    /* ── STAGE 5: בוחן ────────────────────────────────── */
+    .s5-title {
+      font-size: 1.8rem; font-weight: 700;
+      color: var(--text); margin-bottom: 1.5rem;
+    }
+
+    .s5-progress-wrap { margin-bottom: 1.8rem; }
+
+    .s5-progress-info {
+      display: flex; justify-content: space-between;
+      font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;
+    }
+
+    .s5-progress-bar {
+      height: 6px; background: var(--surface-2);
+      border-radius: 4px; overflow: hidden;
+    }
+
+    .s5-progress-fill {
+      height: 100%; background: var(--accent);
+      border-radius: 4px; transition: width 0.4s ease;
+    }
+
+    .s5-question-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.8rem; margin-bottom: 1rem;
+      animation: fadeInUp 0.35s ease;
+    }
+
+    .s5-question-text {
+      font-size: 1.1rem; font-weight: 700;
+      color: var(--text); line-height: 1.6; margin-bottom: 1.5rem;
+    }
+
+    .s5-answers { display: flex; flex-direction: column; gap: 0.7rem; }
+
+    .s5-answer-btn {
+      width: 100%; background: var(--surface-2);
+      border: 2px solid var(--border); border-radius: 10px;
+      padding: 0.9rem 1.2rem;
+      font-family: 'Alef', sans-serif; font-size: 0.95rem;
+      color: var(--text); cursor: pointer;
+      text-align: right; direction: rtl;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .s5-answer-btn:hover:not(:disabled) { border-color: var(--accent); background: #1a1800; }
+    .s5-answer-btn.correct { border-color: var(--accent); background: #1c1200; color: var(--accent); }
+    .s5-answer-btn.wrong { border-color: #ef4444; background: #2a0d0d; color: #ef4444; }
+    .s5-answer-btn:disabled { cursor: default; }
+
+    .s5-explanation {
+      background: var(--surface-2); border-radius: 10px;
+      padding: 1rem 1.2rem; margin-top: 1.2rem;
+      font-size: 0.9rem; color: var(--text-muted); line-height: 1.7;
+      animation: fadeInUp 0.3s ease;
+    }
+
+    .s5-explanation strong { color: var(--text); }
+    .s5-next-wrap { text-align: center; margin-top: 0.5rem; animation: fadeInUp 0.3s ease; }
+
+    .s5-score { text-align: center; animation: fadeInUp 0.5s ease; padding: 1rem 0; }
+    .s5-score-icon { font-size: 4rem; display: block; margin-bottom: 1rem; }
+    .s5-score-number { font-size: 3.5rem; font-weight: 700; color: var(--accent); }
+    .s5-score-label { font-size: 1rem; color: var(--text-muted); margin: 0.3rem 0 1.5rem; }
+    .s5-score-message { font-size: 1.2rem; font-weight: 700; color: var(--text); margin-bottom: 2rem; }
+
+    .s5-submit-box {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; text-align: right;
+    }
+
+    .s5-submit-label { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 0.7rem; }
+
+    .s5-name-input {
+      width: 100%; padding: 0.75rem 1rem;
+      background: var(--surface); border: 2px solid var(--border);
+      border-radius: 8px; font-family: 'Alef', sans-serif;
+      font-size: 1rem; color: var(--text); direction: rtl;
+      margin-bottom: 0.7rem; transition: border-color 0.2s;
+    }
+
+    .s5-name-input:focus { outline: none; border-color: var(--accent); }
+
+    .s5-submit-btn {
+      width: 100%; padding: 0.85rem;
+      background: var(--accent); color: #0d1117;
+      border: none; border-radius: 10px;
+      font-family: 'Alef', sans-serif; font-size: 1rem; font-weight: 700;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+
+    .s5-submit-btn:hover { opacity: 0.88; }
+    .s5-submit-btn:disabled { opacity: 0.4; cursor: default; }
+
+    .video-section { margin-top: 2rem; text-align: center; }
+    .video-title { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 0.3rem; }
+    .video-sub { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem; }
+    .video-wrap { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; }
+    .video-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; border-radius: 10px; }
+
+    /* ── PLACEHOLDER ──────────────────────────────────── */
+    .placeholder {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
+    }
+
+    .placeholder h2 { font-size: 1.5rem; margin-bottom: 0.8rem; color: var(--text); }
+
+    /* ── BACK LINK ─────────────────────────────────────── */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 0.5rem 0;
+      margin-bottom: 1rem;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+  <!-- ── HERO SCREEN ── -->
+  <div class="hero" id="hero">
+    <span class="hero-icon">⚔️</span>
+    <h1>מירוץ החימוש בטבע</h1>
+    <h2>כשטורף ונטרף מפתחים זה את זה — ואף אחד לא מנצח ניצחון מוחלט</h2>
+    <button class="btn-start" onclick="startLearning()">בואו נתחיל</button>
+  </div>
+
+  <!-- ── STAGE VIEW ── -->
+  <div class="stage-view" id="stageView">
+    <div class="topbar">
+      <div class="progress-steps" id="progressSteps"></div>
+    </div>
+    <div class="stage-content" id="stageContent"></div>
+    <div class="stage-nav">
+      <button class="btn-nav" id="btnPrev" onclick="prevStage()">הקודם</button>
+      <button class="btn-nav primary" id="btnNext" onclick="nextStage()">הבא</button>
+    </div>
+  </div>
+
+  <script>
+    const STAGES = [
+      { label: 'מבוא' },
+      { label: 'טורף ונטרף' },
+      { label: 'הסוואה וחיקוי' },
+      { label: 'שיתוף פעולה' },
+      { label: 'בוחן' },
+    ];
+
+    const STAGE_HTML = [
+      `<div class="s1">
+  <a class="back-link" href="index.html">→ חזרה לדף הבית</a>
+  <p class="s1-pretitle">לפני שמתחילים —</p>
+  <h2 class="s1-title">מי מנצח — הצ'יטה או האיילה?</h2>
+  <p class="s1-sub">חישבו רגע ובחרו:</p>
+
+  <div class="vote-btns">
+    <button class="vote-btn" onclick="s1Vote(this)">הצ'יטה — היא המהירה יותר 🐆</button>
+    <button class="vote-btn" onclick="s1Vote(this)">האיילה — היא יודעת להימלט 🦌</button>
+    <button class="vote-btn" onclick="s1Vote(this)">אף אחד לא מנצח "ניצחון מוחלט"</button>
+  </div>
+
+  <div class="s1-reveal hidden" id="s1Reveal">
+    <span class="reveal-tag">התשובה המפתיעה:</span>
+    <h3>אף אחד לא מנצח — וזה בדיוק הנקודה</h3>
+
+    <div class="s1-explain">
+      <p>כל פעם שהצ'יטה נעשית מהירה יותר, האיילות שנשארות בחיים הן אלו שרצות מהר יותר — ולאורך דורות, גם הן מהירות יותר. זה ממריץ את הצ'יטות להשתפר שוב. ושוב. ושוב.</p>
+      <p>זה נקרא <strong>מירוץ חימוש אבולוציוני</strong> — מרוץ שאף אחד לא יכול לנצח בו ניצחון מוחלט. כל שיפור של צד אחד הוא לחץ על הצד השני להתפתח גם הוא.</p>
+      <p>זה לא רק בין טורפים וניצודים — זה קורה בכל מקום בטבע: בין צמחים לחרקים, בין מחלות לגוף, בין פרזיטים למאכסנים שלהם.</p>
+    </div>
+
+    <div class="arms-cycle">
+      <div class="arms-cycle-title">⚙️ כך נראה מירוץ החימוש</div>
+      <div class="cycle-steps">
+        <div class="cycle-row">
+          <span class="cycle-icon">🐆</span>
+          <div class="cycle-text"><strong>הצ'יטה מהירה יותר</strong> — תופסת יותר איילות</div>
+        </div>
+        <div class="cycle-arrow">↓</div>
+        <div class="cycle-row">
+          <span class="cycle-icon">🦌</span>
+          <div class="cycle-text"><strong>האיילות האיטיות נכחדות</strong> — נשארות רק המהירות</div>
+        </div>
+        <div class="cycle-arrow">↓</div>
+        <div class="cycle-row">
+          <span class="cycle-icon">🧬</span>
+          <div class="cycle-text"><strong>דור האיילות הבא מהיר יותר</strong> — הצ'יטות מתקשות לצוד</div>
+        </div>
+        <div class="cycle-arrow">↓</div>
+        <div class="cycle-row">
+          <span class="cycle-icon">🔄</span>
+          <div class="cycle-text"><strong>הצ'יטות מתפתחות שוב</strong> — המחזור חוזר</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="s1-teaser">בשלבים הבאים נראה כיצד מירוץ החימוש עיצב יצורים מדהימים — מנחשים עמידים לרעל, דרך פרפרים מזויפים, ועד פרחים שנראים כמו דבורות.</p>
+  </div>
+</div>`,
+      `<div class="s2">
+  <h2 class="s2-title">טורף ונטרף</h2>
+  <p class="s2-sub">כשכל צד מתפתח בתגובה לשני — ואף אחד לא יכול להרשות לעצמו לעצור</p>
+
+  <div class="prey-card">
+    <img class="prey-img" src="https://upload.wikimedia.org/wikipedia/commons/8/85/Cheetah_chasing_Thompsons_gazelle.jpg" alt="צ'יטה רודפת אחרי גזל" />
+    <div class="prey-body">
+      <div class="prey-vs">🐆 צ'יטה <span class="vs-badge">VS</span> 🦌 איילה</div>
+      <p class="prey-text">הצ'יטה היא החיה המהירה ביותר ביבשה — <strong>112 קמ"ש</strong>. אבל האיילות לא עמדו מנגד: לאורך מיליוני שנים הן פיתחו ריצה זיגזג, סיבולת, ורגישות חדה לתנועה. הצ'יטה מצליחה לצוד רק בכ-50% מהניסיונות שלה — כי האיילות לוקחות את הלחץ ברצינות.</p>
+      <span class="race-badge">🔄 המרוץ נמשך מזה מיליוני שנים</span>
+    </div>
+  </div>
+
+  <div class="prey-card">
+    <div class="prey-img-pair">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/20/Poison_dart_frog_229.JPG" alt="צפרדע רעל" />
+      <img src="https://upload.wikimedia.org/wikipedia/commons/3/31/Common_Garter_Snake_-_Thamnophis_sirtalis.jpg" alt="נחש גרטר" />
+    </div>
+    <div class="prey-body">
+      <div class="prey-vs">🐸 צפרדע-הרעל <span class="vs-badge">VS</span> 🐍 נחש הגרטר</div>
+      <p class="prey-text">צפרדעי-הרעל פיתחו רעל כה חזק שטיפה אחת יכולה להרוג אדם. אבל נחש הגרטר האמריקאי עשה את הבלתי-ייאמן — הוא פיתח <strong>עמידות גנטית לרעל</strong>. כעת: הצפרדעים מייצרות רעל חזק יותר, הנחשים עמידים יותר — ושניהם ממשיכים להתפתח.</p>
+      <span class="race-badge">⚗️ מרוץ חימוש כימי</span>
+    </div>
+  </div>
+
+  <div class="prey-card">
+    <img class="prey-img" src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Killer_Whales_Hunting_a_Crabeater_Seal.jpg" alt="לווייתנים קטלנים צדים כלב ים" />
+    <div class="prey-body">
+      <div class="prey-vs">🐋 לווייתן קטלן <span class="vs-badge">VS</span> 🦭 כלב ים</div>
+      <p class="prey-text">לווייתנים קטלנים ציידו כלבי ים באותה שיטה מאות שנים — עד שכלבי הים שינו את דפוסי השחייה שלהם. הלווייתנים הגיבו ב<strong>ציד קבוצתי מתואם</strong>. כלבי הים פיתחו שחייה עמוקה יותר ויכולת צלילה ממושכת. המרוץ נמשך מתחת לפני המים.</p>
+      <span class="race-badge">🌊 מרוץ חימוש תת-ימי</span>
+    </div>
+  </div>
+</div>`,
+      `<div class="s3">
+  <h2 class="s3-title">הסוואה וחיקוי</h2>
+  <p class="s3-sub">לא כל מה שנראה מסוכן — מסוכן. ולא כל מה שנראה כמו עלה — עלה.</p>
+
+  <div class="s3-section-title">🌿 חלק א׳ — הסוואה</div>
+
+  <div class="s3-card">
+    <div class="s3-reveal-wrap">
+      <img class="s3-img" src="https://c.pxhere.com/photos/65/3e/mosquitoes_procreation_insects-857138.jpg!d" alt="חרק מקל מוסווה על ענף" />
+      <div class="s3-overlay" id="s3Overlay">
+        <div class="s3-overlay-text">האם אתם רואים את החיה בתמונה?</div>
+        <button class="s3-overlay-btn" onclick="s3Reveal()">גלו ←</button>
+      </div>
+    </div>
+    <div id="s3RevealedLabel"></div>
+    <div class="s3-card-body">
+      <div class="s3-card-title">🪲 חרק-המקל</div>
+      <p class="s3-card-text">חרק-המקל הוא אחד הממחישים הטובים ביותר של הסוואה — גופו, צבעו, ואפילו תנועתו מחקים ענף עץ. טורף שלא רואה אותו — לא יאכל אותו. לאורך דורות, <strong>החרקים שנראו הכי כמו ענפים שרדו</strong> — וכך הסוואה השתכללה.</p>
+    </div>
+  </div>
+
+  <div class="s3-card">
+    <img class="s3-img" src="https://i.giphy.com/ZA1RFjPsYTVbOpI5dk.webp" alt="תמנון מחליף צבעים" style="object-fit: contain; object-position: center; background: #0a0e14;" />
+    <div class="s3-card-body">
+      <div class="s3-card-title">🐙 התמנון — אלוף ההסוואה הדינמית</div>
+      <p class="s3-card-text">התמנון יכול לשנות <strong>צבע, מרקם וצורה</strong> תוך שבריר שנייה. לא הסתגלות אחת קבועה — אלא מערכת שלמה שהתפתחה במשך מיליוני שנים. הוא יכול לחקות סלע, חול, אצה, ואפילו חיות רעילות אחרות.</p>
+    </div>
+  </div>
+
+  <div class="s3-section-title">🦋 חלק ב׳ — חיקוי מטעה</div>
+  <p style="font-size:0.95rem; color:var(--text-muted); margin-bottom:1.2rem; line-height:1.7">לפעמים לא מספיק להיות מסוכן — כדאי גם <strong style="color:var(--text)">להיראות</strong> מסוכן. ופעמים אחרות, מספיק להיראות כמו מישהו אחר שהוא מסוכן.</p>
+
+  <div class="s3-butterfly-pair">
+    <div class="s3-butterfly-card">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/62/Monarch_butterfly.JPG" alt="פרפר מונרך" />
+      <div class="s3-butterfly-body">
+        <div class="s3-butterfly-name">פרפר המונרך</div>
+        <span class="s3-butterfly-tag tag-real">⚠️ רעיל באמת</span>
+        <p class="s3-butterfly-text">גופו ספוג בחומרים רעילים מהצמחים שאכל כזחל. הטורפים לומדים במהרה: <strong>כנפיים כתומות-שחורות = לא לאכול.</strong></p>
+      </div>
+    </div>
+    <div class="s3-butterfly-card">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/4/4f/Viceroy_butterfly_basilarchia_archippus_with_black_lines_and_borders_and_small_white_spots.jpg" alt="פרפר ויסרוי" />
+      <div class="s3-butterfly-body">
+        <div class="s3-butterfly-name">פרפר הויסרוי</div>
+        <span class="s3-butterfly-tag tag-fake">✨ מתחזה</span>
+        <p class="s3-butterfly-text">לא רעיל בכלל — אבל נראה כמעט זהה למונרך. הטורפים לא מסתכנים. <strong>הויסרוי נהנה מהמוניטין של שכנו</strong> — בלי לשלם את המחיר.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="s3-insight">
+    <p>שלושת הדוגמאות האלו — הסוואה, הסוואה דינמית, וחיקוי — הן כולן תגובות ל<strong>אותו לחץ אבולוציוני</strong>: טורפים שרואים היטב. כל אסטרטגיה שונה, אבל כולן נוצרו מאותו מנגנון — ברירה טבעית לאורך מיליוני דורות.</p>
+  </div>
+</div>`,
+      `<div class="s4">
+  <h2 class="s4-title">שיתוף פעולה</h2>
+  <p class="s4-sub">לא כל co-evolution הוא מלחמה. לפעמים שני הצדדים מרוויחים — ואז התלות ביניהם הופכת כל כך עמוקה שאף אחד לא יכול לשרוד בלי השני.</p>
+
+  <div class="s4-card">
+    <img class="s4-img" src="https://upload.wikimedia.org/wikipedia/commons/3/34/Bee_Orchid_(Ophrys_apifera)_(17490084764).jpg" alt="סחלב הדבורה" />
+    <div class="s4-body">
+      <span class="s4-mutual-badge">🌸 צמח ↔ חרק</span>
+      <div class="s4-card-title">🐝 סחלב הדבורה — ההונאה המושלמת</div>
+      <p class="s4-card-text">סחלב הדבורה פיתח עלי כותרת שנראים, מריחים, ואפילו מרגישים בדיוק כמו דבורה נקבה. הדבורה הזכר מנסה להזדווג עם הפרח — ובתהליך מפזר את האבקה לפרח הבא. <strong>הסחלב לא מייצר צוף בכלל</strong> — זו הונאה מושלמת שהתפתחה לאורך מיליוני שנים.</p>
+    </div>
+  </div>
+
+  <div class="s4-card">
+    <img class="s4-img" src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Blastophaga_psenes_female_displaying_the_unique_habitus_of_agaonid_wasps_-_Oo_1055603.jpg" alt="צרעת תאנה" style="object-position: center 30%;" />
+    <div class="s4-body">
+      <span class="s4-mutual-badge">🌿 צמח ↔ חרק</span>
+      <div class="s4-card-title">🫐 תאנה וצרעת-התאנה — 80 מיליון שנה של שותפות</div>
+      <p class="s4-card-text">כל תאנה בעולם — כולל זו שאתם אוכלים — מואבקת על ידי <strong>צרעה זעירה שחיה כל חייה בתוך התאנה</strong>. הצרעה נכנסת, מניחה ביצים, ומאביקה בדרך. בלי הצרעה — אין תאנים. בלי תאנים — אין צרעות. שני המינים התפתחו יחד במשך 80 מיליון שנה.</p>
+    </div>
+  </div>
+
+  <div class="s4-card">
+    <img class="s4-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Red_Apple.jpg/1280px-Red_Apple.jpg" alt="פירות ועצים" />
+    <div class="s4-body">
+      <span class="s4-mutual-badge">🌳 צמח ↔ ציפור</span>
+      <div class="s4-card-title">🍎 פירות וציפורים — כשהאוכל הוא כרטיס נסיעה</div>
+      <p class="s4-card-text">פירות אדומים, גדולים ומתוקים לא התפתחו בשבילנו — הם התפתחו בשביל ציפורים. הצמח "מתגמל" את הציפור בארוחה תמורת פיזור הזרעים רחוק. <strong>שני הצדדים הסתגלו זה לזה</strong>: הציפורים לצבע ולטעם, הצמחים לגודל ולצבע שמושך ציפורים דווקא.</p>
+    </div>
+  </div>
+
+  <div class="s4-summary">
+    <p>שלושת הדוגמאות מראות שמירוץ החימוש לא חייב להסתיים בניצחון של אחד הצדדים — לפעמים <strong>שיתוף פעולה עמוק הוא הפתרון האבולוציוני הטוב ביותר</strong>. ככל שהתלות הדדית עמוקה יותר, כך שני המינים מתפתחים יחד — כמו שני שותפים שלא יכולים בלי אחד השני.</p>
+  </div>
+</div>`,
+      `<div class="s5">
+  <h2 class="s5-title">בוחן מסכם</h2>
+  <div id="s5Content"></div>
+</div>`,
+    ];
+
+    let current = 0;
+
+    function buildProgressBar() {
+      const container = document.getElementById('progressSteps');
+      container.innerHTML = '';
+      STAGES.forEach((stage, i) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'step-wrap';
+        const step = document.createElement('div');
+        step.className = 'step' +
+          (i === current ? ' active' : '') +
+          (i < current  ? ' done'   : '');
+        step.innerHTML = `
+          <div class="step-dot">${i < current ? '✓' : i + 1}</div>
+          <div class="step-label">${stage.label}</div>
+        `;
+        step.addEventListener('click', () => { current = i; renderStage(); });
+        wrap.appendChild(step);
+        if (i < STAGES.length - 1) {
+          const line = document.createElement('div');
+          line.className = 'step-line' + (i < current ? ' done' : '');
+          wrap.appendChild(line);
+        }
+        container.appendChild(wrap);
+      });
+    }
+
+    function renderStage() {
+      document.getElementById('stageContent').innerHTML = STAGE_HTML[current];
+      document.getElementById('btnPrev').disabled = current === 0;
+      document.getElementById('btnNext').textContent =
+        current === STAGES.length - 1 ? 'סיום' : 'הבא';
+      buildProgressBar();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (current === 2) setTimeout(s3InitStage, 0);
+      if (current === 4) setTimeout(s5Init, 0);
+    }
+
+    function s3InitStage() {
+      const overlay = document.getElementById('s3Overlay');
+      if (overlay) overlay.classList.remove('hidden');
+      const label = document.getElementById('s3RevealedLabel');
+      if (label) label.innerHTML = '';
+    }
+
+    function startLearning() {
+      document.getElementById('hero').style.display = 'none';
+      document.getElementById('stageView').classList.add('active');
+      renderStage();
+    }
+
+    function nextStage() {
+      if (current < STAGES.length - 1) { current++; renderStage(); }
+    }
+
+    function prevStage() {
+      if (current > 0) { current--; renderStage(); }
+    }
+
+    // ── Stage 5: Quiz ─────────────────────────────────
+    const S5_QUESTIONS = [
+      {
+        q: 'מה זה מירוץ חימוש אבולוציוני?',
+        answers: [
+          'תהליך שבו שני מינים מתפתחים זה בתגובה לזה, ללא הפסקה',
+          'תחרות ספורט בין בעלי חיים',
+          'מצב שבו מין אחד תמיד מנצח',
+          'שינוי גנטי שקורה בתוך פרט אחד'
+        ],
+        correct: 0,
+        explanation: 'מירוץ חימוש אבולוציוני הוא מחזור אינסופי — כל שיפור של מין אחד יוצר לחץ על השני להשתפר גם הוא, ואף אחד לא מנצח ניצחון מוחלט.'
+      },
+      {
+        q: 'כמה אחוז מהציידות של הצ\'יטה מצליחות?',
+        answers: [
+          'כ-50%',
+          'כ-90%',
+          'כ-10%',
+          'כ-75%'
+        ],
+        correct: 0,
+        explanation: 'הצ\'יטה מצליחה לצוד רק בכ-50% מהניסיונות — כי האיילות התפתחו להיות מהירות ומתחמקות לא פחות ממנה.'
+      },
+      {
+        q: 'מה פיתח נחש הגרטר בתגובה לרעל של הצפרדע?',
+        answers: [
+          'עמידות גנטית לרעל',
+          'עור עבה יותר',
+          'מהירות תגובה גבוהה יותר',
+          'יכולת לזהות את הצפרדע מרחוק'
+        ],
+        correct: 0,
+        explanation: 'נחש הגרטר פיתח מוטציה גנטית שמאפשרת לו לסבול את הרעל. זהו מירוץ חימוש כימי — הצפרדעים מייצרות רעל חזק יותר, והנחשים נעשים עמידים יותר.'
+      },
+      {
+        q: 'פרפר הויסרוי נראה כמו פרפר המונרך. למה זה עוזר לו?',
+        answers: [
+          'טורפים לא ניגשים אליו כי הם חושבים שהוא רעיל',
+          'הוא נעשה רעיל בעצמו',
+          'הוא מתחבר לעדרי מונרך להגנה',
+          'הוא טועה ומזדווג עם מונרכים'
+        ],
+        correct: 0,
+        explanation: 'הויסרוי לא רעיל בכלל — אבל הטורפים שלמדו להימנע מהמונרך הרעיל נמנעים גם ממנו. זה נקרא חיקוי בייטסי.'
+      },
+      {
+        q: 'מה מיוחד בשיתוף הפעולה בין התאנה לצרעת-התאנה?',
+        answers: [
+          'אף אחד מהם לא יכול לשרוד בלי השני',
+          'רק התאנה תלויה בצרעה',
+          'רק הצרעה תלויה בתאנה',
+          'הם מתחרים על אותו מזון'
+        ],
+        correct: 0,
+        explanation: 'זו תלות הדדית מוחלטת: בלי הצרעה אין האבקה ואין תאנים, ובלי התאנה אין לצרעה מקום להטיל ביצים. 80 מיליון שנה של שותפות.'
+      }
+    ];
+
+    let s5Current = 0, s5Score = 0, s5Answered = false;
+
+    function s5Init() {
+      s5Current = 0; s5Score = 0; s5Answered = false;
+      s5ShowQuestion();
+    }
+
+    function s5ShowQuestion() {
+      const el = document.getElementById('s5Content');
+      if (!el) return;
+      s5Answered = false;
+      const q = S5_QUESTIONS[s5Current];
+      const pct = (s5Current / S5_QUESTIONS.length) * 100;
+      const indices = [0,1,2,3];
+      for (let i = 3; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = indices[i]; indices[i] = indices[j]; indices[j] = tmp;
+      }
+      const shuffled = indices.map(i => q.answers[i]);
+      const newCorrect = indices.indexOf(q.correct);
+      let answersHTML = '';
+      shuffled.forEach((ans, i) => {
+        answersHTML += '<button class="s5-answer-btn" onclick="s5Answer(this,' + i + ',' + newCorrect + ')">' + ans + '</button>';
+      });
+      const isLast = s5Current === S5_QUESTIONS.length - 1;
+      el.innerHTML =
+        '<div class="s5-progress-wrap">' +
+        '<div class="s5-progress-info"><span>שאלה ' + (s5Current+1) + ' מתוך ' + S5_QUESTIONS.length + '</span><span>' + s5Score + ' נכון עד כה</span></div>' +
+        '<div class="s5-progress-bar"><div class="s5-progress-fill" style="width:' + pct + '%"></div></div>' +
+        '</div>' +
+        '<div class="s5-question-card">' +
+        '<div class="s5-question-text">' + q.q + '</div>' +
+        '<div class="s5-answers">' + answersHTML + '</div>' +
+        '<div class="s5-explanation hidden" id="s5Explanation"></div>' +
+        '</div>' +
+        '<div class="s5-next-wrap hidden" id="s5NextWrap">' +
+        '<button class="btn-action" onclick="s5Next()">' + (isLast ? 'לתוצאות &#x1F3C6;' : 'השאלה הבאה &#x2190;') + '</button>' +
+        '</div>';
+    }
+
+    function s5Answer(btn, chosen, correct) {
+      if (s5Answered) return;
+      s5Answered = true;
+      const allBtns = document.querySelectorAll('.s5-answer-btn');
+      allBtns.forEach(b => b.disabled = true);
+      if (chosen === correct) { btn.classList.add('correct'); s5Score++; }
+      else { btn.classList.add('wrong'); allBtns[correct].classList.add('correct'); }
+      const expEl = document.getElementById('s5Explanation');
+      if (expEl) {
+        expEl.innerHTML = (chosen === correct ? '✓ נכון! ' : '✗ לא בדיוק. ') + S5_QUESTIONS[s5Current].explanation;
+        expEl.classList.remove('hidden');
+      }
+      const nw = document.getElementById('s5NextWrap');
+      if (nw) nw.classList.remove('hidden');
+    }
+
+    function s5Next() {
+      s5Current++;
+      if (s5Current >= S5_QUESTIONS.length) s5ShowScore();
+      else s5ShowQuestion();
+    }
+
+    function s5ShowScore() {
+      const el = document.getElementById('s5Content');
+      if (!el) return;
+      const total = S5_QUESTIONS.length;
+      let icon, message;
+      if (s5Score === total)  { icon = '🏆'; message = 'מושלם! אתם מומחי מירוץ החימוש'; }
+      else if (s5Score >= 3)  { icon = '🎯'; message = 'כל הכבוד! הבנתם את העיקר'; }
+      else if (s5Score >= 2)  { icon = '📚'; message = 'לא רע! כדאי לחזור על השלבים ולנסות שוב'; }
+      else                    { icon = '💪'; message = 'תחזרו ותנסו שוב — אתם יכולים!'; }
+      el.innerHTML =
+        '<div class="s5-score">' +
+        '<span class="s5-score-icon">' + icon + '</span>' +
+        '<div class="s5-score-number">' + s5Score + ' / ' + total + '</div>' +
+        '<div class="s5-score-label">תשובות נכונות</div>' +
+        '<div class="s5-score-message">' + message + '</div>' +
+        '<div class="s5-submit-box">' +
+        '<p class="s5-submit-label">שלחו את התוצאות למורה:</p>' +
+        '<input class="s5-name-input" id="s5NameInput" type="text" placeholder="שם מלא" />' +
+        '<input class="s5-name-input" id="s5ClassInput" type="text" placeholder="כיתה (למשל: ח2)" />' +
+        '<button class="s5-submit-btn" onclick="s5Submit(' + s5Score + ',' + total + ')">שלח תוצאות &#x1F4E8;</button>' +
+        '</div>' +
+        '<button class="btn-action" onclick="s5Init()">נסו שוב &#x1F504;</button>' +
+        '<div class="video-section">' +
+        '<div class="video-title">🎥 רוצים לדעת עוד?</div>' +
+        '<p class="video-sub">סרטון קצר ומומלץ להעשרה</p>' +
+        '<div class="video-wrap"><iframe src="https://www.youtube.com/embed/_zGy_tr_tY4?si=OI3-4GtgtJyz5-CA" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>' +
+        '</div>' +
+        '</div>';
+    }
+
+    function s5Submit(score, total) {
+      const nameInput  = document.getElementById('s5NameInput');
+      const classInput = document.getElementById('s5ClassInput');
+      const name  = nameInput  ? nameInput.value.trim()  : '';
+      const klass = classInput ? classInput.value.trim() : '';
+      if (!name)  { nameInput.style.borderColor  = '#ef4444'; nameInput.placeholder  = 'נא להכניס שם לפני השליחה'; return; }
+      if (!klass) { classInput.style.borderColor = '#ef4444'; classInput.placeholder = 'נא להכניס כיתה לפני השליחה'; return; }
+      const url = 'https://docs.google.com/forms/d/e/1FAIpQLSdZVKzP4GJxItJuK0EqYZruCPFytjOkRDj9ayHrcIscCAhjUw/viewform?usp=pp_url' +
+        '&entry.1662845623=' + encodeURIComponent(name) +
+        '&entry.1846907217=' + encodeURIComponent(klass) +
+        '&entry.1990643179=' + encodeURIComponent(score + '/' + total);
+      window.open(url, '_blank');
+      const btn = document.querySelector('.s5-submit-btn');
+      if (btn) { btn.textContent = 'נשלח! ✓'; btn.disabled = true; }
+    }
+
+    function s3Reveal() {
+      const overlay = document.getElementById('s3Overlay');
+      if (overlay) overlay.classList.add('hidden');
+      const label = document.getElementById('s3RevealedLabel');
+      if (label) {
+        label.innerHTML = '<div class="s3-revealed-label">👆 הנה הוא! מוסווה לחלוטין בין הענפים</div>';
+      }
+    }
+
+    function s1Vote(btn) {
+      document.querySelectorAll('.vote-btn').forEach(b => {
+        b.disabled = true;
+        b.style.opacity = '0.35';
+      });
+      btn.style.opacity = '1';
+      btn.classList.add('chosen');
+      const reveal = document.getElementById('s1Reveal');
+      reveal.classList.remove('hidden');
+      setTimeout(() => reveal.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+    }
+  </script>
+
+</body>
+</html>

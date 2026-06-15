@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>אבולוציה אנושית</title>
+  <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #0d1117;
+      --surface:    #161b27;
+      --surface-2:  #1e2535;
+      --border:     #2a3145;
+      --text:       #e2e8f0;
+      --text-muted: #8896aa;
+      --accent:     #60a5fa;
+      --accent-dim: #1e3a5f;
+    }
+
+    body {
+      font-family: 'Alef', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      direction: rtl;
+    }
+
+    .hidden { display: none !important; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── HERO ─────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 2rem;
+      background: radial-gradient(ellipse at 50% 40%, #0d1a2e 0%, var(--bg) 70%);
+    }
+
+    .hero-icon {
+      font-size: 5rem; margin-bottom: 1.5rem;
+      animation: float 3.5s ease-in-out infinite; display: block;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-12px); }
+    }
+
+    .hero h1 { font-size: 3rem; font-weight: 700; color: var(--accent); margin-bottom: 0.6rem; }
+
+    .hero h2 {
+      font-size: 1.15rem; color: var(--text-muted); font-weight: 400;
+      max-width: 480px; line-height: 1.7; margin-bottom: 2rem;
+    }
+
+    .hero-notice {
+      max-width: 560px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 1.4rem 1.8rem; margin: 0 0 2rem;
+      text-align: right; line-height: 1.9;
+      font-size: 0.95rem; color: var(--text-muted);
+    }
+
+    .hero-notice strong { color: var(--text); }
+
+    .btn-start {
+      background: var(--accent); color: #0d1117;
+      border: none; padding: 0.9rem 2.8rem;
+      font-size: 1.2rem; font-family: 'Alef', sans-serif;
+      font-weight: 700; border-radius: 50px; cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 32px rgba(96, 165, 250, 0.25);
+    }
+
+    .btn-start:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 48px rgba(96, 165, 250, 0.45);
+    }
+
+    /* ── STAGE VIEW ───────────────────────────────────── */
+    .stage-view { display: none; }
+    .stage-view.active { display: block; }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg); border-bottom: 1px solid var(--border);
+      padding: 0.8rem 1rem;
+    }
+
+    .progress-steps {
+      display: flex; align-items: center;
+      justify-content: center; gap: 0;
+      flex-wrap: nowrap; overflow-x: auto;
+    }
+
+    .step-wrap { display: flex; align-items: center; }
+
+    .step {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0.35rem; cursor: pointer;
+    }
+
+    .step:hover .step-dot { border-color: var(--accent); transform: scale(1.1); }
+
+    .step-dot {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--surface-2); border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 700; color: var(--text-muted);
+      transition: all 0.3s;
+    }
+
+    .step.active .step-dot {
+      background: var(--accent); border-color: var(--accent); color: #0d1117;
+      box-shadow: 0 0 16px rgba(96, 165, 250, 0.4);
+    }
+
+    .step.done .step-dot { background: var(--accent-dim); border-color: var(--accent-dim); color: #bfdbfe; }
+
+    .step-label { font-size: 0.68rem; color: var(--text-muted); white-space: nowrap; }
+    .step.active .step-label { color: var(--accent); font-weight: 700; }
+
+    .step-line {
+      width: 28px; height: 2px;
+      background: var(--border); margin-bottom: 1.1rem; flex-shrink: 0;
+    }
+
+    .step-line.done { background: var(--accent-dim); }
+
+    .stage-content {
+      max-width: 680px; margin: 0 auto; padding: 2rem 1.2rem 1rem;
+    }
+
+    .stage-nav {
+      max-width: 680px; margin: 0 auto;
+      padding: 1rem 1.2rem 2.5rem;
+      display: flex; justify-content: space-between; gap: 1rem;
+    }
+
+    .btn-nav {
+      padding: 0.65rem 1.6rem; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--text); font-family: 'Alef', sans-serif;
+      font-size: 0.95rem; cursor: pointer; transition: background 0.2s;
+    }
+
+    .btn-nav:hover:not(:disabled) { background: var(--surface-2); }
+    .btn-nav:disabled { opacity: 0.35; cursor: default; }
+
+    .btn-nav.primary {
+      background: var(--accent); color: #0d1117;
+      border-color: var(--accent); font-weight: 700;
+    }
+
+    .btn-nav.primary:hover { opacity: 0.88; }
+
+    .btn-action {
+      display: inline-block; background: var(--accent); color: #0d1117;
+      border: none; padding: 0.75rem 2rem; font-size: 1rem;
+      font-family: 'Alef', sans-serif; font-weight: 700;
+      border-radius: 10px; cursor: pointer; transition: opacity 0.2s;
+      margin-top: 1rem;
+    }
+
+    .btn-action:hover { opacity: 0.88; }
+
+    /* ── STAGE 1: מבוא ────────────────────────────────── */
+    .s1-pretitle {
+      font-size: 0.9rem; color: var(--accent);
+      font-weight: 700; letter-spacing: 0.5px; margin-bottom: 0.5rem;
+    }
+
+    .s1-title {
+      font-size: 2rem; font-weight: 700; color: var(--text);
+      margin-bottom: 0.6rem; line-height: 1.3;
+    }
+
+    .s1-sub { font-size: 1rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+    .vote-btns { display: flex; flex-direction: column; gap: 0.7rem; margin-bottom: 1.5rem; }
+
+    .vote-btn {
+      width: 100%; background: var(--surface);
+      border: 2px solid var(--border); border-radius: 10px;
+      padding: 0.9rem 1.2rem; font-family: 'Alef', sans-serif;
+      font-size: 1rem; color: var(--text); cursor: pointer;
+      text-align: right; direction: rtl;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .vote-btn:hover:not(:disabled) { border-color: var(--accent); background: var(--surface-2); }
+    .vote-btn.chosen { border-color: var(--accent); background: #0d1a2e; color: var(--accent); }
+
+    .s1-reveal { animation: fadeInUp 0.5s ease; }
+
+    .reveal-tag {
+      display: inline-block; background: var(--accent-dim); color: var(--accent);
+      font-size: 0.78rem; font-weight: 700;
+      padding: 0.3rem 0.8rem; border-radius: 20px; margin-bottom: 0.8rem;
+    }
+
+    .s1-reveal h3 {
+      font-size: 1.4rem; font-weight: 700; color: var(--text);
+      margin-bottom: 1.2rem; line-height: 1.4;
+    }
+
+    .s1-chimp-img {
+      width: 100%; max-height: 320px;
+      object-fit: cover; object-position: center top;
+      border-radius: 12px; display: block; margin-bottom: 1.5rem;
+    }
+
+    .dna-compare {
+      display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;
+    }
+
+    .dna-card {
+      flex: 1; min-width: 140px;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.2rem; text-align: center;
+    }
+
+    .dna-pct {
+      font-size: 2rem; font-weight: 700; color: var(--accent); display: block;
+    }
+
+    .dna-label { font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; margin-top: 0.3rem; }
+
+    .s1-explain {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.8rem; margin-bottom: 1.5rem;
+    }
+
+    .s1-explain p {
+      font-size: 1rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 0.8rem;
+    }
+
+    .s1-explain p:last-child { margin-bottom: 0; }
+    .s1-explain strong { color: var(--text); }
+
+    .s1-teaser {
+      text-align: center; padding: 1.2rem; color: var(--text-muted);
+      font-size: 1rem; line-height: 1.7; font-style: italic;
+    }
+
+    /* ── STAGE 2: עץ המשפחה ──────────────────────────── */
+    .anc-row {
+      display: flex; align-items: flex-start;
+      gap: 0; margin: 1.5rem 0 0; overflow-x: auto;
+      padding-bottom: 0.5rem;
+    }
+
+    .anc-wrap { display: flex; align-items: center; }
+
+    .anc-node {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 0.4rem; cursor: pointer; padding: 0.9rem 0.8rem;
+      background: var(--surface); border: 2px solid var(--border);
+      border-radius: 14px; min-width: 120px; text-align: center;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s;
+      flex-shrink: 0;
+    }
+
+    .anc-node:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .anc-node.active { border-color: var(--accent); background: #0d1a2e; }
+
+    .anc-emoji { font-size: 2rem; }
+
+    .anc-name {
+      font-size: 0.85rem; font-weight: 700; color: var(--text); line-height: 1.3;
+    }
+
+    .anc-period { font-size: 0.72rem; color: var(--text-muted); line-height: 1.4; margin-top: 0.1rem; }
+
+    .anc-line {
+      height: 2px; flex: 1; min-width: 16px;
+      background: var(--border); margin-bottom: 1.8rem; flex-shrink: 0;
+    }
+
+    .anc-detail {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.5rem; margin-top: 1.2rem;
+      animation: fadeInUp 0.4s ease;
+    }
+
+    .anc-detail-header { margin-bottom: 1.2rem; }
+
+    .anc-detail-name {
+      font-size: 1.4rem; font-weight: 700; color: var(--accent); margin-bottom: 0.2rem;
+    }
+
+    .anc-detail-latin { font-size: 0.85rem; color: var(--text-muted); font-style: italic; }
+
+    .anc-detail-photo {
+      width: 100%; max-height: 240px;
+      object-fit: contain; object-position: center;
+      background: #0a0e14; border-radius: 10px;
+      display: block; margin-bottom: 1.2rem;
+    }
+
+    .anc-stats {
+      display: flex; gap: 0.7rem; flex-wrap: wrap; margin-bottom: 1.2rem;
+    }
+
+    .anc-stat {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.5rem 0.9rem;
+      font-size: 0.82rem; color: var(--text-muted); line-height: 1.4;
+    }
+
+    .anc-stat strong { color: var(--text); display: block; font-size: 0.78rem; margin-bottom: 0.1rem; }
+
+    .anc-badge {
+      display: inline-block; background: var(--accent-dim); color: var(--accent);
+      font-size: 0.8rem; font-weight: 700;
+      padding: 0.3rem 0.9rem; border-radius: 20px; margin-bottom: 1rem;
+    }
+
+    .anc-facts { list-style: none; margin: 0; padding: 0; }
+
+    .anc-facts li {
+      font-size: 0.95rem; color: var(--text-muted); line-height: 1.7;
+      padding: 0.45rem 0; border-bottom: 1px solid var(--border);
+      display: flex; gap: 0.7rem; align-items: flex-start;
+    }
+
+    .anc-facts li:last-child { border-bottom: none; }
+
+    .anc-facts li::before {
+      content: '›'; color: var(--accent); font-weight: 700; flex-shrink: 0; margin-top: 0.05rem;
+    }
+
+    .anc-facts li.lucy-fact { cursor: pointer; flex-direction: column; gap: 0; }
+    .anc-facts li.lucy-fact::before { display: none; }
+    .anc-facts li.lucy-fact .lucy-row {
+      display: flex; gap: 0.7rem; align-items: flex-start; width: 100%;
+    }
+    .anc-facts li.lucy-fact .lucy-row::before {
+      content: '›'; color: var(--accent); font-weight: 700; flex-shrink: 0; margin-top: 0.05rem;
+    }
+    .anc-facts li.lucy-fact:hover .lucy-label { color: var(--accent); }
+    .lucy-toggle-hint {
+      font-size: 0.78rem; color: var(--accent); opacity: 0.7;
+      margin-right: 0.3rem;
+    }
+    .lucy-expand {
+      display: none; margin-top: 0.8rem; padding: 1rem;
+      background: var(--surface-2); border-radius: 10px;
+      animation: fadeInUp 0.3s ease;
+    }
+    .lucy-expand.open { display: block; }
+    .lucy-expand p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 0.9rem; }
+    .lucy-imgs { display: flex; gap: 0.8rem; }
+    .lucy-img-wrap { flex: 1; text-align: center; }
+    .lucy-img-wrap img { width: 100%; border-radius: 8px; object-fit: cover; max-height: 180px; }
+    .lucy-img-wrap:last-child img { object-position: center 0%; }
+    .lucy-img-wrap span { font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.3rem; }
+
+    .anc-hint {
+      text-align: center; padding: 2rem 1rem;
+      color: var(--text-muted); font-size: 0.95rem; font-style: italic;
+    }
+
+    /* ── STAGE 3: מה הפך אותנו לאנושיים? ────────────── */
+    .s3-intro-img {
+      width: 100%; max-height: 220px;
+      object-fit: cover; object-position: center;
+      border-radius: 12px; display: block; margin-bottom: 1.5rem;
+    }
+
+    .s3-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 1rem; margin: 1.2rem 0;
+    }
+
+    .s3-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.4rem 1.3rem;
+    }
+
+    .s3-card-icon { font-size: 2.4rem; display: block; margin-bottom: 0.6rem; }
+
+    .s3-card-title {
+      font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 0.6rem;
+    }
+
+    .s3-card-text {
+      font-size: 0.9rem; color: var(--text-muted); line-height: 1.75;
+    }
+
+    .s3-card-fact {
+      margin-top: 0.8rem; padding: 0.55rem 0.8rem;
+      background: var(--accent-dim); border-radius: 8px;
+      font-size: 0.82rem; color: var(--accent); font-weight: 700;
+    }
+
+    .s3-closing {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.5rem 1.4rem; margin-top: 1.2rem;
+      text-align: center;
+    }
+
+    .s3-closing p {
+      font-size: 1rem; color: var(--text-muted); line-height: 1.8;
+    }
+
+    .s3-closing strong { color: var(--text); }
+
+    /* ── STAGE 4: ניאנדרתלים ─────────────────────────── */
+    .s4-hero-img {
+      width: 50%; display: block; margin: 0 auto 1.5rem;
+      border-radius: 14px;
+    }
+
+    .s4-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 1rem; margin-bottom: 1.2rem;
+    }
+
+    .s4-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.3rem;
+    }
+
+    .s4-card-icon { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+
+    .s4-card-title {
+      font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem;
+    }
+
+    .s4-card-text {
+      font-size: 0.9rem; color: var(--text-muted); line-height: 1.75;
+    }
+
+    .s4-dna {
+      background: var(--surface); border: 2px solid var(--accent-dim);
+      border-radius: 16px; padding: 1.5rem 1.4rem;
+      text-align: center; margin-bottom: 0.5rem;
+    }
+
+    .s4-dna-label {
+      font-size: 0.85rem; color: var(--accent); font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem;
+    }
+
+    .s4-dna-pct {
+      font-size: 3.5rem; font-weight: 700; color: var(--text);
+      line-height: 1.1; display: block; margin-bottom: 0.3rem;
+    }
+
+    .s4-dna-sub {
+      font-size: 1rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.6;
+    }
+
+    .s4-dna-explain {
+      font-size: 0.88rem; color: var(--text-muted); line-height: 1.75;
+      background: var(--surface-2); border-radius: 10px; padding: 1rem;
+      text-align: right;
+    }
+
+    .s4-dna-explain strong { color: var(--text); }
+
+    /* ── STAGE 5: בוחן ────────────────────────────────── */
+    .s5-pretitle { font-size: 0.9rem; color: var(--accent); font-weight: 700; margin-bottom: 0.4rem; }
+    .s5-title { font-size: 2rem; font-weight: 700; color: var(--text); margin-bottom: 1.5rem; }
+
+    .s5-progress-wrap { margin-bottom: 1.8rem; }
+    .s5-progress-info { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+    .s5-progress-bar { height: 6px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+    .s5-progress-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.4s ease; }
+
+    .s5-question-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.8rem; margin-bottom: 1rem;
+      animation: fadeInUp 0.35s ease;
+    }
+    .s5-question-text { font-size: 1.15rem; font-weight: 700; color: var(--text); line-height: 1.6; margin-bottom: 1.5rem; }
+    .s5-answers { display: flex; flex-direction: column; gap: 0.7rem; }
+    .s5-answer-btn {
+      width: 100%; background: var(--surface-2);
+      border: 2px solid var(--border); border-radius: 10px;
+      padding: 0.9rem 1.2rem; font-family: 'Alef', sans-serif;
+      font-size: 0.95rem; color: var(--text); cursor: pointer;
+      text-align: right; direction: rtl;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .s5-answer-btn:hover:not(:disabled) { border-color: var(--accent); }
+    .s5-answer-btn.correct { border-color: #4ade80; background: #052e16; color: #4ade80; }
+    .s5-answer-btn.wrong   { border-color: #f87171; background: #2d0f0f; color: #f87171; }
+    .s5-answer-btn:disabled { cursor: default; }
+
+    .s5-explanation { border-radius: 10px; padding: 0.8rem 1rem; margin-top: 1rem; font-size: 0.9rem; font-weight: 700; }
+    .s5-explanation.ok { color: #4ade80; }
+    .s5-explanation.no { color: #f87171; }
+
+    .s5-next-wrap { text-align: center; margin-top: 1rem; animation: fadeInUp 0.3s ease; }
+    .s5-next-btn {
+      background: var(--accent); color: #0d1117;
+      border: none; padding: 0.85rem 2.4rem;
+      font-size: 1rem; font-family: 'Alef', sans-serif;
+      font-weight: 700; border-radius: 50px; cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .s5-next-btn:hover { opacity: 0.88; }
+
+    .s5-score { text-align: center; animation: fadeInUp 0.5s ease; padding: 1rem 0; }
+    .s5-score-emoji { font-size: 4rem; margin-bottom: 1rem; display: block; }
+    .s5-score-num { font-size: 3.5rem; font-weight: 700; color: var(--accent); line-height: 1; margin-bottom: 0.4rem; }
+    .s5-score-label { font-size: 1rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+    .s5-name-form {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.4rem; text-align: right; margin-bottom: 1rem;
+    }
+    .s5-name-form label { display: block; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.4rem; font-weight: 700; }
+    .s5-name-form input {
+      width: 100%; background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.65rem 0.9rem;
+      font-family: 'Alef', sans-serif; font-size: 1rem; color: var(--text);
+      direction: rtl; margin-bottom: 0.9rem;
+    }
+    .s5-name-form input:focus { outline: none; border-color: var(--accent); }
+    .s5-send {
+      width: 100%; background: var(--accent); color: #0d1117;
+      border: none; padding: 0.8rem; font-size: 1rem;
+      font-family: 'Alef', sans-serif; font-weight: 700;
+      border-radius: 10px; cursor: pointer; transition: opacity 0.2s;
+    }
+    .s5-send:hover { opacity: 0.88; }
+    .s5-sent { background: #052e16; border: 1px solid #4ade80; border-radius: 10px; padding: 1rem; color: #4ade80; font-size: 0.95rem; text-align: center; }
+
+    .video-section { margin-top: 2rem; text-align: center; }
+    .video-title { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 0.3rem; }
+    .video-sub { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem; }
+    .video-note { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.8rem; font-style: italic; }
+    .video-wrap { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; }
+    .video-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; border-radius: 10px; }
+    .video-link-btn {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      background: #ff0000; color: #fff;
+      border: none; border-radius: 10px;
+      padding: 0.8rem 1.6rem; font-size: 1rem;
+      font-family: 'Alef', sans-serif; font-weight: 700;
+      cursor: pointer; text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .video-link-btn:hover { opacity: 0.88; }
+
+    /* ── BACK LINK ─────────────────────────────────────── */
+    .back-link {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.85rem; color: var(--text-muted);
+      text-decoration: none; padding: 0.5rem 0; margin-bottom: 1rem;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+  <!-- ── HERO SCREEN ── -->
+  <div class="hero" id="hero">
+    <span class="hero-icon">🦴</span>
+    <h1>אבולוציה אנושית</h1>
+    <h2>מאיפה הגענו? המסע של המין האנושי — מהאב הקדמון הראשון ועד היום</h2>
+    <button class="btn-start" onclick="startLearning()">בואו נתחיל</button>
+  </div>
+
+  <!-- ── STAGE VIEW ── -->
+  <div class="stage-view" id="stageView">
+    <div class="topbar">
+      <div class="progress-steps" id="progressSteps"></div>
+    </div>
+    <div class="stage-content" id="stageContent"></div>
+    <div class="stage-nav">
+      <button class="btn-nav" id="btnPrev" onclick="prevStage()">הקודם</button>
+      <button class="btn-nav primary" id="btnNext" onclick="nextStage()">הבא</button>
+    </div>
+  </div>
+
+  <script>
+    const STAGES = [
+      { label: 'מבוא' },
+      { label: 'עץ המשפחה' },
+      { label: 'מה הפך אותנו לאנושיים?' },
+      { label: 'ניאנדרתלים' },
+      { label: 'בוחן' },
+    ];
+
+    const STAGE_HTML = [
+      `<div class="s1">
+  <a class="back-link" href="index.html">→ חזרה לדף הבית</a>
+  <p class="s1-pretitle">לפני שמתחילים —</p>
+  <h2 class="s1-title">מה ההבדל בינינו לבין שימפנזה?</h2>
+  <p class="s1-sub">חישבו ובחרו:</p>
+
+  <div class="vote-btns">
+    <button class="vote-btn" onclick="s1Vote(this)">הכל — אנחנו לגמרי שונים 🧍</button>
+    <button class="vote-btn" onclick="s1Vote(this)">הרבה — אנחנו הרבה יותר מפותחים 🧠</button>
+    <button class="vote-btn" onclick="s1Vote(this)">פחות ממה שחושבים 🐒</button>
+  </div>
+
+  <div class="s1-reveal hidden" id="s1Reveal">
+    <span class="reveal-tag">התשובה המפתיעה:</span>
+    <h3>רק 1.2% DNA מפרידים בינינו לבין השימפנזה</h3>
+
+    <img class="s1-chimp-img"
+      src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Schimpanse,_Pan_troglodytes_3.JPG/800px-Schimpanse,_Pan_troglodytes_3.JPG"
+      alt="שימפנזה" />
+
+    <div class="dna-compare">
+      <div class="dna-card">
+        <span class="dna-pct">98.8%</span>
+        <div class="dna-label">DNA משותף עם שימפנזה</div>
+      </div>
+      <div class="dna-card">
+        <span class="dna-pct">85%</span>
+        <div class="dna-label">DNA משותף עם עכבר</div>
+      </div>
+      <div class="dna-card">
+        <span class="dna-pct">60%</span>
+        <div class="dna-label">DNA משותף עם בננה</div>
+      </div>
+    </div>
+
+    <div class="s1-explain">
+      <p>אבל חשוב להבין: <strong>אנחנו לא "מגיעים מקוף"</strong>. לא השימפנזה הפכה לאדם.</p>
+      <p>אנחנו ושימפנזה חולקים <strong>אב קדמון משותף</strong> שחי לפני כ-6 מיליון שנה — ומאז כל אחד מאיתנו הלך בדרכו שלו. השימפנזה התפתחה לכיוון אחד, ואנחנו לכיוון אחר.</p>
+      <p>זה כמו שני בני דודים שיש להם סבא משותף — אף אחד מהם לא "מגיע" מהשני.</p>
+    </div>
+
+    <p class="s1-teaser">בשלבים הבאים נעקוב אחרי הדרך שלנו — מהאב הקדמון הזה ועד לאדם המודרני.</p>
+  </div>
+</div>`,
+      `<div class="s2">
+  <p class="s1-pretitle">עץ המשפחה האנושי —</p>
+  <h2 class="s1-title">המסע מהאב הקדמון לאדם המודרני</h2>
+  <p class="s1-sub">לחצו על כל אב קדמון כדי ללמוד עליו:</p>
+
+  <div class="anc-row" id="ancRow">
+    <div class="anc-wrap">
+      <div class="anc-node" id="anc0" onclick="showAnc(0)">
+        <div class="anc-emoji">🦴</div>
+        <div class="anc-name">אוסטרלו-פיתקוס</div>
+        <div class="anc-period">4–2 מיליון שנה</div>
+      </div>
+    </div>
+    <div class="anc-line"></div>
+    <div class="anc-wrap">
+      <div class="anc-node" id="anc1" onclick="showAnc(1)">
+        <div class="anc-emoji">🪨</div>
+        <div class="anc-name">הומו הביליס</div>
+        <div class="anc-period">2.4–1.4 מיליון שנה</div>
+      </div>
+    </div>
+    <div class="anc-line"></div>
+    <div class="anc-wrap">
+      <div class="anc-node" id="anc2" onclick="showAnc(2)">
+        <div class="anc-emoji">🔥</div>
+        <div class="anc-name">הומו ארקטוס</div>
+        <div class="anc-period">1.9 מיליון–108 אלף שנה</div>
+      </div>
+    </div>
+    <div class="anc-line"></div>
+    <div class="anc-wrap">
+      <div class="anc-node" id="anc3" onclick="showAnc(3)">
+        <div class="anc-emoji">🧠</div>
+        <div class="anc-name">הומו ספיינס</div>
+        <div class="anc-period">300 אלף שנה עד היום</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="ancDetail" class="anc-hint">לחצו על אחד מהאבות הקדמונים למעלה כדי לראות פרטים ←</div>
+</div>`,
+      `<div class="s3">
+  <p class="s1-pretitle">שלב 3 —</p>
+  <h2 class="s1-title">מה הפך אותנו לאנושיים?</h2>
+  <p class="s1-sub">ארבעה דברים שאף יצור חי אחר לא עשה כמונו:</p>
+
+  <div class="s3-grid">
+
+    <div class="s3-card">
+      <span class="s3-card-icon">🗣️</span>
+      <div class="s3-card-title">שפה מורכבת</div>
+      <p class="s3-card-text">
+        בעלי חיים רבים מתקשרים — אבל רק אנחנו יכולים לספר סיפור, להסביר תוכנית, ולהעביר ידע מדור לדור.<br><br>
+        השפה אפשרה לנו לשתף פעולה עם זרים מוחלטים, לבנות ערים, ולצבור ידע מדעי על פני מאות שנים.
+      </p>
+      <div class="s3-card-fact">✦ בלי שפה — אין מדע, אין חוק, אין תרבות</div>
+    </div>
+
+    <div class="s3-card">
+      <span class="s3-card-icon">🔥</span>
+      <div class="s3-card-title">אש ובישול</div>
+      <p class="s3-card-text">
+        שליטה באש לפני כ-1.5 מיליון שנה שינתה הכל. בישול הפך מזון קשה לעיכול — לקלוריות זמינות ומהירות.<br><br>
+        התוצאה? הגוף לא היה צריך להשקיע בעיכול ארוך, ולכן המוח יכול לצמוח. בישול = מוח גדול יותר.
+      </p>
+      <div class="s3-card-fact">✦ המוח שלנו צורך 20% מהאנרגיה היומית של הגוף</div>
+    </div>
+
+    <div class="s3-card">
+      <span class="s3-card-icon">🏹</span>
+      <div class="s3-card-title">כלים מורכבים</div>
+      <p class="s3-card-text">
+        מחידוד אבן פשוטה — ועד חץ וקשת, מחט חוט, וסירת דיג. כל כלי חדש פתח אפשרויות הישרדות חדשות.<br><br>
+        היכולת לתכנן כלי שאת תוצאתו תראו רק בעוד שעה — היא ייחודית לאדם. היא מחייבת חשיבה על העתיד.
+      </p>
+      <div class="s3-card-fact">✦ כלי האבן הראשונים: לפני 3.3 מיליון שנה</div>
+    </div>
+
+    <div class="s3-card">
+      <span class="s3-card-icon">🤝</span>
+      <div class="s3-card-title">שיתוף פעולה</div>
+      <p class="s3-card-text">
+        נמלים משתפות פעולה — אבל רק בין קרובי משפחה. אנחנו משתפים פעולה עם מיליוני זרים מוחלטים, בזכות שפה ואמונות משותפות.<br><br>
+        מדינות, חברות, ספורט, מדע — כולם מבוססים על היכולת הנדירה הזו.
+      </p>
+      <div class="s3-card-fact">✦ 8 מיליארד בני אדם — מין אחד, שיתוף פעולה עולמי</div>
+    </div>
+
+  </div>
+
+  <img class="s3-intro-img"
+    src="https://upload.wikimedia.org/wikipedia/commons/f/f4/SantaCruz-CuevaManos-P2210651b.jpg"
+    alt="ציורי מערה — ידיים, ארגנטינה" />
+
+  <div class="s3-closing">
+    <p>
+      במערת <strong>קובה דה לאס מאנוס</strong> בארגנטינה, לפני כ-9,000 שנה,<br>
+      בני אדם הדביקו את ידיהם לקיר המערה ופיחפחו צבע סביבן.<br><br>
+      <strong>זו אמנות. זו תקשורת. זו אנושיות.</strong>
+    </p>
+  </div>
+</div>`,
+      `<div class="s4">
+  <p class="s1-pretitle">שלב 4 —</p>
+  <h2 class="s1-title">הניאנדרתלים: הבני דודים שנעלמו</h2>
+  <p class="s1-sub">הם לא היו פראים. הם לא היו טיפשים. אז מי הם היו?</p>
+
+  <img class="s4-hero-img"
+    src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Neanderthal_man_reconstruction%2C_Natural_History_Museum%2C_London.jpg/960px-Neanderthal_man_reconstruction%2C_Natural_History_Museum%2C_London.jpg?_=20230410142324"
+    alt="שחזור ניאנדרתל" />
+  <p style="text-align:center;font-size:0.78rem;color:var(--text-muted);margin-top:0.4rem;margin-bottom:1.5rem;">שחזור ניאנדרתל, המוזיאון לתולדות הטבע, לונדון</p>
+
+  <div class="s4-cards">
+
+    <div class="s4-card">
+      <span class="s4-card-icon">🦴</span>
+      <div class="s4-card-title">מי היו?</div>
+      <p class="s4-card-text">
+        הניאנדרתלים חיו באירופה ובמזרח התיכון לפני 400,000–40,000 שנה.
+        גופם היה חסון ועמיד לקור, מוחם היה גדול כמו שלנו — ואולי אפילו קצת יותר גדול.
+        הם ציידו ממותות ואיילים ענקיים בכלים שייצרו בעצמם.
+      </p>
+    </div>
+
+    <div class="s4-card">
+      <span class="s4-card-icon">🌸</span>
+      <div class="s4-card-title">הם לא היו פראים</div>
+      <p class="s4-card-text">
+        ניאנדרתלים <strong>קברו את מתיהם</strong> — לעיתים עם פרחים וכלים.
+        הם טיפלו בחולים ובזקנים שלא יכלו לצוד.
+        יש עדויות לכך שיצרו תכשיטים וצבעו את גופם — ניצני תרבות.
+      </p>
+    </div>
+
+    <div class="s4-card">
+      <span class="s4-card-icon">💀</span>
+      <div class="s4-card-title">למה נעלמו?</div>
+      <p class="s4-card-text">
+        לפני כ-70,000 שנה הגיע הומו ספיינס לאירופה. אחרי פחות מ-30,000 שנה של "שכנות" —
+        הניאנדרתלים נעלמו. הסיבה עדיין שנויה במחלוקת:
+        תחרות על משאבים? מחלות? שינויי אקלים? כנראה — שילוב של הכל.
+      </p>
+    </div>
+
+  </div>
+
+  <div class="s4-dna">
+    <div class="s4-dna-label">הפתעה גנטית</div>
+    <span class="s4-dna-pct">2–4%</span>
+    <div class="s4-dna-sub">מה-DNA של רוב בני האדם כיום — הגיע מניאנדרתלים</div>
+    <div class="s4-dna-explain">
+      כשהומו ספיינס פגש ניאנדרתלים באירופה ובמזרח התיכון, הם <strong>לא רק נלחמו — הם גם התרבו יחד.</strong><br><br>
+      כתוצאה מכך, לרוב האנשים כיום שאינם ממוצא אפריקאי טהור יש 2–4% DNA ניאנדרתלי.
+      חלק מהגנים האלה <strong>עדיין פעילים בגופנו היום</strong> — וקשורים למערכת החיסון ועמידות לקור.
+    </div>
+  </div>
+</div>`,
+      `<div class="s5" id="s5Root">
+  <p class="s5-pretitle">שלב אחרון —</p>
+  <h2 class="s5-title">בוחן מסכם</h2>
+  <div id="s5Content"></div>
+</div>`,
+    ];
+
+    let current = 0;
+
+    function buildProgressBar() {
+      const container = document.getElementById('progressSteps');
+      container.innerHTML = '';
+      STAGES.forEach((stage, i) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'step-wrap';
+        const step = document.createElement('div');
+        step.className = 'step' +
+          (i === current ? ' active' : '') +
+          (i < current  ? ' done'   : '');
+        step.innerHTML = `
+          <div class="step-dot">${i < current ? '✓' : i + 1}</div>
+          <div class="step-label">${stage.label}</div>
+        `;
+        step.addEventListener('click', () => { current = i; renderStage(); });
+        wrap.appendChild(step);
+        if (i < STAGES.length - 1) {
+          const line = document.createElement('div');
+          line.className = 'step-line' + (i < current ? ' done' : '');
+          wrap.appendChild(line);
+        }
+        container.appendChild(wrap);
+      });
+    }
+
+    function renderStage() {
+      document.getElementById('stageContent').innerHTML = STAGE_HTML[current];
+      document.getElementById('btnPrev').disabled = current === 0;
+      document.getElementById('btnNext').textContent =
+        current === STAGES.length - 1 ? 'סיום ✓' : 'הבא ←';
+      buildProgressBar();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (current === 4) setTimeout(s5Init, 0);
+    }
+
+    function startLearning() {
+      document.getElementById('hero').style.display = 'none';
+      document.getElementById('stageView').classList.add('active');
+      renderStage();
+    }
+
+    function nextStage() {
+      if (current < STAGES.length - 1) { current++; renderStage(); }
+    }
+
+    function prevStage() {
+      if (current > 0) { current--; renderStage(); }
+    }
+
+    /* ── STAGE 5 ─────────────────────────────────────── */
+    const S5_QS = [
+      {
+        q: 'כמה אחוז DNA משותף יש לנו עם שימפנזה?',
+        opts: ['60%', '85%', '98.8%', '100%'],
+        ans: 2,
+      },
+      {
+        q: 'מי היה הראשון להשתמש בכלי אבן באופן שיטתי?',
+        opts: ['אוסטרלופיתקוס', 'הומו הביליס', 'הומו ארקטוס', 'הומו ספיינס'],
+        ans: 1,
+      },
+      {
+        q: 'מה הייתה ההישג הגדול של הומו ארקטוס?',
+        opts: ['המצאת הכתב', 'שליטה באש ויציאה מאפריקה', 'בניית ערים', 'פיתוח שפה מורכבת'],
+        ans: 1,
+      },
+      {
+        q: 'מה גילו ארכיאולוגים על הניאנדרתלים?',
+        opts: ['הם לא השתמשו בכלים כלל', 'הם קברו את מתיהם וטיפלו בחולים', 'הם היו צמחוניים', 'הם ידעו לקרוא ולכתוב'],
+        ans: 1,
+      },
+      {
+        q: 'כמה אחוז DNA ניאנדרתלי יש לרוב האנשים שאינם ממוצא אפריקאי?',
+        opts: ['0%', '2–4%', '10–15%', '50%'],
+        ans: 1,
+      },
+      {
+        q: 'מה הפך את הומו ספיינס לייחודי מכל היצורים האחרים?',
+        opts: ['גודל גוף גדול במיוחד', 'ראייה לילית', 'שפה מורכבת ושיתוף פעולה בקנה מידה גדול', 'מהירות ריצה גבוהה'],
+        ans: 2,
+      },
+    ];
+
+    let s5Current = 0;
+    let s5Score = 0;
+    let s5Answered = false;
+
+    function s5Init() {
+      s5Current = 0;
+      s5Score = 0;
+      s5Answered = false;
+      s5ShowQuestion();
+    }
+
+    function s5ShowQuestion() {
+      const el = document.getElementById('s5Content');
+      if (!el) return;
+      s5Answered = false;
+      const q = S5_QS[s5Current];
+      const pct = (s5Current / S5_QS.length) * 100;
+      const isLast = s5Current === S5_QS.length - 1;
+      let optsHTML = '';
+      q.opts.forEach((o, oi) => {
+        optsHTML += '<button class="s5-answer-btn" onclick="s5Answer(this,' + oi + ',' + q.ans + ')">' + o + '</button>';
+      });
+      el.innerHTML =
+        '<div class="s5-progress-wrap">' +
+          '<div class="s5-progress-info">' +
+            '<span>שאלה ' + (s5Current + 1) + ' מתוך ' + S5_QS.length + '</span>' +
+            '<span>' + s5Score + ' נכון עד כה</span>' +
+          '</div>' +
+          '<div class="s5-progress-bar"><div class="s5-progress-fill" style="width:' + pct + '%"></div></div>' +
+        '</div>' +
+        '<div class="s5-question-card">' +
+          '<div class="s5-question-text">' + q.q + '</div>' +
+          '<div class="s5-answers">' + optsHTML + '</div>' +
+          '<div class="s5-explanation hidden" id="s5Explanation"></div>' +
+        '</div>' +
+        '<div class="s5-next-wrap hidden" id="s5NextWrap">' +
+          '<button class="s5-next-btn" onclick="s5Next()">' + (isLast ? 'לתוצאות 🏆' : 'השאלה הבאה ←') + '</button>' +
+        '</div>';
+    }
+
+    function s5Answer(btn, chosen, correct) {
+      if (s5Answered) return;
+      s5Answered = true;
+      const allBtns = document.querySelectorAll('.s5-answer-btn');
+      allBtns.forEach(b => b.disabled = true);
+      if (chosen === correct) {
+        btn.classList.add('correct');
+        s5Score++;
+      } else {
+        btn.classList.add('wrong');
+        allBtns[correct].classList.add('correct');
+      }
+      const expEl = document.getElementById('s5Explanation');
+      if (expEl) {
+        expEl.textContent = chosen === correct ? '✓ נכון!' : '✗ לא נכון';
+        expEl.className = 's5-explanation ' + (chosen === correct ? 'ok' : 'no');
+      }
+      document.getElementById('s5NextWrap').classList.remove('hidden');
+    }
+
+    function s5Next() {
+      s5Current++;
+      if (s5Current >= S5_QS.length) {
+        s5ShowScore();
+      } else {
+        s5ShowQuestion();
+      }
+    }
+
+    function s5ShowScore() {
+      const el = document.getElementById('s5Content');
+      if (!el) return;
+      const total = S5_QS.length;
+      const emoji = s5Score === total ? '🏆' : s5Score >= total * 0.7 ? '🌟' : '💪';
+      const label = s5Score === total ? 'מושלם! שלטת בכל החומר' :
+        s5Score >= total * 0.7 ? 'כל הכבוד! ידע מרשים' : 'כדאי לחזור על החומר ולנסות שוב';
+      el.innerHTML =
+        '<div class="s5-score">' +
+          '<span class="s5-score-emoji">' + emoji + '</span>' +
+          '<div class="s5-score-num">' + s5Score + '/' + total + '</div>' +
+          '<div class="s5-score-label">' + label + '</div>' +
+          '<div class="s5-name-form" id="s5Form">' +
+            '<label>שם פרטי ושם משפחה:</label>' +
+            '<input type="text" id="s5Name" placeholder="למשל: ישראל ישראלי" />' +
+            '<label>כיתה:</label>' +
+            '<input type="text" id="s5Class" placeholder=\'למשל: ז\u05f32\' />' +
+            '<button class="s5-send" onclick="s5Send(' + s5Score + ',' + total + ')">שלחו תוצאה ←</button>' +
+          '</div>' +
+          '<div class="video-section">' +
+            '<div class="video-title">🎥 רוצים לדעת עוד?</div>' +
+            '<p class="video-sub">סרטון קצר ומומלץ להעשרה</p>' +
+            '<p class="video-note">⚠️ הסרטון באנגלית — מיועד להעשרה בלבד</p>' +
+            '<a class="video-link-btn" href="https://www.youtube.com/watch?v=DZv8VyIQ7YU" target="_blank" rel="noopener">▶ צפו בסרטון ב-YouTube</a>' +
+          '</div>' +
+        '</div>';
+      setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    }
+
+    function s5Send(score, total) {
+      const name  = document.getElementById('s5Name').value.trim();
+      const klass = document.getElementById('s5Class').value.trim();
+      if (!name || !klass) { alert('נא למלא שם וכיתה'); return; }
+      const url = 'https://docs.google.com/forms/d/e/1FAIpQLSe13TESGSPFG7b-ByXlSkKWG_7qR4AR6ZOlv31BdoJLqq8Gkw/viewform?usp=pp_url'
+        + '&entry.1753846366=' + encodeURIComponent(name)
+        + '&entry.240948921='  + encodeURIComponent(klass)
+        + '&entry.923537609='  + encodeURIComponent(score + '/' + total);
+      window.open(url, '_blank');
+      document.getElementById('s5Form').innerHTML =
+        '<div class="s5-sent">✓ תודה! התוצאה נשלחה בהצלחה</div>';
+    }
+
+    /* ── STAGE 2 ─────────────────────────────────────── */
+    const S2_ANCESTORS = [
+      {
+        name: 'אוסטרלופיתקוס',
+        latin: 'Australopithecus afarensis',
+        period: 'לפני 4–2 מיליון שנה',
+        where: 'אפריקה',
+        brain: '~450 סמ"ק',
+        badge: 'הלך זקוף על שתי רגליים',
+        img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Lucy_aus_Afar.jpg/400px-Lucy_aus_Afar.jpg',
+        facts: [
+          'הראשון להלך זקוף על שתי רגליים — ידיו היו פנויות',
+          'מוחו היה קטן כמוח שימפנזה — כמעט ללא שימוש בכלים',
+          '"לוסי" הנודעת (1974) הייתה אוסטרלופיתקוס אפרנסיס — שלד כמעט שלם',
+          'גרה ביערות ובסוואנות אפריקה — אכלה צמחים, פירות, ואולי קצת בשר',
+        ],
+      },
+      {
+        name: 'הומו הביליס',
+        latin: 'Homo habilis',
+        period: 'לפני 2.4–1.4 מיליון שנה',
+        where: 'אפריקה',
+        brain: '~650 סמ"ק',
+        badge: 'כלי האבן הראשונים',
+        img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Homo_habilis-2.JPG/400px-Homo_habilis-2.JPG',
+        facts: [
+          '"הביליס" = "מיומן ידיים" בלטינית — נקרא כך בגלל כלי האבן שיצר',
+          'ייצר כלי אבן פרימיטיביים — בעיקר לחיתוך בשר ופיצוח עצמות',
+          'מוחו גדל ב-50% לעומת אוסטרלופיתקוס — קפיצה אבולוציונית משמעותית',
+          'עדיין לא שלט באש — אבל היה הראשון שהשתמש בכלים באופן שיטתי',
+        ],
+      },
+      {
+        name: 'הומו ארקטוס',
+        latin: 'Homo erectus',
+        period: 'לפני 1.9 מיליון–108 אלף שנה',
+        where: 'אפריקה, אסיה, אירופה',
+        brain: '~1,000 סמ"ק',
+        badge: 'שלט באש, יצא מאפריקה',
+        img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Homo_erectus_new.jpg/400px-Homo_erectus_new.jpg',
+        facts: [
+          'הראשון לצאת מאפריקה — התפשט עד אסיה (ג\'אווה, סין) ואירופה',
+          'שלט באש: בישול אפשר לאכול מאכלים עשירים יותר — המוח גדל',
+          'ייצר כלים מתוחכמים ("גרזני אבן") — עדות לחשיבה מורכבת',
+          'חי בקבוצות חברתיות — כנראה כבר תקשר בצורה פרימיטיבית',
+        ],
+      },
+      {
+        name: 'הומו ספיינס',
+        latin: 'Homo sapiens',
+        period: 'לפני 300 אלף שנה עד היום',
+        where: 'כל העולם',
+        brain: '~1,400 סמ"ק',
+        badge: 'שפה, אמנות, תרבות',
+        img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Lascaux_04.jpg/800px-Lascaux_04.jpg',
+        facts: [
+          'פיתח שפה מורכבת — מה שאפשר להעביר ידע ולשתף פעולה בקנה מידה גדול',
+          'יצר אמנות סלע, מוזיקה ופולחן דתי לפני עשרות אלפי שנים',
+          'יצא מאפריקה לפני כ-70 אלף שנה והתפשט לכל יבשות העולם',
+          'אנחנו — כן, גם אתם — הומו ספיינס מודרני!',
+        ],
+      },
+    ];
+
+    let s2ActiveAnc = -1;
+
+    function showAnc(idx) {
+      s2ActiveAnc = idx;
+      document.querySelectorAll('.anc-node').forEach((n, i) => {
+        n.classList.toggle('active', i === idx);
+      });
+      const a = S2_ANCESTORS[idx];
+      const det = document.getElementById('ancDetail');
+      det.className = 'anc-detail';
+      det.innerHTML = `
+        <div class="anc-detail-header">
+          <div class="anc-detail-name">${a.name}</div>
+          <div class="anc-detail-latin">${a.latin}</div>
+        </div>
+        <span class="anc-badge">${a.badge}</span>
+        <img class="anc-detail-photo" src="${a.img}" alt="${a.name}"
+             onerror="this.style.display='none'" />
+        <div class="anc-stats">
+          <div class="anc-stat"><strong>תקופה</strong>${a.period}</div>
+          <div class="anc-stat"><strong>מיקום</strong>${a.where}</div>
+          <div class="anc-stat"><strong>גודל מוח</strong>${a.brain}</div>
+        </div>
+        <ul class="anc-facts">
+          ${a.facts.map(f => f.includes('לוסי') ? `
+            <li class="lucy-fact" onclick="toggleLucy()">
+              <div class="lucy-row">
+                <span class="lucy-label">${f}</span>
+                <span class="lucy-toggle-hint">← לחצו לפרטים</span>
+              </div>
+              <div class="lucy-expand" id="lucyExpand">
+                <p>לוסי התגלתה ב-1974 באתיופיה על ידי הפלאואנתרופולוג דונלד ג'והנסון. השלד שלה הוא מהשלמים ביותר שנמצאו — כ-40% מהעצמות שרדו. לוסי עמדה על גובה של כ-1.1 מטר ושקלה כ-29 ק"ג. ניתוח עצמות הרגליים והאגן הוכיח שהיא הלכה על שתיים — אך ידיה הארוכות מראות שעדיין טיפסה על עצים.</p>
+                <div class="lucy-imgs">
+                  <div class="lucy-img-wrap">
+                    <img src="https://www.nhm.ac.uk/content/dam/nhm-www/discover/human-evolution/australopithecus-afarensis/lucy-cast-on-black-two-column.jpg.thumb.1920.1920.png" alt="שלד לוסי" />
+                    <span>תבנית השלד המקורי</span>
+                  </div>
+                  <div class="lucy-img-wrap">
+                    <img src="https://media.sciencephoto.com/c0/54/63/24/c0546324-800px-wm.jpg" alt="שחזור לוסי" />
+                    <span>שחזור מראה לוסי</span>
+                  </div>
+                </div>
+              </div>
+            </li>` : `<li>${f}</li>`).join('')}
+        </ul>
+      `;
+      setTimeout(() => det.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+    }
+
+    function toggleLucy() {
+      const el = document.getElementById('lucyExpand');
+      if (!el) return;
+      el.classList.toggle('open');
+    }
+
+    /* ── STAGE 1 ─────────────────────────────────────── */
+    function s1Vote(btn) {
+      document.querySelectorAll('.vote-btn').forEach(b => {
+        b.disabled = true; b.style.opacity = '0.35';
+      });
+      btn.style.opacity = '1';
+      btn.classList.add('chosen');
+      const reveal = document.getElementById('s1Reveal');
+      reveal.classList.remove('hidden');
+      setTimeout(() => reveal.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+    }
+  </script>
+
+</body>
+</html>

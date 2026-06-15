@@ -1,65 +1,135 @@
-import Image from "next/image";
+import React from "react";
+import Link from "next/link";
+import { ArrowLeft, GraduationCap } from "lucide-react";
 
-export default function Home() {
+export default function PortalHomePage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="relative min-h-screen bg-[#080c18] text-[#e8edf8] flex flex-col justify-between overflow-hidden">
+      {/* Dynamic Background Gradients */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-amber-500/5 via-transparent to-transparent blur-3xl pointer-events-none rounded-full" />
+      <div className="absolute -top-40 -left-40 w-96 h-96 bg-emerald-500/5 blur-3xl rounded-full pointer-events-none" />
+      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-sky-500/5 blur-3xl rounded-full pointer-events-none" />
+
+      {/* Main Container */}
+      <div className="relative w-full max-w-6xl mx-auto px-6 py-20 flex-1 flex flex-col justify-center items-center z-10">
+        
+        {/* Header Section */}
+        <div className="text-center mb-20 space-y-4">
+          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 bg-surface border border-border-custom rounded-full text-sm font-bold text-text-muted">
+            <GraduationCap className="w-4 h-4 text-amber-400" />
+            <span>פורטל פדגוגי דיגיטלי</span>
+          </div>
+          <h1 className="text-6xl font-black tracking-tight text-white mt-6">
+            ניר עוז-ארי
+            <span className="block mt-3 text-3xl font-bold bg-gradient-to-r from-amber-400 via-sky-400 to-emerald-400 bg-clip-text text-transparent">
+              חומרי לימוד ולומדות אינטראקטיביות
+            </span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-text-muted max-w-xl mx-auto text-base md:text-lg leading-relaxed pt-2">
+            בחרו נושא לימוד כדי להתחיל בשיעור, לומדה או משחק כיתתי אינטראקטיבי.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        {/* Subjects Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
+          
+          {/* Card: של"ח */}
+          <Link
+            href="/shelach"
+            className="group glass-card rounded-2xl border border-border-custom hover:border-shelach/40 hover:shadow-[0_12px_40px_rgba(249,115,22,0.12)] transition-all duration-300 flex flex-col overflow-hidden"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            {/* Header Image with Gradient overlay */}
+            <div
+              className="h-48 bg-cover bg-center relative"
+              style={{
+                backgroundImage: `url('https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Ardon_Mountain%2C_Ramon_Makhtesh%2C_Negev%2C_Israel_%D7%94%D7%A8_%D7%90%D7%A8%D7%93%D7%95%D7%9F%2C_%D7%9E%D7%9B%D7%AA%D7%A9_%D7%A8%D7%9E%D7%95%D7%9F%2C_%D7%9ה%D7%A8_%D7%9ה%D7%A0%D7%92%D7%91_-_panoramio.jpg/1000px-Ardon_Mountain%2C_Ramon_Makhtesh%2C_Negev%2C_Israel_%D7%94%D7%A8_%D7%90%D7%A8%D7%93%D7%95%D7%9F%2C_%D7%9E%D7%9B%D7%AA%D7%A9_%D7%A8%D7%9E%D7%95%D7%9F%2C_%D7%9ה%D7%A8_%D7%9ה%D7%A0%D7%92%D7%91_-_panoramio.jpg')`
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-[#080c18] via-transparent to-transparent opacity-80" />
+            </div>
+            {/* Body */}
+            <div className="p-8 flex-1 flex flex-col justify-between">
+              <div>
+                <h3 className="text-2xl font-bold text-white group-hover:text-shelach transition-colors">של״ח</h3>
+                <p className="text-sm font-semibold text-shelach/80 mt-1.5">לימודי ארץ ישראל</p>
+                <p className="text-text-muted text-sm leading-relaxed mt-4">
+                  סדנאות למידה אינטראקטיביות העוסקות בהיסטוריה, גיאוגרפיה, טבע ורב-תרבותיות בארץ ישראל.
+                </p>
+              </div>
+              <div className="mt-8 flex items-center gap-2 text-sm font-bold text-shelach group-hover:translate-x-[-6px] transition-transform">
+                <span>כניסה לסדנאות</span>
+                <ArrowLeft className="w-4 h-4" />
+              </div>
+            </div>
+          </Link>
+
+          {/* Card: אנגלית */}
+          <Link
+            href="/english-auction"
+            className="group glass-card rounded-2xl border border-border-custom hover:border-english/40 hover:shadow-[0_12px_40px_rgba(0,200,255,0.12)] transition-all duration-300 flex flex-col overflow-hidden"
           >
-            Documentation
-          </a>
+            {/* Header Image */}
+            <div
+              className="h-48 bg-cover bg-center relative"
+              style={{
+                backgroundImage: `url('https://negativespace.co/wp-content/uploads/2017/04/negative-space-closeup-vintage-typewriter-Custom-1.jpg')`
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-[#080c18] via-transparent to-transparent opacity-80" />
+            </div>
+            {/* Body */}
+            <div className="p-8 flex-1 flex flex-col justify-between">
+              <div>
+                <h3 className="text-2xl font-bold text-white group-hover:text-english transition-colors">אנגלית</h3>
+                <p className="text-sm font-semibold text-english/80 mt-1.5">The Sentence Auction</p>
+                <p className="text-text-muted text-sm leading-relaxed mt-4">
+                  משחק מכירה פומבית כיתתי לתרגול ושיפור חוקי הדקדוק ובניית משפטים באנגלית בצורה חווייתית.
+                </p>
+              </div>
+              <div className="mt-8 flex items-center gap-2 text-sm font-bold text-english group-hover:translate-x-[-6px] transition-transform">
+                <span>פתח משחק</span>
+                <ArrowLeft className="w-4 h-4" />
+              </div>
+            </div>
+          </Link>
+
+          {/* Card: העשרה */}
+          <Link
+            href="/enrichment"
+            className="group glass-card rounded-2xl border border-border-custom hover:border-enrichment/40 hover:shadow-[0_12px_40px_rgba(34,197,94,0.12)] transition-all duration-300 flex flex-col overflow-hidden"
+          >
+            {/* Header Image */}
+            <div
+              className="h-48 bg-cover bg-center relative"
+              style={{
+                backgroundImage: `url('https://www.spacecentre.co.uk/media/5hhl423f/jwst-carina-nebula.jpg?anchor=center&rmode=crop&width=1000&height=600&format=webp&quality=80')`
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-[#080c18] via-transparent to-transparent opacity-80" />
+            </div>
+            {/* Body */}
+            <div className="p-8 flex-1 flex flex-col justify-between">
+              <div>
+                <h3 className="text-2xl font-bold text-white group-hover:text-enrichment transition-colors">העשרה</h3>
+                <p className="text-sm font-semibold text-enrichment/80 mt-1.5">מחוץ לתוכנית הלימודים</p>
+                <p className="text-text-muted text-sm leading-relaxed mt-4">
+                  לומדות בנושאים מרתקים ומדעיים, כולל מודולים אינטראקטיביים מעמיקים בנושא אבולוציה.
+                </p>
+              </div>
+              <div className="mt-8 flex items-center gap-2 text-sm font-bold text-enrichment group-hover:translate-x-[-6px] transition-transform">
+                <span>כניסה ללומדות</span>
+                <ArrowLeft className="w-4 h-4" />
+              </div>
+            </div>
+          </Link>
+
         </div>
-      </main>
+      </div>
+
+      {/* Footer */}
+      <footer className="w-full text-center py-6 border-t border-border-custom text-xs text-text-muted relative z-10 bg-surface/30">
+        <span>© {new Date().getFullYear()} ניר עוז-ארי — כל הזכויות שמורות</span>
+      </footer>
     </div>
   );
 }

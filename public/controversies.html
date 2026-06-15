@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ויכוחים ואתגרים</title>
+  <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #0d1117;
+      --surface:    #161b27;
+      --surface-2:  #1e2535;
+      --border:     #2a3145;
+      --text:       #e2e8f0;
+      --text-muted: #8896aa;
+      --accent:     #a78bfa;
+      --accent-dim: #2d1b69;
+    }
+
+    body {
+      font-family: 'Alef', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      direction: rtl;
+    }
+
+    .hidden { display: none !important; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── HERO ─────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 2rem;
+      background: radial-gradient(ellipse at 50% 40%, #1a0d2e 0%, var(--bg) 70%);
+    }
+
+    .hero-icon {
+      font-size: 5rem; margin-bottom: 1.5rem;
+      animation: float 3.5s ease-in-out infinite; display: block;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-12px); }
+    }
+
+    .hero h1 { font-size: 3rem; font-weight: 700; color: var(--accent); margin-bottom: 0.6rem; }
+
+    .hero h2 {
+      font-size: 1.15rem; color: var(--text-muted); font-weight: 400;
+      max-width: 480px; line-height: 1.7; margin-bottom: 2rem;
+    }
+
+    .hero-notice {
+      max-width: 560px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 1.4rem 1.8rem; margin: 0 0 2rem;
+      text-align: right; line-height: 1.9;
+      font-size: 0.95rem; color: var(--text-muted);
+    }
+
+    .hero-notice strong { color: var(--text); }
+
+    .btn-start {
+      background: var(--accent); color: #0d1117;
+      border: none; padding: 0.9rem 2.8rem;
+      font-size: 1.2rem; font-family: 'Alef', sans-serif;
+      font-weight: 700; border-radius: 50px; cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 32px rgba(167, 139, 250, 0.25);
+    }
+
+    .btn-start:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 48px rgba(167, 139, 250, 0.45);
+    }
+
+    /* ── STAGE VIEW ───────────────────────────────────── */
+    .stage-view { display: none; }
+    .stage-view.active { display: block; }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg); border-bottom: 1px solid var(--border);
+      padding: 0.8rem 1rem;
+    }
+
+    .progress-steps {
+      display: flex; align-items: center;
+      justify-content: center; gap: 0;
+      flex-wrap: nowrap; overflow-x: auto;
+    }
+
+    .step-wrap { display: flex; align-items: center; }
+
+    .step {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0.35rem; cursor: pointer;
+    }
+
+    .step:hover .step-dot { border-color: var(--accent); transform: scale(1.1); }
+
+    .step-dot {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--surface-2); border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 700; color: var(--text-muted);
+      transition: all 0.3s;
+    }
+
+    .step.active .step-dot {
+      background: var(--accent); border-color: var(--accent); color: #0d1117;
+      box-shadow: 0 0 16px rgba(167, 139, 250, 0.4);
+    }
+
+    .step.done .step-dot { background: var(--accent-dim); border-color: var(--accent-dim); color: #c4b5fd; }
+
+    .step-label { font-size: 0.68rem; color: var(--text-muted); white-space: nowrap; }
+    .step.active .step-label { color: var(--accent); font-weight: 700; }
+
+    .step-line {
+      width: 28px; height: 2px;
+      background: var(--border); margin-bottom: 1.1rem; flex-shrink: 0;
+    }
+
+    .step-line.done { background: var(--accent-dim); }
+
+    .stage-content {
+      max-width: 680px; margin: 0 auto; padding: 2rem 1.2rem 1rem;
+    }
+
+    .stage-nav {
+      max-width: 680px; margin: 0 auto;
+      padding: 1rem 1.2rem 2.5rem;
+      display: flex; justify-content: space-between; gap: 1rem;
+    }
+
+    .btn-nav {
+      padding: 0.65rem 1.6rem; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--text); font-family: 'Alef', sans-serif;
+      font-size: 0.95rem; cursor: pointer; transition: background 0.2s;
+    }
+
+    .btn-nav:hover:not(:disabled) { background: var(--surface-2); }
+    .btn-nav:disabled { opacity: 0.35; cursor: default; }
+
+    .btn-nav.primary {
+      background: var(--accent); color: #0d1117;
+      border-color: var(--accent); font-weight: 700;
+    }
+
+    .btn-nav.primary:hover { opacity: 0.88; }
+
+    /* ── SHARED COMPONENTS ────────────────────────────── */
+    .pretitle {
+      font-size: 0.9rem; color: var(--accent);
+      font-weight: 700; letter-spacing: 0.5px; margin-bottom: 0.5rem;
+    }
+
+    .stage-title {
+      font-size: 2rem; font-weight: 700; color: var(--text);
+      margin-bottom: 0.6rem; line-height: 1.3;
+    }
+
+    .stage-sub { font-size: 1rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+    .vote-btns { display: flex; flex-direction: column; gap: 0.7rem; margin-bottom: 1.5rem; }
+
+    .vote-btn {
+      width: 100%; background: var(--surface);
+      border: 2px solid var(--border); border-radius: 10px;
+      padding: 0.9rem 1.2rem; font-family: 'Alef', sans-serif;
+      font-size: 1rem; color: var(--text); cursor: pointer;
+      text-align: right; direction: rtl;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .vote-btn:hover:not(:disabled) { border-color: var(--accent); background: var(--surface-2); }
+    .vote-btn.chosen { border-color: var(--accent); background: #1a0d2e; color: var(--accent); }
+
+    .reveal-box { animation: fadeInUp 0.5s ease; }
+
+    .reveal-tag {
+      display: inline-block; background: var(--accent-dim); color: var(--accent);
+      font-size: 0.78rem; font-weight: 700;
+      padding: 0.3rem 0.8rem; border-radius: 20px; margin-bottom: 0.8rem;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 1rem; margin: 1.2rem 0;
+    }
+
+    .info-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.3rem;
+    }
+
+    .info-card-icon { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+
+    .info-card-title {
+      font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem;
+    }
+
+    .info-card-text {
+      font-size: 0.9rem; color: var(--text-muted); line-height: 1.75;
+    }
+
+    .highlight-box {
+      background: var(--accent-dim); border: 1px solid rgba(167,139,250,0.3);
+      border-radius: 12px; padding: 1.3rem 1.4rem; margin: 1.2rem 0;
+      font-size: 0.95rem; color: var(--text-muted); line-height: 1.8;
+    }
+
+    .highlight-box strong { color: var(--accent); }
+
+    .info-block {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.4rem; margin-bottom: 1rem;
+    }
+
+    .info-block p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 0.7rem; }
+    .info-block p:last-child { margin-bottom: 0; }
+    .info-block strong { color: var(--text); }
+
+    .back-link {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.85rem; color: var(--text-muted);
+      text-decoration: none; padding: 0.5rem 0; margin-bottom: 1rem;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover { color: var(--accent); }
+
+    /* ── STAGE 2: תיאוריה מדעית ───────────────────────── */
+    .compare-row {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1rem; margin: 1.2rem 0;
+    }
+
+    .compare-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.2rem; text-align: center;
+    }
+
+    .compare-card.bad  { border-color: #f87171; }
+    .compare-card.good { border-color: var(--accent); }
+
+    .compare-card-label {
+      font-size: 0.78rem; font-weight: 700; margin-bottom: 0.6rem;
+      padding: 0.25rem 0.7rem; border-radius: 20px; display: inline-block;
+    }
+
+    .compare-card.bad  .compare-card-label { background: #2d0f0f; color: #f87171; }
+    .compare-card.good .compare-card-label { background: var(--accent-dim); color: var(--accent); }
+
+    .compare-card-word {
+      font-size: 1.4rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem;
+    }
+
+    .compare-card-text { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+
+    .theory-examples {
+      display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 1rem 0;
+    }
+
+    .theory-chip {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 20px; padding: 0.4rem 0.9rem;
+      font-size: 0.85rem; color: var(--text-muted);
+      cursor: pointer; transition: border-color 0.2s, color 0.2s;
+    }
+    .theory-chip:hover { border-color: var(--accent); color: var(--text); }
+    .theory-chip.active { border-color: var(--accent); color: var(--accent); }
+    .theory-explain {
+      display: none; width: 100%;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 0.75rem 1rem;
+      font-size: 0.85rem; color: var(--text); line-height: 1.6;
+      margin-top: 0.2rem;
+    }
+    .theory-explain.visible { display: block; }
+
+    /* ── STAGE 3: דת ומדע ─────────────────────────────── */
+    .opinion-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.3rem; margin-bottom: 0.9rem;
+    }
+
+    .opinion-card-header {
+      display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.7rem;
+    }
+
+    .opinion-icon { font-size: 1.8rem; }
+
+    .opinion-who { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); }
+
+    .opinion-quote {
+      font-size: 0.95rem; color: var(--text-muted); line-height: 1.8;
+      border-right: 3px solid var(--accent-dim);
+      padding-right: 0.9rem;
+    }
+
+    /* ── STAGE 4: שאלות פתוחות ────────────────────────── */
+    .open-q {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.3rem; margin-bottom: 0.9rem;
+    }
+
+    .open-q-header {
+      display: flex; align-items: flex-start; gap: 0.8rem; margin-bottom: 0.6rem;
+    }
+
+    .open-q-icon { font-size: 1.6rem; flex-shrink: 0; }
+
+    .open-q-q { font-size: 1rem; font-weight: 700; color: var(--text); line-height: 1.4; }
+
+    .open-q-a { font-size: 0.9rem; color: var(--text-muted); line-height: 1.75; }
+
+    .open-q-status {
+      display: inline-block; margin-top: 0.6rem;
+      font-size: 0.78rem; font-weight: 700;
+      padding: 0.25rem 0.7rem; border-radius: 20px;
+      background: var(--surface-2); color: var(--text-muted);
+    }
+
+    .open-q-status.research { background: var(--accent-dim); color: var(--accent); }
+
+    /* ── STAGE 5: בוחן ────────────────────────────────── */
+    .s5-pretitle { font-size: 0.9rem; color: var(--accent); font-weight: 700; margin-bottom: 0.4rem; }
+    .s5-title { font-size: 2rem; font-weight: 700; color: var(--text); margin-bottom: 1.5rem; }
+
+    .s5-progress-wrap { margin-bottom: 1.8rem; }
+    .s5-progress-info { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+    .s5-progress-bar { height: 6px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+    .s5-progress-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.4s ease; }
+
+    .s5-question-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.8rem; margin-bottom: 1rem;
+      animation: fadeInUp 0.35s ease;
+    }
+    .s5-question-text { font-size: 1.15rem; font-weight: 700; color: var(--text); line-height: 1.6; margin-bottom: 1.5rem; }
+    .s5-answers { display: flex; flex-direction: column; gap: 0.7rem; }
+    .s5-answer-btn {
+      width: 100%; background: var(--surface-2);
+      border: 2px solid var(--border); border-radius: 10px;
+      padding: 0.9rem 1.2rem; font-family: 'Alef', sans-serif;
+      font-size: 0.95rem; color: var(--text); cursor: pointer;
+      text-align: right; direction: rtl;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .s5-answer-btn:hover:not(:disabled) { border-color: var(--accent); }
+    .s5-answer-btn.correct { border-color: #4ade80; background: #052e16; color: #4ade80; }
+    .s5-answer-btn.wrong   { border-color: #f87171; background: #2d0f0f; color: #f87171; }
+    .s5-answer-btn:disabled { cursor: default; }
+
+    .s5-explanation { border-radius: 10px; padding: 0.8rem 1rem; margin-top: 1rem; font-size: 0.9rem; font-weight: 700; }
+    .s5-explanation.ok { color: #4ade80; }
+    .s5-explanation.no { color: #f87171; }
+
+    .s5-next-wrap { text-align: center; margin-top: 1rem; animation: fadeInUp 0.3s ease; }
+    .s5-next-btn {
+      background: var(--accent); color: #0d1117;
+      border: none; padding: 0.85rem 2.4rem;
+      font-size: 1rem; font-family: 'Alef', sans-serif;
+      font-weight: 700; border-radius: 50px; cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .s5-next-btn:hover { opacity: 0.88; }
+
+    .s5-score { text-align: center; animation: fadeInUp 0.5s ease; padding: 1rem 0; }
+    .s5-score-emoji { font-size: 4rem; margin-bottom: 1rem; display: block; }
+    .s5-score-num { font-size: 3.5rem; font-weight: 700; color: var(--accent); line-height: 1; margin-bottom: 0.4rem; }
+    .s5-score-label { font-size: 1rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+    .s5-name-form {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.4rem; text-align: right; margin-bottom: 1rem;
+    }
+    .s5-name-form label { display: block; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.4rem; font-weight: 700; }
+    .s5-name-form input {
+      width: 100%; background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.65rem 0.9rem;
+      font-family: 'Alef', sans-serif; font-size: 1rem; color: var(--text);
+      direction: rtl; margin-bottom: 0.9rem;
+    }
+    .s5-name-form input:focus { outline: none; border-color: var(--accent); }
+    .s5-send {
+      width: 100%; background: var(--accent); color: #0d1117;
+      border: none; padding: 0.8rem; font-size: 1rem;
+      font-family: 'Alef', sans-serif; font-weight: 700;
+      border-radius: 10px; cursor: pointer; transition: opacity 0.2s;
+    }
+    .s5-send:hover { opacity: 0.88; }
+    .s5-sent { background: #052e16; border: 1px solid #4ade80; border-radius: 10px; padding: 1rem; color: #4ade80; font-size: 0.95rem; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <!-- ── HERO SCREEN ── -->
+  <div class="hero" id="hero">
+    <span class="hero-icon">⚖️</span>
+    <h1>ויכוחים ואתגרים</h1>
+    <h2>למה אנשים לא מסכימים עם תיאוריית האבולוציה — ומה המדע עונה</h2>
+    <button class="btn-start" onclick="startLearning()">בואו נתחיל</button>
+  </div>
+
+  <!-- ── STAGE VIEW ── -->
+  <div class="stage-view" id="stageView">
+    <div class="topbar">
+      <div class="progress-steps" id="progressSteps"></div>
+    </div>
+    <div class="stage-content" id="stageContent"></div>
+    <div class="stage-nav">
+      <button class="btn-nav" id="btnPrev" onclick="prevStage()">הקודם</button>
+      <button class="btn-nav primary" id="btnNext" onclick="nextStage()">הבא ←</button>
+    </div>
+  </div>
+
+  <script>
+    const STAGES = [
+      { label: 'מבוא' },
+      { label: '"רק תיאוריה"' },
+      { label: 'דת ומדע' },
+      { label: 'שאלות פתוחות' },
+      { label: 'בוחן' },
+    ];
+
+    const STAGE_HTML = [
+
+      /* ── STAGE 1: מבוא ── */
+      `<div>
+  <a class="back-link" href="index.html">→ חזרה לדף הבית</a>
+  <p class="pretitle">לפני שמתחילים —</p>
+  <h2 class="stage-title">האם אתה מאמין בתיאוריית האבולוציה?</h2>
+  <p class="stage-sub">בחרו את התשובה הקרובה ביותר לדעתכם:</p>
+
+  <div class="vote-btns">
+    <button class="vote-btn" onclick="s1Vote(this)">כן, בהחלט — המדע ברור 🔬</button>
+    <button class="vote-btn" onclick="s1Vote(this)">לא בטוח — יש לי ספקות 🤔</button>
+    <button class="vote-btn" onclick="s1Vote(this)">לא — אני לא מאמין/ה בזה ❌</button>
+  </div>
+
+  <div class="reveal-box hidden" id="s1Reveal">
+    <span class="reveal-tag">נתון מעניין:</span>
+    <h3 style="font-size:1.4rem;font-weight:700;color:var(--text);margin-bottom:1.2rem;line-height:1.4">
+      97% מהמדענים בעולם מסכימים שתיאוריית האבולוציה נכונה
+    </h3>
+
+    <div class="info-block">
+      <p>זה אחד הנתונים המוסכמים ביותר במדע — כמו ההסכמה שכדור הארץ עגול, שהגיל שלו 4.5 מיליארד שנה, ושהעישון גורם לסרטן.</p>
+      <p>ובכל זאת, בקרב הציבור הרחב יש הרבה יותר ספקות. <strong>מאיפה הפער הזה?</strong></p>
+      <p>בלומדה הזו נבדוק את הטענות הנפוצות נגד אבולוציה — ומה המדע עונה עליהן. נבדוק גם אילו שאלות המדע עדיין <em>לא</em> פתר.</p>
+    </div>
+
+    <div class="highlight-box">
+      ⚠️ הלומדה הזו לא מנסה לשנות את האמונות שלכם.<br>
+      המטרה היא להבין <strong>מה אומר המדע</strong>, ולהבדיל בין ויכוחים לגיטימיים לבין אי-הבנות.
+    </div>
+  </div>
+</div>`,
+
+      /* ── STAGE 2: "רק תיאוריה" ── */
+      `<div>
+  <p class="pretitle">שלב 2 —</p>
+  <h2 class="stage-title">"זו רק תיאוריה"</h2>
+  <p class="stage-sub">הטענה הנפוצה ביותר — ולמה היא מבוססת על אי-הבנה</p>
+
+  <div class="compare-row">
+    <div class="compare-card bad">
+      <div class="compare-card-label">בשפה יומיומית</div>
+      <div class="compare-card-word">תיאוריה</div>
+      <p class="compare-card-text">השערה, ניחוש, רעיון שעדיין לא הוכח. "יש לי תיאוריה לגבי מה קרה..."</p>
+    </div>
+    <div class="compare-card good">
+      <div class="compare-card-label">במדע</div>
+      <div class="compare-card-word">תיאוריה</div>
+      <p class="compare-card-text">הסבר מקיף המגובה בראיות נרחבות, עמד במבחן של מחקרים רבים, ומוסכם על הקהילה המדעית.</p>
+    </div>
+  </div>
+
+  <div class="info-block">
+    <p>כשמדענים קוראים למשהו "תיאוריה" — זו למעשה המחמאה המדעית הגדולה ביותר. זה אומר: <strong>הסבר זה נבדק שוב ושוב ועמד בכל המבחנים.</strong></p>
+    <p>בשפת המדע, "עובדה" פירושה תצפית בודדת. "תיאוריה" מסבירה מה גורם לתצפיות האלה — ולכן היא גבוהה יותר בהיררכיה המדעית.</p>
+  </div>
+
+  <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:0.6rem;font-weight:700">עוד "תיאוריות" מדעיות — שאף אחד לא מפקפק בהן:</p>
+  <div class="theory-examples">
+    <span class="theory-chip" onclick="toggleTheory('gravity')">🍎 תיאוריית הגרביטציה</span>
+    <span class="theory-chip" onclick="toggleTheory('germ')">🦠 תיאוריית הנבט (חיידקים גורמים למחלות)</span>
+    <span class="theory-chip" onclick="toggleTheory('atom')">⚛️ תיאוריה האטומית</span>
+    <span class="theory-chip" onclick="toggleTheory('tectonic')">🌍 תיאוריית הטקטוניקה של הלוחות</span>
+    <div class="theory-explain" id="explain-gravity">גרביטציה היא הכוח שמושך עצמים זה לזה. תיאוריית הגרביטציה, שפותחה על ידי ניוטון ושוכללה על ידי איינשטיין, מסבירה למה תפוחים נופלים, למה כדור הארץ מקיף את השמש, ולמה הירח לא מתרחק לחלל — ועמדה במאות שנות בדיקה.</div>
+    <div class="theory-explain" id="explain-germ">תיאוריית הנבט קובעת שמחלות זיהומיות נגרמות על ידי מיקרואורגניזמים — חיידקים, וירוסים ופטריות. פותחה בשנות ה-1860 על ידי לואי פסטר וקרל קוך, והיא הבסיס של כל הרפואה המודרנית: אנטיביוטיקה, חיסונים, סטריליזציה.</div>
+    <div class="theory-explain" id="explain-atom">התיאוריה האטומית קובעת שכל החומר בעולם בנוי מחלקיקים זעירים הנקראים אטומים. מדענים כמו דלטון, ראת'רפורד ובּוֹר בנו אותה לאורך המאה ה-19 וה-20. היא הבסיס לכימיה, לפיזיקה ולכל הטכנולוגיה המודרנית.</div>
+    <div class="theory-explain" id="explain-tectonic">תיאוריית הטקטוניקה של הלוחות קובעת שקרום כדור הארץ מחולק ל"לוחות" ענקיים שזזים לאט. התיאוריה הוצעה בראשית המאה ה-20 על ידי אלפרד וגנר ואושרה בשנות ה-60 בראיות ממצע האוקיינוס. היא מסבירה רעידות אדמה, התפרצויות געש והיווצרות הרים.</div>
+  </div>
+
+  <div class="highlight-box">
+    <strong>אז מה ההבדל בין תיאוריה לעובדה מוכחת?</strong><br>
+    במדע, שום דבר לא "מוכח" לחלוטין לנצח — תמיד אפשר שראיה חדשה תשנה את ההבנה. אבל תיאוריה מדעית טובה היא הדבר הקרוב ביותר שיש לנו לאמת.
+  </div>
+</div>`,
+
+      /* ── STAGE 3: דת ומדע ── */
+      `<div>
+  <p class="pretitle">שלב 3 —</p>
+  <h2 class="stage-title">דת ומדע — חייבים להתנגש?</h2>
+  <p class="stage-sub">עמדות שונות מהעולם הדתי</p>
+
+  <div class="info-block">
+    <p>הוויכוח בין אבולוציה לדת מוכר בעיקר מארה"ב — אבל בעולם הדתי עצמו, העמדות הרבה יותר מגוונות ממה שנדמה.</p>
+  </div>
+
+  <div class="opinion-card">
+    <div class="opinion-card-header">
+      <span class="opinion-icon">⛪</span>
+      <div class="opinion-who">הכנסייה הקתולית</div>
+    </div>
+    <p class="opinion-quote">האפיפיור יוחנן פאולוס השני הצהיר ב-1996 שתיאוריית האבולוציה היא "יותר מהשערה" וקיבל אותה רשמית. הכנסייה מלמדת שאבולוציה היא תהליך שאלוהים יצר.</p>
+  </div>
+
+  <div class="opinion-card">
+    <div class="opinion-card-header">
+      <span class="opinion-icon">✡️</span>
+      <div class="opinion-who">יהדות מסורתית</div>
+    </div>
+    <p class="opinion-quote">רבנים רבים, כולל פוסקי הלכה מרכזיים, ראו אין סתירה בין תורה לתיאוריית האבולוציה. "יום" בבראשית יכול לפרשו כתקופה ארוכה, לא 24 שעות. הרב קוק, למשל, ראה באבולוציה ביטוי לשאיפה של העולם להתפתח לעבר שלמות, ותואמת לתורת הקבלה.</p>
+  </div>
+
+  <div class="opinion-card">
+    <div class="opinion-card-header">
+      <span class="opinion-icon">🕌</span>
+      <div class="opinion-who">אסלאם</div>
+    </div>
+    <p class="opinion-quote">גם באסלאם אין עמדה אחידה — חלק מהמוסלמים מתנגדים לאבולוציה מטעמי אמונה, וחלק מקבלים אותה. מדענים מוסלמים רבים עובדים בביולוגיה אבולוציונית ולא רואים בכך סתירה לאמונתם.</p>
+  </div>
+
+  <div class="highlight-box">
+    <strong>שאלה לחשיבה:</strong><br> מדע שואל "כיצד?" — כיצד נוצרו המינים, כיצד התפתח העולם.<br>
+    דת שואלת "מדוע?" — מה משמעות החיים, מה חובתנו.<br><br>
+    שתי שאלות שונות. אפשר לענות על שתיהן בו-זמנית.
+  </div>
+</div>`,
+
+      /* ── STAGE 4: שאלות פתוחות ── */
+      `<div>
+  <p class="pretitle">שלב 4 —</p>
+  <h2 class="stage-title">מה המדע עדיין לא יודע?</h2>
+  <p class="stage-sub">מדע אמיתי לא יודע הכל — וזה בסדר גמור</p>
+
+  <div class="info-block">
+    <p>אחת מנקודות החוזק של המדע היא היכולת לומר "אנחנו לא יודעים עדיין." הנה שאלות אמיתיות שהמדע עדיין חוקר:</p>
+  </div>
+
+  <div class="open-q">
+    <div class="open-q-header">
+      <span class="open-q-icon">🧫</span>
+      <div class="open-q-q">כיצד נוצרו החיים מחומר דומם?</div>
+    </div>
+    <p class="open-q-a">זו שאלת "מקור החיים" — ואין לה תשובה מוסכמת עדיין. יש תיאוריות מבטיחות (כמו "מרק קדמוני" או פתח הידרותרמי בים), אבל אף אחת לא הוכחה. חשוב: שאלה זו נפרדת לחלוטין מתיאוריית האבולוציה — האבולוציה מסבירה מה קרה <em>אחרי</em> שהחיים כבר קיימים.</p>
+    <span class="open-q-status research">🔬 בחקירה פעילה</span>
+  </div>
+
+  <div class="open-q">
+    <div class="open-q-header">
+      <span class="open-q-icon">👁️</span>
+      <div class="open-q-q">כיצד יכל האבולוציה לייצר מבנים מורכבים כמו העין?</div>
+    </div>
+    <p class="open-q-a">זו טענה קלאסית ("עין שלא שלמה אינה מועילה — אז כיצד התפתחה?"). לזה יש למעשה תשובה טובה: יש שלבי ביניים שכל אחד מהם מועיל — מתא רגיש לאור ועד עין מורכבת. נמצאו בטבע כל שלבי הביניים האלה בחיות שונות.</p>
+    <span class="open-q-status" style="background:#0c1f0c;color:#4ade80">✓ יש תשובה</span>
+  </div>
+
+  <div class="open-q">
+    <div class="open-q-header">
+      <span class="open-q-icon">⚡</span>
+      <div class="open-q-q">קצב האבולוציה — איטי ורצוף או בקפיצות?</div>
+    </div>
+    <p class="open-q-a">דארווין האמין שהאבולוציה תמיד איטית ורצופה. מדענים מודרניים גילו שלעיתים ישנן תקופות של שינוי מהיר יחסית, ואחר כך דממה ארוכה. הוויכוח על הקצב — "gradualism" מול "punctuated equilibrium" — עדיין פעיל.</p>
+    <span class="open-q-status research">🔬 ויכוח מדעי פעיל</span>
+  </div>
+
+  <div class="open-q">
+    <div class="open-q-header">
+      <span class="open-q-icon">🧬</span>
+      <div class="open-q-q">מה עושה ה-"DNA הזבל"?</div>
+    </div>
+    <p class="open-q-a">כ-98% מה-DNA שלנו אינו מקודד לחלבונים. בעבר קראו לזה "DNA זבל". כיום מתברר שלחלק ממנו יש תפקיד בוויסות גנים — אבל רוב החוקרים עדיין לא יודעים מה בדיוק.</p>
+    <span class="open-q-status research">🔬 בחקירה פעילה</span>
+  </div>
+
+  <div class="highlight-box">
+    <strong>זה בדיוק מה שמבדיל מדע מאמונה עיוורת:</strong><br>
+    מדע אומר "אנחנו לא יודעים, בוא נחקור." הוא לא מתיימר לדעת הכל. ואת החלקים שלא ידועים — אפשר לחקור, לפרסם, ולשנות את הדעה לאור ראיות חדשות.
+  </div>
+</div>`,
+
+      /* ── STAGE 5: בוחן ── */
+      `<div class="s5" id="s5Root">
+  <p class="s5-pretitle">שלב אחרון —</p>
+  <h2 class="s5-title">בוחן מסכם</h2>
+  <div id="s5Content"></div>
+</div>`,
+    ];
+
+    let current = 0;
+
+    /* ── STAGE 1 ── */
+    function s1Vote(btn) {
+      document.querySelectorAll('.vote-btn').forEach(b => {
+        b.disabled = true; b.style.opacity = '0.35';
+      });
+      btn.style.opacity = '1';
+      btn.classList.add('chosen');
+      const reveal = document.getElementById('s1Reveal');
+      reveal.classList.remove('hidden');
+      setTimeout(() => reveal.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+    }
+
+    /* ── STAGE 5 ── */
+    const S5_QS = [
+      {
+        q: 'מה פירוש "תיאוריה" במדע?',
+        opts: ['השערה שעדיין לא הוכחה', 'ניחוש מושכל', 'הסבר מקיף המגובה בראיות נרחבות', 'אמת מוחלטת שאי אפשר לפרוך'],
+        ans: 2,
+      },
+      {
+        q: 'כמה אחוז מהמדענים מסכימים שתיאוריית האבולוציה נכונה?',
+        opts: ['כ-50%', 'כ-70%', 'כ-85%', 'כ-97%'],
+        ans: 3,
+      },
+      {
+        q: 'מה עמדת הכנסייה הקתולית כיום כלפי תיאוריית האבולוציה?',
+        opts: ['מתנגדת לה בתוקף', 'מקבלת אותה כתהליך שאלוהים יצר', 'אינה מתייחסת לנושא', 'תומכת בהוראת בריאתנות במקומה'],
+        ans: 1,
+      },
+      {
+        q: 'שאלת מקור החיים (כיצד נוצרו החיים מחומר דומם) — מה הקשר שלה לתיאוריית האבולוציה?',
+        opts: ['אבולוציה מסבירה גם את מקור החיים', 'זו שאלה נפרדת לחלוטין', 'המדע כבר פתר שאלה זו', 'אין לה שום קשר לביולוגיה'],
+        ans: 1,
+      },
+      {
+        q: 'מה הדגים המדע לגבי האבולוציה של העין?',
+        opts: ['עין לא יכולה להתפתח בהדרגה', 'נמצאו בחיות שונות כל שלבי הביניים — מתא רגיש לאור ועד עין מורכבת', 'העין נוצרה בבת-אחת', 'זו עדיין שאלה פתוחה לחלוטין'],
+        ans: 1,
+      },
+    ];
+
+    let s5Current = 0;
+    let s5Score = 0;
+    let s5Answered = false;
+
+    function s5Init() {
+      s5Current = 0;
+      s5Score = 0;
+      s5Answered = false;
+      s5ShowQuestion();
+    }
+
+    function s5ShowQuestion() {
+      const el = document.getElementById('s5Content');
+      if (!el) return;
+      s5Answered = false;
+      const q = S5_QS[s5Current];
+      const pct = (s5Current / S5_QS.length) * 100;
+      const isLast = s5Current === S5_QS.length - 1;
+      let optsHTML = '';
+      q.opts.forEach((o, oi) => {
+        optsHTML += '<button class="s5-answer-btn" onclick="s5Answer(this,' + oi + ',' + q.ans + ')">' + o + '</button>';
+      });
+      el.innerHTML =
+        '<div class="s5-progress-wrap">' +
+          '<div class="s5-progress-info">' +
+            '<span>שאלה ' + (s5Current + 1) + ' מתוך ' + S5_QS.length + '</span>' +
+            '<span>' + s5Score + ' נכון עד כה</span>' +
+          '</div>' +
+          '<div class="s5-progress-bar"><div class="s5-progress-fill" style="width:' + pct + '%"></div></div>' +
+        '</div>' +
+        '<div class="s5-question-card">' +
+          '<div class="s5-question-text">' + q.q + '</div>' +
+          '<div class="s5-answers">' + optsHTML + '</div>' +
+          '<div class="s5-explanation hidden" id="s5Explanation"></div>' +
+        '</div>' +
+        '<div class="s5-next-wrap hidden" id="s5NextWrap">' +
+          '<button class="s5-next-btn" onclick="s5Next()">' + (isLast ? 'לתוצאות 🏆' : 'השאלה הבאה ←') + '</button>' +
+        '</div>';
+    }
+
+    function s5Answer(btn, chosen, correct) {
+      if (s5Answered) return;
+      s5Answered = true;
+      const allBtns = document.querySelectorAll('.s5-answer-btn');
+      allBtns.forEach(b => b.disabled = true);
+      if (chosen === correct) {
+        btn.classList.add('correct');
+        s5Score++;
+      } else {
+        btn.classList.add('wrong');
+        allBtns[correct].classList.add('correct');
+      }
+      const expEl = document.getElementById('s5Explanation');
+      if (expEl) {
+        expEl.textContent = chosen === correct ? '✓ נכון!' : '✗ לא נכון';
+        expEl.className = 's5-explanation ' + (chosen === correct ? 'ok' : 'no');
+      }
+      document.getElementById('s5NextWrap').classList.remove('hidden');
+    }
+
+    function s5Next() {
+      s5Current++;
+      if (s5Current >= S5_QS.length) {
+        s5ShowScore();
+      } else {
+        s5ShowQuestion();
+      }
+    }
+
+    function s5ShowScore() {
+      const el = document.getElementById('s5Content');
+      if (!el) return;
+      const total = S5_QS.length;
+      const emoji = s5Score === total ? '🏆' : s5Score >= total * 0.7 ? '🌟' : '💪';
+      const label = s5Score === total ? 'מושלם! שלטת בכל החומר' :
+        s5Score >= total * 0.7 ? 'כל הכבוד! ידע מרשים' : 'כדאי לחזור על החומר ולנסות שוב';
+      el.innerHTML =
+        '<div class="s5-score">' +
+          '<span class="s5-score-emoji">' + emoji + '</span>' +
+          '<div class="s5-score-num">' + s5Score + '/' + total + '</div>' +
+          '<div class="s5-score-label">' + label + '</div>' +
+          '<div class="s5-name-form" id="s5Form">' +
+            '<label>שם פרטי ושם משפחה:</label>' +
+            '<input type="text" id="s5Name" placeholder="למשל: ישראל ישראלי" />' +
+            '<label>כיתה:</label>' +
+            '<input type="text" id="s5Class" placeholder=\'למשל: ז\u05f32\' />' +
+            '<button class="s5-send" onclick="s5Send(' + s5Score + ',' + total + ')">שלחו תוצאה ←</button>' +
+          '</div>' +
+        '</div>';
+      setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    }
+
+    function s5Send(score, total) {
+      const name  = document.getElementById('s5Name').value.trim();
+      const klass = document.getElementById('s5Class').value.trim();
+      if (!name || !klass) { alert('נא למלא שם וכיתה'); return; }
+      const url = 'https://docs.google.com/forms/d/e/1FAIpQLSfSJ7z_8BGbXwGAvfoIi0jq-qi8YfkRnQJHHY-CyiWWQMoneg/viewform?usp=pp_url'
+        + '&entry.698754440='  + encodeURIComponent(name)
+        + '&entry.730348424='  + encodeURIComponent(klass)
+        + '&entry.1540593400=' + encodeURIComponent(score + '/' + total);
+      window.open(url, '_blank');
+      document.getElementById('s5Form').innerHTML =
+        '<div class="s5-sent">✓ תודה! התוצאה נשלחה בהצלחה</div>';
+    }
+
+    /* ── ENGINE ── */
+    function buildProgressBar() {
+      const container = document.getElementById('progressSteps');
+      container.innerHTML = '';
+      STAGES.forEach((stage, i) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'step-wrap';
+        const step = document.createElement('div');
+        step.className = 'step' +
+          (i === current ? ' active' : '') +
+          (i < current  ? ' done'   : '');
+        step.innerHTML = `
+          <div class="step-dot">${i < current ? '✓' : i + 1}</div>
+          <div class="step-label">${stage.label}</div>
+        `;
+        step.addEventListener('click', () => { current = i; renderStage(); });
+        wrap.appendChild(step);
+        if (i < STAGES.length - 1) {
+          const line = document.createElement('div');
+          line.className = 'step-line' + (i < current ? ' done' : '');
+          wrap.appendChild(line);
+        }
+        container.appendChild(wrap);
+      });
+    }
+
+    function renderStage() {
+      document.getElementById('stageContent').innerHTML = STAGE_HTML[current];
+      document.getElementById('btnPrev').disabled = current === 0;
+      document.getElementById('btnNext').textContent =
+        current === STAGES.length - 1 ? 'סיום ✓' : 'הבא ←';
+      buildProgressBar();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (current === 4) setTimeout(s5Init, 0);
+    }
+
+    function toggleTheory(id) {
+      const box = document.getElementById('explain-' + id);
+      const chip = box.previousElementSibling;
+      // find the chip that called this (by scanning siblings)
+      const allChips = box.parentElement.querySelectorAll('.theory-chip');
+      const allBoxes = box.parentElement.querySelectorAll('.theory-explain');
+      const isOpen = box.classList.contains('visible');
+      allBoxes.forEach(b => b.classList.remove('visible'));
+      allChips.forEach(c => c.classList.remove('active'));
+      if (!isOpen) {
+        box.classList.add('visible');
+        // mark the chip active
+        const chips = { gravity: 0, germ: 1, atom: 2, tectonic: 3 };
+        allChips[chips[id]].classList.add('active');
+      }
+    }
+
+    function startLearning() {
+      document.getElementById('hero').style.display = 'none';
+      document.getElementById('stageView').classList.add('active');
+      renderStage();
+    }
+
+    function nextStage() {
+      if (current < STAGES.length - 1) { current++; renderStage(); }
+    }
+
+    function prevStage() {
+      if (current > 0) { current--; renderStage(); }
+    }
+  </script>
+
+</body>
+</html>

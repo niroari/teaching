@@ -1,0 +1,2820 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>אבולוציה – כך החיים משתנים</title>
+  <link href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    .hidden { display: none !important; }
+
+    :root {
+      --bg:         #0d1117;
+      --surface:    #161b27;
+      --surface-2:  #1e2535;
+      --border:     #2a3145;
+      --text:       #e2e8f0;
+      --text-muted: #8896aa;
+      --accent:     #4ade80;
+      --accent-dim: #166534;
+    }
+
+    body {
+      font-family: 'Alef', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      direction: rtl;
+    }
+
+    /* ── HERO ─────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      background: radial-gradient(ellipse at 50% 40%, #0d2818 0%, var(--bg) 70%);
+    }
+
+    .hero-icon {
+      font-size: 5rem;
+      margin-bottom: 1.5rem;
+      animation: float 3.5s ease-in-out infinite;
+      display: block;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-12px); }
+    }
+
+    .hero h1 {
+      font-size: 3.2rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.5px;
+    }
+
+    .hero h2 {
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--text-muted);
+      max-width: 480px;
+      line-height: 1.8;
+      margin-bottom: 2.5rem;
+    }
+
+    .btn-start {
+      background: var(--accent);
+      color: #0d1117;
+      border: none;
+      padding: 0.9rem 2.8rem;
+      font-size: 1.2rem;
+      font-family: 'Alef', sans-serif;
+      font-weight: 700;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 32px rgba(74, 222, 128, 0.25);
+    }
+
+    .btn-start:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 48px rgba(74, 222, 128, 0.45);
+    }
+
+    .hero-notice {
+      max-width: 560px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.4rem 1.8rem;
+      margin: 1.8rem 0 2rem;
+      text-align: right;
+      line-height: 1.9;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .hero-notice strong { color: var(--text); }
+
+    /* ── STAGE VIEW ───────────────────────────────────── */
+    .stage-view {
+      display: none;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    .stage-view.active {
+      display: flex;
+    }
+
+    /* ── PROGRESS BAR ─────────────────────────────────── */
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 1.2rem 1.5rem;
+    }
+
+    .progress-steps {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 0;
+    }
+
+    .step-wrap {
+      display: flex;
+      align-items: center;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+      cursor: pointer;
+    }
+
+    .step:hover .step-dot {
+      border-color: var(--accent);
+      transform: scale(1.1);
+    }
+
+    .step-dot {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      transition: all 0.3s;
+    }
+
+    .step.active .step-dot {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #0d1117;
+      box-shadow: 0 0 16px rgba(74, 222, 128, 0.4);
+    }
+
+    .step.done .step-dot {
+      background: var(--accent-dim);
+      border-color: var(--accent-dim);
+      color: #d1fae5;
+    }
+
+    .step-label {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .step.active .step-label {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .step-line {
+      width: 36px;
+      height: 2px;
+      background: var(--border);
+      margin: 0 3px 18px 3px;
+      transition: background 0.3s;
+    }
+
+    .step-line.done {
+      background: var(--accent-dim);
+    }
+
+    /* ── STAGE CONTENT ────────────────────────────────── */
+    .stage-content {
+      flex: 1;
+      padding: 3rem 2rem;
+      max-width: 780px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* ── NAV BUTTONS ──────────────────────────────────── */
+    .stage-nav {
+      padding: 1.2rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .btn-nav {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 0.65rem 1.8rem;
+      font-size: 1rem;
+      font-family: 'Alef', sans-serif;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-nav:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-nav:disabled {
+      opacity: 0.25;
+      cursor: not-allowed;
+    }
+
+    .btn-nav.primary {
+      background: var(--accent);
+      color: #0d1117;
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+
+    .btn-nav.primary:hover {
+      transform: scale(1.04);
+      box-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
+      color: #0d1117;
+    }
+
+    /* ── PLACEHOLDER STYLES ───────────────────────────── */
+    .placeholder {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-muted);
+    }
+
+    .placeholder h2 {
+      font-size: 1.8rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .placeholder p {
+      font-size: 1.05rem;
+      line-height: 1.8;
+    }
+
+    /* ── STAGE 1: מבוא ────────────────────────────────── */
+    .s1-pretitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+      letter-spacing: 1px;
+    }
+
+    .s1-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.8rem;
+      line-height: 1.3;
+    }
+
+    .s1-sub {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .s1-votes {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .vote-btn {
+      padding: 0.8rem 2rem;
+      font-size: 1.05rem;
+      font-family: 'Alef', sans-serif;
+      border-radius: 50px;
+      border: 2px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .vote-btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: scale(1.04);
+    }
+
+    .vote-btn.chosen {
+      border-color: var(--accent) !important;
+      color: var(--accent) !important;
+      opacity: 1 !important;
+    }
+
+    .s1-reveal {
+      margin-top: 3rem;
+      padding-top: 2.5rem;
+      border-top: 1px solid var(--border);
+      animation: fadeInUp 0.5s ease;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal-tag {
+      display: inline-block;
+      background: var(--accent-dim);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 0.3rem 0.9rem;
+      border-radius: 20px;
+      margin-bottom: 0.8rem;
+    }
+
+    .s1-reveal h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.8rem;
+      color: var(--text);
+      line-height: 1.4;
+    }
+
+    .wow-facts {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .wow-card {
+      flex: 1;
+      min-width: 180px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .wow-num {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 0.6rem;
+    }
+
+    .wow-text {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .xray-pair {
+      display: flex;
+      gap: 1.5rem;
+      margin: 2rem 0;
+      flex-wrap: wrap;
+    }
+
+    .xray-card {
+      flex: 1;
+      min-width: 220px;
+      background: #000;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .xray-card img {
+      width: 100%;
+      display: block;
+      max-height: 320px;
+      object-fit: cover;
+      object-position: top;
+    }
+
+    .xray-label {
+      text-align: center;
+      padding: 0.6rem;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .sci-credit {
+      margin-top: 0.3rem;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+    }
+
+    .s1-explain {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.8rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .s1-explain h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0.9rem;
+    }
+
+    .s1-explain p {
+      font-size: 1rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-bottom: 0.7rem;
+    }
+
+    .s1-explain p:last-child { margin-bottom: 0; }
+    .s1-explain strong { color: var(--text); }
+
+    .s1-teaser {
+      text-align: center;
+      padding: 1.2rem;
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.7;
+      font-style: italic;
+    }
+
+    .s1-feedback {
+      margin-top: 1.2rem;
+      padding: 0.9rem 1.4rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      animation: fadeInUp 0.3s ease;
+    }
+
+    .s1-feedback.correct {
+      background: rgba(74, 222, 128, 0.12);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+    }
+
+    .s1-feedback.wrong {
+      background: rgba(248, 113, 113, 0.1);
+      border: 1px solid #f87171;
+      color: #f87171;
+    }
+
+    /* ── STAGE 2: ברירה טבעית ───────────────────────── */
+    .s2-intro { margin-bottom: 2.5rem; }
+
+    .s2-definition, .s3-definition {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-bottom: 1.8rem;
+      padding: 1.2rem 1.5rem;
+      border-right: 3px solid var(--accent);
+      background: var(--surface);
+      border-radius: 0 10px 10px 0;
+    }
+
+    /* ── STAGE 3: תורשה ──────────────────────────────── */
+    .s3-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+    }
+
+    .s3-lab {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .s3-lab-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .parents-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .parent-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .parent-beetle { width: 54px; height: 72px; }
+    .parent-beetle svg { width: 100%; height: 100%; display: block; }
+
+    .parent-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .parents-plus {
+      font-size: 2rem;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+    }
+
+    .s3-mix-btn { margin-bottom: 1.5rem; }
+
+    .offspring-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      min-height: 80px;
+      margin-bottom: 1rem;
+    }
+
+    .offspring-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      animation: fadeInUp 0.3s ease;
+    }
+
+    .offspring-beetle { width: 38px; height: 50px; }
+    .offspring-beetle svg { width: 100%; height: 100%; display: block; }
+
+    .mutation-badge {
+      font-size: 0.65rem;
+      background: #7c3aed;
+      color: #fff;
+      padding: 0.15rem 0.4rem;
+      border-radius: 10px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .s3-mix-count {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .s3-insight {
+      margin-top: 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--accent-dim);
+      border-radius: 12px;
+      padding: 1.5rem;
+      animation: fadeInUp 0.5s ease;
+    }
+
+    .s3-insight p {
+      font-size: 1rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-bottom: 0.6rem;
+    }
+
+    .s3-insight p:last-child { margin-bottom: 0; }
+    .s3-insight strong { color: var(--text); }
+
+    /* ── STAGE 4: הזמן הגדול ─────────────────────────── */
+    .s4-title {
+      font-size: 1.8rem; font-weight: 700;
+      color: var(--text); margin-bottom: 1.5rem;
+    }
+
+    .s4-scale-cards {
+      display: flex; gap: 1rem;
+      margin-bottom: 2.5rem; flex-wrap: wrap;
+    }
+
+    .s4-scale-card {
+      flex: 1; min-width: 200px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.5rem; text-align: center;
+    }
+
+    .s4-scale-icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
+
+    .s4-scale-card p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.7; }
+    .s4-scale-card strong { color: var(--accent); }
+
+    .s4-timeline {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.5rem; margin-bottom: 2rem;
+    }
+
+    .tl-intro {
+      text-align: center; color: var(--text-muted);
+      font-size: 0.95rem; margin-bottom: 1.5rem;
+    }
+
+    .tl-track { position: relative; margin-bottom: 1.5rem; padding: 0 17px; }
+
+    .tl-line {
+      position: absolute; top: 17px; left: 17px; right: 17px;
+      height: 2px; background: var(--border); z-index: 0;
+    }
+
+    .tl-dots {
+      display: flex; justify-content: space-between;
+      position: relative; z-index: 1;
+    }
+
+    .tl-dot { display: flex; flex-direction: column; align-items: center; }
+
+    .tl-dot span {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--surface-2); border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.95rem; transition: all 0.3s; cursor: pointer;
+    }
+
+    .tl-dot:hover span {
+      border-color: var(--accent);
+      transform: scale(1.15);
+    }
+
+    .tl-dot.active span {
+      background: var(--accent); border-color: var(--accent);
+      box-shadow: 0 0 14px rgba(74,222,128,0.5); transform: scale(1.25);
+    }
+
+    .tl-dot.done span { background: var(--accent-dim); border-color: var(--accent-dim); }
+
+    .tl-event-card {
+      background: var(--surface-2); border-radius: 12px;
+      padding: 1.5rem; margin-bottom: 1.5rem;
+      min-height: 130px; text-align: center;
+    }
+
+    .tl-ev-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+
+    .tl-ev-year {
+      font-size: 0.82rem; color: var(--accent);
+      font-weight: 700; margin-bottom: 0.3rem; letter-spacing: 0.3px;
+    }
+
+    .tl-ev-label {
+      font-size: 1.3rem; font-weight: 700;
+      color: var(--text); margin-bottom: 0.7rem;
+    }
+
+    .tl-ev-desc {
+      font-size: 0.95rem; color: var(--text-muted);
+      line-height: 1.7; margin-bottom: 0.8rem;
+    }
+
+    .tl-ev-wow {
+      display: inline-block; background: var(--accent-dim);
+      color: var(--accent); font-size: 0.82rem;
+      font-weight: 700; padding: 0.3rem 0.8rem; border-radius: 20px;
+    }
+
+    .s4-end {
+      background: var(--surface); border: 1px solid var(--accent-dim);
+      border-radius: 12px; padding: 1.8rem;
+      animation: fadeInUp 0.5s ease;
+    }
+
+    .s4-end h3 {
+      font-size: 1.2rem; font-weight: 700;
+      color: var(--accent); margin-bottom: 1.2rem;
+    }
+
+    .scale-bar-wrap { margin: 1.2rem 0; }
+
+    .scale-bar-label {
+      font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.3rem;
+    }
+
+    .scale-bar {
+      height: 20px; background: var(--surface-2); border-radius: 4px;
+      overflow: hidden; margin-bottom: 0.15rem;
+    }
+
+    .scale-bar-fill { height: 100%; background: var(--accent); border-radius: 4px; min-width: 3px; }
+    .scale-bar-fill.full { background: #2d3a2d; width: 100%; }
+
+    .scale-bar-note {
+      font-size: 0.72rem; color: var(--text-muted); font-style: italic;
+    }
+
+    .s4-end p {
+      font-size: 1rem; color: var(--text-muted);
+      line-height: 1.8; margin-top: 1rem;
+    }
+
+    .s4-end strong { color: var(--text); }
+
+    .s2-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+    }
+
+    .concept-cards {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .concept-card {
+      flex: 1;
+      min-width: 160px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.2rem;
+    }
+
+    .concept-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: var(--accent);
+      color: #0d1117;
+      border-radius: 50%;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 0.7rem;
+    }
+
+    .concept-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+
+    .concept-card p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .s2-cta {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    .s2-game {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .game-round { font-size: 1rem; font-weight: 700; color: var(--text); }
+
+    .game-timer {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 2.5rem;
+      text-align: center;
+      transition: color 0.3s;
+    }
+
+    .game-timer.urgent { color: #ef4444; }
+
+    .game-instructions {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .game-field {
+      position: relative;
+      height: 260px;
+      background: linear-gradient(160deg, #1a3a0a 0%, #0f2206 100%);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+      cursor: crosshair;
+      border: 2px solid #2d5c14;
+    }
+
+    .beetle {
+      position: absolute;
+      width: 30px;
+      height: 40px;
+      cursor: pointer;
+      transform: translate(-50%, -50%);
+      transition: transform 0.15s, opacity 0.25s;
+      user-select: none;
+    }
+
+    .beetle svg { width: 100%; height: 100%; display: block; }
+
+    .beetle:hover:not(.inactive) { transform: translate(-50%, -50%) scale(1.4); }
+
+    .beetle.caught {
+      transform: translate(-50%, -50%) scale(0) !important;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .beetle.inactive { pointer-events: none; }
+
+    .game-stats {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 1rem;
+      justify-content: center;
+    }
+
+    .stat { font-size: 0.95rem; font-weight: 700; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; }
+    .green-text { color: #4ade80; }
+    .red-text   { color: #f87171; }
+
+    .round-history { margin-bottom: 1rem; }
+
+    .hist-row {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin-bottom: 0.4rem;
+      font-size: 0.82rem;
+    }
+
+    .hist-label { color: var(--text-muted); min-width: 62px; }
+
+    .hist-bar {
+      flex: 1;
+      height: 14px;
+      background: var(--surface-2);
+      border-radius: 7px;
+      overflow: hidden;
+      display: flex;
+    }
+
+    .hist-green { background: #4ade80; height: 100%; transition: width 0.6s ease; }
+    .hist-red   { background: #f87171; height: 100%; flex: 1; }
+    .hist-nums  { min-width: 44px; font-weight: 700; }
+
+    .round-result {
+      background: var(--surface-2);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .result-caught {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+
+    .result-survive, .result-next {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 0.2rem;
+    }
+
+    .btn-game-start {
+      display: block;
+      width: 100%;
+      padding: 0.9rem;
+      background: var(--accent);
+      color: #0d1117;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-family: 'Alef', sans-serif;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 20px rgba(74,222,128,0.2);
+    }
+
+    .btn-game-start:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 30px rgba(74,222,128,0.35);
+    }
+
+    .s2-outcome {
+      background: var(--surface);
+      border: 1px solid var(--accent-dim);
+      border-radius: 12px;
+      padding: 1.8rem;
+      margin-top: 1rem;
+      animation: fadeInUp 0.5s ease;
+    }
+
+    .s2-outcome h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .s2-outcome p {
+      font-size: 1rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-bottom: 0.8rem;
+    }
+
+    .s2-outcome p:last-child { margin-bottom: 0; }
+    .s2-outcome strong { color: var(--text); }
+
+    .s2-waiting {
+      margin-top: 1rem;
+      padding: 1.4rem;
+      border-radius: 12px;
+      border: 1px dashed var(--border);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      animation: pulse-border 2.5s ease-in-out infinite;
+    }
+
+    .s2-waiting-icon {
+      display: block;
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+      opacity: 0.6;
+    }
+
+    @keyframes pulse-border {
+      0%, 100% { border-color: var(--border); }
+      50%       { border-color: var(--text-muted); }
+    }
+
+    /* ── STAGE 5: ראיות ─────────────────────────────── */
+    .s5-title {
+      font-size: 1.8rem; font-weight: 700;
+      color: var(--text); margin-bottom: 1.5rem;
+    }
+
+    .s5-definition {
+      font-size: 1.05rem; color: var(--text-muted);
+      line-height: 1.8; margin-bottom: 2rem;
+      padding: 1.2rem 1.5rem;
+      border-right: 3px solid var(--accent);
+      background: var(--surface); border-radius: 0 10px 10px 0;
+    }
+
+    .s5-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 520px) { .s5-grid { grid-template-columns: 1fr; } }
+
+    .s5-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+
+    .s5-card:hover:not(.revealed) { border-color: var(--accent); transform: translateY(-2px); }
+    .s5-card.revealed { cursor: default; border-color: var(--accent-dim); }
+
+    .s5-card-header {
+      display: flex; align-items: center; gap: 0.8rem;
+      padding: 1rem 1.2rem;
+    }
+
+    .s5-card-icon { font-size: 2rem; flex-shrink: 0; }
+
+    .s5-card-title { font-size: 1rem; font-weight: 700; color: var(--text); }
+
+    .s5-card-hint { font-size: 0.8rem; color: var(--accent); margin-top: 0.15rem; }
+
+    .s5-card-body {
+      padding: 0 1.2rem 1.2rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+      animation: fadeInUp 0.4s ease;
+    }
+
+    .s5-card-body img {
+      width: 100%; border-radius: 8px; margin-bottom: 0.8rem; display: block;
+    }
+
+    .s5-card-body p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.7; }
+    .s5-card-body strong { color: var(--text); }
+
+    .s5-video-link {
+      display: inline-block;
+      margin-top: 0.9rem;
+      padding: 0.45rem 1rem;
+      border-radius: 6px;
+      border: 1px solid var(--accent-dim);
+      background: rgba(74, 222, 128, 0.07);
+      color: var(--accent);
+      font-size: 0.85rem;
+      font-family: 'Alef', sans-serif;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .s5-video-link:hover {
+      background: rgba(74, 222, 128, 0.15);
+      border-color: var(--accent);
+    }
+
+    .s5-summary {
+      background: var(--surface); border: 1px solid var(--accent-dim);
+      border-radius: 12px; padding: 1.8rem;
+      animation: fadeInUp 0.5s ease;
+    }
+
+    .s5-summary h3 {
+      font-size: 1.2rem; font-weight: 700; color: var(--accent); margin-bottom: 1rem;
+    }
+
+    .s5-summary p { font-size: 1rem; color: var(--text-muted); line-height: 1.8; }
+    .s5-summary strong { color: var(--text); }
+
+    /* ── STAGE 6: דוגמאות ─────────────────────────────── */
+    .s6-title {
+      font-size: 1.8rem; font-weight: 700;
+      color: var(--text); margin-bottom: 1.5rem;
+    }
+
+    .s6-definition {
+      font-size: 1.05rem; color: var(--text-muted);
+      line-height: 1.8; margin-bottom: 2rem;
+      padding: 1.2rem 1.5rem;
+      border-right: 3px solid var(--accent);
+      background: var(--surface); border-radius: 0 10px 10px 0;
+    }
+
+    .s6-gallery {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+    }
+
+    .s6-dots {
+      display: flex; justify-content: center;
+      gap: 0.6rem; margin-bottom: 1.5rem;
+    }
+
+    .s6-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--border);
+      transition: background 0.3s, transform 0.3s;
+    }
+
+    .s6-dot.active { background: var(--accent); transform: scale(1.35); }
+
+    .s6-card { animation: fadeInUp 0.35s ease; }
+
+    .s6-card-icon {
+      font-size: 3.5rem; display: block;
+      text-align: center; margin-bottom: 0.8rem;
+    }
+
+    .s6-card-title {
+      font-size: 1.4rem; font-weight: 700;
+      color: var(--text); margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .s6-card-story {
+      font-size: 0.95rem; color: var(--text-muted);
+      line-height: 1.8; margin-bottom: 1.2rem;
+    }
+
+    .s6-card-story strong { color: var(--text); }
+
+    .s6-wow {
+      background: var(--surface-2);
+      border: 1px solid var(--accent-dim);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .s6-wow-label {
+      font-size: 0.75rem; font-weight: 700;
+      color: var(--accent); letter-spacing: 0.4px; margin-bottom: 0.3rem;
+    }
+
+    .s6-wow-text { font-size: 0.93rem; color: var(--text-muted); line-height: 1.7; }
+    .s6-wow-text strong { color: var(--text); }
+
+    .s6-nav {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-top: 0.5rem;
+    }
+
+    .s6-counter { font-size: 0.9rem; color: var(--text-muted); }
+
+    /* ── STAGE 7: בוחן ─────────────────────────────────── */
+    .s7-title {
+      font-size: 1.8rem; font-weight: 700;
+      color: var(--text); margin-bottom: 1.5rem;
+    }
+
+    .s7-progress-wrap { margin-bottom: 1.8rem; }
+
+    .s7-progress-info {
+      display: flex; justify-content: space-between;
+      font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;
+    }
+
+    .s7-progress-bar {
+      height: 6px; background: var(--surface-2);
+      border-radius: 4px; overflow: hidden;
+    }
+
+    .s7-progress-fill {
+      height: 100%; background: var(--accent);
+      border-radius: 4px; transition: width 0.4s ease;
+    }
+
+    .s7-question-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.8rem; margin-bottom: 1rem;
+      animation: fadeInUp 0.35s ease;
+    }
+
+    .s7-question-text {
+      font-size: 1.15rem; font-weight: 700;
+      color: var(--text); line-height: 1.6; margin-bottom: 1.5rem;
+    }
+
+    .s7-answers { display: flex; flex-direction: column; gap: 0.7rem; }
+
+    .s7-answer-btn {
+      width: 100%; background: var(--surface-2);
+      border: 2px solid var(--border); border-radius: 10px;
+      padding: 0.9rem 1.2rem;
+      font-family: 'Alef', sans-serif; font-size: 0.95rem;
+      color: var(--text); cursor: pointer;
+      text-align: right; direction: rtl;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .s7-answer-btn:hover:not(:disabled) {
+      border-color: var(--accent); background: #1a2535;
+    }
+
+    .s7-answer-btn.correct {
+      border-color: var(--accent); background: #0d2818; color: var(--accent);
+    }
+
+    .s7-answer-btn.wrong {
+      border-color: #ef4444; background: #2a0d0d; color: #ef4444;
+    }
+
+    .s7-answer-btn:disabled { cursor: default; }
+
+    .s7-explanation {
+      background: var(--surface-2); border-radius: 10px;
+      padding: 1rem 1.2rem; margin-top: 1.2rem;
+      font-size: 0.9rem; color: var(--text-muted); line-height: 1.7;
+      animation: fadeInUp 0.3s ease;
+    }
+
+    .s7-explanation strong { color: var(--text); }
+
+    .s7-next-wrap { text-align: center; margin-top: 0.5rem; animation: fadeInUp 0.3s ease; }
+
+    .s7-score { text-align: center; animation: fadeInUp 0.5s ease; padding: 1rem 0; }
+    .s7-score-icon { font-size: 4rem; display: block; margin-bottom: 1rem; }
+    .s7-score-number { font-size: 3.5rem; font-weight: 700; color: var(--accent); }
+    .s7-score-label { font-size: 1rem; color: var(--text-muted); margin: 0.3rem 0 1.5rem; }
+    .s7-score-message { font-size: 1.2rem; font-weight: 700; color: var(--text); margin-bottom: 2rem; }
+
+    .s7-submit-box {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0;
+      text-align: right;
+    }
+
+    .s7-submit-label {
+      font-size: 0.95rem; color: var(--text-muted); margin-bottom: 0.7rem;
+    }
+
+    .s7-name-input {
+      width: 100%; padding: 0.75rem 1rem;
+      background: var(--surface); border: 2px solid var(--border);
+      border-radius: 8px; font-family: 'Alef', sans-serif;
+      font-size: 1rem; color: var(--text); direction: rtl;
+      margin-bottom: 1rem; transition: border-color 0.2s;
+    }
+
+    .s7-name-input:focus { outline: none; border-color: var(--accent); }
+
+    .s7-submit-btn {
+      width: 100%; padding: 0.85rem;
+      background: var(--accent); color: #0d1117;
+      border: none; border-radius: 10px;
+      font-family: 'Alef', sans-serif; font-size: 1rem; font-weight: 700;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+
+    .s7-submit-btn:hover { opacity: 0.88; }
+    .s7-submit-btn:disabled { opacity: 0.4; cursor: default; }
+
+    .s7-video-box {
+      margin-top: 2rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .s7-video-title {
+      font-size: 1rem; font-weight: 700;
+      color: var(--accent); margin-bottom: 0.4rem;
+    }
+
+    .s7-video-sub {
+      font-size: 0.88rem; color: var(--text-muted);
+      margin-bottom: 1.2rem;
+    }
+
+    .s7-video-link-btn {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      background: #ff0000; color: #fff;
+      border: none; border-radius: 10px;
+      padding: 0.8rem 1.6rem; font-size: 1rem;
+      font-family: 'Alef', sans-serif; font-weight: 700;
+      cursor: pointer; text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .s7-video-link-btn:hover { opacity: 0.88; }
+
+    /* ── PRESENTATION MODE ──────────────────────────── */
+    .btn-pres {
+      background: transparent;
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      padding: 0.6rem 2rem;
+      font-size: 1rem;
+      font-family: 'Alef', sans-serif;
+      font-weight: 700;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 0.7rem;
+      display: block;
+    }
+    .btn-pres:hover { background: var(--accent); color: #0d1117; }
+
+    .pres-overlay {
+      position: fixed; inset: 0;
+      background: #090c12;
+      z-index: 9999;
+      display: flex; flex-direction: column;
+      font-family: 'Alef', sans-serif;
+      direction: rtl;
+    }
+    .pres-overlay.hidden { display: none !important; }
+
+    .pres-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.65rem 1.5rem;
+      background: #161b27;
+      border-bottom: 2px solid var(--accent);
+      flex-shrink: 0;
+    }
+    .pres-module-label { font-size: 0.82rem; color: var(--accent); font-weight: 700; letter-spacing: 0.4px; }
+    .pres-counter { font-size: 0.88rem; color: var(--text-muted); }
+    .pres-exit-btn {
+      background: transparent; border: 1px solid var(--border);
+      color: var(--text-muted); padding: 0.3rem 0.85rem;
+      border-radius: 6px; font-family: 'Alef', sans-serif;
+      font-size: 0.82rem; cursor: pointer; transition: all 0.2s;
+    }
+    .pres-exit-btn:hover { border-color: #ef4444; color: #ef4444; }
+
+    .pres-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .pres-body.pres-has-image { flex-direction: row; }
+
+    .pres-img-wrap {
+      flex: 0 0 46%;
+      display: flex; align-items: center; justify-content: center;
+      background: #050810; overflow: hidden;
+    }
+    .pres-img-wrap img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+
+    .pres-icon-wrap {
+      flex: 0 0 16%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5.5rem;
+      background: radial-gradient(ellipse at 50% 50%, #0d2818 0%, #090c12 70%);
+    }
+
+    .pres-content {
+      flex: 1; padding: 1.1rem 2.5rem;
+      overflow-y: auto; display: flex; flex-direction: column;
+      justify-content: center; gap: 0.55rem;
+    }
+    .pres-stage-label { font-size: 0.75rem; color: var(--accent); font-weight: 700; letter-spacing: 0.5px; }
+    .pres-title { font-size: 2rem; font-weight: 700; color: var(--text); line-height: 1.25; }
+
+    .pres-points { list-style: none; display: flex; flex-direction: column; gap: 0.45rem; margin: 0; padding: 0; }
+    .pres-points li {
+      font-size: 1.12rem; line-height: 1.5; color: var(--text);
+      padding-right: 1.3rem; position: relative;
+    }
+    .pres-points li::before {
+      content: "◆"; color: var(--accent); position: absolute;
+      right: 0; font-size: 0.52rem; top: 0.48rem;
+    }
+
+    .pres-activity {
+      background: #0b1f0e; border: 1px solid var(--accent-dim);
+      border-right: 3px solid var(--accent);
+      border-radius: 8px; padding: 0.75rem 1rem; margin-top: 0.2rem;
+    }
+    .pres-activity-label { font-size: 0.72rem; font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .pres-activity p { font-size: 0.96rem; color: var(--text-muted); line-height: 1.6; margin: 0; }
+
+    .pres-question {
+      background: #0e1525; border: 1px solid #2a3145;
+      border-right: 3px solid #60a5fa; border-radius: 8px;
+      padding: 0.65rem 1rem; font-size: 0.9rem; color: #93c5fd; line-height: 1.5;
+    }
+    .pres-note { font-size: 0.82rem; color: var(--text-muted); font-style: italic; line-height: 1.5; }
+
+    .pres-summary {
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent);
+      padding: 0.8rem 1rem;
+      border-top: 1px solid var(--accent-dim);
+      margin-top: 0.4rem;
+      line-height: 1.5;
+    }
+
+    .pres-nav-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.75rem 1.5rem;
+      background: #161b27; border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .pres-nav-btn {
+      background: var(--surface-2); border: 1px solid var(--border);
+      color: var(--text); padding: 0.5rem 1.4rem;
+      border-radius: 8px; font-family: 'Alef', sans-serif;
+      font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    }
+    .pres-nav-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+    .pres-nav-btn:disabled { opacity: 0.3; cursor: default; }
+    .pres-nav-btn.primary { background: var(--accent); border-color: var(--accent); color: #0d1117; }
+    .pres-nav-btn.primary:hover:not(:disabled) { opacity: 0.88; color: #0d1117; }
+
+    .pres-dots { display: flex; gap: 7px; align-items: center; }
+    .pres-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--border); cursor: pointer; transition: all 0.2s;
+    }
+    .pres-dot.active { background: var(--accent); transform: scale(1.35); }
+
+    .pres-item {
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.32s ease, transform 0.32s ease;
+    }
+    .pres-item.pres-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── HERO SCREEN ── -->
+  <div class="hero" id="hero">
+    <span class="hero-icon">🧬</span>
+    <h1>אבולוציה</h1>
+    <h2>מסע קצר להבנת אחת התגליות הגדולות בהיסטוריה של המדע</h2>
+    <button class="btn-start" onclick="startLearning()">בואו נתחיל</button>
+    <button class="btn-pres" onclick="presOpen()">מצגת למורה</button>
+  </div>
+
+  <!-- ── STAGE VIEW ── -->
+  <div class="stage-view" id="stageView">
+
+    <!-- Progress Bar -->
+    <div class="topbar">
+      <div class="progress-steps" id="progressSteps"></div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="stage-content" id="stageContent"></div>
+
+    <!-- Navigation -->
+    <div class="stage-nav">
+      <button class="btn-nav" id="btnPrev" onclick="prevStage()">הקודם</button>
+      <button class="btn-nav primary" id="btnNext" onclick="nextStage()">הבא</button>
+    </div>
+
+  </div>
+
+  <script>
+    const STAGES = [
+      { label: 'מבוא' },
+      { label: 'ברירה טבעית' },
+      { label: 'תורשה' },
+      { label: 'הזמן הגדול' },
+      { label: 'ראיות' },
+      { label: 'דוגמאות' },
+      { label: 'בוחן' },
+    ];
+
+    // Placeholder content — will be replaced stage by stage
+    const STAGE_HTML = [
+      `<div class="s1">
+  <p class="s1-pretitle">לפני שמתחילים —</p>
+  <h2 class="s1-title">האם לוויתן קרוב משפחה שלך?</h2>
+  <p class="s1-sub">נשמע מוזר? בחרו את התשובה שלכם:</p>
+  <div class="s1-votes">
+    <button class="vote-btn" data-answer="correct" onclick="s1Vote(this)">כן, בהחלט 🐋</button>
+    <button class="vote-btn" data-answer="wrong" onclick="s1Vote(this)">לא נראה לי 🙅</button>
+  </div>
+
+  <div class="s1-feedback" id="s1Feedback" style="display:none"></div>
+
+  <div class="s1-reveal" id="s1Reveal" style="display:none">
+    <span class="reveal-tag">התשובה המדהימה:</span>
+    <h3>כן — וזה הרבה יותר מוזר ממה שחשבתם</h3>
+
+    <div class="wow-facts">
+      <div class="wow-card">
+        <div class="wow-num">80%</div>
+        <div class="wow-text">מהגנים של לוויתן זהים לגנים של בני אדם</div>
+      </div>
+      <div class="wow-card">
+        <div class="wow-num">5</div>
+        <div class="wow-text">אצבעות מוסתרות בתוך סנפיר הלווייתן — בדיוק כמו ביד שלכם</div>
+      </div>
+    </div>
+
+    <div class="xray-pair">
+      <div class="xray-card">
+        <img src="humanhand.jpg" alt="עצמות יד אדם" />
+        <div class="xray-label">יד אדם</div>
+      </div>
+      <div class="xray-card">
+        <img src="whalehand2.jpg" alt="עצמות סנפיר לווייתן" />
+        <div class="xray-label">סנפיר לווייתן</div>
+      </div>
+    </div>
+
+    <div class="s1-explain">
+      <h3>אז מה זה אומר?</h3>
+      <p>לפני כ-50 מיליון שנה, אבות אבותיו של הלוויתן הלכו על ארבע, על היבשה. לאורך דורות ודורות הם השתנו — ואיבדו רגליים, פיתחו גוף מוארך, ועברו לים. אבל מבנה העצמות? הוא עדיין שם, בתוך הסנפיר.</p>
+      <p>זה — בקצרה — <strong>אבולוציה</strong>: תהליך שבו מינים משתנים לאורך זמן ארוך מאוד.</p>
+    </div>
+
+    <div class="s1-teaser">
+      <p>איך בדיוק זה קורה? בשלב הבא תגלו — ותשחקו את זה בעצמכם.</p>
+    </div>
+  </div>
+</div>`,
+      `<div class="s2">
+  <div class="s2-intro">
+    <h2 class="s2-title">ברירה טבעית — שלושה כללים פשוטים</h2>
+    <p class="s2-definition">ברירה טבעית היא התהליך שבו פרטים עם תכונות מתאימות יותר לסביבתם שורדים, מתרבים, ומעבירים את התכונות האלה לצאצאים. לאורך הדורות, התכונות המועילות הופכות נפוצות יותר — והמין משתנה.</p>
+    <div class="concept-cards">
+      <div class="concept-card">
+        <div class="concept-num">1</div>
+        <h3>שונות</h3>
+        <p>לא כולם זהים — יש הבדלים טבעיים בין פרטים באוכלוסייה</p>
+      </div>
+      <div class="concept-card">
+        <div class="concept-num">2</div>
+        <h3>לחץ סביבתי</h3>
+        <p>לא כולם שורדים — רק חלק מגיעים להתרבות</p>
+      </div>
+      <div class="concept-card">
+        <div class="concept-num">3</div>
+        <h3>הורשה</h3>
+        <p>התכונות עוברות לצאצאים — הדור הבא דומה לשורדים</p>
+      </div>
+    </div>
+    <p class="s2-cta">עכשיו תחוו את זה בעצמכם &#x1F447;</p>
+  </div>
+
+  <div class="s2-game" id="s2Game">
+    <div class="game-header">
+      <div class="game-round">סיבוב <span id="roundNum">1</span> מתוך 4</div>
+      <div class="game-timer" id="gameTimer">&#x23F3;</div>
+    </div>
+    <div class="game-instructions" id="gameInstructions">
+      אתם טורפים רעבים. לחצו על כמה שיותר חיפושיות תוך 5 שניות!
+    </div>
+    <div class="game-field" id="gameField"></div>
+    <div class="game-stats">
+      <div class="stat"><span class="green-text">&#9679;</span>&nbsp;ירוקות:&nbsp;<span id="greenCount" class="green-text">10</span></div>
+      <div class="stat"><span class="red-text">&#9679;</span>&nbsp;אדומות:&nbsp;<span id="redCount" class="red-text">10</span></div>
+    </div>
+    <div class="round-history" id="roundHistory"></div>
+    <div class="round-result hidden" id="roundResult"></div>
+    <button class="btn-game-start" id="btnGameStart" onclick="s2StartRound()">התחילו לצוד!</button>
+  </div>
+
+  <div class="s2-waiting" id="s2Waiting">
+    <span class="s2-waiting-icon">🔒</span>
+    <p>השלימו את ארבעת הסיבובים כדי לגלות מה קרה לאוכלוסייה</p>
+  </div>
+
+  <div class="s2-outcome hidden" id="s2Outcome">
+    <h3>ראיתם מה קרה? זו ברירה טבעית.</h3>
+    <p>בלי לתכנן כלום — תפסתם יותר חיפושיות <strong>אדומות</strong> כי הן היו קל יותר לראות. הירוקות, שהתחפשו לסביבה, שרדו יותר. לאורך הדורות, האוכלוסייה הפכה ירוקה יותר ויותר.</p>
+    <p>זה בדיוק מה שקורה בטבע: אף אחד לא "החליט" שהירוקות ינצחו — זה פשוט קרה, כי הן שרדו.</p>
+    <p>בשלב הבא נבין <strong>איך התכונות האלה עוברות הלאה</strong> מדור לדור.</p>
+  </div>
+</div>`,
+      `<div class="s3">
+  <h2 class="s3-title">תורשה — איך תכונות עוברות הלאה</h2>
+  <p class="s3-definition">תורשה היא העברת תכונות מהורים לצאצאים דרך גנים. בגלל תורשה, צאצאים דומים להוריהם — אבל לא זהים להם.</p>
+
+  <div class="concept-cards">
+    <div class="concept-card">
+      <div class="concept-num">1</div>
+      <h3>גנים — הוראות הבנייה של הגוף</h3>
+      <p>בכל תא בגוף נמצאות הוראות מפורטות שקובעות את כל התכונות</p>
+    </div>
+    <div class="concept-card">
+      <div class="concept-num">2</div>
+      <h3>ירושה — חצי מאבא, חצי מאמא</h3>
+      <p>כל צאצא מקבל גנים משני ההורים — לכן הוא לא זהה לאף אחד מהם</p>
+    </div>
+    <div class="concept-card">
+      <div class="concept-num">3</div>
+      <h3>מוטציה — טעות קטנה שיוצרת תכונה חדשה</h3>
+      <p>לעתים רחוקות, גן משתנה בטעות — ונוצרת תכונה שלא הייתה בהורים כלל</p>
+    </div>
+  </div>
+
+  <div class="s3-lab">
+    <p class="s3-lab-title">נסו בעצמכם — מה יצא לצאצא?</p>
+    <div class="parents-row">
+      <div class="parent-card">
+        <div class="parent-beetle" id="s3ParentA"></div>
+        <p class="parent-label">הורה א׳</p>
+      </div>
+      <div class="parents-plus">+</div>
+      <div class="parent-card">
+        <div class="parent-beetle" id="s3ParentB"></div>
+        <p class="parent-label">הורה ב׳</p>
+      </div>
+    </div>
+    <button class="btn-game-start s3-mix-btn" onclick="s3Mix()">ערבב! &#x1F9EC;</button>
+    <div class="offspring-grid" id="s3OffspringGrid"></div>
+    <div class="s3-mix-count" id="s3MixCount"></div>
+  </div>
+
+  <div class="s3-insight hidden" id="s3Insight">
+    <p><strong>כל צאצא שונה — זו השונות שברירה טבעית עובדת עליה!</strong></p>
+    <p>בלי שונות אין ברירה טבעית. בלי ברירה טבעית אין אבולוציה. הכל מתחיל כאן — בגן הקטן שמשתנה.</p>
+    <p>בשלב הבא תגלו כמה זמן לוקח לכל זה לקרות — והתשובה תפתיע אתכם.</p>
+  </div>
+</div>`,
+      `<div class="s4">
+  <h2 class="s4-title">הזמן הגדול — כמה זמן לוקחת אבולוציה?</h2>
+  <p class="s3-definition">אבולוציה עובדת לאט מאוד. לא מדובר במאות שנים — אלא במיליוני דורות, על פני מיליארדי שנים. כדי להבין את זה, צריך להבין כמה ישן כדור הארץ.</p>
+
+  <div class="s4-scale-cards">
+    <div class="s4-scale-card">
+      <div class="s4-scale-icon">&#x1F550;</div>
+      <p>אם כל תולדות כדור הארץ היו <strong>יום אחד</strong> — בני האדם הופיעו ב-4 השניות האחרונות לפני חצות</p>
+    </div>
+    <div class="s4-scale-card">
+      <div class="s4-scale-icon">&#x26BD;</div>
+      <p>אם כל תולדות כדור הארץ היו <strong>מגרש כדורגל</strong> — כל ההיסטוריה האנושית נכנסת ב-5 הסנטימטרים האחרונים</p>
+    </div>
+  </div>
+
+  <div class="s4-timeline">
+    <p class="tl-intro">עכשיו עברו את הדרך עצמה — לחצו קדימה</p>
+    <div class="tl-track">
+      <div class="tl-line"></div>
+      <div class="tl-dots" id="s4Dots"></div>
+    </div>
+    <div class="tl-event-card hidden" id="s4EventCard"></div>
+    <button class="btn-game-start" id="s4BtnNext" onclick="s4Next()">התחילו את המסע &#x2190;</button>
+  </div>
+
+  <div class="s4-end hidden" id="s4End">
+    <h3>אנחנו הם הרף עין בתולדות החיים</h3>
+    <div class="scale-bar-wrap">
+      <p class="scale-bar-label">כל תולדות כדור הארץ — 4.5 מיליארד שנה</p>
+      <div class="scale-bar"><div class="scale-bar-fill full"></div></div>
+      <p class="scale-bar-label" style="margin-top:0.7rem">כל ההיסטוריה האנושית — 5,000 שנה</p>
+      <div class="scale-bar"><div class="scale-bar-fill" style="width:0.11%"></div></div>
+      <p class="scale-bar-note">* לא לפי קנה מידה אמיתי — הפס התחתון היה אמור להיות בלתי נראה לחלוטין</p>
+    </div>
+    <p>ועדיין — בכל הזמן הזה, האבולוציה עשתה עבודה מדהימה. מחיידק פשוט לדגים, לזוחלים, ליונקים — ולאדם.</p>
+    <p>בשלב הבא נראה את <strong>הראיות</strong> שמוכיחות שכל זה אכן קרה.</p>
+  </div>
+</div>`,
+      `<div class="s5">
+  <h2 class="s5-title">ראיות — מנין אנחנו יודעים?</h2>
+  <p class="s5-definition">אבולוציה היא לא רק תיאוריה — יש לה ראיות רבות ומגוונות שמגיעות מתחומים שונים לגמרי של המדע. לחצו על כל כרטיס כדי לגלות.</p>
+
+  <div class="s5-grid" id="s5Grid">
+    <div class="s5-card" id="s5Card0" onclick="s5Reveal(0)">
+      <div class="s5-card-header">
+        <span class="s5-card-icon">&#x1F995;</span>
+        <div>
+          <div class="s5-card-title">מאובנים</div>
+          <div class="s5-card-hint" id="s5Hint0">&#x1F449; לחצו לגלות</div>
+        </div>
+      </div>
+    </div>
+    <div class="s5-card" id="s5Card1" onclick="s5Reveal(1)">
+      <div class="s5-card-header">
+        <span class="s5-card-icon">&#x1F9EC;</span>
+        <div>
+          <div class="s5-card-title">DNA משותף</div>
+          <div class="s5-card-hint" id="s5Hint1">&#x1F449; לחצו לגלות</div>
+        </div>
+      </div>
+    </div>
+    <div class="s5-card" id="s5Card2" onclick="s5Reveal(2)">
+      <div class="s5-card-header">
+        <span class="s5-card-icon">&#x1F9B4;</span>
+        <div>
+          <div class="s5-card-title">מבנים שאריתיים</div>
+          <div class="s5-card-hint" id="s5Hint2">&#x1F449; לחצו לגלות</div>
+        </div>
+      </div>
+    </div>
+    <div class="s5-card" id="s5Card3" onclick="s5Reveal(3)">
+      <div class="s5-card-header">
+        <span class="s5-card-icon">&#x1F441;</span>
+        <div>
+          <div class="s5-card-title">אבולוציה בזמן אמת</div>
+          <div class="s5-card-hint" id="s5Hint3">&#x1F449; לחצו לגלות</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="s5-summary hidden" id="s5Summary">
+    <h3>כל הראיות מצביעות לאותו כיוון</h3>
+    <p>מאובנים, DNA, מבנה הגוף, ואבולוציה שניתן לראות היום — כולם מספרים את אותו הסיפור. לא מדובר בהשערה אחת, אלא במאות שנות מחקר ממדעים שונים שמאשרים זה את זה. בשלב הבא נראה כמה דוגמאות מהעולם האמיתי.</p>
+  </div>
+</div>`,
+      `<div class="s6">
+  <h2 class="s6-title">דוגמאות — אבולוציה בפעולה</h2>
+  <p class="s6-definition">הנה כמה דוגמאות מהעולם האמיתי שמראות כיצד אבולוציה עיצבה יצורים שונים לגמרי — לכל אחד בדרכו שלו.</p>
+  <div class="s6-gallery">
+    <div class="s6-dots" id="s6Dots"></div>
+    <div id="s6Card"></div>
+    <div class="s6-nav">
+      <button class="btn-nav" id="s6BtnPrev" onclick="s6Prev()">&#x2192; הקודם</button>
+      <span class="s6-counter" id="s6Counter"></span>
+      <button class="btn-nav primary" id="s6BtnNext" onclick="s6Next()">הבא &#x2190;</button>
+    </div>
+  </div>
+</div>`,
+      `<div class="s7">
+  <h2 class="s7-title">בוחן מסכם</h2>
+  <div id="s7Content"></div>
+</div>`,
+    ];
+
+    let current = 0;
+
+    function buildProgressBar() {
+      const container = document.getElementById('progressSteps');
+      container.innerHTML = '';
+
+      STAGES.forEach((stage, i) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'step-wrap';
+
+        const step = document.createElement('div');
+        step.className = 'step' +
+          (i === current ? ' active' : '') +
+          (i < current  ? ' done'   : '');
+
+        step.innerHTML = `
+          <div class="step-dot">${i < current ? '✓' : i + 1}</div>
+          <div class="step-label">${stage.label}</div>
+        `;
+
+        step.addEventListener('click', () => { current = i; renderStage(); });
+
+        wrap.appendChild(step);
+
+        if (i < STAGES.length - 1) {
+          const line = document.createElement('div');
+          line.className = 'step-line' + (i < current ? ' done' : '');
+          wrap.appendChild(line);
+        }
+
+        container.appendChild(wrap);
+      });
+    }
+
+    function renderStage() {
+      document.getElementById('stageContent').innerHTML = STAGE_HTML[current];
+      document.getElementById('btnPrev').disabled = current === 0;
+      document.getElementById('btnNext').textContent =
+        current === STAGES.length - 1 ? 'סיום' : 'הבא';
+      buildProgressBar();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (current === 1) setTimeout(s2InitGame, 0);
+      if (current === 2) setTimeout(s3Init, 0);
+      if (current === 3) setTimeout(s4Init, 0);
+      if (current === 4) setTimeout(s5Init, 0);
+      if (current === 5) setTimeout(s6Init, 0);
+      if (current === 6) setTimeout(s7Init, 0);
+    }
+
+    function startLearning() {
+      document.getElementById('hero').style.display = 'none';
+      document.getElementById('stageView').classList.add('active');
+      renderStage();
+    }
+
+    function nextStage() {
+      if (current < STAGES.length - 1) { current++; renderStage(); }
+    }
+
+    function prevStage() {
+      if (current > 0) { current--; renderStage(); }
+    }
+
+    // ── Stage 2: Natural Selection Game ──────────────
+    let s2State = {};
+
+    function s2InitGame() {
+      s2State = {
+        round: 1, maxRounds: 4,
+        greenCount: 10, redCount: 10,
+        timer: null, timeLeft: 5,
+        active: false, history: []
+      };
+      s2RenderField();
+      s2UpdateStats();
+      const r = document.getElementById('roundResult');
+      if (r) r.classList.add('hidden');
+      const o = document.getElementById('s2Outcome');
+      if (o) o.classList.add('hidden');
+      const h = document.getElementById('roundHistory');
+      if (h) h.innerHTML = '';
+      const btn = document.getElementById('btnGameStart');
+      if (btn) { btn.textContent = 'התחילו לצוד!'; btn.onclick = s2StartRound; btn.style.display = 'block'; }
+      const timer = document.getElementById('gameTimer');
+      if (timer) { timer.textContent = '⏳'; timer.classList.remove('urgent'); }
+    }
+
+    function s2RenderField() {
+      const field = document.getElementById('gameField');
+      if (!field) return;
+      field.innerHTML = '';
+      const beetles = [];
+      for (let i = 0; i < s2State.greenCount; i++) beetles.push('green');
+      for (let i = 0; i < s2State.redCount; i++) beetles.push('red');
+      for (let i = beetles.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [beetles[i], beetles[j]] = [beetles[j], beetles[i]];
+      }
+      const SVG_GREEN =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 32">' +
+        '<line x1="10" y1="5" x2="7" y2="1" stroke="#1a3d05" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<line x1="14" y1="5" x2="17" y2="1" stroke="#1a3d05" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<line x1="6" y1="15" x2="1" y2="12" stroke="#1a3d05" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<line x1="6" y1="19" x2="1" y2="19" stroke="#1a3d05" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<line x1="7" y1="23" x2="2" y2="27" stroke="#1a3d05" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<line x1="18" y1="15" x2="23" y2="12" stroke="#1a3d05" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<line x1="18" y1="19" x2="23" y2="19" stroke="#1a3d05" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<line x1="17" y1="23" x2="22" y2="27" stroke="#1a3d05" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<ellipse cx="12" cy="21" rx="7" ry="10" fill="#2d6b0a"/>' +
+        '<line x1="12" y1="12" x2="12" y2="30" stroke="#1a3d05" stroke-width="1"/>' +
+        '<circle cx="12" cy="8" r="5.5" fill="#1a3d05"/>' +
+        '<circle cx="9.5" cy="7" r="1.2" fill="#000"/>' +
+        '<circle cx="14.5" cy="7" r="1.2" fill="#000"/>' +
+        '</svg>';
+
+      const SVG_RED =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 32">' +
+        '<line x1="10" y1="5" x2="7" y2="1" stroke="#7f1d1d" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<line x1="14" y1="5" x2="17" y2="1" stroke="#7f1d1d" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<line x1="6" y1="15" x2="1" y2="12" stroke="#7f1d1d" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<line x1="6" y1="19" x2="1" y2="19" stroke="#7f1d1d" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<line x1="7" y1="23" x2="2" y2="27" stroke="#7f1d1d" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<line x1="18" y1="15" x2="23" y2="12" stroke="#7f1d1d" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<line x1="18" y1="19" x2="23" y2="19" stroke="#7f1d1d" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<line x1="17" y1="23" x2="22" y2="27" stroke="#7f1d1d" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<ellipse cx="12" cy="21" rx="7" ry="10" fill="#ef4444"/>' +
+        '<circle cx="9" cy="18" r="2" fill="#7f1d1d"/>' +
+        '<circle cx="15" cy="18" r="2" fill="#7f1d1d"/>' +
+        '<circle cx="9" cy="24" r="2" fill="#7f1d1d"/>' +
+        '<circle cx="15" cy="24" r="2" fill="#7f1d1d"/>' +
+        '<line x1="12" y1="12" x2="12" y2="30" stroke="#7f1d1d" stroke-width="1"/>' +
+        '<circle cx="12" cy="8" r="5.5" fill="#1c1917"/>' +
+        '<circle cx="9.5" cy="7" r="1.2" fill="#fff"/>' +
+        '<circle cx="14.5" cy="7" r="1.2" fill="#fff"/>' +
+        '</svg>';
+
+      beetles.forEach(color => {
+        const b = document.createElement('div');
+        b.className = 'beetle inactive';
+        b.dataset.color = color;
+        b.style.left = (8 + Math.random() * 82) + '%';
+        b.style.top  = (8 + Math.random() * 78) + '%';
+        b.innerHTML = color === 'green' ? SVG_GREEN : SVG_RED;
+        b.addEventListener('click', () => s2CatchBeetle(b));
+        field.appendChild(b);
+      });
+    }
+
+    function s2StartRound() {
+      if (s2State.active) return;
+      document.getElementById('roundResult').classList.add('hidden');
+      document.getElementById('btnGameStart').style.display = 'none';
+      document.querySelectorAll('.beetle').forEach(b => b.classList.remove('inactive'));
+      s2State.active = true;
+      s2State.timeLeft = 5;
+      const timerEl = document.getElementById('gameTimer');
+      timerEl.textContent = s2State.timeLeft;
+      timerEl.classList.remove('urgent');
+      s2State.timer = setInterval(() => {
+        s2State.timeLeft--;
+        timerEl.textContent = s2State.timeLeft;
+        if (s2State.timeLeft <= 2) timerEl.classList.add('urgent');
+        if (s2State.timeLeft <= 0) { clearInterval(s2State.timer); s2EndRound(); }
+      }, 1000);
+    }
+
+    function s2CatchBeetle(b) {
+      if (!s2State.active || b.classList.contains('caught')) return;
+      b.classList.add('caught');
+      if (b.dataset.color === 'green') s2State.greenCount = Math.max(0, s2State.greenCount - 1);
+      else s2State.redCount = Math.max(0, s2State.redCount - 1);
+      s2UpdateStats();
+    }
+
+    function s2EndRound() {
+      s2State.active = false;
+      document.querySelectorAll('.beetle').forEach(b => b.classList.add('inactive'));
+      const survivors = { green: s2State.greenCount, red: s2State.redCount, round: s2State.round };
+      s2State.history.push(survivors);
+      s2UpdateHistory();
+      const total = survivors.green + survivors.red;
+      if (total > 0) {
+        s2State.greenCount = survivors.green === 0 ? 0 : Math.round(survivors.green / total * 20);
+        s2State.redCount   = survivors.red   === 0 ? 0 : 20 - s2State.greenCount;
+      }
+      s2UpdateStats();
+      const caught = 20 - (survivors.green + survivors.red);
+      const result = document.getElementById('roundResult');
+      result.innerHTML =
+        '<p class="result-caught">תפסתם ' + caught + ' חיפושיות!</p>' +
+        '<p class="result-survive">שורדות: <span class="green-text">' + survivors.green + ' ירוקות</span> + <span class="red-text">' + survivors.red + ' אדומות</span></p>' +
+        '<p class="result-next">הדור הבא: <span class="green-text">' + s2State.greenCount + ' ירוקות</span> + <span class="red-text">' + s2State.redCount + ' אדומות</span></p>';
+      result.classList.remove('hidden');
+      const btn = document.getElementById('btnGameStart');
+      if (s2State.round >= s2State.maxRounds) {
+        btn.textContent = 'ראו את התוצאה הסופית';
+        btn.onclick = s2ShowOutcome;
+      } else {
+        s2State.round++;
+        document.getElementById('roundNum').textContent = s2State.round;
+        btn.textContent = 'סיבוב הבא';
+        btn.onclick = () => { s2RenderField(); s2StartRound(); };
+      }
+      btn.style.display = 'block';
+    }
+
+    function s2UpdateStats() {
+      const g = document.getElementById('greenCount');
+      const r = document.getElementById('redCount');
+      if (g) g.textContent = s2State.greenCount;
+      if (r) r.textContent = s2State.redCount;
+    }
+
+    function s2UpdateHistory() {
+      const hist = document.getElementById('roundHistory');
+      if (!hist) return;
+      hist.innerHTML = s2State.history.map(h => {
+        const gPct = Math.round(h.green / 20 * 100);
+        return '<div class="hist-row">' +
+          '<span class="hist-label">סיבוב ' + h.round + '</span>' +
+          '<span class="hist-bar"><span class="hist-green" style="width:' + gPct + '%"></span><span class="hist-red"></span></span>' +
+          '<span class="hist-nums"><span class="green-text">' + h.green + '</span>/<span class="red-text">' + h.red + '</span></span>' +
+          '</div>';
+      }).join('');
+    }
+
+    function s2ShowOutcome() {
+      document.getElementById('btnGameStart').style.display = 'none';
+      const waiting = document.getElementById('s2Waiting');
+      if (waiting) waiting.style.display = 'none';
+      const o = document.getElementById('s2Outcome');
+
+      const finalGreen = s2State.greenCount;
+      const finalRed   = s2State.redCount;
+      let html;
+
+      if (finalGreen > finalRed) {
+        html = '<h3>ראיתם מה קרה? זו ברירה טבעית.</h3>' +
+          '<p>בלי לתכנן כלום — תפסתם יותר חיפושיות <strong>אדומות</strong> כי הן בלטו על הרקע הירוק. הירוקות, שהתחפשו לסביבה, שרדו יותר. לאורך הדורות, האוכלוסייה הפכה ירוקה יותר ויותר.</p>' +
+          '<p>זה בדיוק מה שקורה בטבע: אף אחד לא "החליט" שהירוקות ינצחו — זה פשוט קרה, כי הן שרדו.</p>' +
+          '<p>בשלב הבא נבין <strong>איך התכונות האלה עוברות הלאה</strong> מדור לדור.</p>';
+      } else if (finalRed > finalGreen) {
+        html = '<h3>הפעם האדומות שרדו יותר — וזה גם מלמד אתכם משהו!</h3>' +
+          '<p>תפסתם הפעם יותר חיפושיות <strong>ירוקות</strong>, אז האדומות שרדו יותר. לאורך הדורות, האוכלוסייה הייתה הופכת אדומה יותר ויותר.</p>' +
+          '<p>זה עדיין ברירה טבעית בפעולה — רק עם תוצאה שונה. ברירה טבעית לא "מחליטה" מה יצא, היא פשוט מעדיפה את <strong>מי ששורד</strong>. אם הטורף תופס יותר ירוקות, האדומות ינצחו. אם הוא תופס יותר אדומות, הירוקות ינצחו.</p>' +
+          '<p>בשלב הבא נבין <strong>איך התכונות האלה עוברות הלאה</strong> מדור לדור.</p>';
+      } else {
+        html = '<h3>תוצאה מאוזנת — ברירה טבעית צריכה הטיה כדי לעבוד</h3>' +
+          '<p>תפסתם כמעט אותה כמות מכל צבע — ולכן האוכלוסייה נשארה מעורבת. בטבע, כדי שברירה טבעית תשנה אוכלוסייה, צריך שיהיה <strong>יתרון ברור</strong> לתכונה אחת על פני השנייה.</p>' +
+          '<p>בסביבה ירוקה, בדרך כלל הירוקות ינצחו — כי הן קשות יותר לצייד לראות. אבל הפעם הקצב היה מאוזן.</p>' +
+          '<p>בשלב הבא נבין <strong>איך התכונות האלה עוברות הלאה</strong> מדור לדור.</p>';
+      }
+
+      o.innerHTML = html;
+      o.classList.remove('hidden');
+      setTimeout(() => o.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    }
+
+    // ── Stage 4: Deep Time ───────────────────────────
+    const S4_EVENTS = [
+      { year: 'לפני 13.8 מיליארד שנה', label: 'המפץ הגדול', icon: '💥',
+        desc: 'היקום נוצר. לא היה עדיין כדור ארץ, לא כוכבים, לא חיים — הכל התחיל מנקודה אחת של אנרגיה.',
+        wow: '13,800,000,000 שנה לפניכם' },
+      { year: 'לפני 4.5 מיליארד שנה', label: 'כדור הארץ נוצר', icon: '🌍',
+        desc: 'ענן של אבק וגז הצטבר לכדור הארץ. בהתחלה הוא היה כדור לבה רותח ללא מים ולא אוויר.',
+        wow: 'כדור הארץ צעיר בכ-9 מיליארד שנה מהיקום' },
+      { year: 'לפני 3.8 מיליארד שנה', label: 'החיים הראשונים', icon: '🦠',
+        desc: 'חיידקים חד-תאיים פשוטים הם צורת החיים הראשונה שהתפתחה בים. במשך מיליארדי שנים — הם היו כל החיים על פני כדור הארץ.',
+        wow: '3 מיליארד שנה של חיידקים בלבד' },
+      { year: 'לפני 530 מיליון שנה', label: 'הדגים הראשונים', icon: '🐟',
+        desc: 'לראשונה מופיעים יצורים עם עמוד שדרה. הדגים הם אבות אבותיהם של כל בעלי החיים שחיים על היבשה — כולל אנחנו.',
+        wow: 'אנחנו קרובי משפחה של הדג' },
+      { year: 'לפני 230 מיליון שנה', label: 'הדינוזאורים הראשונים', icon: '🦕',
+        desc: 'הדינוזאורים שלטו בכדור הארץ 165 מיליון שנה — פי 65 מכל ההיסטוריה האנושית.',
+        wow: '165 מיליון שנה של שלטון' },
+      { year: 'לפני 66 מיליון שנה', label: 'הכחדת הדינוזאורים', icon: '☄️',
+        desc: 'אסטרואיד ענק פגע בכדור הארץ. הדינוזאורים נכחדו — ויונקים קטנים שרדו. מהם התפתחנו אנחנו.',
+        wow: 'אם האסטרואיד היה מחטיא — בני האדם לא היו קיימים' },
+      { year: 'לפני 2.5 מיליון שנה', label: 'בני האדם הראשונים', icon: '🦴',
+        desc: 'ה-Homo הראשון הופיע באפריקה. הלך זקוף, השתמש בכלים — אבל מוחו היה קטן בהרבה ממוחנו.',
+        wow: 'גם בני אדם הם תוצאה של אבולוציה' },
+      { year: 'לפני 5,000 שנה בלבד', label: 'כל ההיסטוריה הכתובה', icon: '📜',
+        desc: 'מצרים, יוון, רומא, ימי הביניים, המהפכה התעשייתית, האינטרנט — הכל קרה ב-5,000 השנים האחרונות.',
+        wow: '0.0001% מתולדות כדור הארץ' },
+    ];
+
+    let s4Current = -1;
+
+    function s4Init() {
+      s4Current = -1;
+      s4BuildDots();
+      const card = document.getElementById('s4EventCard');
+      if (card) { card.innerHTML = ''; card.classList.add('hidden'); }
+      const end = document.getElementById('s4End');
+      if (end) end.classList.add('hidden');
+      const btn = document.getElementById('s4BtnNext');
+      if (btn) { btn.textContent = 'התחילו את המסע ←'; btn.style.display = 'block'; }
+    }
+
+    function s4BuildDots() {
+      const container = document.getElementById('s4Dots');
+      if (!container) return;
+      container.innerHTML = '';
+      S4_EVENTS.forEach((ev, i) => {
+        const dot = document.createElement('div');
+        dot.className = 'tl-dot';
+        const span = document.createElement('span');
+        span.textContent = ev.icon;
+        dot.appendChild(span);
+        dot.addEventListener('click', () => s4ShowEvent(i));
+        container.appendChild(dot);
+      });
+    }
+
+    function s4ShowEvent(i) {
+      s4Current = i;
+      document.querySelectorAll('.tl-dot').forEach((d, idx) => {
+        d.className = 'tl-dot' + (idx === i ? ' active' : idx < i ? ' done' : '');
+      });
+      const ev = S4_EVENTS[i];
+      const card = document.getElementById('s4EventCard');
+      card.style.animation = 'none';
+      card.offsetHeight;
+      card.style.animation = 'fadeInUp 0.4s ease';
+      card.classList.remove('hidden');
+      card.innerHTML =
+        '<div class="tl-ev-icon">' + ev.icon + '</div>' +
+        '<div class="tl-ev-year">' + ev.year + '</div>' +
+        '<h3 class="tl-ev-label">' + ev.label + '</h3>' +
+        '<p class="tl-ev-desc">' + ev.desc + '</p>' +
+        '<div class="tl-ev-wow">' + ev.wow + '</div>';
+      const btn = document.getElementById('s4BtnNext');
+      btn.textContent = i === S4_EVENTS.length - 1 ? 'לסיכום ←' : 'האירוע הבא ←';
+      btn.style.display = 'block';
+    }
+
+    function s4Next() {
+      const next = s4Current + 1;
+      if (next >= S4_EVENTS.length) { s4ShowEnd(); return; }
+      s4ShowEvent(next);
+    }
+
+    function s4ShowEnd() {
+      document.getElementById('s4BtnNext').style.display = 'none';
+      const end = document.getElementById('s4End');
+      end.classList.remove('hidden');
+      setTimeout(() => end.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    }
+
+    // ── Stage 3: Heredity Lab ─────────────────────────
+    function makeBeetleSVG(bodyColor, headColor, legColor, pattern) {
+      let deco = '';
+      if (pattern === 'spotted') {
+        deco = '<circle cx="9" cy="18" r="2" fill="' + headColor + '"/>' +
+               '<circle cx="15" cy="18" r="2" fill="' + headColor + '"/>' +
+               '<circle cx="9" cy="24" r="2" fill="' + headColor + '"/>' +
+               '<circle cx="15" cy="24" r="2" fill="' + headColor + '"/>';
+      } else if (pattern === 'striped') {
+        deco = '<line x1="6" y1="17" x2="18" y2="17" stroke="' + headColor + '" stroke-width="1.5"/>' +
+               '<line x1="6" y1="22" x2="18" y2="22" stroke="' + headColor + '" stroke-width="1.5"/>' +
+               '<line x1="6" y1="27" x2="18" y2="27" stroke="' + headColor + '" stroke-width="1.5"/>';
+      }
+      const L = legColor;
+      return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 32">' +
+        '<line x1="10" y1="5" x2="7" y2="1" stroke="' + L + '" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<line x1="14" y1="5" x2="17" y2="1" stroke="' + L + '" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<line x1="6" y1="15" x2="1" y2="12" stroke="' + L + '" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<line x1="6" y1="19" x2="1" y2="19" stroke="' + L + '" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<line x1="7" y1="23" x2="2" y2="27" stroke="' + L + '" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<line x1="18" y1="15" x2="23" y2="12" stroke="' + L + '" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<line x1="18" y1="19" x2="23" y2="19" stroke="' + L + '" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<line x1="17" y1="23" x2="22" y2="27" stroke="' + L + '" stroke-width="1.5" stroke-linecap="round"/>' +
+        '<ellipse cx="12" cy="21" rx="7" ry="10" fill="' + bodyColor + '"/>' +
+        deco +
+        '<line x1="12" y1="12" x2="12" y2="30" stroke="' + L + '" stroke-width="1"/>' +
+        '<circle cx="12" cy="8" r="5.5" fill="' + headColor + '"/>' +
+        '<circle cx="9.5" cy="7" r="1.2" fill="#000"/>' +
+        '<circle cx="14.5" cy="7" r="1.2" fill="#000"/>' +
+        '</svg>';
+    }
+
+    const S3_COLORS = [
+      { body: '#2d6b0a', head: '#1a3d05', leg: '#1a3d05' },
+      { body: '#d97706', head: '#92400e', leg: '#92400e' }
+    ];
+    const S3_PATTERNS = ['plain', 'spotted'];
+    const S3_MUTATION = { body: '#7c3aed', head: '#4c1d95', leg: '#4c1d95' };
+
+    let s3MixCount = 0;
+
+    function s3Init() {
+      s3MixCount = 0;
+      const elA = document.getElementById('s3ParentA');
+      const elB = document.getElementById('s3ParentB');
+      if (elA) elA.innerHTML = makeBeetleSVG(S3_COLORS[0].body, S3_COLORS[0].head, S3_COLORS[0].leg, 'plain');
+      if (elB) elB.innerHTML = makeBeetleSVG(S3_COLORS[1].body, S3_COLORS[1].head, S3_COLORS[1].leg, 'spotted');
+      const grid = document.getElementById('s3OffspringGrid');
+      if (grid) grid.innerHTML = '';
+      const cnt = document.getElementById('s3MixCount');
+      if (cnt) cnt.textContent = '';
+      const ins = document.getElementById('s3Insight');
+      if (ins) ins.classList.add('hidden');
+    }
+
+    function s3Mix() {
+      const grid = document.getElementById('s3OffspringGrid');
+      if (!grid) return;
+      s3MixCount++;
+
+      let color, pattern, isMutation = false;
+      if (Math.random() < 1 / 7) {
+        color   = S3_MUTATION;
+        pattern = S3_PATTERNS[Math.floor(Math.random() * 2)];
+        isMutation = true;
+      } else {
+        color   = S3_COLORS[Math.floor(Math.random() * 2)];
+        pattern = S3_PATTERNS[Math.floor(Math.random() * 2)];
+      }
+
+      const item = document.createElement('div');
+      item.className = 'offspring-item';
+      const beetleWrap = document.createElement('div');
+      beetleWrap.className = 'offspring-beetle';
+      beetleWrap.innerHTML = makeBeetleSVG(color.body, color.head, color.leg, pattern);
+      item.appendChild(beetleWrap);
+      if (isMutation) {
+        const badge = document.createElement('span');
+        badge.className = 'mutation-badge';
+        badge.textContent = 'מוטציה!';
+        item.appendChild(badge);
+      }
+      grid.appendChild(item);
+
+      const cnt = document.getElementById('s3MixCount');
+      if (cnt) cnt.textContent = 'ערבבתם ' + s3MixCount + ' פעמים';
+
+      if (s3MixCount >= 6) {
+        const ins = document.getElementById('s3Insight');
+        if (ins && ins.classList.contains('hidden')) {
+          ins.classList.remove('hidden');
+          setTimeout(() => ins.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+        }
+      }
+    }
+
+    // ── Stage 7: Quiz ─────────────────────────────────
+    const S7_QUESTIONS = [
+      {
+        q: 'מה זו אבולוציה?',
+        answers: [
+          'שינוי בתכונות של אוכלוסייה לאורך דורות רבים',
+          'שינוי שקורה לאדם לאורך חייו',
+          'תהליך שרק מינים חלשים עוברים',
+          'קפיצה גנטית פתאומית'
+        ],
+        correct: 0,
+        explanation: 'אבולוציה היא שינוי הדרגתי בתכונות של אוכלוסייה שלמה, לאורך דורות רבים — לא שינוי ביחיד.'
+      },
+      {
+        q: 'מה זו ברירה טבעית?',
+        answers: [
+          'תהליך שבו יצורים מותאמים יותר שורדים ומתרבים',
+          'תהליך שבו בני אדם בוחרים איזה חיות לרבות',
+          'תאונה גנטית שיוצרת מין חדש',
+          'שינוי מכוון שיוצר מין חזק יותר'
+        ],
+        correct: 0,
+        explanation: 'ברירה טבעית היא מנגנון אוטומטי: יצורים שמותאמים יותר לסביבה שורדים ומתרבים יותר — בלי שאף אחד "מחליט" על כך.'
+      },
+      {
+        q: 'מה גורם לשונות בין צאצאים?',
+        answers: [
+          'שילוב גנים מהורים ומוטציות אקראיות',
+          'החלטות מודעות של ההורים',
+          'הסביבה בלבד',
+          'מזל בלבד'
+        ],
+        correct: 0,
+        explanation: 'כל צאצא מקבל שילוב אקראי של גנים משני ההורים, ולעתים גם מוטציה חדשה — לכן אף צאצא לא זהה לחלוטין להוריו.'
+      },
+      {
+        q: 'כמה שנים כדור הארץ קיים?',
+        answers: [
+          'כ-4.5 מיליארד שנה',
+          'כ-500 מיליון שנה',
+          'כ-6,000 שנה',
+          'כ-1 מיליארד שנה'
+        ],
+        correct: 0,
+        explanation: 'כדור הארץ נוצר לפני כ-4.5 מיליארד שנה. החיים הופיעו לפני כ-3.8 מיליארד שנה, ובני אדם — רק לפני כ-300,000 שנה.'
+      },
+      {
+        q: 'מה מוכיח שמינים שונים קשורים קשר גנטי?',
+        answers: [
+          'DNA דומה מאוד בין מינים קרובים',
+          'צורה חיצונית דומה',
+          'מגורים באותו מקום',
+          'אכילת אותו מזון'
+        ],
+        correct: 0,
+        explanation: 'DNA הוא הראיה החזקה ביותר — ככל שמינים קרובים יותר אבולוציונית, כך ה-DNA שלהם דומה יותר. צורה חיצונית יכולה להיות מטעה.'
+      },
+      {
+        q: 'כלבים הם צאצאים של...',
+        answers: [
+          'זאבים',
+          'שועלים',
+          'דובים',
+          'חתולים'
+        ],
+        correct: 0,
+        explanation: 'כל כלבי העולם — מכל הגזעים — הם צאצאים של זאב שבויית לפני כ-15,000 שנה. זו דוגמה מצוינת לברירה מלאכותית.'
+      }
+    ];
+
+    let s7Current = 0;
+    let s7Score = 0;
+    let s7Answered = false;
+
+    function s7Init() {
+      s7Current = 0;
+      s7Score = 0;
+      s7Answered = false;
+      s7ShowQuestion();
+    }
+
+    function s7ShowQuestion() {
+      const el = document.getElementById('s7Content');
+      if (!el) return;
+      s7Answered = false;
+      const q = S7_QUESTIONS[s7Current];
+      const pct = (s7Current / S7_QUESTIONS.length) * 100;
+
+      const indices = [0, 1, 2, 3];
+      for (let i = 3; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = indices[i]; indices[i] = indices[j]; indices[j] = tmp;
+      }
+      const shuffledAnswers = indices.map(i => q.answers[i]);
+      const newCorrectIdx = indices.indexOf(q.correct);
+
+      let answersHTML = '';
+      shuffledAnswers.forEach((ans, i) => {
+        answersHTML += '<button class="s7-answer-btn" onclick="s7Answer(this,' + i + ',' + newCorrectIdx + ')">' + ans + '</button>';
+      });
+
+      const isLast = s7Current === S7_QUESTIONS.length - 1;
+      el.innerHTML =
+        '<div class="s7-progress-wrap">' +
+        '<div class="s7-progress-info">' +
+        '<span>שאלה ' + (s7Current + 1) + ' מתוך ' + S7_QUESTIONS.length + '</span>' +
+        '<span>' + s7Score + ' נכון עד כה</span>' +
+        '</div>' +
+        '<div class="s7-progress-bar"><div class="s7-progress-fill" style="width:' + pct + '%"></div></div>' +
+        '</div>' +
+        '<div class="s7-question-card">' +
+        '<div class="s7-question-text">' + q.q + '</div>' +
+        '<div class="s7-answers">' + answersHTML + '</div>' +
+        '<div class="s7-explanation hidden" id="s7Explanation"></div>' +
+        '</div>' +
+        '<div class="s7-next-wrap hidden" id="s7NextWrap">' +
+        '<button class="btn-game-start" onclick="s7Next()">' +
+        (isLast ? 'לתוצאות &#x1F3C6;' : 'השאלה הבאה &#x2190;') +
+        '</button>' +
+        '</div>';
+    }
+
+    function s7Answer(btn, chosen, correct) {
+      if (s7Answered) return;
+      s7Answered = true;
+      const allBtns = document.querySelectorAll('.s7-answer-btn');
+      allBtns.forEach(b => b.disabled = true);
+      if (chosen === correct) {
+        btn.classList.add('correct');
+        s7Score++;
+      } else {
+        btn.classList.add('wrong');
+        allBtns[correct].classList.add('correct');
+      }
+      const q = S7_QUESTIONS[s7Current];
+      const expEl = document.getElementById('s7Explanation');
+      if (expEl) {
+        expEl.innerHTML = (chosen === correct ? '✓ נכון! ' : '✗ לא בדיוק. ') + q.explanation;
+        expEl.classList.remove('hidden');
+      }
+      const nextWrap = document.getElementById('s7NextWrap');
+      if (nextWrap) nextWrap.classList.remove('hidden');
+    }
+
+    function s7Next() {
+      s7Current++;
+      if (s7Current >= S7_QUESTIONS.length) {
+        s7ShowScore();
+      } else {
+        s7ShowQuestion();
+      }
+    }
+
+    function s7ShowScore() {
+      const el = document.getElementById('s7Content');
+      if (!el) return;
+      const total = S7_QUESTIONS.length;
+      let icon, message;
+      if (s7Score === total)    { icon = '🏆'; message = 'מושלם! אתם מומחי אבולוציה'; }
+      else if (s7Score >= 4)   { icon = '🎯'; message = 'כל הכבוד! הבנתם את העיקר'; }
+      else if (s7Score >= 2)   { icon = '📚'; message = 'לא רע! כדאי לחזור על השלבים ולנסות שוב'; }
+      else                     { icon = '💪'; message = 'תחזרו ותנסו שוב — אתם יכולים!'; }
+      el.innerHTML =
+        '<div class="s7-score">' +
+        '<span class="s7-score-icon">' + icon + '</span>' +
+        '<div class="s7-score-number">' + s7Score + ' / ' + total + '</div>' +
+        '<div class="s7-score-label">תשובות נכונות</div>' +
+        '<div class="s7-score-message">' + message + '</div>' +
+        '<div class="s7-submit-box">' +
+        '<p class="s7-submit-label">שלחו את התוצאות למורה:</p>' +
+        '<input class="s7-name-input" id="s7NameInput" type="text" placeholder="שם מלא" style="margin-bottom:0.7rem" />' +
+        '<input class="s7-name-input" id="s7ClassInput" type="text" placeholder="כיתה (למשל: ח2)" />' +
+        '<button class="s7-submit-btn" onclick="s7Submit(' + s7Score + ',' + total + ')">שלח תוצאות &#x1F4E8;</button>' +
+        '</div>' +
+        '<button class="btn-game-start" onclick="s7Init()">נסו שוב &#x1F504;</button>' +
+        '</div>' +
+        '<div class="s7-video-box">' +
+        '<div class="s7-video-title">&#x1F3A5; רוצים לדעת עוד?</div>' +
+        '<p class="s7-video-sub">סרטון קצר ומומלץ להעשרה</p>' +
+        '<a class="s7-video-link-btn" href="https://www.youtube.com/watch?v=TLt5xPefG74" target="_blank" rel="noopener">▶ צפו בסרטון ב-YouTube</a>' +
+        '</div>';
+    }
+
+    function s7Submit(score, total) {
+      const nameInput  = document.getElementById('s7NameInput');
+      const classInput = document.getElementById('s7ClassInput');
+      const name  = nameInput  ? nameInput.value.trim()  : '';
+      const klass = classInput ? classInput.value.trim() : '';
+      if (!name) {
+        nameInput.style.borderColor = '#ef4444';
+        nameInput.placeholder = 'נא להכניס שם לפני השליחה';
+        return;
+      }
+      if (!klass) {
+        classInput.style.borderColor = '#ef4444';
+        classInput.placeholder = 'נא להכניס כיתה לפני השליחה';
+        return;
+      }
+      const url = 'https://docs.google.com/forms/d/e/1FAIpQLSfcNX2yx_YvpivGRmLOTMAUncmTMuN8KlcoGR1jSN6nUJY4Ow/viewform?usp=pp_url' +
+        '&entry.1688849251=' + encodeURIComponent(name) +
+        '&entry.1737489614=' + encodeURIComponent(klass) +
+        '&entry.2011009170=' + encodeURIComponent(score + '/' + total);
+      window.open(url, '_blank');
+      const btn = document.querySelector('.s7-submit-btn');
+      if (btn) { btn.textContent = 'נשלח! ✓'; btn.disabled = true; }
+    }
+
+    // ── Stage 6: Examples ─────────────────────────────
+    const S6_CARDS = [
+      {
+        icon: '🐕',
+        title: 'כלבים — כשהאדם מנהל את הברירה',
+        story: 'כל כלבי העולם — מהצ\'יוואווה הזעיר עד הגרייט דיין הענקי — הם צאצאים של <strong>זאב אחד</strong> שבויית לפני כ-15,000 שנה. לאורך הדורות, בני אדם בחרו לרבות כלבים לפי תכונות שרצו: מהירות, חוש ריח, ידידותיות. כך נוצרו יותר מ-400 גזעים שונים — זו <strong>ברירה מלאכותית</strong>, כמו ברירה טבעית אבל מונחית על ידי בני אדם.',
+        wow_label: 'עובדת "וואו"',
+        wow: 'זאב וצ\'יוואווה חולקים <strong>99.9% DNA זהה</strong>. ההבדל העצום בחיצוניות נובע מקומץ גנים שהשתנו לאורך הדורות.',
+        video: 'https://www.youtube.com/watch?v=9Y5Fwp7i-0E'
+      },
+      {
+        icon: '🐦',
+        title: 'ציפורי דרווין — מקור אחד, 15 מינים',
+        story: 'כשדרווין הגיע לאיי גלאפגוס, הוא מצא 15 מינים של ציפורי פינץ׳ — כולן דומות, אבל עם <strong>מקורים שונים לחלוטין</strong>. ציפור עם מקור חזק לשבור גרעינים. אחרת עם מקור דק לחטט בפרחים. שלישית שמשתמשת בענפים כמו כלי עבודה. כולן מאב קדמון אחד — וכל קבוצה הסתגלה למקור מזון אחר.',
+        wow_label: 'עובדת "וואו"',
+        wow: 'צורת המקור יכולה להשתנות <strong>תוך דור אחד בלבד</strong> אחרי שינוי קיצוני באקלים — זה נצפה ותועד מחקרית באיי גלאפגוס.',
+        video: 'https://www.youtube.com/watch?v=s64Y8sVYfFY&t=10s'
+      },
+      {
+        icon: '🐋',
+        title: 'הלוויתן — חזרה לים',
+        story: 'לפני <strong>50 מיליון שנה</strong>, אבי הלוויתן היה יונק שהלך על ארבע ביבשה — בערך בגודל זאב. לאט לאט, הצאצאים שלו בילו יותר זמן בים: הרגליים הפכו לסנפירים, זנב נוצר, ונחיר עבר לראש. זה לקח מיליוני שנים, אבל המאובנים מראים כל שלב בדרך.',
+        wow_label: 'עובדת "וואו"',
+        wow: 'שלד הסנפיר של הלוויתן מכיל <strong>5 "אצבעות" מוסתרות</strong> — שריד מהרגל שהייתה לאבות הקדמונים שלו. ראיתם אותן כבר בשלב 1!',
+        video: 'https://www.youtube.com/watch?v=_OSRKtT_9vw'
+      },
+      {
+        icon: '🦠',
+        title: 'חיידקים — אבולוציה בתוך שנים',
+        story: 'חיידקים מתרבים כל 20 דקות — כלומר, יש להם <strong>אלפי דורות בשנה</strong>. כשנותנים לחיידקים אנטיביוטיקה, רובם מתים — אבל אם יש אחד עם מוטציה שמגינה עליו, הוא שורד ומתרבה. תוך שבועות, כל האוכלוסייה עמידה. זה בדיוק למה חשוב לא לקחת אנטיביוטיקה מיותרת.',
+        wow_label: 'עובדת "וואו"',
+        wow: 'בניסוי שנמשך <strong>30 שנה ו-70,000 דורות</strong>, חיידקים הסתגלו לאכול חומר שמעולם לא אכלו — ומדענים צפו בכל שלב בשינוי.',
+        video: 'https://www.youtube.com/watch?v=V9ZFMoh3hJk'
+      }
+    ];
+
+    let s6Current = 0;
+
+    function s6Init() {
+      s6Current = 0;
+      s6BuildDots();
+      s6ShowCard();
+    }
+
+    function s6BuildDots() {
+      const el = document.getElementById('s6Dots');
+      if (!el) return;
+      el.innerHTML = '';
+      S6_CARDS.forEach((_, i) => {
+        const d = document.createElement('div');
+        d.className = 's6-dot' + (i === 0 ? ' active' : '');
+        el.appendChild(d);
+      });
+    }
+
+    function s6ShowCard() {
+      const data = S6_CARDS[s6Current];
+      const cardEl = document.getElementById('s6Card');
+      if (!cardEl) return;
+      const videoLink = data.video
+        ? '<div style="text-align:center;margin-top:1rem"><a href="' + data.video + '" target="_blank" rel="noopener noreferrer" class="s5-video-link">&#x25B6; צפו בסרטון להרחבה</a></div>'
+        : '';
+      cardEl.innerHTML =
+        '<div class="s6-card">' +
+        '<span class="s6-card-icon">' + data.icon + '</span>' +
+        '<div class="s6-card-title">' + data.title + '</div>' +
+        '<p class="s6-card-story">' + data.story + '</p>' +
+        '<div class="s6-wow">' +
+        '<div class="s6-wow-label">&#x2728; ' + data.wow_label + '</div>' +
+        '<div class="s6-wow-text">' + data.wow + '</div>' +
+        '</div>' +
+        videoLink +
+        '</div>';
+      document.querySelectorAll('.s6-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === s6Current);
+      });
+      const counter = document.getElementById('s6Counter');
+      if (counter) counter.textContent = (s6Current + 1) + ' / ' + S6_CARDS.length;
+      const prev = document.getElementById('s6BtnPrev');
+      const next = document.getElementById('s6BtnNext');
+      if (prev) prev.disabled = s6Current === 0;
+      if (next) next.textContent = s6Current === S6_CARDS.length - 1 ? 'סיום ✓' : 'הבא ←';
+    }
+
+    function s6Next() {
+      if (s6Current < S6_CARDS.length - 1) { s6Current++; s6ShowCard(); }
+    }
+
+    function s6Prev() {
+      if (s6Current > 0) { s6Current--; s6ShowCard(); }
+    }
+
+    // ── Stage 5: Evidence ─────────────────────────────
+    const S5_CARDS = [
+      {
+        title: 'מאובנים',
+        img: 'fossils.jpg',
+        text: '<strong>מאובנים הם שרידים של יצורים שחיו לפני מיליוני שנים.</strong> הם ממפים את עץ החיים בדיוק מדהים — ומראים כיצד מינים השתנו בהדרגה לאורך הזמן. ככל שחופרים עמוק יותר, מוצאים יצורים פשוטים יותר — בדיוק כפי שהתיאוריה מנבאת.',
+        video: 'https://www.youtube.com/watch?v=bRuSmxJo_iA'
+      },
+      {
+        title: 'DNA משותף',
+        img: 'DNA.jpg',
+        text: '<strong>כל יצור חי על פני כדור הארץ משתמש באותה שפת DNA.</strong> ככל שמינים קרובים יותר, ה-DNA שלהם דומה יותר. אנחנו חולקים 98.8% DNA עם שימפנזה — ו-60% עם בננה! זה בלתי אפשרי להסביר בלי מוצא משותף.',
+        video: 'https://www.youtube.com/watch?v=zwibgNGe4aY'
+      },
+      {
+        title: 'מבנים שאריתיים',
+        img: null,
+        text: '<strong>גופנו נושא שאריות של איברים שהיו שימושיים אצל אבותינו.</strong> עצם הזנב הקטנה שלנו (הקוקסיקס), שרירים שמזיזים את האוזן — שימושיים לחיות שצריכות לכוון אוזניים — ואפילו שרירי זקירת שערות בזמן קור. כולם עדות לעבר אחר.',
+        video: 'https://www.youtube.com/watch?v=UHbcjzkjG0o'
+      },
+      {
+        title: 'אבולוציה בזמן אמת',
+        img: null,
+        text: '<strong>אפשר לראות אבולוציה קורה ממש היום.</strong> חיידקים מפתחים עמידות לאנטיביוטיקה מדור לדור. עכברבושים בניו יורק הסתגלו לאוכל עירוני. פרפרים החשיכו בצבעם ליד מפעלי פחם כדי להיטמע ברקע. ברירה טבעית — בפעולה.',
+        video: 'https://www.youtube.com/watch?v=V9ZFMoh3hJk'
+      }
+    ];
+
+    let s5Revealed = [false, false, false, false];
+
+    function s5Init() {
+      s5Revealed = [false, false, false, false];
+      for (let i = 0; i < 4; i++) {
+        const card = document.getElementById('s5Card' + i);
+        if (!card) continue;
+        card.classList.remove('revealed');
+        card.onclick = (function(idx) { return function() { s5Reveal(idx); }; })(i);
+        const body = card.querySelector('.s5-card-body');
+        if (body) body.remove();
+        const hint = document.getElementById('s5Hint' + i);
+        if (hint) hint.innerHTML = '&#x1F449; לחצו לגלות';
+      }
+      const sum = document.getElementById('s5Summary');
+      if (sum) sum.classList.add('hidden');
+    }
+
+    function s5Reveal(i) {
+      if (s5Revealed[i]) return;
+      s5Revealed[i] = true;
+      const card = document.getElementById('s5Card' + i);
+      const data = S5_CARDS[i];
+      card.classList.add('revealed');
+      card.onclick = null;
+      const hint = document.getElementById('s5Hint' + i);
+      if (hint) hint.textContent = '';
+      const body = document.createElement('div');
+      body.className = 's5-card-body';
+      if (data.img) {
+        const img = document.createElement('img');
+        img.src = data.img;
+        img.alt = data.title;
+        body.appendChild(img);
+      }
+      const p = document.createElement('p');
+      p.innerHTML = data.text;
+      body.appendChild(p);
+      if (data.video) {
+        const a = document.createElement('a');
+        a.href = data.video;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.className = 's5-video-link';
+        a.textContent = '▶ צפו בסרטון להרחבה';
+        body.appendChild(a);
+      }
+      card.appendChild(body);
+      setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+      if (s5Revealed.every(Boolean)) {
+        const sum = document.getElementById('s5Summary');
+        if (sum) {
+          sum.classList.remove('hidden');
+          setTimeout(() => sum.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+        }
+      }
+    }
+
+    function s1Vote(btn) {
+      document.querySelectorAll('.vote-btn').forEach(b => {
+        b.disabled = true;
+        b.style.opacity = '0.35';
+      });
+      btn.style.opacity = '1';
+      btn.classList.add('chosen');
+
+      const feedback = document.getElementById('s1Feedback');
+      if (btn.dataset.answer === 'correct') {
+        feedback.className = 's1-feedback correct';
+        feedback.textContent = '✓ נכון! לוויתן הוא אכן קרוב משפחה שלנו — עוד תגלו כמה זה מוזר 🐋';
+      } else {
+        feedback.className = 's1-feedback wrong';
+        feedback.textContent = '✗ לא בדיוק — אבל ההפתעה גדולה ממה שציפיתם. תראו למטה 👇';
+      }
+      feedback.style.display = 'block';
+
+      const reveal = document.getElementById('s1Reveal');
+      reveal.style.display = 'block';
+      setTimeout(() => reveal.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+    }
+
+    // ── PRESENTATION MODE ────────────────────────────
+    const PRES_SLIDES = [
+      {
+        stage: 'שלב 1 — מבוא',
+        title: 'האם לוויתן קרוב משפחה שלך?',
+        image: 'whalehand2.jpg',
+        imageAlt: 'עצמות סנפיר לווייתן',
+        points: [
+          '80% מהגנים של לוויתן <strong>זהים לגנים של בני אדם</strong>',
+          '5 אצבעות מוסתרות בתוך סנפיר הלוויתן — בדיוק כמו ביד שלכם',
+          'לפני 50 מיליון שנה — אבות הלוויתן הלכו על ארבע, על היבשה',
+          '<strong>אבולוציה</strong>: תהליך שבו מינים משתנים לאורך זמן ארוך מאוד'
+        ],
+        question: 'שאלו את הכיתה: מי חשב שהתשובה היא כן?'
+      },
+      {
+        stage: 'שלב 2 — ברירה טבעית',
+        title: 'ברירה טבעית — שלושה כללים',
+        icon: '🪲',
+        points: [
+          '<strong>שונות</strong> — לא כולם זהים; יש הבדלים טבעיים בין פרטים באוכלוסייה',
+          '<strong>לחץ סביבתי</strong> — לא כולם שורדים; רק חלק מגיעים להתרבות',
+          '<strong>הורשה</strong> — התכונות עוברות לצאצאים; הדור הבא דומה לשורדים'
+        ],
+        summary: 'לאורך דורות — תכונות מועילות הופכות נפוצות יותר, והמין משתנה',
+        activity: 'חלקו תלמידים לצבע ירוק ואדום (חיפושיות). המורה "צד" רק תלמידים אדומים. אחרי 3 סיבובים — מי נשאר? הצביעו עם ידיים.'
+      },
+      {
+        stage: 'שלב 3 — תורשה',
+        title: 'תורשה — איך תכונות עוברות הלאה',
+        icon: '🧬',
+        points: [
+          '<strong>גנים</strong> — הוראות הבנייה של הגוף; בכל תא קיים עותק שלם',
+          '<strong>ירושה</strong> — חצי מאבא, חצי מאמא; לכן צאצא לא זהה לאף אחד מהם',
+          '<strong>מוטציה</strong> — טעות קטנה בהעתקת הגן; יוצרת תכונה שלא הייתה קודם'
+        ],
+        summary: 'בלי שונות — אין ברירה טבעית. בלי ברירה טבעית — אין אבולוציה',
+        activity: 'כל תלמיד זורק מטבע פעמיים. ר+ר = חיפושית חומה, ר+פ = ירוקה, פ+פ = אדומה. ספרו בכיתה — כמה מכל צבע יצא?'
+      },
+      {
+        stage: 'שלב 4 — הזמן הגדול',
+        title: 'כמה זמן לוקחת אבולוציה?',
+        image: 'ev-deeptime.png',
+        imageAlt: 'קניון גרנד — שכבות סלע עתיקות',
+        points: [
+          'כדור הארץ בן <strong>4.5 מיליארד שנה</strong>',
+          'אם כל ההיסטוריה = יום אחד — בני האדם הופיעו <strong>ב-4 שניות האחרונות</strong>',
+          'אם כל ההיסטוריה = מגרש כדורגל — כל ההיסטוריה האנושית = <strong>5 סנטימטר אחרונים</strong>',
+          'אבולוציה עובדת על מיליוני דורות — לא ניתן לראות אותה בחיי אדם'
+        ]
+      },
+      {
+        stage: 'שלב 5 — ראיות',
+        title: 'מנין אנחנו יודעים?',
+        image: 'ev-fossil.jpg',
+        imageAlt: 'מאובן אמוניט בסלע',
+        points: [
+          '🦕 <strong>מאובנים</strong> — שומרים עקבות של מינים שחיו לפני מיליוני שנים',
+          '🧬 <strong>DNA משותף</strong> — ככל שמינים קרובים יותר, ה-DNA שלהם דומה יותר',
+          '🦴 <strong>מבנים שאריתיים</strong> — אפנדיקס, עצמות רגל בלוויתן, כנפיים בפינגווין',
+          '👁 <strong>אבולוציה בזמן אמת</strong> — חיידקים מפתחים עמידות לאנטיביוטיקה תוך שנים'
+        ]
+      },
+      {
+        stage: 'שלב 6 — דוגמאות',
+        title: 'אבולוציה בפעולה',
+        image: 'ev-finches.jpg',
+        imageAlt: 'ציפורי דרווין — השוואת מקורים',
+        points: [
+          '🐦 <strong>ציפורי דרווין</strong> — מין אחד, 14 מינים שונים; כל מקור מותאם למזון אחר',
+          '🐕 <strong>כלבים</strong> — 400 גזעים שונים, כולם מגיעים מזאב אחד, תוך 15,000 שנה',
+          '🐋 <strong>לוויתן</strong> — ממהלך ביבשה לשחייה בים; עצמות הרגל עדיין נמצאות בגוף',
+          '🦠 <strong>חיידקים</strong> — מפתחים עמידות לאנטיביוטיקה — אנחנו רואים את זה קורה היום'
+        ]
+      },
+      {
+        stage: 'שלב 7 — בוחן',
+        title: 'בוחן מסכם',
+        icon: '🏆',
+        points: [
+          '6 שאלות רב-ברירה — כל החומר שלמדנו',
+          'הגישו ב-Google Forms — תוצאות אצלכם בזמן אמת',
+          'בסיום: סרטון סיכום ב-YouTube'
+        ],
+        note: 'הפנו את התלמידים לאתר ולחצו יחד על "בוחן מסכם"'
+      }
+    ];
+
+    let presCurrent = 0;
+    let presReveal = 0;
+
+    function presItemCount(slide) {
+      let n = slide.points.length;
+      if (slide.summary)  n++;
+      if (slide.question) n++;
+      if (slide.activity) n++;
+      if (slide.note) n++;
+      return n;
+    }
+
+    function presOpen() {
+      presCurrent = 0;
+      presReveal = 0;
+      document.getElementById('presOverlay').classList.remove('hidden');
+      presRender();
+      document.addEventListener('keydown', presKeyHandler);
+    }
+
+    function presExit() {
+      document.getElementById('presOverlay').classList.add('hidden');
+      document.removeEventListener('keydown', presKeyHandler);
+    }
+
+    function presKeyHandler(e) {
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowDown')  presForward();
+      if (e.key === 'ArrowRight' || e.key === 'ArrowUp')   presBack();
+      if (e.key === 'Escape') presExit();
+    }
+
+    function presForward() {
+      const slide = PRES_SLIDES[presCurrent];
+      const total = presItemCount(slide);
+      if (presReveal < total) {
+        // reveal next item in place (no full re-render)
+        const items = document.querySelectorAll('#presBody .pres-item');
+        if (items[presReveal]) items[presReveal].classList.add('pres-visible');
+        presReveal++;
+        presUpdateNav();
+      } else if (presCurrent < PRES_SLIDES.length - 1) {
+        presCurrent++;
+        presReveal = 0;
+        presRender();
+      } else {
+        presExit();
+      }
+    }
+
+    function presBack() {
+      if (presCurrent === 0) return;
+      presCurrent--;
+      presReveal = presItemCount(PRES_SLIDES[presCurrent]); // show all on prev slide
+      presRender();
+    }
+
+    function presUpdateNav() {
+      const slide = PRES_SLIDES[presCurrent];
+      const allShown = presReveal >= presItemCount(slide);
+      const isLastSlide = presCurrent === PRES_SLIDES.length - 1;
+      const nextBtn = document.getElementById('presBtnNext');
+      nextBtn.textContent = (isLastSlide && allShown) ? 'סיום' : 'הבא ←';
+      document.getElementById('presBtnPrev').disabled = presCurrent === 0;
+    }
+
+    function presRender() {
+      const slide = PRES_SLIDES[presCurrent];
+      const total = PRES_SLIDES.length;
+
+      document.getElementById('presCounter').textContent = (presCurrent + 1) + ' / ' + total;
+
+      const dots = document.getElementById('presDots');
+      dots.innerHTML = '';
+      for (let i = 0; i < total; i++) {
+        const d = document.createElement('div');
+        d.className = 'pres-dot' + (i === presCurrent ? ' active' : '');
+        (function(idx) { d.onclick = function() { presCurrent = idx; presReveal = 0; presRender(); }; })(i);
+        dots.appendChild(d);
+      }
+
+      let html = '';
+      if (slide.image) {
+        html += '<div class="pres-img-wrap"><img src="' + slide.image + '" alt="' + slide.imageAlt + '" /></div>';
+      } else if (slide.icon) {
+        html += '<div class="pres-icon-wrap">' + slide.icon + '</div>';
+      }
+
+      html += '<div class="pres-content">';
+      html += '<div class="pres-stage-label">' + slide.stage + '</div>';
+      html += '<div class="pres-title">' + slide.title + '</div>';
+
+      let idx = 0;
+      html += '<ul class="pres-points">';
+      slide.points.forEach(function(p) {
+        const vis = idx < presReveal ? ' pres-visible' : '';
+        html += '<li class="pres-item' + vis + '">' + p + '</li>';
+        idx++;
+      });
+      html += '</ul>';
+
+      if (slide.summary) {
+        const vis = idx < presReveal ? ' pres-visible' : '';
+        html += '<div class="pres-summary pres-item' + vis + '">' + slide.summary + '</div>';
+        idx++;
+      }
+      if (slide.question) {
+        const vis = idx < presReveal ? ' pres-visible' : '';
+        html += '<div class="pres-question pres-item' + vis + '">💬 ' + slide.question + '</div>';
+        idx++;
+      }
+      if (slide.activity) {
+        const vis = idx < presReveal ? ' pres-visible' : '';
+        html += '<div class="pres-activity pres-item' + vis + '"><div class="pres-activity-label">פעילות כיתתית</div><p>' + slide.activity + '</p></div>';
+        idx++;
+      }
+      if (slide.note) {
+        const vis = idx < presReveal ? ' pres-visible' : '';
+        html += '<p class="pres-note pres-item' + vis + '">📌 ' + slide.note + '</p>';
+        idx++;
+      }
+
+      html += '</div>';
+      const bodyEl = document.getElementById('presBody');
+      bodyEl.className = 'pres-body' + (slide.image ? ' pres-has-image' : '');
+      bodyEl.innerHTML = html;
+      presUpdateNav();
+    }
+  </script>
+
+  <!-- ── PRESENTATION OVERLAY ── -->
+  <div class="pres-overlay hidden" id="presOverlay">
+    <div class="pres-topbar">
+      <div class="pres-module-label">אבולוציה — מצגת למורה</div>
+      <div class="pres-counter" id="presCounter">1 / 7</div>
+      <button class="pres-exit-btn" onclick="presExit()">✕ יציאה</button>
+    </div>
+    <div class="pres-body" id="presBody"></div>
+    <div class="pres-nav-bar">
+      <button class="pres-nav-btn" id="presBtnPrev" onclick="presBack()">→ הקודם</button>
+      <div class="pres-dots" id="presDots"></div>
+      <button class="pres-nav-btn primary" id="presBtnNext" onclick="presForward()">הבא ←</button>
+    </div>
+  </div>
+
+</body>
+</html>

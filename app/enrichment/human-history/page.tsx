@@ -14,40 +14,40 @@ const HUMAN_HISTORY_LESSONS = [
   {
     num: "שיעור 2",
     slug: "lesson-2",
-    title: "המהפכה החקלאית",
-    desc: "האם החקלאות הייתה שדרוג לחיי המין האנושי, או שמא המלכודת הגדולה בהיסטוריה?",
+    title: "כוחם של סיפורים (מדומיינים)",
+    desc: "על מיתוסים משותפים, סדר מדומיין והיכולת של אלפי זרים לשתף פעולה סביב סיפורים משותפים.",
     color: "group-hover:text-amber-400 text-amber-500",
     borderGlow: "hover:border-amber-500/40 hover:shadow-[0_12px_40px_rgba(245,158,11,0.1)]"
   },
   {
     num: "שיעור 3",
     slug: "lesson-3",
-    title: "איחוד האנושות",
-    desc: "שלושת הגורמים המאחדים הגדולים של האנושות: הכסף, האימפריות והדתות הגלובליות.",
+    title: "המהפכה החקלאית",
+    desc: "האם ביות הצמחים והבעלי חיים היה שדרוג לחיינו, או שמא המלכודת הגדולה ביותר בהיסטוריה?",
     color: "group-hover:text-amber-400 text-amber-500",
     borderGlow: "hover:border-amber-500/40 hover:shadow-[0_12px_40px_rgba(245,158,11,0.1)]"
   },
   {
     num: "שיעור 4",
     slug: "lesson-4",
-    title: "המהפכה המדעית",
-    desc: "כיצד ההודאה באי-ידיעה והשילוב בין מדע לאימפריאליזם הולידו את העולם המודרני.",
+    title: "תוצאות החקלאות",
+    desc: "על חרדות המחר, יצירת המעמדות והאי-שוויון, וצמיחתן של אימפריות וערים גדולות בעקבות החקלאות.",
     color: "group-hover:text-amber-400 text-amber-500",
     borderGlow: "hover:border-amber-500/40 hover:shadow-[0_12px_40px_rgba(245,158,11,0.1)]"
   },
   {
     num: "שיעור 5",
     slug: "lesson-5",
-    title: "המהפכה התעשייתית",
-    desc: "על גילוי האנרגיה וחומרי הגלם החדשים, כניסתו של השעון לחיינו והתמוטטות המשפחה והקהילה.",
+    title: "המהפכה המדעית",
+    desc: "כיצד ההודאה באי-ידיעה והשילוב בין מדע, כוח וכסף הולידו את העולם המודרני והתעשייתי.",
     color: "group-hover:text-amber-400 text-amber-500",
     borderGlow: "hover:border-amber-500/40 hover:shadow-[0_12px_40px_rgba(245,158,11,0.1)]"
   },
   {
     num: "שיעור 6",
     slug: "lesson-6",
-    title: "העתיד של המין האנושי",
-    desc: "מהאינטליגנציה המלאכותית ועד הנדסה גנטית — האם אנחנו בדרך להפוך לאלים?",
+    title: "העתיד",
+    desc: "מהנדסה גנטית ועד בינה מלאכותית — האם ההומו סאפיינס בדרך להחליף את עצמו בישות חדשה?",
     color: "group-hover:text-amber-400 text-amber-500",
     borderGlow: "hover:border-amber-500/40 hover:shadow-[0_12px_40px_rgba(245,158,11,0.1)]"
   }

@@ -19,27 +19,27 @@ const LESSONS_DATA: Record<string, LessonData> = {
   },
   "lesson-2": {
     num: "שיעור 2",
-    title: "המהפכה החקלאית",
+    title: "כוחם של סיפורים (מדומיינים)",
     embedUrl: "https://www.canva.com/design/DAGjafLYqw4/-IyQTT7zmkmDKzXhJmso1A/view?embed"
   },
   "lesson-3": {
     num: "שיעור 3",
-    title: "איחוד האנושות",
+    title: "המהפכה החקלאית",
     embedUrl: "https://www.canva.com/design/DAGjp3qkUFI/tlraJt5yC4_j9EF4tHR--A/view?embed"
   },
   "lesson-4": {
     num: "שיעור 4",
-    title: "המהפכה המדעית",
+    title: "תוצאות החקלאות",
     embedUrl: "https://www.canva.com/design/DAGli5GaC-w/mv7mM7HYhF7TWxato3N6uQ/view?embed"
   },
   "lesson-5": {
     num: "שיעור 5",
-    title: "המהפכה התעשייתית",
+    title: "המהפכה המדעית",
     embedUrl: "https://www.canva.com/design/DAGmA1q4C5w/oqd1LFNk9-fdtY1V80SVhQ/view?embed"
   },
   "lesson-6": {
     num: "שיעור 6",
-    title: "העתיד של המין האנושי",
+    title: "העתיד",
     embedUrl: "https://www.canva.com/design/DAGmBB4uuU4/4G-VceCwzVK6No8pSD_hWg/view?embed"
   }
 };

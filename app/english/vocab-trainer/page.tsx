@@ -25,7 +25,9 @@ import {
   LogOut,
   User,
   CloudLightning,
-  RefreshCw
+  RefreshCw,
+  Sun,
+  Moon
 } from "lucide-react";
 import { useAuth } from "@/lib/context/AuthContext";
 import { dbFirestore } from "@/lib/firebase";
@@ -97,6 +99,9 @@ export default function VocabTrainerPage() {
   const [speechSupported, setSpeechSupported] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
 
+  // Comfort Reading Mode State
+  const [comfortMode, setComfortMode] = useState<"dark" | "light">("dark");
+
   // Syncing states
   const [isMerging, setIsMerging] = useState(false);
   const [hasLocalWordsToMerge, setHasLocalWordsToMerge] = useState(false);
@@ -167,7 +172,7 @@ export default function VocabTrainerPage() {
             firestoreWords.push(doc.data() as Word);
           });
 
-          // Sort newer words first (by numeric comparison of ID, which is Date.now().toString())
+          // Sort newer words first
           firestoreWords.sort((a, b) => Number(b.id) - Number(a.id));
           setWords(firestoreWords);
 
@@ -199,6 +204,24 @@ export default function VocabTrainerPage() {
       setSpeechSupported(true);
     }
   }, [user, authLoading]);
+
+  // Load Comfort Mode state from local storage on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedMode = localStorage.getItem("teaching-site-comfort-mode");
+      if (storedMode === "light" || storedMode === "dark") {
+        setComfortMode(storedMode);
+      }
+    }
+  }, []);
+
+  const toggleComfortMode = () => {
+    const nextMode = comfortMode === "dark" ? "light" : "dark";
+    setComfortMode(nextMode);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("teaching-site-comfort-mode", nextMode);
+    }
+  };
 
   // Save words state, update local storage cache, and sync to Firestore
   const saveWords = async (newWords: Word[]) => {
@@ -255,7 +278,6 @@ export default function VocabTrainerPage() {
         if (toAdd.length > 0) {
           const batch = writeBatch(dbFirestore);
           toAdd.forEach(w => {
-            // Re-assign id to ensure unique key in Firestore if needed, or use existing
             const docRef = doc(dbFirestore, "users", user.uid, "words", w.id);
             batch.set(docRef, w);
           });
@@ -341,7 +363,6 @@ export default function VocabTrainerPage() {
   const handleDeleteWord = (id: string) => {
     const updated = words.filter(w => w.id !== id);
     saveWords(updated);
-    // Reset index limits
     if (cardIndex >= updated.length && updated.length > 0) {
       setCardIndex(updated.length - 1);
     }
@@ -381,12 +402,10 @@ export default function VocabTrainerPage() {
     const updated = words.map(w => w.id === currentWord.id ? { ...w, mastered: true } : w);
     saveWords(updated);
     
-    // Play sound/effect and transition
     if (soundEnabled && speechSupported) {
       speakWord("Great job!");
     }
     
-    // Smooth next
     setTimeout(() => {
       handleNextCard();
     }, 300);
@@ -431,30 +450,24 @@ export default function VocabTrainerPage() {
         prompt = `מהי המילה באנגלית עבור: "${word.hebrew}"?`;
         correctAnswer = word.english;
       } else {
-        // Replace the word in the example sentence with blanks
         const regex = new RegExp(`\\b${word.english}\\b`, 'gi');
         prompt = word.example!.replace(regex, "_______");
         correctAnswer = word.english;
         exampleContext = `התרגום של המילה החסרה: ${word.hebrew}`;
       }
 
-      // Generate distractors
       const distractors: string[] = [];
       const isEnglishAnswer = chosenType === "he-to-en" || chosenType === "fill-blank";
-      
-      // Filter potential sources for distractors
       const listSources = words.filter(w => w.id !== word.id);
       
       while (distractors.length < 3) {
         if (listSources.length > distractors.length) {
-          // Draw from user words
           const potential = listSources[Math.floor(Math.random() * listSources.length)];
           const val = isEnglishAnswer ? potential.english : potential.hebrew;
           if (!distractors.includes(val) && val !== correctAnswer) {
             distractors.push(val);
           }
         } else {
-          // Draw from fallback list
           const potential = FALLBACK_DISTRACTORS[Math.floor(Math.random() * FALLBACK_DISTRACTORS.length)];
           const val = isEnglishAnswer ? potential.english : potential.hebrew;
           if (!distractors.includes(val) && val !== correctAnswer) {
@@ -484,7 +497,7 @@ export default function VocabTrainerPage() {
   };
 
   const handleQuizAnswer = (option: string) => {
-    if (selectedQuizOption !== null) return; // Answered already
+    if (selectedQuizOption !== null) return;
     
     setSelectedQuizOption(option);
     const isCorrect = option === quizQuestions[quizIndex].correctAnswer;
@@ -507,7 +520,6 @@ export default function VocabTrainerPage() {
       setQuizIndex(prev => prev + 1);
     } else {
       setQuizFinished(true);
-      // Trigger full page confetti if score is high
       if (quizScore >= quizQuestions.length * 0.7) {
         confetti({
           particleCount: 150,
@@ -579,9 +591,8 @@ export default function VocabTrainerPage() {
 
   // --- Match Game Logic ---
   const startNewMatchGame = () => {
-    if (words.length < 4) return; // Need at least 4 words
+    if (words.length < 4) return;
     
-    // Choose 4 random words
     const selected = [...words].sort(() => Math.random() - 0.5).slice(0, 4);
     
     const englishCards: MatchCard[] = selected.map(w => ({
@@ -624,7 +635,6 @@ export default function VocabTrainerPage() {
     const card = matchCards[clickedIndex];
     if (card.isMatched || card.isFlipped || selectedMatchIndices.length >= 2) return;
 
-    // Flip card
     const updatedCards = [...matchCards];
     updatedCards[clickedIndex].isFlipped = true;
     setMatchCards(updatedCards);
@@ -637,9 +647,7 @@ export default function VocabTrainerPage() {
       const firstCard = matchCards[newSelected[0]];
       const secondCard = matchCards[newSelected[1]];
 
-      // Check match
       if (firstCard.matchId === secondCard.matchId && firstCard.type !== secondCard.type) {
-        // Match found!
         setTimeout(() => {
           const matched = [...matchCards];
           matched[newSelected[0]].isMatched = true;
@@ -647,11 +655,9 @@ export default function VocabTrainerPage() {
           setMatchCards(matched);
           setSelectedMatchIndices([]);
 
-          // Pronounce the English word when matched
           const englishText = firstCard.type === "english" ? firstCard.text : secondCard.text;
           speakWord(englishText);
 
-          // Check if game complete
           const allMatched = matched.every(c => c.isMatched);
           if (allMatched) {
             setMatchCompleted(true);
@@ -667,7 +673,6 @@ export default function VocabTrainerPage() {
           }
         }, 500);
       } else {
-        // No match
         setTimeout(() => {
           const resetFlipped = [...matchCards];
           resetFlipped[newSelected[0]].isFlipped = false;
@@ -679,16 +684,6 @@ export default function VocabTrainerPage() {
     }
   };
 
-  // Clean up match game interval on unmount
-  useEffect(() => {
-    return () => {
-      if (timerIntervalRef.current) {
-        clearInterval(timerIntervalRef.current);
-      }
-    };
-  }, []);
-
-  // When changing tabs, initialize/reset appropriate states
   useEffect(() => {
     if (words.length > 0) {
       if (activeTab === "quiz") {
@@ -701,17 +696,54 @@ export default function VocabTrainerPage() {
     }
     setIsCardFlipped(false);
     
-    // Clear match timer if leaving match game tab
     if (activeTab !== "match" && timerIntervalRef.current) {
       clearInterval(timerIntervalRef.current);
       setMatchGameActive(false);
     }
   }, [activeTab, words.length]);
 
+  useEffect(() => {
+    return () => {
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
+      }
+    };
+  }, []);
+
+  // --- Readability & Comfort Mode Layout Helper Definitions ---
+  const isLight = comfortMode === "light";
+
+  const textTitle = isLight ? "text-zinc-900" : "text-white";
+  const textBody = isLight ? "text-zinc-800" : "text-[#e8edf8]";
+  const textMuted = isLight ? "text-zinc-500" : "text-text-muted";
+  const textEnglish = isLight ? "text-zinc-950 font-bold" : "text-zinc-100 font-extrabold";
+  const textHebrew = isLight ? "text-zinc-800" : "text-slate-200";
+  const textExample = isLight ? "text-zinc-700 bg-zinc-50 border-zinc-200" : "text-slate-300 bg-[#080c18]/50 border-border-custom/50";
+  const cardStyle = isLight ? "light-card text-zinc-800" : "glass-card text-[#e8edf8]";
+  const borderTheme = isLight ? "border-zinc-200" : "border-border-custom";
+  const hoverRowBg = isLight ? "hover:bg-zinc-100/60" : "hover:bg-[#0c1222]/40";
+  const inputStyle = isLight ? "bg-white border-zinc-300 text-zinc-900 focus:border-cyan-500" : "bg-[#0d1222]/80 border-border-custom text-white focus:border-cyan-500/50";
+  const controlPanelBg = isLight ? "bg-zinc-100/60 border-zinc-200" : "bg-[#0c1222]/80 border-border-custom";
+
+  const getTabClass = (tabName: typeof activeTab) => {
+    const isActive = activeTab === tabName;
+    if (isActive) {
+      return isLight
+        ? "bg-cyan-100 border-cyan-400 text-cyan-800 shadow-sm"
+        : "bg-cyan-500/10 border-cyan-500/40 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.1)]";
+    } else {
+      return isLight
+        ? "border-transparent text-zinc-500 hover:text-zinc-900 hover:bg-zinc-200/50"
+        : "border-transparent text-text-muted hover:text-white hover:bg-surface/50";
+    }
+  };
+
   return (
-    <div className="relative min-h-screen bg-[#080c18] text-[#e8edf8] flex flex-col justify-between overflow-hidden">
+    <div className={`relative min-h-screen flex flex-col justify-between overflow-hidden transition-colors duration-300 ${isLight ? "bg-[#f8fafc]" : "bg-[#080c18]"}`}>
       {/* Background Gradients */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-cyan-500/5 via-transparent to-transparent blur-3xl pointer-events-none rounded-full" />
+      {!isLight && (
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-cyan-500/5 via-transparent to-transparent blur-3xl pointer-events-none rounded-full" />
+      )}
 
       {/* Main Container */}
       <div className="relative w-full max-w-5xl mx-auto px-4 md:px-6 py-12 flex-1 flex flex-col z-10">
@@ -720,7 +752,7 @@ export default function VocabTrainerPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <Link
             href="/english"
-            className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-english transition-colors self-start"
+            className={`inline-flex items-center gap-1.5 text-xs transition-colors self-start ${isLight ? "text-zinc-500 hover:text-cyan-600" : "text-text-muted hover:text-english"}`}
           >
             <ArrowRight className="w-3.5 h-3.5" />
             <span>חזרה לאנגלית</span>
@@ -730,17 +762,44 @@ export default function VocabTrainerPage() {
             {/* Audio Toggle */}
             <button
               onClick={() => setSoundEnabled(!soundEnabled)}
-              className="px-3 py-1.5 rounded-lg border border-border-custom bg-surface hover:bg-surface-hover text-text-muted hover:text-white transition-all text-xs flex items-center gap-1.5 cursor-pointer"
+              className={`px-3 py-1.5 rounded-lg border transition-all text-xs flex items-center gap-1.5 cursor-pointer ${
+                isLight
+                  ? "border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-600 hover:text-zinc-800"
+                  : "border-border-custom bg-surface hover:bg-surface-hover text-text-muted hover:text-white"
+              }`}
             >
               {soundEnabled ? (
                 <>
-                  <Volume2 className="w-3.5 h-3.5 text-cyan-400" />
+                  <Volume2 className="w-3.5 h-3.5 text-cyan-500" />
                   <span>שמע פעיל</span>
                 </>
               ) : (
                 <>
-                  <VolumeX className="w-3.5 h-3.5 text-zinc-500" />
+                  <VolumeX className="w-3.5 h-3.5 text-zinc-400" />
                   <span>שמע כבוי</span>
+                </>
+              )}
+            </button>
+
+            {/* Comfort Reading Mode Toggle */}
+            <button
+              onClick={toggleComfortMode}
+              className={`px-3 py-1.5 rounded-lg border text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all ${
+                isLight
+                  ? "border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100"
+                  : "border-border-custom bg-surface hover:bg-surface-hover text-text-muted hover:text-white"
+              }`}
+              title={isLight ? "מעבר למצב כהה" : "מעבר למצב קריאה בהיר"}
+            >
+              {isLight ? (
+                <>
+                  <Moon className="w-3.5 h-3.5 text-amber-600" />
+                  <span>מצב כהה</span>
+                </>
+              ) : (
+                <>
+                  <Sun className="w-3.5 h-3.5 text-amber-400" />
+                  <span>מצב בהיר</span>
                 </>
               )}
             </button>
@@ -748,8 +807,8 @@ export default function VocabTrainerPage() {
             {/* Auth Dropdown/State */}
             {user ? (
               <div className="flex items-center gap-2.5">
-                <div className="flex items-center gap-1.5 bg-surface border border-border-custom rounded-lg px-3 py-1.5 text-xs text-zinc-300">
-                  <User className="w-3.5 h-3.5 text-cyan-400" />
+                <div className={`flex items-center gap-1.5 border rounded-lg px-3 py-1.5 text-xs ${isLight ? "bg-white border-zinc-200 text-zinc-700" : "bg-surface border-border-custom text-zinc-300"}`}>
+                  <User className="w-3.5 h-3.5 text-cyan-500" />
                   <span className="font-semibold">{user.displayName || user.email || "תלמיד/ה"}</span>
                 </div>
                 <button
@@ -763,7 +822,7 @@ export default function VocabTrainerPage() {
             ) : (
               <Link
                 href="/login?redirect=/english/vocab-trainer"
-                className="px-3.5 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-zinc-950 text-xs font-bold cursor-pointer transition-all flex items-center gap-1"
+                className="px-3.5 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-zinc-950 text-xs font-bold cursor-pointer transition-all flex items-center gap-1 shadow-sm"
               >
                 <LogIn className="w-3.5 h-3.5" />
                 <span>התחבר לשמירה בענן</span>
@@ -773,23 +832,19 @@ export default function VocabTrainerPage() {
         </div>
 
         <div className="text-right mb-8">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-surface border border-border-custom rounded-full text-xs font-bold text-english mb-3">
+          <div className={`inline-flex items-center gap-1.5 px-3 py-1 border rounded-full text-xs font-bold mb-3 ${isLight ? "bg-white border-zinc-200 text-cyan-600" : "bg-surface border-border-custom text-english"}`}>
             <BookmarkCheck className="w-3.5 h-3.5" />
             <span>אימון אוצר מילים</span>
           </div>
-          <h1 className="text-3xl font-black text-white">מאגר מילים ואימונים</h1>
-          <p className="text-text-muted text-xs mt-1.5">הזינו את מילות השיעור ותרגלו אותן במגוון דרכים אינטראקטיביות</p>
+          <h1 className={`text-3xl font-black ${textTitle}`}>מאגר מילים ואימונים</h1>
+          <p className={`text-xs mt-1.5 ${textMuted}`}>הזינו את מילות השיעור ותרגלו אותן במגוון דרכים אינטראקטיביות</p>
         </div>
 
         {/* Tab Buttons */}
-        <div className="flex flex-wrap gap-2 mb-8 border-b border-border-custom pb-4 justify-start">
+        <div className={`flex flex-wrap gap-2 mb-8 border-b pb-4 justify-start ${borderTheme}`}>
           <button
             onClick={() => setActiveTab("manage")}
-            className={`px-4 py-2 rounded-xl text-xs md:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 border ${
-              activeTab === "manage"
-                ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
-                : "border-transparent text-text-muted hover:text-white hover:bg-surface/50"
-            }`}
+            className={`px-4 py-2 rounded-xl text-xs md:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 border ${getTabClass("manage")}`}
           >
             <FileText className="w-4 h-4" />
             <span>מאגר המילים ({words.length})</span>
@@ -798,11 +853,7 @@ export default function VocabTrainerPage() {
           <button
             onClick={() => setActiveTab("flashcards")}
             disabled={words.length === 0}
-            className={`px-4 py-2 rounded-xl text-xs md:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 border disabled:opacity-50 disabled:cursor-not-allowed ${
-              activeTab === "flashcards"
-                ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
-                : "border-transparent text-text-muted hover:text-white hover:bg-surface/50"
-            }`}
+            className={`px-4 py-2 rounded-xl text-xs md:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 border disabled:opacity-50 disabled:cursor-not-allowed ${getTabClass("flashcards")}`}
           >
             <Layers className="w-4 h-4" />
             <span>כרטיסיות מידע</span>
@@ -811,11 +862,7 @@ export default function VocabTrainerPage() {
           <button
             onClick={() => setActiveTab("quiz")}
             disabled={words.length === 0}
-            className={`px-4 py-2 rounded-xl text-xs md:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 border disabled:opacity-50 disabled:cursor-not-allowed ${
-              activeTab === "quiz"
-                ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
-                : "border-transparent text-text-muted hover:text-white hover:bg-surface/50"
-            }`}
+            className={`px-4 py-2 rounded-xl text-xs md:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 border disabled:opacity-50 disabled:cursor-not-allowed ${getTabClass("quiz")}`}
           >
             <HelpCircle className="w-4 h-4" />
             <span>מבחן אמריקאי</span>
@@ -824,11 +871,7 @@ export default function VocabTrainerPage() {
           <button
             onClick={() => setActiveTab("spelling")}
             disabled={words.length === 0}
-            className={`px-4 py-2 rounded-xl text-xs md:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 border disabled:opacity-50 disabled:cursor-not-allowed ${
-              activeTab === "spelling"
-                ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
-                : "border-transparent text-text-muted hover:text-white hover:bg-surface/50"
-            }`}
+            className={`px-4 py-2 rounded-xl text-xs md:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 border disabled:opacity-50 disabled:cursor-not-allowed ${getTabClass("spelling")}`}
           >
             <Sparkles className="w-4 h-4" />
             <span>אימון כתיבה</span>
@@ -837,11 +880,7 @@ export default function VocabTrainerPage() {
           <button
             onClick={() => setActiveTab("match")}
             disabled={words.length < 4}
-            className={`px-4 py-2 rounded-xl text-xs md:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 border disabled:opacity-50 disabled:cursor-not-allowed ${
-              activeTab === "match"
-                ? "bg-cyan-500/10 border-cyan-500/40 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
-                : "border-transparent text-text-muted hover:text-white hover:bg-surface/50"
-            }`}
+            className={`px-4 py-2 rounded-xl text-xs md:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 border disabled:opacity-50 disabled:cursor-not-allowed ${getTabClass("match")}`}
             title={words.length < 4 ? "יש להזין לפחות 4 מילים כדי לשחק" : ""}
           >
             <Trophy className="w-4 h-4" />
@@ -850,16 +889,16 @@ export default function VocabTrainerPage() {
         </div>
 
         {/* Tab Content Display */}
-        <div className="flex-1 w-full">
+        <div className="flex-1 w-full text-right">
           {!isLoaded ? (
-            <div className="flex justify-center items-center py-20 text-text-muted text-sm">
-              בטוען מילים...
+            <div className={`flex justify-center items-center py-20 text-sm ${textMuted}`}>
+              טוען מילים...
             </div>
           ) : words.length === 0 && activeTab !== "manage" ? (
-            <div className="glass-card rounded-2xl border border-border-custom p-12 text-center max-w-md mx-auto space-y-4">
-              <BookOpen className="w-12 h-12 text-zinc-600 mx-auto" />
-              <h3 className="text-lg font-bold text-white">מאגר המילים שלכם ריק</h3>
-              <p className="text-text-muted text-xs leading-relaxed">
+            <div className={`rounded-2xl border p-12 text-center max-w-md mx-auto space-y-4 ${cardStyle}`}>
+              <BookOpen className="w-12 h-12 text-zinc-400 mx-auto" />
+              <h3 className={`text-lg font-bold ${textTitle}`}>מאגר המילים שלכם ריק</h3>
+              <p className={`text-xs leading-relaxed ${textMuted}`}>
                 כדי להתחיל להתאמן, יש להיכנס ללשונית "מאגר המילים" ולהוסיף מילים או לטעון את רשימת מילות המחדל.
               </p>
               <button
@@ -882,18 +921,18 @@ export default function VocabTrainerPage() {
                   className="space-y-6"
                 >
                   {hasLocalWordsToMerge && (
-                    <div className="glass-card rounded-2xl border border-cyan-500/30 bg-cyan-950/15 p-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-right">
+                    <div className={`rounded-2xl border p-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-right ${isLight ? "bg-cyan-50 border-cyan-200 text-cyan-800" : "bg-cyan-950/15 border-cyan-500/30"}`}>
                       <div className="flex items-center gap-3">
-                        <CloudLightning className="w-5 h-5 text-cyan-400 shrink-0" />
+                        <CloudLightning className="w-5 h-5 text-cyan-500 shrink-0" />
                         <div>
-                          <p className="text-sm font-bold text-white">יש לכם מילים מקומיות בדפדפן זה</p>
-                          <p className="text-xs text-text-muted mt-0.5">מצאנו מילים ששמרתם במחשב זה. האם ברצונכם להעלות ולסנכרן אותן עם החשבון שלכם בענן?</p>
+                          <p className={`text-sm font-bold ${isLight ? "text-cyan-900" : "text-white"}`}>יש לכם מילים מקומיות בדפדפן זה</p>
+                          <p className={`text-xs mt-0.5 ${isLight ? "text-zinc-600" : "text-text-muted"}`}>מצאנו מילים ששמרתם במחשב זה. האם ברצונכם להעלות ולסנכרן אותן עם החשבון שלכם בענן?</p>
                         </div>
                       </div>
                       <button
                         onClick={handleMergeLocalWords}
                         disabled={isMerging}
-                        className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-zinc-950 font-bold text-xs shrink-0 transition-all cursor-pointer flex items-center gap-1.5"
+                        className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-zinc-950 font-bold text-xs shrink-0 transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
                       >
                         {isMerging ? (
                           <>
@@ -911,200 +950,226 @@ export default function VocabTrainerPage() {
                   )}
 
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                  {/* Left Column: Form to Add Word */}
-                  <div className="lg:col-span-4 space-y-6">
-                    <div className="glass-card rounded-2xl border border-border-custom p-6">
-                      <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                        <Plus className="w-4 h-4 text-cyan-400" />
-                        <span>הוספת מילה חדשה</span>
-                      </h3>
+                    {/* Left Column: Form to Add Word */}
+                    <div className="lg:col-span-4 space-y-6">
+                      <div className={`rounded-2xl border p-6 ${cardStyle}`}>
+                        <h3 className={`text-lg font-bold mb-4 flex items-center gap-2 ${textTitle}`}>
+                          <Plus className="w-4 h-4 text-cyan-500" />
+                          <span>הוספת מילה חדשה</span>
+                        </h3>
 
-                      <form onSubmit={handleAddWord} className="space-y-4 text-right">
-                        <div className="space-y-1.5">
-                          <label className="text-xs text-text-muted font-bold block">המילה באנגלית</label>
-                          <input
-                            type="text"
-                            placeholder="e.g. significant"
-                            value={newEnglish}
-                            onChange={(e) => setNewEnglish(e.target.value.replace(/[^a-zA-Z\s-]/g, ""))}
-                            dir="ltr"
-                            className="w-full h-10 bg-[#0d1222]/80 border border-border-custom rounded-xl px-3 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-cyan-500/50"
-                          />
-                        </div>
-
-                        <div className="space-y-1.5">
-                          <label className="text-xs text-text-muted font-bold block">התרגום לעברית</label>
-                          <input
-                            type="text"
-                            placeholder="לדוגמה: משמעותי"
-                            value={newHebrew}
-                            onChange={(e) => setNewHebrew(e.target.value)}
-                            className="w-full h-10 bg-[#0d1222]/80 border border-border-custom rounded-xl px-3 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-cyan-500/50"
-                          />
-                        </div>
-
-                        <div className="space-y-1.5">
-                          <label className="text-xs text-text-muted font-bold block">חלק דיבר</label>
-                          <select
-                            value={newPart}
-                            onChange={(e) => setNewPart(e.target.value)}
-                            className="w-full h-10 bg-[#0f1526] border border-border-custom rounded-xl px-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"
-                          >
-                            <option value="noun">שם עצם (Noun)</option>
-                            <option value="verb">פועל (Verb)</option>
-                            <option value="adjective">שם תואר (Adjective)</option>
-                            <option value="adverb">תואר הפועל (Adverb)</option>
-                            <option value="other">אחר (Other)</option>
-                          </select>
-                        </div>
-
-                        <div className="space-y-1.5">
-                          <label className="text-xs text-text-muted font-bold block">משפט דוגמה (אופציונלי)</label>
-                          <textarea
-                            placeholder="e.g. This is a significant improvement."
-                            value={newExample}
-                            onChange={(e) => setNewExample(e.target.value)}
-                            dir="ltr"
-                            rows={3}
-                            className="w-full bg-[#0d1222]/80 border border-border-custom rounded-xl p-3 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-cyan-500/50 resize-none"
-                          />
-                        </div>
-
-                        {formError && (
-                          <div className="text-xs text-rose-400 font-semibold bg-rose-500/10 border border-rose-500/20 p-2 rounded-lg">
-                            {formError}
+                        <form onSubmit={handleAddWord} className="space-y-4 text-right">
+                          <div className="space-y-1.5">
+                            <label className={`text-xs font-bold block ${textMuted}`}>המילה באנגלית</label>
+                            <input
+                              type="text"
+                              placeholder="e.g. significant"
+                              value={newEnglish}
+                              onChange={(e) => setNewEnglish(e.target.value.replace(/[^a-zA-Z\s-]/g, ""))}
+                              dir="ltr"
+                              className={`w-full h-10 rounded-xl px-3 text-sm focus:outline-none transition-colors border ${inputStyle}`}
+                            />
                           </div>
-                        )}
 
-                        <button
-                          type="submit"
-                          className="w-full h-10 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all border border-cyan-400/20"
-                        >
-                          <Plus className="w-4 h-4" />
-                          <span>הוסף מילה לרשימה</span>
-                        </button>
-                      </form>
-                    </div>
+                          <div className="space-y-1.5">
+                            <label className={`text-xs font-bold block ${textMuted}`}>התרגום לעברית</label>
+                            <input
+                              type="text"
+                              placeholder="לדוגמה: משמעותי"
+                              value={newHebrew}
+                              onChange={(e) => setNewHebrew(e.target.value)}
+                              className={`w-full h-10 rounded-xl px-3 text-sm focus:outline-none transition-colors border ${inputStyle}`}
+                            />
+                          </div>
 
-                    {/* Actions panel */}
-                    <div className="glass-card rounded-2xl border border-border-custom p-5 flex justify-between gap-3">
-                      <button
-                        onClick={handleResetDefaults}
-                        className="flex-1 py-2 px-3 rounded-lg border border-border-custom bg-surface hover:bg-surface-hover text-text-muted hover:text-white transition-colors text-xs font-semibold cursor-pointer text-center"
-                      >
-                        איפוס מילות ברירת מחדל
-                      </button>
-                      <button
-                        onClick={handleClearAll}
-                        disabled={words.length === 0}
-                        className="flex-1 py-2 px-3 rounded-lg border border-red-950/40 bg-red-950/10 hover:bg-red-900/20 text-red-400 hover:text-red-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs font-semibold cursor-pointer text-center"
-                      >
-                        מחק את כל המילים
-                      </button>
-                    </div>
+                          <div className="space-y-1.5">
+                            <label className={`text-xs font-bold block ${textMuted}`}>חלק דיבר</label>
+                            <select
+                              value={newPart}
+                              onChange={(e) => setNewPart(e.target.value)}
+                              className={`w-full h-10 rounded-xl px-3 text-sm focus:outline-none border ${
+                                isLight 
+                                  ? "bg-white border-zinc-300 text-zinc-900" 
+                                  : "bg-[#0f1526] border-border-custom text-white"
+                              }`}
+                            >
+                              <option value="noun">שם עצם (Noun)</option>
+                              <option value="verb">פועל (Verb)</option>
+                              <option value="adjective">שם תואר (Adjective)</option>
+                              <option value="adverb">תואר הפועל (Adverb)</option>
+                              <option value="other">אחר (Other)</option>
+                            </select>
+                          </div>
 
-                    {!user && (
-                      <div className="glass-card rounded-2xl border border-cyan-500/20 bg-cyan-950/5 p-5 text-right space-y-3">
-                        <p className="text-xs font-bold text-cyan-400 flex items-center gap-1.5 justify-end">
-                          <span>שמירה בענן</span>
-                          <CloudLightning className="w-3.5 h-3.5 animate-pulse" />
-                        </p>
-                        <p className="text-xs text-text-muted leading-relaxed">
-                          המילים שלכם נשמרות כרגע מקומית בדפדפן זה בלבד. התחברו כדי לשמור אותן בענן ולגשת אליהן מכל מכשיר (מחשב, טאבלט או נייד).
-                        </p>
-                        <Link
-                          href="/login?redirect=/english/vocab-trainer"
-                          className="w-full py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 border border-cyan-400/20"
-                        >
-                          <LogIn className="w-3.5 h-3.5" />
-                          <span>התחברו כעת</span>
-                        </Link>
-                      </div>
-                    )}
-                  </div>
+                          <div className="space-y-1.5">
+                            <label className={`text-xs font-bold block ${textMuted}`}>משפט דוגמה (אופציונלי)</label>
+                            <textarea
+                              placeholder="e.g. This is a significant improvement."
+                              value={newExample}
+                              onChange={(e) => setNewExample(e.target.value)}
+                              dir="ltr"
+                              rows={3}
+                              className={`w-full rounded-xl p-3 text-sm focus:outline-none resize-none border ${inputStyle}`}
+                            />
+                          </div>
 
-                  {/* Right Column: Words Table / List */}
-                  <div className="lg:col-span-8 space-y-4">
-                    <div className="flex items-center gap-4 bg-[#0c1222]/80 border border-border-custom rounded-2xl px-4 py-2">
-                      <Search className="w-5 h-5 text-text-muted shrink-0" />
-                      <input
-                        type="text"
-                        placeholder="חיפוש מילה באנגלית או בעברית..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full h-10 bg-transparent text-sm text-white placeholder:text-text-muted focus:outline-none text-right"
-                      />
-                    </div>
-
-                    <div className="glass-card rounded-2xl border border-border-custom overflow-hidden">
-                      {filteredWords.length === 0 ? (
-                        <div className="py-20 text-center text-text-muted text-xs">
-                          לא נמצאו מילים התואמות את החיפוש.
-                        </div>
-                      ) : (
-                        <div className="divide-y divide-border-custom">
-                          {filteredWords.map((word) => (
-                            <div key={word.id} className="p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:bg-[#0c1222]/40 transition-colors text-right">
-                              {/* Left part: Actions & English Word */}
-                              <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
-                                <div className="flex items-center gap-2">
-                                  <button
-                                    onClick={() => handleDeleteWord(word.id)}
-                                    className="p-2 rounded-lg border border-border-custom text-text-muted hover:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
-                                    title="מחק מילה"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </button>
-                                  
-                                  <button
-                                    onClick={(e) => handleToggleMastered(word.id, e)}
-                                    className={`p-2 rounded-lg border transition-all cursor-pointer flex items-center justify-center ${
-                                      word.mastered
-                                        ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-                                        : "border-border-custom text-text-muted hover:text-white"
-                                    }`}
-                                    title={word.mastered ? "סמן כלא נלמד" : "סמן כנלמד"}
-                                  >
-                                    <Check className="w-3.5 h-3.5" />
-                                  </button>
-
-                                  {speechSupported && (
-                                    <button
-                                      onClick={(e) => speakWord(word.english, e)}
-                                      className="p-2 rounded-lg border border-border-custom text-text-muted hover:text-cyan-400 hover:bg-cyan-500/10 transition-all cursor-pointer"
-                                      title="השמע מילה"
-                                    >
-                                      <Volume2 className="w-3.5 h-3.5" />
-                                    </button>
-                                  )}
-                                </div>
-
-                                <div className="text-left" dir="ltr">
-                                  <span className="font-extrabold text-white text-base tracking-wide block">{word.english}</span>
-                                  <span className="text-[10px] font-bold text-cyan-400/80 bg-cyan-950/40 px-1.5 py-0.5 rounded border border-cyan-800/30">
-                                    {word.partOfSpeech}
-                                  </span>
-                                </div>
-                              </div>
-
-                              {/* Right part: Hebrew Meaning & Example */}
-                              <div className="flex-1 md:max-w-md w-full">
-                                <span className="font-bold text-sm text-zinc-200">{word.hebrew}</span>
-                                {word.example && (
-                                  <p className="text-xs text-text-muted mt-1 leading-relaxed text-left bg-[#080c18]/50 p-2 rounded border border-border-custom/50" dir="ltr">
-                                    {word.example}
-                                  </p>
-                                )}
-                              </div>
+                          {formError && (
+                            <div className="text-xs text-rose-500 font-semibold bg-rose-500/10 border border-rose-500/20 p-2.5 rounded-lg">
+                              {formError}
                             </div>
-                          ))}
+                          )}
+
+                          <button
+                            type="submit"
+                            className="w-full h-10 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all border border-cyan-400/25 shadow-sm"
+                          >
+                            <Plus className="w-4 h-4" />
+                            <span>הוסף מילה לרשימה</span>
+                          </button>
+                        </form>
+                      </div>
+
+                      {/* Actions panel */}
+                      <div className={`rounded-2xl border p-5 flex justify-between gap-3 ${cardStyle}`}>
+                        <button
+                          onClick={handleResetDefaults}
+                          className={`flex-1 py-2 px-3 rounded-lg border text-xs font-semibold cursor-pointer text-center transition-colors ${
+                            isLight
+                              ? "border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-600 hover:text-zinc-800"
+                              : "border-border-custom bg-surface hover:bg-surface-hover text-text-muted hover:text-white"
+                          }`}
+                        >
+                          איפוס מילות ברירת מחדל
+                        </button>
+                        <button
+                          onClick={handleClearAll}
+                          disabled={words.length === 0}
+                          className="flex-1 py-2 px-3 rounded-lg border border-red-950/40 bg-red-950/10 hover:bg-red-900/20 text-red-400 hover:text-red-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs font-semibold cursor-pointer text-center"
+                        >
+                          מחק את כל המילים
+                        </button>
+                      </div>
+
+                      {!user && (
+                        <div className={`rounded-2xl border p-5 text-right space-y-3 ${
+                          isLight 
+                            ? "bg-cyan-50/50 border-cyan-200/60" 
+                            : "bg-cyan-950/5 border-cyan-500/20"
+                        }`}>
+                          <p className="text-xs font-bold text-cyan-500 flex items-center gap-1.5 justify-end">
+                            <span>שמירה בענן</span>
+                            <CloudLightning className="w-3.5 h-3.5" />
+                          </p>
+                          <p className={`text-xs leading-relaxed ${isLight ? "text-zinc-600" : "text-text-muted"}`}>
+                            המילים שלכם נשמרות כרגע מקומית בדפדפן זה בלבד. התחברו כדי לשמור אותן בענן ולגשת אליהן מכל מכשיר (מחשב, טאבלט או נייד).
+                          </p>
+                          <Link
+                            href="/login?redirect=/english/vocab-trainer"
+                            className="w-full py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 border border-cyan-400/20"
+                          >
+                            <LogIn className="w-3.5 h-3.5" />
+                            <span>התחברו כעת</span>
+                          </Link>
                         </div>
                       )}
                     </div>
+
+                    {/* Right Column: Words Table / List */}
+                    <div className="lg:col-span-8 space-y-4">
+                      <div className={`flex items-center gap-4 border rounded-2xl px-4 py-2 ${controlPanelBg}`}>
+                        <Search className={`w-5 h-5 shrink-0 ${textMuted}`} />
+                        <input
+                          type="text"
+                          placeholder="חיפוש מילה באנגלית או בעברית..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className={`w-full h-10 bg-transparent text-sm placeholder:text-zinc-400 focus:outline-none text-right ${isLight ? "text-zinc-900" : "text-white"}`}
+                        />
+                      </div>
+
+                      <div className={`rounded-2xl border overflow-hidden ${cardStyle}`}>
+                        {filteredWords.length === 0 ? (
+                          <div className={`py-20 text-center text-xs ${textMuted}`}>
+                            לא נמצאו מילים התואמות את החיפוש.
+                          </div>
+                        ) : (
+                          <div className={`divide-y ${borderTheme}`}>
+                            {filteredWords.map((word) => (
+                              <div key={word.id} className={`p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-5 transition-colors text-right ${hoverRowBg}`}>
+                                {/* Left part: Actions & English Word */}
+                                <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
+                                  <div className="flex items-center gap-2">
+                                    <button
+                                      onClick={() => handleDeleteWord(word.id)}
+                                      className={`p-2 rounded-lg border transition-colors cursor-pointer ${
+                                        isLight 
+                                          ? "border-zinc-200 text-zinc-400 hover:text-red-600 hover:bg-red-50"
+                                          : "border-border-custom text-text-muted hover:text-red-400 hover:bg-red-500/10"
+                                      }`}
+                                      title="מחק מילה"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                    
+                                    <button
+                                      onClick={(e) => handleToggleMastered(word.id, e)}
+                                      className={`p-2 rounded-lg border transition-all cursor-pointer flex items-center justify-center ${
+                                        word.mastered
+                                          ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500"
+                                          : isLight
+                                            ? "border-zinc-200 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100"
+                                            : "border-border-custom text-text-muted hover:text-white"
+                                      }`}
+                                      title={word.mastered ? "סמן כלא נלמד" : "סמן כנלמד"}
+                                    >
+                                      <Check className="w-4 h-4" />
+                                    </button>
+
+                                    {speechSupported && (
+                                      <button
+                                        onClick={(e) => speakWord(word.english, e)}
+                                        className={`p-2 rounded-lg border transition-all cursor-pointer ${
+                                          isLight 
+                                            ? "border-zinc-200 text-zinc-400 hover:text-cyan-600 hover:bg-cyan-50" 
+                                            : "border-border-custom text-text-muted hover:text-cyan-400 hover:bg-cyan-500/10"
+                                        }`}
+                                        title="השמע מילה"
+                                      >
+                                        <Volume2 className="w-4 h-4" />
+                                      </button>
+                                    )}
+                                  </div>
+
+                                  <div className="text-left" dir="ltr">
+                                    <span className={`text-lg tracking-wide block leading-tight ${textEnglish}`}>{word.english}</span>
+                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
+                                      isLight
+                                        ? "text-sky-700 bg-sky-50 border-sky-100"
+                                        : "text-cyan-400/80 bg-cyan-950/40 border-cyan-800/30"
+                                    }`}>
+                                      {word.partOfSpeech}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* Right part: Hebrew Meaning & Example */}
+                                <div className="flex-grow md:max-w-md w-full">
+                                  <span className={`font-semibold text-base block mb-1.5 ${textHebrew}`}>{word.hebrew}</span>
+                                  {word.example && (
+                                    <p className={`text-sm rounded-xl p-3 leading-relaxed text-left border ${textExample}`} dir="ltr">
+                                      {word.example}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            )}
+                </motion.div>
+              )}
 
               {/* TAB 2: FLASHCARDS */}
               {activeTab === "flashcards" && words.length > 0 && (
@@ -1118,10 +1183,10 @@ export default function VocabTrainerPage() {
                   {/* Progress bar */}
                   <div className="space-y-1.5 text-right">
                     <div className="flex justify-between text-[11px] font-bold text-text-muted">
-                      <span>{words.filter(w => w.mastered).length} מתוך {words.length} מילים נלמדו</span>
-                      <span>התקדמות המאגר</span>
+                      <span className={isLight ? "text-zinc-600" : ""}>{words.filter(w => w.mastered).length} מתוך {words.length} מילים נלמדו</span>
+                      <span className={isLight ? "text-zinc-600" : ""}>התקדמות המאגר</span>
                     </div>
-                    <div className="h-2 w-full bg-surface border border-border-custom rounded-full overflow-hidden">
+                    <div className={`h-2.5 w-full border rounded-full overflow-hidden ${isLight ? "bg-zinc-200 border-zinc-300" : "bg-surface border-border-custom"}`}>
                       <div
                         className="h-full bg-gradient-to-r from-cyan-500 to-emerald-500 rounded-full transition-all duration-300"
                         style={{ width: `${(words.filter(w => w.mastered).length / words.length) * 100}%` }}
@@ -1141,25 +1206,33 @@ export default function VocabTrainerPage() {
                     >
                       {/* CARD FRONT: English Word */}
                       <div
-                        className="absolute inset-0 w-full h-full rounded-2xl backface-hidden glass-card flex flex-col justify-between p-8"
+                        className={`absolute inset-0 w-full h-full rounded-2xl backface-hidden flex flex-col justify-between p-8 ${cardStyle}`}
                         style={{ backfaceVisibility: "hidden" }}
                       >
-                        <div className="flex justify-between items-center text-xs text-text-muted font-bold">
+                        <div className={`flex justify-between items-center text-xs font-bold ${textMuted}`}>
                           <span>כרטיסייה {cardIndex + 1} מתוך {words.length}</span>
-                          <span className="text-[10px] text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded bg-cyan-950/20">
+                          <span className={`text-[10px] border px-2 py-0.5 rounded ${
+                            isLight
+                              ? "text-sky-700 bg-sky-50 border-sky-200"
+                              : "text-cyan-400 border-cyan-500/20 bg-cyan-950/20"
+                          }`}>
                             {words[cardIndex].partOfSpeech}
                           </span>
                         </div>
 
                         <div className="flex-1 flex flex-col justify-center items-center gap-4">
-                          <span className="text-4xl font-black text-white tracking-wider font-sans select-all">
+                          <span className={`text-4xl md:text-5xl font-black tracking-wider font-sans select-all ${isLight ? "text-zinc-900" : "text-white"}`}>
                             {words[cardIndex].english}
                           </span>
                           
                           {speechSupported && (
                             <button
                               onClick={(e) => speakWord(words[cardIndex].english, e)}
-                              className="p-3 rounded-full border border-border-custom bg-[#080c18] hover:bg-cyan-500/10 hover:border-cyan-500/40 text-cyan-400 transition-all cursor-pointer"
+                              className={`p-3 rounded-full border transition-all cursor-pointer ${
+                                isLight
+                                  ? "border-zinc-200 bg-zinc-50 hover:bg-cyan-50 hover:border-cyan-400 text-cyan-600"
+                                  : "border-border-custom bg-[#080c18] hover:bg-cyan-500/10 hover:border-cyan-500/40 text-cyan-400"
+                              }`}
                               title="השמע מילה"
                             >
                               <Volume2 className="w-5 h-5" />
@@ -1167,37 +1240,37 @@ export default function VocabTrainerPage() {
                           )}
                         </div>
 
-                        <div className="text-[10px] text-text-muted font-bold animate-pulse">
+                        <div className={`text-[10px] font-bold animate-pulse ${textMuted}`}>
                           לחץ כדי להציג את התרגום
                         </div>
                       </div>
 
                       {/* CARD BACK: Hebrew Meaning */}
                       <div
-                        className="absolute inset-0 w-full h-full rounded-2xl backface-hidden glass-card flex flex-col justify-between p-8 rotate-y-180"
+                        className={`absolute inset-0 w-full h-full rounded-2xl backface-hidden flex flex-col justify-between p-8 rotate-y-180 ${cardStyle}`}
                         style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
                       >
-                        <div className="flex justify-between items-center text-xs text-text-muted font-bold">
+                        <div className={`flex justify-between items-center text-xs font-bold ${textMuted}`}>
                           <span>תשובה / תרגום</span>
                           {words[cardIndex].mastered && (
-                            <span className="text-[10px] text-emerald-400 bg-emerald-950/40 px-2 py-0.5 border border-emerald-800/30 rounded font-bold">
+                            <span className="text-[10px] text-emerald-500 bg-emerald-500/10 px-2 py-0.5 border border-emerald-500/20 rounded font-bold">
                               נלמד ✓
                             </span>
                           )}
                         </div>
 
                         <div className="flex-1 flex flex-col justify-center items-center gap-3">
-                          <span className="text-3xl font-black text-emerald-400 select-all">
+                          <span className={`text-3xl font-black select-all ${isLight ? "text-emerald-600" : "text-emerald-400"}`}>
                             {words[cardIndex].hebrew}
                           </span>
                           {words[cardIndex].example && (
-                            <p className="text-xs text-zinc-300 max-w-xs mt-2 leading-relaxed bg-[#080c18]/50 p-3 rounded-lg border border-border-custom/50" dir="ltr">
+                            <p className={`text-sm rounded-xl p-3 max-w-xs mt-2 leading-relaxed border ${textExample}`} dir="ltr">
                               {words[cardIndex].example}
                             </p>
                           )}
                         </div>
 
-                        <div className="text-[10px] text-text-muted font-bold">
+                        <div className={`text-[10px] font-bold ${textMuted}`}>
                           לחץ כדי לחזור למילה
                         </div>
                       </div>
@@ -1208,7 +1281,11 @@ export default function VocabTrainerPage() {
                   <div className="flex items-center justify-between gap-4">
                     <button
                       onClick={handlePrevCard}
-                      className="p-3 rounded-xl border border-border-custom bg-surface hover:bg-surface-hover text-text-muted hover:text-white transition-all cursor-pointer"
+                      className={`p-3 rounded-xl border transition-all cursor-pointer ${
+                        isLight
+                          ? "border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-500 hover:text-zinc-800"
+                          : "border-border-custom bg-surface hover:bg-surface-hover text-text-muted hover:text-white"
+                      }`}
                       title="מילה קודמת"
                     >
                       <ArrowRight className="w-5 h-5" />
@@ -1218,7 +1295,7 @@ export default function VocabTrainerPage() {
                       <button
                         onClick={handleCardMastered}
                         disabled={words[cardIndex].mastered}
-                        className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-all border border-emerald-400/20"
+                        className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-all border border-emerald-500/30 shadow-sm"
                       >
                         <Check className="w-4 h-4" />
                         <span>ידעתי! (סמן כנלמד)</span>
@@ -1228,8 +1305,10 @@ export default function VocabTrainerPage() {
                         onClick={(e) => handleToggleMastered(words[cardIndex].id, e)}
                         className={`px-4 py-2.5 rounded-xl border text-xs font-bold cursor-pointer transition-all ${
                           words[cardIndex].mastered
-                            ? "bg-rose-950/20 border-rose-800/40 text-rose-400 hover:bg-rose-900/20"
-                            : "bg-surface border-border-custom text-text-muted hover:text-white"
+                            ? "bg-rose-500/10 border-rose-500/20 text-rose-600 hover:bg-rose-500/20"
+                            : isLight
+                              ? "border-zinc-200 bg-white text-zinc-500 hover:text-zinc-800 hover:bg-zinc-50"
+                              : "bg-surface border-border-custom text-text-muted hover:text-white"
                         }`}
                       >
                         {words[cardIndex].mastered ? "הסר מרשימת הנלמדים" : "סמן כצריך חזרה"}
@@ -1238,7 +1317,11 @@ export default function VocabTrainerPage() {
 
                     <button
                       onClick={handleNextCard}
-                      className="p-3 rounded-xl border border-border-custom bg-surface hover:bg-surface-hover text-text-muted hover:text-white transition-all cursor-pointer"
+                      className={`p-3 rounded-xl border transition-all cursor-pointer ${
+                        isLight
+                          ? "border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-500 hover:text-zinc-800"
+                          : "border-border-custom bg-surface hover:bg-surface-hover text-text-muted hover:text-white"
+                      }`}
                       title="מילה הבאה"
                     >
                       <ArrowRight className="w-5 h-5 rotate-180" />
@@ -1257,27 +1340,29 @@ export default function VocabTrainerPage() {
                   className="max-w-xl mx-auto space-y-6"
                 >
                   {quizQuestions.length === 0 ? (
-                    <div className="text-center py-10 text-text-muted">מייצר שאלות...</div>
+                    <div className={`text-center py-10 ${textMuted}`}>מייצר שאלות...</div>
                   ) : !quizFinished ? (
-                    <div className="glass-card rounded-2xl border border-border-custom p-8 text-right space-y-6">
+                    <div className={`rounded-2xl border p-8 text-right space-y-6 ${cardStyle}`}>
                       {/* Quiz Header info */}
-                      <div className="flex justify-between items-center text-xs text-text-muted font-bold border-b border-border-custom/50 pb-4">
-                        <span>שאלה {quizIndex + 1} מתוך {quizQuestions.length}</span>
-                        <span className="text-emerald-400">ניקוד: {quizScore}</span>
+                      <div className={`flex justify-between items-center text-xs font-bold border-b pb-4 ${borderTheme}`}>
+                        <span className={textMuted}>שאלה {quizIndex + 1} מתוך {quizQuestions.length}</span>
+                        <span className={isLight ? "text-emerald-600" : "text-emerald-400"}>ניקוד: {quizScore}</span>
                       </div>
 
                       {/* Prompt */}
                       <div className="space-y-3">
-                        <span className="text-[10px] text-cyan-400 font-bold uppercase tracking-wider">
+                        <span className="text-[10px] text-cyan-500 font-bold uppercase tracking-wider">
                           {quizQuestions[quizIndex].type === "fill-blank" ? "השלמת משפט" : quizQuestions[quizIndex].type === "he-to-en" ? "תרגום לעברית" : "תרגום לאנגלית"}
                         </span>
                         
-                        <h3 className={`text-xl font-bold text-white leading-relaxed ${quizQuestions[quizIndex].type === "fill-blank" ? "font-serif text-left pt-2" : ""}`} dir={quizQuestions[quizIndex].type === "fill-blank" ? "ltr" : "rtl"}>
+                        <h3 className={`text-xl font-bold leading-relaxed ${isLight ? "text-zinc-900" : "text-white"} ${quizQuestions[quizIndex].type === "fill-blank" ? "font-serif text-left pt-2" : ""}`} dir={quizQuestions[quizIndex].type === "fill-blank" ? "ltr" : "rtl"}>
                           {quizQuestions[quizIndex].prompt}
                         </h3>
 
                         {quizQuestions[quizIndex].exampleContext && (
-                          <p className="text-xs text-text-muted font-medium bg-[#080c18] p-2.5 rounded-lg border border-border-custom">
+                          <p className={`text-xs font-medium p-2.5 rounded-lg border ${
+                            isLight ? "bg-zinc-50 border-zinc-200 text-zinc-600" : "bg-[#080c18] border-border-custom text-text-muted"
+                          }`}>
                             {quizQuestions[quizIndex].exampleContext}
                           </p>
                         )}
@@ -1286,7 +1371,7 @@ export default function VocabTrainerPage() {
                         {quizQuestions[quizIndex].type === "en-to-he" && speechSupported && (
                           <button
                             onClick={() => speakWord(quizQuestions[quizIndex].englishWord)}
-                            className="inline-flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 font-semibold cursor-pointer"
+                            className="inline-flex items-center gap-1.5 text-xs text-cyan-500 hover:text-cyan-600 font-semibold cursor-pointer"
                           >
                             <Volume2 className="w-3.5 h-3.5" />
                             <span>האזנה להגייה</span>
@@ -1301,15 +1386,23 @@ export default function VocabTrainerPage() {
                           const isCorrectAns = option === quizQuestions[quizIndex].correctAnswer;
                           const hasAnswered = selectedQuizOption !== null;
 
-                          let btnStyle = "border-border-custom bg-surface hover:bg-surface-hover text-white";
+                          let btnStyle = isLight 
+                            ? "border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-800" 
+                            : "border-border-custom bg-surface hover:bg-surface-hover text-white";
 
                           if (hasAnswered) {
                             if (isCorrectAns) {
-                              btnStyle = "bg-emerald-500/10 border-emerald-500/40 text-emerald-400 font-bold shadow-[0_0_15px_rgba(16,185,129,0.1)]";
+                              btnStyle = isLight
+                                ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 font-bold shadow-sm"
+                                : "bg-emerald-500/10 border-emerald-500/40 text-emerald-400 font-bold shadow-[0_0_15px_rgba(16,185,129,0.1)]";
                             } else if (isSelected) {
-                              btnStyle = "bg-rose-500/10 border-rose-500/40 text-rose-400 font-bold";
+                              btnStyle = isLight
+                                ? "bg-rose-500/10 border-rose-500/30 text-rose-700 font-bold"
+                                : "bg-rose-500/10 border-rose-500/40 text-rose-400 font-bold";
                             } else {
-                              btnStyle = "border-border-custom bg-surface/30 text-text-muted opacity-50";
+                              btnStyle = isLight
+                                ? "border-zinc-150 bg-zinc-50/50 text-zinc-400 opacity-60"
+                                : "border-border-custom bg-surface/30 text-text-muted opacity-50";
                             }
                           }
 
@@ -1320,12 +1413,12 @@ export default function VocabTrainerPage() {
                               disabled={hasAnswered}
                               dir={quizQuestions[quizIndex].type === "he-to-en" || quizQuestions[quizIndex].type === "fill-blank" ? "ltr" : "rtl"}
                               className={`w-full py-4 px-6 rounded-xl border text-right font-semibold text-sm transition-all cursor-pointer flex justify-between items-center ${btnStyle} ${
-                                quizQuestions[quizIndex].type === "he-to-en" || quizQuestions[quizIndex].type === "fill-blank" ? "text-left font-serif" : ""
+                                quizQuestions[quizIndex].type === "he-to-en" || quizQuestions[quizIndex].type === "fill-blank" ? "text-left font-serif text-base" : ""
                               }`}
                             >
                               <span>{option}</span>
-                              {hasAnswered && isCorrectAns && <Check className="w-4 h-4 text-emerald-400" />}
-                              {hasAnswered && isSelected && !isCorrectAns && <X className="w-4 h-4 text-rose-400" />}
+                              {hasAnswered && isCorrectAns && <Check className="w-4 h-4 text-emerald-500" />}
+                              {hasAnswered && isSelected && !isCorrectAns && <X className="w-4 h-4 text-rose-500" />}
                             </button>
                           );
                         })}
@@ -1333,10 +1426,10 @@ export default function VocabTrainerPage() {
 
                       {/* Action Button */}
                       {selectedQuizOption !== null && (
-                        <div className="flex justify-end pt-4 border-t border-border-custom/50">
+                        <div className={`flex justify-end pt-4 border-t ${borderTheme}`}>
                           <button
                             onClick={handleNextQuizQuestion}
-                            className="px-6 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5"
+                            className="px-6 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
                           >
                             <span>{quizIndex === quizQuestions.length - 1 ? "סיים בוחן" : "לשאלה הבאה"}</span>
                             <ArrowRight className="w-4 h-4 rotate-180" />
@@ -1346,22 +1439,24 @@ export default function VocabTrainerPage() {
                     </div>
                   ) : (
                     // Quiz Results Panel
-                    <div className="glass-card rounded-2xl border border-border-custom p-10 text-center space-y-6">
-                      <div className="w-16 h-16 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mx-auto text-3xl font-black">
+                    <div className={`rounded-2xl border p-10 text-center space-y-6 ${cardStyle}`}>
+                      <div className={`w-16 h-16 rounded-full border flex items-center justify-center mx-auto text-3xl font-black ${
+                        isLight ? "bg-cyan-50 border-cyan-200 text-cyan-700" : "bg-cyan-500/10 border-cyan-500/30 text-cyan-400"
+                      }`}>
                         {Math.round((quizScore / quizQuestions.length) * 100)}%
                       </div>
 
                       <div className="space-y-2">
-                        <h3 className="text-2xl font-black text-white">הבוחן הושלם בהצלחה!</h3>
-                        <p className="text-text-muted text-sm leading-relaxed">
-                          עניתם נכון על <span className="text-cyan-400 font-bold">{quizScore}</span> מתוך <span className="text-white font-bold">{quizQuestions.length}</span> שאלות.
+                        <h3 className={`text-2xl font-black ${textTitle}`}>הבוחן הושלם בהצלחה!</h3>
+                        <p className={`text-sm leading-relaxed ${textMuted}`}>
+                          עניתם נכון על <span className="text-cyan-500 font-bold">{quizScore}</span> מתוך <span className={isLight ? "text-zinc-800 font-bold" : "text-white font-bold"}>{quizQuestions.length}</span> שאלות.
                         </p>
                       </div>
 
                       <div className="flex justify-center gap-3">
                         <button
                           onClick={startNewQuiz}
-                          className="px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs transition-all cursor-pointer flex items-center gap-2"
+                          className="px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs transition-all cursor-pointer flex items-center gap-2 shadow-sm"
                         >
                           <RotateCcw className="w-4 h-4" />
                           <span>בוחן חדש</span>
@@ -1369,7 +1464,11 @@ export default function VocabTrainerPage() {
 
                         <button
                           onClick={() => setActiveTab("manage")}
-                          className="px-5 py-2.5 rounded-xl border border-border-custom bg-surface hover:bg-surface-hover text-text-muted hover:text-white transition-all text-xs font-semibold cursor-pointer"
+                          className={`px-5 py-2.5 rounded-xl border text-xs font-semibold cursor-pointer transition-colors ${
+                            isLight
+                              ? "border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-600"
+                              : "border-border-custom bg-surface hover:bg-surface-hover text-text-muted hover:text-white"
+                          }`}
                         >
                           חזרה למאגר
                         </button>
@@ -1389,32 +1488,32 @@ export default function VocabTrainerPage() {
                   className="max-w-xl mx-auto space-y-6"
                 >
                   {spellingWords.length === 0 ? (
-                    <div className="text-center py-10 text-text-muted">טוען שאלות...</div>
+                    <div className={`text-center py-10 ${textMuted}`}>טוען שאלות...</div>
                   ) : !spellingFinished ? (
-                    <div className="glass-card rounded-2xl border border-border-custom p-8 text-right space-y-6">
-                      <div className="flex justify-between items-center text-xs text-text-muted font-bold border-b border-border-custom/50 pb-4">
-                        <span>מילה {spellingIndex + 1} מתוך {spellingWords.length}</span>
-                        <span className="text-emerald-400">ניקוד: {spellingScore}</span>
+                    <div className={`rounded-2xl border p-8 text-right space-y-6 ${cardStyle}`}>
+                      <div className={`flex justify-between items-center text-xs font-bold border-b pb-4 ${borderTheme}`}>
+                        <span className={textMuted}>מילה {spellingIndex + 1} מתוך {spellingWords.length}</span>
+                        <span className={isLight ? "text-emerald-600" : "text-emerald-400"}>ניקוד: {spellingScore}</span>
                       </div>
 
                       <div className="space-y-4">
-                        <span className="text-[10px] text-cyan-400 font-bold uppercase tracking-wider">
+                        <span className="text-[10px] text-cyan-500 font-bold uppercase tracking-wider">
                           אימון כתיבה ואיות
                         </span>
                         
                         <div className="space-y-1">
-                          <p className="text-xs text-text-muted font-bold">כיצד כותבים באנגלית:</p>
-                          <h3 className="text-2xl font-black text-white">
+                          <p className={`text-xs font-bold ${textMuted}`}>כיצד כותבים באנגלית:</p>
+                          <h3 className={`text-2xl font-black ${textTitle}`}>
                             {spellingWords[spellingIndex].hebrew}
                           </h3>
                         </div>
 
                         {spellingWords[spellingIndex].example && (
-                          <div className="bg-[#080c18] border border-border-custom rounded-xl p-3.5 text-left" dir="ltr">
-                            <p className="text-xs text-text-muted font-bold mb-1.5 text-right" dir="rtl">
+                          <div className={`border rounded-xl p-4 text-left ${isLight ? "bg-zinc-50 border-zinc-200" : "bg-[#080c18] border-border-custom"}`} dir="ltr">
+                            <p className={`text-xs font-bold mb-1.5 text-right ${textMuted}`} dir="rtl">
                               משפט דוגמה להקשר:
                             </p>
-                            <p className="text-sm font-serif text-zinc-300">
+                            <p className={`text-base font-serif ${isLight ? "text-zinc-800" : "text-zinc-300"}`}>
                               {spellingWords[spellingIndex].example!.replace(
                                 new RegExp(`\\b${spellingWords[spellingIndex].english}\\b`, "gi"),
                                 "_______"
@@ -1434,12 +1533,14 @@ export default function VocabTrainerPage() {
                             onChange={(e) => setSpellingInput(e.target.value.replace(/[^a-zA-Z\s-]/g, ""))}
                             disabled={spellingChecked}
                             dir="ltr"
-                            className={`w-full h-12 bg-[#0d1222]/80 border rounded-xl px-4 text-base font-bold font-serif text-white focus:outline-none focus:ring-1 transition-all ${
+                            className={`w-full h-12 border rounded-xl px-4 text-lg font-bold font-serif focus:outline-none focus:ring-1 transition-all ${
                               spellingChecked
                                 ? spellingCorrect
-                                  ? "border-emerald-500/50 focus:ring-emerald-500/30"
-                                  : "border-rose-500/50 focus:ring-rose-500/30"
-                                : "border-border-custom focus:border-cyan-500/50 focus:ring-cyan-500/30"
+                                  ? "border-emerald-500/50 focus:ring-emerald-500/30 text-emerald-600 bg-emerald-50/10"
+                                  : "border-rose-500/50 focus:ring-rose-500/30 text-rose-600 bg-rose-50/10"
+                                : isLight
+                                  ? "border-zinc-300 text-zinc-900 bg-white focus:border-cyan-500"
+                                  : "border-border-custom text-white bg-[#0d1222]/80 focus:border-cyan-500/50"
                             }`}
                           />
                         </div>
@@ -1450,7 +1551,7 @@ export default function VocabTrainerPage() {
                             <button
                               type="button"
                               onClick={() => speakWord(spellingWords[spellingIndex].english)}
-                              className="inline-flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 font-bold cursor-pointer"
+                              className="inline-flex items-center gap-1.5 text-xs text-cyan-500 hover:text-cyan-600 font-bold cursor-pointer"
                             >
                               <Volume2 className="w-4 h-4" />
                               <span>האזנה להגייה הנכונה</span>
@@ -1462,19 +1563,19 @@ export default function VocabTrainerPage() {
                         {spellingChecked && (
                           <div className={`p-4 rounded-xl border flex items-center justify-between text-right text-sm ${
                             spellingCorrect
-                              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-                              : "bg-rose-500/10 border-rose-500/30 text-rose-400"
+                              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700"
+                              : "bg-rose-500/10 border-rose-500/30 text-rose-700"
                           }`}>
                             {spellingCorrect ? (
                               <div className="flex items-center gap-2">
-                                <Check className="w-4 h-4" />
+                                <Check className="w-4 h-4 text-emerald-600" />
                                 <span className="font-bold">כל הכבוד! אייתתם נכון.</span>
                               </div>
                             ) : (
                               <div>
                                 <p className="font-bold">טעות קלה באיות.</p>
-                                <p className="text-xs mt-1 opacity-90">
-                                  הכתיב הנכון הוא: <span className="font-mono font-bold select-all bg-[#080c18] px-2 py-0.5 border border-border-custom rounded" dir="ltr">{spellingWords[spellingIndex].english}</span>
+                                <p className="text-xs mt-1 opacity-95">
+                                  הכתיב הנכון הוא: <span className="font-mono font-bold select-all bg-white dark:bg-[#080c18] px-2.5 py-0.5 border border-zinc-200 dark:border-border-custom rounded" dir="ltr">{spellingWords[spellingIndex].english}</span>
                                 </p>
                               </div>
                             )}
@@ -1487,7 +1588,7 @@ export default function VocabTrainerPage() {
                             <button
                               type="submit"
                               disabled={!spellingInput.trim()}
-                              className="px-6 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 font-bold text-xs transition-all cursor-pointer"
+                              className="px-6 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 font-bold text-xs transition-all cursor-pointer shadow-sm"
                             >
                               בדוק איוש
                             </button>
@@ -1495,7 +1596,7 @@ export default function VocabTrainerPage() {
                             <button
                               type="button"
                               onClick={handleNextSpelling}
-                              className="px-6 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5"
+                              className="px-6 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
                             >
                               <span>{spellingIndex === spellingWords.length - 1 ? "סיים אימון" : "למילה הבאה"}</span>
                               <ArrowRight className="w-4 h-4 rotate-180" />
@@ -1506,22 +1607,24 @@ export default function VocabTrainerPage() {
                     </div>
                   ) : (
                     // Spelling Finished Panel
-                    <div className="glass-card rounded-2xl border border-border-custom p-10 text-center space-y-6">
-                      <div className="w-16 h-16 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mx-auto text-3xl font-black">
+                    <div className={`rounded-2xl border p-10 text-center space-y-6 ${cardStyle}`}>
+                      <div className={`w-16 h-16 rounded-full border flex items-center justify-center mx-auto text-3xl font-black ${
+                        isLight ? "bg-cyan-50 border-cyan-200 text-cyan-700" : "bg-cyan-500/10 border-cyan-500/30 text-cyan-400"
+                      }`}>
                         {Math.round((spellingScore / spellingWords.length) * 100)}%
                       </div>
 
                       <div className="space-y-2">
-                        <h3 className="text-2xl font-black text-white">אימון הכתיבה הושלם!</h3>
-                        <p className="text-text-muted text-sm leading-relaxed">
-                          אייתתם נכון <span className="text-cyan-400 font-bold">{spellingScore}</span> מתוך <span className="text-white font-bold">{spellingWords.length}</span> מילים.
+                        <h3 className={`text-2xl font-black ${textTitle}`}>אימון הכתיבה הושלם!</h3>
+                        <p className={`text-sm leading-relaxed ${textMuted}`}>
+                          אייתתם נכון <span className="text-cyan-500 font-bold">{spellingScore}</span> מתוך <span className={isLight ? "text-zinc-850 font-bold" : "text-white font-bold"}>{spellingWords.length}</span> מילים.
                         </p>
                       </div>
 
                       <div className="flex justify-center gap-3">
                         <button
                           onClick={startNewSpelling}
-                          className="px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs transition-all cursor-pointer flex items-center gap-2"
+                          className="px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs transition-all cursor-pointer flex items-center gap-2 shadow-sm"
                         >
                           <RotateCcw className="w-4 h-4" />
                           <span>אימון חדש</span>
@@ -1529,7 +1632,11 @@ export default function VocabTrainerPage() {
 
                         <button
                           onClick={() => setActiveTab("manage")}
-                          className="px-5 py-2.5 rounded-xl border border-border-custom bg-surface hover:bg-surface-hover text-text-muted hover:text-white transition-all text-xs font-semibold cursor-pointer"
+                          className={`px-5 py-2.5 rounded-xl border text-xs font-semibold cursor-pointer transition-colors ${
+                            isLight
+                              ? "border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-600"
+                              : "border-border-custom bg-surface hover:bg-surface-hover text-text-muted hover:text-white"
+                          }`}
                         >
                           חזרה למאגר
                         </button>
@@ -1549,22 +1656,22 @@ export default function VocabTrainerPage() {
                   className="max-w-2xl mx-auto space-y-6"
                 >
                   {/* Stats display */}
-                  <div className="flex justify-between items-center bg-[#0c1222]/80 border border-border-custom rounded-2xl p-4 text-xs font-bold text-text-muted">
+                  <div className={`flex justify-between items-center border rounded-2xl p-4 text-xs font-bold ${controlPanelBg}`}>
                     <div className="flex items-center gap-1.5">
                       <span>מהלכים:</span>
-                      <span className="text-white">{matchMoves}</span>
+                      <span className={isLight ? "text-zinc-800" : "text-white"}>{matchMoves}</span>
                     </div>
 
                     <div className="flex items-center gap-1.5">
                       <span>זמן:</span>
-                      <span className="text-cyan-400">
+                      <span className="text-cyan-500">
                         {Math.floor(matchTimer / 60)}:{(matchTimer % 60).toString().padStart(2, "0")}
                       </span>
                     </div>
 
                     <button
                       onClick={startNewMatchGame}
-                      className="text-cyan-400 hover:underline flex items-center gap-1 cursor-pointer"
+                      className="text-cyan-500 hover:underline flex items-center gap-1 cursor-pointer"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
                       <span>אתחל משחק</span>
@@ -1581,12 +1688,20 @@ export default function VocabTrainerPage() {
                             onClick={() => handleMatchCardClick(idx)}
                             className={`h-24 rounded-xl border transition-all duration-300 flex items-center justify-center p-3 text-center cursor-pointer select-none relative overflow-hidden ${
                               card.isMatched
-                                ? "bg-emerald-950/10 border-emerald-500/20 text-emerald-500/40 opacity-40 cursor-default"
+                                ? isLight
+                                  ? "bg-emerald-50/50 border-emerald-200 text-emerald-700 opacity-50 cursor-default"
+                                  : "bg-emerald-950/10 border-emerald-500/20 text-emerald-500/40 opacity-40 cursor-default"
                                 : card.isFlipped
                                   ? card.type === "english"
-                                    ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)] scale-[1.02]"
-                                    : "bg-emerald-500/10 border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.1)] scale-[1.02]"
-                                  : "bg-surface border-border-custom text-zinc-300 hover:border-zinc-700 hover:text-white"
+                                    ? isLight
+                                      ? "bg-cyan-50 border-cyan-400 text-cyan-700 shadow-sm scale-[1.02]"
+                                      : "bg-cyan-500/10 border-cyan-500/50 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)] scale-[1.02]"
+                                    : isLight
+                                      ? "bg-emerald-50 border-emerald-400 text-emerald-700 shadow-sm scale-[1.02]"
+                                      : "bg-emerald-500/10 border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.1)] scale-[1.02]"
+                                  : isLight
+                                    ? "bg-white border-zinc-200 text-zinc-700 hover:border-zinc-400 hover:text-zinc-900 shadow-sm"
+                                    : "bg-surface border-border-custom text-zinc-300 hover:border-zinc-700 hover:text-white"
                             }`}
                           >
                             <span
@@ -1600,7 +1715,7 @@ export default function VocabTrainerPage() {
 
                             {card.isMatched && (
                               <div className="absolute top-2 right-2">
-                                <Check className="w-3.5 h-3.5 text-emerald-500" />
+                                <Check className="w-3.5 h-3.5 text-emerald-600" />
                               </div>
                             )}
                           </div>
@@ -1609,22 +1724,24 @@ export default function VocabTrainerPage() {
                     </div>
                   ) : (
                     /* Completion state */
-                    <div className="glass-card rounded-2xl border border-border-custom p-10 text-center space-y-6 max-w-md mx-auto">
+                    <div className={`rounded-2xl border p-10 text-center space-y-6 max-w-md mx-auto ${cardStyle}`}>
                       <Trophy className="w-12 h-12 text-yellow-500 mx-auto" />
                       
                       <div className="space-y-2">
-                        <h3 className="text-2xl font-black text-white">כל הכבוד!</h3>
-                        <p className="text-text-muted text-sm">התאמתם את כל הזוגות בהצלחה!</p>
+                        <h3 className={`text-2xl font-black ${textTitle}`}>כל הכבוד!</h3>
+                        <p className={`text-sm ${textMuted}`}>התאמתם את כל הזוגות בהצלחה!</p>
                       </div>
 
-                      <div className="bg-[#080c18] border border-border-custom rounded-xl p-4 grid grid-cols-2 divide-x divide-border-custom">
+                      <div className={`border rounded-xl p-4 grid grid-cols-2 divide-x ${
+                        isLight ? "bg-zinc-50 border-zinc-200 divide-zinc-200" : "bg-[#080c18] border-border-custom divide-border-custom"
+                      }`}>
                         <div className="text-center p-1">
-                          <p className="text-[10px] text-text-muted uppercase font-bold">מהלכים</p>
-                          <p className="text-xl font-extrabold text-white mt-1">{matchMoves}</p>
+                          <p className={`text-[10px] uppercase font-bold ${textMuted}`}>מהלכים</p>
+                          <p className={`text-xl font-extrabold mt-1 ${isLight ? "text-zinc-800" : "text-white"}`}>{matchMoves}</p>
                         </div>
                         <div className="text-center p-1">
-                          <p className="text-[10px] text-text-muted uppercase font-bold">זמן משחק</p>
-                          <p className="text-xl font-extrabold text-cyan-400 mt-1">
+                          <p className={`text-[10px] uppercase font-bold ${textMuted}`}>זמן משחק</p>
+                          <p className="text-xl font-extrabold text-cyan-500 mt-1">
                             {Math.floor(matchTimer / 60)}:{(matchTimer % 60).toString().padStart(2, "0")}
                           </p>
                         </div>
@@ -1633,7 +1750,7 @@ export default function VocabTrainerPage() {
                       <div className="flex justify-center gap-3">
                         <button
                           onClick={startNewMatchGame}
-                          className="px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs transition-all cursor-pointer flex items-center gap-2"
+                          className="px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs transition-all cursor-pointer flex items-center gap-2 shadow-sm"
                         >
                           <RotateCcw className="w-4 h-4" />
                           <span>שחק שוב</span>
@@ -1641,7 +1758,11 @@ export default function VocabTrainerPage() {
                         
                         <button
                           onClick={() => setActiveTab("manage")}
-                          className="px-5 py-2.5 rounded-xl border border-border-custom bg-surface hover:bg-surface-hover text-text-muted hover:text-white transition-all text-xs font-semibold cursor-pointer"
+                          className={`px-5 py-2.5 rounded-xl border text-xs font-semibold cursor-pointer transition-colors ${
+                            isLight
+                              ? "border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-600"
+                              : "border-border-custom bg-surface hover:bg-surface-hover text-text-muted hover:text-white"
+                          }`}
                         >
                           חזרה למאגר
                         </button>
@@ -1657,7 +1778,11 @@ export default function VocabTrainerPage() {
       </div>
 
       {/* Footer */}
-      <footer className="w-full text-center py-6 border-t border-border-custom text-xs text-text-muted relative z-10 bg-surface/30 shrink-0">
+      <footer className={`w-full text-center py-6 border-t text-xs relative z-10 shrink-0 ${
+        isLight
+          ? "bg-zinc-50 border-zinc-200 text-zinc-500"
+          : "bg-surface/30 border-border-custom text-text-muted"
+      }`}>
         <span>© {new Date().getFullYear()} ניר עוז-ארי — אימון מילים באנגלית</span>
       </footer>
     </div>

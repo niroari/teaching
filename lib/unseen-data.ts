@@ -2,9 +2,13 @@ export interface UnseenQuestion {
   id: number;
   paragraphIndex: number;
   linesHint: string;
+  type: "mcq" | "open" | "copy";
   question: string;
-  options: string[];
-  answerIndex: number;
+  options?: string[]; // Only for 'mcq'
+  answerIndex?: number; // Only for 'mcq'
+  suggestedAnswer?: string; // Only for 'open'
+  keywords?: string[]; // Only for 'open'
+  targetSentence?: string; // Only for 'copy'
   explanation: string; // Explanation in Hebrew
 }
 
@@ -36,6 +40,7 @@ export const PRE_GENERATED_UNSEENS: Record<"Easy" | "Medium" | "Hard", UnseenDat
         id: 1,
         paragraphIndex: 0,
         linesHint: "lines 1-3",
+        type: "mcq",
         question: "Where did Clara find the old drawing?",
         options: [
           "In a big forest",
@@ -50,29 +55,20 @@ export const PRE_GENERATED_UNSEENS: Record<"Easy" | "Medium" | "Hard", UnseenDat
         id: 2,
         paragraphIndex: 1,
         linesHint: "lines 4-7",
-        question: "What did Clara discover after three weeks?",
-        options: [
-          "A secret drawing",
-          "A map to a hidden water source",
-          "A bag of gold",
-          "A new type of tree"
-        ],
-        answerIndex: 1,
-        explanation: "מעולה! בפסקה 2 כתוב שהקוד היה מפה המכוונת למקור מים נסתר (hidden water source)."
+        type: "copy",
+        question: "Copy the sentence that tells us how long Clara tried to understand the secret code.",
+        targetSentence: "Clara spent three weeks trying to understand the code.",
+        explanation: "המשפט הנכון להעתקה הוא: 'Clara spent three weeks trying to understand the code.' (קלארה בילתה שלושה שבועות בניסיון להבין את הקוד)."
       },
       {
         id: 3,
         paragraphIndex: 2,
         linesHint: "lines 8-11",
+        type: "open",
         question: "According to paragraph 3, what can the rare plant be used for?",
-        options: [
-          "To build houses",
-          "To make golden paint",
-          "To make new medicines",
-          "To water the desert trees"
-        ],
-        answerIndex: 2,
-        explanation: "מצוין! בפסקה 3 נאמר שניתן להשתמש בצמח הנדיר כדי לייצר תרופות חדשות (make new medicines)."
+        suggestedAnswer: "It can be used to make new medicines.",
+        keywords: ["medicines", "medicine", "cure", "make medicines"],
+        explanation: "התשובה המוצעת היא שהצמח משמש להכנת תרופות חדשות (make new medicines)."
       }
     ],
     globalQuestion: {
@@ -108,6 +104,7 @@ export const PRE_GENERATED_UNSEENS: Record<"Easy" | "Medium" | "Hard", UnseenDat
         id: 1,
         paragraphIndex: 0,
         linesHint: "lines 1-4",
+        type: "mcq",
         question: "According to paragraph 1, why do whales sing?",
         options: [
           "To scare away sharks",
@@ -122,29 +119,20 @@ export const PRE_GENERATED_UNSEENS: Record<"Easy" | "Medium" | "Hard", UnseenDat
         id: 2,
         paragraphIndex: 1,
         linesHint: "lines 5-8",
-        question: "What happens when a humpback whale from another region joins a new group?",
-        options: [
-          "The group changes its swimming direction",
-          "The group might learn its song",
-          "The whale is not accepted by the group",
-          "The whale stops singing completely"
-        ],
-        answerIndex: 1,
-        explanation: "מעולה! בפסקה 2 מצוין שאם לווייתן מאזור אחר מצטרף, האחרים עשויים ללמוד את השיר שלו (learn its song)."
+        type: "open",
+        question: "What shows that whales have cultural learning?",
+        suggestedAnswer: "They learn songs from humpback whales that come from other regions.",
+        keywords: ["learn its song", "learn songs", "other regions", "different region", "joins the group"],
+        explanation: "התשובה המוצעת היא שהם לומדים שירים חדשים מלווייתנים המגיעים מאזורים אחרים ומצטרפים אליהם."
       },
       {
         id: 3,
         paragraphIndex: 2,
         linesHint: "lines 9-12",
-        question: "According to paragraph 3, how does ocean noise affect whales?",
-        options: [
-          "It helps them navigate faster",
-          "It makes them swim closer to the shore",
-          "It disrupts their communication",
-          "It makes their songs louder"
-        ],
-        answerIndex: 2,
-        explanation: "מצוין! בפסקה 3 מתאר שרעש באוקיינוס מפריע לתקשורת שלהם (disrupts their communication)."
+        type: "copy",
+        question: "Copy the sentence that mentions what environmental groups are doing to protect whales.",
+        targetSentence: "Environmental groups are now working to create quieter sea zones to protect these intelligent animals.",
+        explanation: "המשפט הנכון להעתקה הוא: 'Environmental groups are now working to create quieter sea zones to protect these intelligent animals.' (ארגוני סביבה פועלים כעת ליצירת אזורים ימיים שקטים יותר כדי להגן על חיות אינטליגנטיות אלו)."
       }
     ],
     globalQuestion: {
@@ -180,6 +168,7 @@ export const PRE_GENERATED_UNSEENS: Record<"Easy" | "Medium" | "Hard", UnseenDat
         id: 1,
         paragraphIndex: 0,
         linesHint: "lines 1-5",
+        type: "mcq",
         question: "What is one benefit of AI mentioned by its proponents in paragraph 1?",
         options: [
           "It will replace all human relationships",
@@ -194,28 +183,19 @@ export const PRE_GENERATED_UNSEENS: Record<"Easy" | "Medium" | "Hard", UnseenDat
         id: 2,
         paragraphIndex: 1,
         linesHint: "lines 6-9",
-        question: "What concern do critics have regarding the integration of AI?",
-        options: [
-          "That AI innovation will stop completely",
-          "That it might perpetuate societal inequalities without regulations",
-          "That computers will become too expensive",
-          "That governments will ban AI"
-        ],
-        answerIndex: 1,
-        explanation: "מעולה! בפסקה 2 מוסבר שיש חשש גובר שללא מסגרות רגולטוריות, ה-AI עלולה להנציח אי-שוויון חברתי (perpetuate societal inequalities)."
+        type: "copy",
+        question: "Copy the sentence that lists the ethical concerns critics have about AI.",
+        targetSentence: "Critics frequently highlight ethical dilemmas, including algorithmic bias, the spread of deepfakes, and massive labor displacement.",
+        explanation: "המשפט הנכון להעתקה הוא: 'Critics frequently highlight ethical dilemmas, including algorithmic bias, the spread of deepfakes, and massive labor displacement.' (מבקרים מדגישים לעתים קרובות דילמות מוסריות, כולל הטיה אלגוריתמית, הפצת דיפפייק, ודחיקה מסיבית של כוח עבודה)."
       },
       {
         id: 3,
         paragraphIndex: 2,
         linesHint: "lines 10-13",
-        question: "According to paragraph 3, what is required to keep AI aligned with human values?",
-        options: [
-          "Restricting AI usage only to universities",
-          "Higher taxes on technology companies",
-          "International cooperation and collaboration on safety standards",
-          "Developing faster hardware"
-        ],
-        answerIndex: 2,
+        type: "open",
+        question: "According to paragraph 3, what must developers and policymakers do to ensure AI remains aligned with human values?",
+        suggestedAnswer: "They must collaborate on safety standards and work together internationally.",
+        keywords: ["collaborate", "cooperate", "safety standards", "cooperation", "policymakers"],
         explanation: "מצוין! בפסקה 3 נאמר ששמירה על ה-AI מתואמת עם ערכי האדם דורשת שיתוף פעולה בינלאומי בסטנדרטים של בטיחות (international cooperation/collaboration on safety standards)."
       }
     ],

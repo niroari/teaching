@@ -52,6 +52,8 @@ export default function UnseenPracticePage() {
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [attempts, setAttempts] = useState(0);
+  const [openAnswerText, setOpenAnswerText] = useState("");
+  const [selfGraded, setSelfGraded] = useState<boolean | null>(null);
   
   // Game Stats
   const [score, setScore] = useState(100);
@@ -154,6 +156,9 @@ export default function UnseenPracticePage() {
     setGameSubStep(0);
     setSelectedOption(null);
     setShowFeedback(false);
+    setIsCorrect(false);
+    setOpenAnswerText("");
+    setSelfGraded(null);
     setScore(100);
     setAttempts(0);
     setTotalQuestionsAnswered(0);
@@ -189,9 +194,75 @@ export default function UnseenPracticePage() {
     }
   };
 
+  const handleCopyCheck = () => {
+    if (showFeedback) return;
+    if (!openAnswerText.trim()) return;
+
+    const activeQuestion = unseen.questions[gameSubStep];
+    const clean = (str: string) => 
+      str.toLowerCase()
+         .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()'"?“”‘’]/g, "")
+         .replace(/\s+/g, " ")
+         .trim();
+
+    const userClean = clean(openAnswerText);
+    const targetClean = clean(activeQuestion.targetSentence || "");
+
+    const isCorrectChoice = userClean === targetClean;
+    setIsCorrect(isCorrectChoice);
+    setAttempts((prev) => prev + 1);
+    setShowFeedback(true);
+
+    if (isCorrectChoice) {
+      if (attempts === 0) {
+        setCorrectOnFirstTry((prev) => prev + 1);
+        confetti({
+          particleCount: 30,
+          spread: 40,
+          origin: { y: 0.8 }
+        });
+      }
+      setTotalQuestionsAnswered((prev) => prev + 1);
+    } else {
+      setScore((prev) => Math.max(prev - 15, 20));
+    }
+  };
+
+  const handleOpenCheck = () => {
+    if (showFeedback) return;
+    if (!openAnswerText.trim()) return;
+
+    setAttempts((prev) => prev + 1);
+    setShowFeedback(true);
+    // Open questions use self-grading, but we initialize correctness status
+    setIsCorrect(false);
+  };
+
+  const handleSelfGrade = (correct: boolean) => {
+    setSelfGraded(correct);
+    setIsCorrect(correct);
+
+    if (correct) {
+      if (attempts === 1) { // check if first try
+        setCorrectOnFirstTry((prev) => prev + 1);
+        confetti({
+          particleCount: 30,
+          spread: 40,
+          origin: { y: 0.8 }
+        });
+      }
+      setTotalQuestionsAnswered((prev) => prev + 1);
+    } else {
+      setScore((prev) => Math.max(prev - 15, 20));
+    }
+  };
+
   const handleNextStep = () => {
     setSelectedOption(null);
     setShowFeedback(false);
+    setIsCorrect(false);
+    setOpenAnswerText("");
+    setSelfGraded(null);
     setAttempts(0);
 
     if (gameSubStep < 3) {
@@ -536,105 +607,227 @@ export default function UnseenPracticePage() {
 
                 {/* The active Question */}
                 <div className={`p-6 rounded-2xl border ${borderStyle} ${cardStyle} space-y-6 shadow-lg flex-1 flex flex-col justify-between`}>
-                  <div className="space-y-4">
-                    {/* Header: Clue category */}
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-teal-400 bg-teal-500/10 px-2.5 py-1 rounded-full border border-teal-500/20">
-                        {gameSubStep < 3 ? `רמז לפסקה ${gameSubStep + 1}` : "רמז מסכם"}
-                      </span>
-                      {gameSubStep < 3 && (
-                        <span className="text-[10px] text-zinc-500 font-bold flex items-center gap-1">
-                          <Search className="w-3.5 h-3.5" />
-                          <span>מיקום: {unseen.questions[gameSubStep].linesHint}</span>
-                        </span>
-                      )}
-                    </div>
+                  {(() => {
+                    const activeQuestion = gameSubStep < 3 
+                      ? unseen.questions[gameSubStep] 
+                      : { ...unseen.globalQuestion, type: "mcq" as const, linesHint: "" };
+                    const qType = activeQuestion.type;
 
-                    {/* Question text */}
-                    <h3 className={`text-lg md:text-xl font-bold ${textTitle} leading-relaxed`} dir="ltr">
-                      {gameSubStep < 3 ? unseen.questions[gameSubStep].question : unseen.globalQuestion.question}
-                    </h3>
-
-                    {/* Options list */}
-                    <div className="space-y-2.5 pt-2">
-                      {(gameSubStep < 3 ? unseen.questions[gameSubStep].options : unseen.globalQuestion.options).map((opt, idx) => {
-                        const isSelected = selectedOption === idx;
-                        const activeQuestion = gameSubStep < 3 ? unseen.questions[gameSubStep] : unseen.globalQuestion;
-                        const isOptCorrect = idx === activeQuestion.answerIndex;
-                        
-                        let optStyle = isLight
-                          ? "border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-800"
-                          : "border-border-custom bg-[#0d1222]/50 hover:bg-surface-hover text-zinc-300";
-
-                        if (showFeedback) {
-                          if (isOptCorrect) {
-                            optStyle = "border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold";
-                          } else if (isSelected) {
-                            optStyle = "border-rose-500 bg-rose-500/10 text-rose-400";
-                          } else {
-                            optStyle = "opacity-40 border-zinc-800";
-                          }
-                        }
-
-                        return (
-                          <button
-                            key={idx}
-                            onClick={() => handleOptionClick(idx)}
-                            disabled={showFeedback}
-                            className={`w-full py-3 px-4 rounded-xl border text-right text-xs transition-all flex items-center justify-between cursor-pointer ${optStyle}`}
-                            dir="ltr"
-                          >
-                            <span className="flex-1 text-left">{opt}</span>
-                            <span className="font-bold opacity-30 select-none ml-2">
-                              {idx === 0 ? "A" : idx === 1 ? "B" : idx === 2 ? "C" : "D"}
+                    return (
+                      <div className="space-y-6 flex-1 flex flex-col justify-between">
+                        <div className="space-y-4">
+                          {/* Header: Clue category */}
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-teal-400 bg-teal-500/10 px-2.5 py-1 rounded-full border border-teal-500/20">
+                              {gameSubStep < 3 ? `רמז לפסקה ${gameSubStep + 1}` : "רמז מסכם"}
                             </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Feedback Explanation */}
-                  <AnimatePresence>
-                    {showFeedback && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className="space-y-4 pt-4 border-t border-dashed border-zinc-700/20"
-                      >
-                        <div className="flex items-start gap-2.5">
-                          {isCorrect ? (
-                            <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                          ) : (
-                            <XCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
-                          )}
-                          <div className="space-y-1 flex-1">
-                            <h4 className={`text-xs font-bold ${isCorrect ? "text-emerald-400" : "text-rose-400"}`}>
-                              {isCorrect ? "תשובה נכונה! כל הכבוד!" : "טעות. נסו שוב כדי ללמוד!"}
-                            </h4>
-                            <p className={`text-xs leading-relaxed ${textMuted}`}>
-                              {gameSubStep < 3 ? unseen.questions[gameSubStep].explanation : unseen.globalQuestion.explanation}
-                            </p>
+                            {gameSubStep < 3 && (
+                              <span className="text-[10px] text-zinc-500 font-bold flex items-center gap-1">
+                                <Search className="w-3.5 h-3.5" />
+                                <span>מיקום: {activeQuestion.linesHint}</span>
+                              </span>
+                            )}
                           </div>
+
+                          {/* Question text */}
+                          <h3 className={`text-lg md:text-xl font-bold ${textTitle} leading-relaxed`} dir="ltr">
+                            {activeQuestion.question}
+                          </h3>
+
+                          {/* Options / Inputs rendering based on type */}
+                          {qType === "mcq" && (
+                            <div className="space-y-2.5 pt-2">
+                              {(activeQuestion.options || []).map((opt, idx) => {
+                                const isSelected = selectedOption === idx;
+                                const isOptCorrect = idx === activeQuestion.answerIndex;
+                                
+                                let optStyle = isLight
+                                  ? "border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-800"
+                                  : "border-border-custom bg-[#0d1222]/50 hover:bg-surface-hover text-zinc-300";
+
+                                if (showFeedback) {
+                                  if (isOptCorrect) {
+                                    optStyle = "border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold";
+                                  } else if (isSelected) {
+                                    optStyle = "border-rose-500 bg-rose-500/10 text-rose-400";
+                                  } else {
+                                    optStyle = "opacity-40 border-zinc-800";
+                                  }
+                                }
+
+                                return (
+                                  <button
+                                    key={idx}
+                                    onClick={() => handleOptionClick(idx)}
+                                    disabled={showFeedback}
+                                    className={`w-full py-3 px-4 rounded-xl border text-right text-xs transition-all flex items-center justify-between cursor-pointer ${optStyle}`}
+                                    dir="ltr"
+                                  >
+                                    <span className="flex-1 text-left">{opt}</span>
+                                    <span className="font-bold opacity-30 select-none ml-2">
+                                      {idx === 0 ? "A" : idx === 1 ? "B" : idx === 2 ? "C" : "D"}
+                                    </span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
+
+                          {qType === "copy" && (
+                            <div className="space-y-4 pt-2">
+                              <div className="space-y-2">
+                                <p className={`text-xs font-bold text-teal-400`}>העתיקו את המשפט במדויק מתוך הפסקה המודגשת מימין:</p>
+                                <input
+                                  type="text"
+                                  placeholder="הקלידו או העתיקו והדביקו כאן את המשפט..."
+                                  value={openAnswerText}
+                                  onChange={(e) => setOpenAnswerText(e.target.value)}
+                                  disabled={showFeedback}
+                                  className={`w-full h-11 px-4 rounded-xl text-xs outline-none transition-colors border ${inputStyle}`}
+                                  dir="ltr"
+                                />
+                              </div>
+                              {!showFeedback && (
+                                <button
+                                  onClick={handleCopyCheck}
+                                  disabled={!openAnswerText.trim()}
+                                  className="w-full h-10 rounded-xl bg-teal-600 hover:bg-teal-500 text-zinc-950 font-bold text-xs cursor-pointer transition-colors"
+                                >
+                                  בדקו את העתקתכם
+                                </button>
+                              )}
+                            </div>
+                          )}
+
+                          {qType === "open" && (
+                            <div className="space-y-4 pt-2">
+                              <div className="space-y-2">
+                                <p className={`text-xs font-bold text-teal-400`}>כתבו תשובה קצרה באנגלית לשאלה:</p>
+                                <textarea
+                                  placeholder="כתבו את תשובתכם באנגלית כאן..."
+                                  value={openAnswerText}
+                                  onChange={(e) => setOpenAnswerText(e.target.value)}
+                                  disabled={showFeedback}
+                                  rows={3}
+                                  className={`w-full p-3 rounded-xl text-xs outline-none transition-colors border resize-none ${inputStyle}`}
+                                  dir="ltr"
+                                />
+                              </div>
+                              {!showFeedback && (
+                                <button
+                                  onClick={handleOpenCheck}
+                                  disabled={!openAnswerText.trim()}
+                                  className="w-full h-10 rounded-xl bg-teal-600 hover:bg-teal-500 text-zinc-950 font-bold text-xs cursor-pointer transition-colors"
+                                >
+                                  בדקו את תשובתכם
+                                </button>
+                              )}
+                            </div>
+                          )}
                         </div>
 
-                        {/* Continue trigger */}
-                        <div className="text-left">
-                          <button
-                            onClick={isCorrect ? handleNextStep : () => setShowFeedback(false)}
-                            className={`px-5 py-2 rounded-xl text-zinc-950 font-bold text-xs transition-all cursor-pointer ${
-                              isCorrect 
-                                ? "bg-teal-500 hover:bg-teal-400" 
-                                : isLight ? "bg-zinc-200 hover:bg-zinc-300 text-zinc-700" : "bg-white hover:bg-zinc-100"
-                            }`}
-                          >
-                            {isCorrect ? (gameSubStep < 3 ? "המשך לרמז הבא ←" : "סיום המשימה וקבלת תעודה ←") : "נסו שוב"}
-                          </button>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                        {/* Feedback Explanation */}
+                        <AnimatePresence>
+                          {showFeedback && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: 10 }}
+                              className="space-y-4 pt-4 border-t border-dashed border-zinc-700/20"
+                            >
+                              {qType === "open" && selfGraded === null ? (
+                                /* Open answer self-grading panel */
+                                <div className="space-y-4">
+                                  {(() => {
+                                    const kwList = activeQuestion.keywords || [];
+                                    const userWords = openAnswerText.toLowerCase();
+                                    const matchedKws = kwList.filter(kw => userWords.includes(kw.toLowerCase()));
+                                    if (matchedKws.length > 0) {
+                                      return (
+                                        <div className="text-[11px] text-emerald-500 font-bold bg-emerald-500/5 p-2 rounded-lg border border-emerald-500/10">
+                                          מצוין! שילבתם מילים חשובות בתשובה: {matchedKws.join(", ")}
+                                        </div>
+                                      );
+                                    }
+                                    return null;
+                                  })()}
+                                  
+                                  <div className={`space-y-1.5 p-3.5 rounded-xl border ${borderStyle} ${
+                                    isLight ? "bg-zinc-100" : "bg-[#0d1222]/30"
+                                  }`}>
+                                    <h5 className="text-xs font-bold text-teal-400">תשובה לדוגמה (באנגלית):</h5>
+                                    <p className={`text-xs font-medium italic ${isLight ? "text-zinc-800" : "text-zinc-200"}`} dir="ltr">
+                                      {activeQuestion.suggestedAnswer}
+                                    </p>
+                                  </div>
+                                  
+                                  <div className="space-y-1.5">
+                                    <h5 className="text-xs font-bold text-teal-400">הסבר בעברית:</h5>
+                                    <p className={`text-xs leading-relaxed ${textMuted}`}>
+                                      {activeQuestion.explanation}
+                                    </p>
+                                  </div>
+
+                                  <div className="space-y-3 pt-3 border-t border-dashed border-zinc-700/20">
+                                    <p className={`text-xs font-bold ${isLight ? "text-zinc-800" : "text-white"}`}>
+                                      האם תשובתכם נכונה בהשוואה לתשובה המוצעת?
+                                    </p>
+                                    <div className="flex gap-2">
+                                      <button
+                                        onClick={() => handleSelfGrade(true)}
+                                        className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-zinc-950 font-bold text-xs rounded-xl transition-colors cursor-pointer shadow-sm"
+                                      >
+                                        כן, עניתי נכון!
+                                      </button>
+                                      <button
+                                        onClick={() => handleSelfGrade(false)}
+                                        className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-zinc-950 font-bold text-xs rounded-xl transition-colors cursor-pointer shadow-sm"
+                                      >
+                                        לא, טעיתי
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                /* Standard check feedback (MCQ, Copy, or completed Open) */
+                                <div className="space-y-4">
+                                  <div className="flex items-start gap-2.5">
+                                    {isCorrect ? (
+                                      <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                                    ) : (
+                                      <XCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
+                                    )}
+                                    <div className="space-y-1 flex-1">
+                                      <h4 className={`text-xs font-bold ${isCorrect ? "text-emerald-400" : "text-rose-400"}`}>
+                                        {isCorrect ? "תשובה נכונה! כל הכבוד!" : "טעות. נסו שוב כדי ללמוד!"}
+                                      </h4>
+                                      <p className={`text-xs leading-relaxed ${textMuted}`}>
+                                        {activeQuestion.explanation}
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  {/* Continue trigger */}
+                                  <div className="text-left">
+                                    <button
+                                      onClick={isCorrect ? handleNextStep : () => setShowFeedback(false)}
+                                      className={`px-5 py-2 rounded-xl text-zinc-950 font-bold text-xs transition-all cursor-pointer ${
+                                        isCorrect 
+                                          ? "bg-teal-500 hover:bg-teal-400" 
+                                          : isLight ? "bg-zinc-200 hover:bg-zinc-300 text-zinc-700" : "bg-white hover:bg-zinc-100"
+                                      }`}
+                                    >
+                                      {isCorrect ? (gameSubStep < 3 ? "המשך לרמז הבא ←" : "סיום המשימה וקבלת תעודה ←") : "נסו שוב"}
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
 

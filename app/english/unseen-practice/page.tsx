@@ -171,7 +171,7 @@ export default function UnseenPracticePage() {
     setSelectedOption(optionIdx);
     setAttempts((prev) => prev + 1);
 
-    const activeQuestion = gameSubStep < 3 ? unseen.questions[gameSubStep] : unseen.globalQuestion;
+    const activeQuestion = gameSubStep < 7 ? unseen.questions[gameSubStep] : unseen.globalQuestion;
     const isCorrectChoice = optionIdx === activeQuestion.answerIndex;
 
     setIsCorrect(isCorrectChoice);
@@ -265,7 +265,7 @@ export default function UnseenPracticePage() {
     setSelfGraded(null);
     setAttempts(0);
 
-    if (gameSubStep < 3) {
+    if (gameSubStep < 7) {
       setGameSubStep((prev) => prev + 1);
     } else {
       // Finished all questions
@@ -601,14 +601,14 @@ export default function UnseenPracticePage() {
                     <span className={textMuted}>נקודות מיומנות</span>
                   </div>
                   <div className={textMuted}>
-                    שאלה <span className="font-bold text-white">{gameSubStep + 1}</span> מתוך 4
+                    שאלה <span className="font-bold text-white">{gameSubStep + 1}</span> מתוך 8
                   </div>
                 </div>
 
                 {/* The active Question */}
                 <div className={`p-6 rounded-2xl border ${borderStyle} ${cardStyle} space-y-6 shadow-lg flex-1 flex flex-col justify-between`}>
                   {(() => {
-                    const activeQuestion = gameSubStep < 3 
+                    const activeQuestion = gameSubStep < 7 
                       ? unseen.questions[gameSubStep] 
                       : { ...unseen.globalQuestion, type: "mcq" as const, linesHint: "" };
                     const qType = activeQuestion.type;
@@ -619,9 +619,9 @@ export default function UnseenPracticePage() {
                           {/* Header: Clue category */}
                           <div className="flex items-center justify-between">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-teal-400 bg-teal-500/10 px-2.5 py-1 rounded-full border border-teal-500/20">
-                              {gameSubStep < 3 ? `רמז לפסקה ${gameSubStep + 1}` : "רמז מסכם"}
+                              {gameSubStep < 7 ? `רמז לפסקה ${(activeQuestion as any).paragraphIndex !== undefined ? (activeQuestion as any).paragraphIndex + 1 : ""}` : "רמז מסכם"}
                             </span>
-                            {gameSubStep < 3 && (
+                            {gameSubStep < 7 && (
                               <span className="text-[10px] text-zinc-500 font-bold flex items-center gap-1">
                                 <Search className="w-3.5 h-3.5" />
                                 <span>מיקום: {activeQuestion.linesHint}</span>
@@ -817,7 +817,7 @@ export default function UnseenPracticePage() {
                                           : isLight ? "bg-zinc-200 hover:bg-zinc-300 text-zinc-700" : "bg-white hover:bg-zinc-100"
                                       }`}
                                     >
-                                      {isCorrect ? (gameSubStep < 3 ? "המשך לרמז הבא ←" : "סיום המשימה וקבלת תעודה ←") : "נסו שוב"}
+                                      {isCorrect ? (gameSubStep < 7 ? "המשך לרמז הבא ←" : "סיום המשימה וקבלת תעודה ←") : "נסו שוב"}
                                     </button>
                                   </div>
                                 </div>
@@ -851,7 +851,9 @@ export default function UnseenPracticePage() {
                     {/* Paragraph List with active highlight */}
                     <div className="space-y-6" dir="ltr">
                       {unseen.paragraphs.map((para, idx) => {
-                        const isParagraphActive = gameSubStep === idx || gameSubStep === 3;
+                        const isParagraphActive = gameSubStep === 7 
+                          ? true 
+                          : (gameSubStep < 7 && unseen.questions[gameSubStep]?.paragraphIndex === idx);
                         const blurClass = isParagraphActive ? "border-teal-500/30 scale-[1.01]" : "blur-[2px] opacity-25 scale-95 pointer-events-none";
 
                         return (
@@ -946,7 +948,7 @@ export default function UnseenPracticePage() {
                   </div>
                   <div className="p-2">
                     <p className="text-[10px] text-slate-400 uppercase font-bold">תשובות נכונות (ניסיון 1)</p>
-                    <p className="text-3xl font-extrabold text-teal-400 mt-1">{correctOnFirstTry} / 4</p>
+                    <p className="text-3xl font-extrabold text-teal-400 mt-1">{correctOnFirstTry} / 8</p>
                   </div>
                 </div>
 

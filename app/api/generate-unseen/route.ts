@@ -44,31 +44,70 @@ You must return a raw JSON object matching the following TypeScript schema exact
     {
       "id": 1,
       "paragraphIndex": 0,
-      "linesHint": "lines 1-6",
+      "linesHint": "lines 1-3",
       "type": "mcq",
-      "question": "Question text in English?",
+      "question": "First question about paragraph 1 in English?",
       "options": ["Option A", "Option B", "Option C", "Option D"],
-      "answerIndex": 0, // 0-based index of correct option
-      "explanation": "Detailed explanation in Hebrew explaining why this is correct and pointing out the keyword clue in paragraph 1."
+      "answerIndex": 0,
+      "explanation": "Detailed explanation in Hebrew."
     },
     {
       "id": 2,
-      "paragraphIndex": 1,
-      "linesHint": "lines 7-12",
-      "type": "copy",
-      "question": "Instruction in English to copy a specific sentence from paragraph 2 (e.g., 'Copy the sentence that shows Clara was happy.')",
-      "targetSentence": "The exact sentence copied verbatim from paragraph 2",
-      "explanation": "Detailed explanation in Hebrew explaining why this sentence is correct."
+      "paragraphIndex": 0,
+      "linesHint": "lines 3-6",
+      "type": "open",
+      "question": "Second question about paragraph 1 in English?",
+      "suggestedAnswer": "Suggested correct model answer in English.",
+      "keywords": ["word1", "word2"],
+      "explanation": "Detailed explanation in Hebrew."
     },
     {
       "id": 3,
+      "paragraphIndex": 1,
+      "linesHint": "lines 7-10",
+      "type": "mcq",
+      "question": "First question about paragraph 2 in English?",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "answerIndex": 1,
+      "explanation": "Detailed explanation in Hebrew."
+    },
+    {
+      "id": 4,
+      "paragraphIndex": 1,
+      "linesHint": "lines 9-12",
+      "type": "copy",
+      "question": "Instruction in English to copy a specific sentence from paragraph 2.",
+      "targetSentence": "The exact sentence copied verbatim from paragraph 2",
+      "explanation": "Detailed explanation in Hebrew."
+    },
+    {
+      "id": 5,
+      "paragraphIndex": 2,
+      "linesHint": "lines 13-15",
+      "type": "mcq",
+      "question": "First question about paragraph 3 in English?",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "answerIndex": 2,
+      "explanation": "Detailed explanation in Hebrew."
+    },
+    {
+      "id": 6,
+      "paragraphIndex": 2,
+      "linesHint": "lines 15-18",
+      "type": "open",
+      "question": "Second question about paragraph 3 in English?",
+      "suggestedAnswer": "Suggested correct model answer in English.",
+      "keywords": ["word3", "word4"],
+      "explanation": "Detailed explanation in Hebrew."
+    },
+    {
+      "id": 7,
       "paragraphIndex": 2,
       "linesHint": "lines 13-18",
-      "type": "open",
-      "question": "Factual or inferential question in English about paragraph 3",
-      "suggestedAnswer": "Suggested correct model answer in English (1 short sentence)",
-      "keywords": ["keyphrase1", "word2", "word3"], // 3-4 key English words/phrases to search for in their answer (for automatic grading check)
-      "explanation": "Detailed explanation in Hebrew explaining the correct answer."
+      "type": "copy",
+      "question": "Instruction in English to copy a specific sentence from paragraph 3.",
+      "targetSentence": "The exact sentence copied verbatim from paragraph 3",
+      "explanation": "Detailed explanation in Hebrew."
     }
   ],
   "globalQuestion": {
@@ -88,10 +127,10 @@ You must return a raw JSON object matching the following TypeScript schema exact
 
 CRITICAL RULES:
 1. All explanations and vocabulary translations must be in correct Hebrew, natural-sounding, and easy for students to read.
-2. The questions array MUST have exactly 3 items, corresponding to paragraphIndex 0, 1, and 2 respectively.
+2. The questions array MUST have exactly 7 items, distributed across paragraphIndex 0, 1, and 2 (e.g. 2 questions for paragraph 1, 2 for paragraph 2, 3 for paragraph 3).
 3. Keep the line range hints accurate in relation to the generated paragraph structures.
-4. Question types must be strictly: Question 1 = 'mcq', Question 2 = 'copy', Question 3 = 'open'.
-5. For Question 2 ('copy'), the 'targetSentence' MUST exist exactly verbatim in paragraph 2 (index 1 of paragraphs).
+4. Ensure a diverse mix of question types (strictly including multiple choice 'mcq', sentence copying 'copy', and open text answer 'open').
+5. For any 'copy' type question, the 'targetSentence' MUST exist exactly verbatim in the corresponding paragraph.
 6. Do not include markdown code block syntax (like \`\`\`json) in the response. Return only the JSON object.
 7. The total reading text must be longer, approximately 25-30 lines of text (about 80-100 words per paragraph, totaling around 250-300 words).`;
 

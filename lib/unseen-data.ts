@@ -53,6 +53,46 @@ export const PRE_GENERATED_UNSEENS: Record<"Easy" | "Medium" | "Hard", UnseenDat
       },
       {
         id: 2,
+        paragraphIndex: 0,
+        linesHint: "lines 3-5",
+        type: "open",
+        question: "How old is Max?",
+        suggestedAnswer: "He is three years old.",
+        keywords: ["three", "years", "old"],
+        explanation: "נכון מאוד! בפסקה 1 כתוב שמקס בן 3 (three years old)."
+      },
+      {
+        id: 3,
+        paragraphIndex: 0,
+        linesHint: "lines 4-5",
+        type: "mcq",
+        question: "What does Max see near the big house?",
+        options: [
+          "A green frog",
+          "A yellow cat",
+          "A red bird",
+          "A white rabbit"
+        ],
+        answerIndex: 1,
+        explanation: "נכון! בפסקה 1 רשום שמקס רואה חתול צהוב (yellow cat)."
+      },
+      {
+        id: 4,
+        paragraphIndex: 1,
+        linesHint: "lines 8-9",
+        type: "mcq",
+        question: "Where does Tom put the dog food?",
+        options: [
+          "In a blue bowl",
+          "In a yellow bag",
+          "In a red bowl",
+          "On the brown floor"
+        ],
+        answerIndex: 2,
+        explanation: "נכון מאוד! בפסקה 2 כתוב שטום שם את האוכל בקערה אדומה (red bowl)."
+      },
+      {
+        id: 5,
         paragraphIndex: 1,
         linesHint: "lines 6-10",
         type: "copy",
@@ -61,7 +101,7 @@ export const PRE_GENERATED_UNSEENS: Record<"Easy" | "Medium" | "Hard", UnseenDat
         explanation: "המשפט הנכון הוא: 'Max sleeps in a warm bed near the door.' (מקס ישן במיטה חמימה ליד הדלת)."
       },
       {
-        id: 3,
+        id: 6,
         paragraphIndex: 2,
         linesHint: "lines 11-15",
         type: "open",
@@ -69,6 +109,15 @@ export const PRE_GENERATED_UNSEENS: Record<"Easy" | "Medium" | "Hard", UnseenDat
         suggestedAnswer: "He runs after a red ball.",
         keywords: ["ball", "red ball", "runs after"],
         explanation: "התשובה המוצעת היא שהוא רץ אחרי כדור אדום (runs after a red ball)."
+      },
+      {
+        id: 7,
+        paragraphIndex: 2,
+        linesHint: "lines 13-15",
+        type: "copy",
+        question: "Copy the sentence that tells us how long Tom and Max play in the garden.",
+        targetSentence: "They play for one hour.",
+        explanation: "המשפט הנכון הוא: 'They play for one hour.' (הם משחקים במשך שעה אחת)."
       }
     ],
     globalQuestion: {
@@ -117,6 +166,25 @@ export const PRE_GENERATED_UNSEENS: Record<"Easy" | "Medium" | "Hard", UnseenDat
       },
       {
         id: 2,
+        paragraphIndex: 0,
+        linesHint: "lines 1-3",
+        type: "open",
+        question: "When did Clara travel to the Negev desert?",
+        suggestedAnswer: "She traveled there last year.",
+        keywords: ["last year", "year"],
+        explanation: "נכון מאוד! בפסקה 1 כתוב שהיא נסעה בשנה שעברה (Last year)."
+      },
+      {
+        id: 3,
+        paragraphIndex: 0,
+        linesHint: "lines 4-5",
+        type: "copy",
+        question: "Copy the sentence that shows Clara took a photo of the picture on the rock.",
+        targetSentence: "She took out her camera and took a photograph of it.",
+        explanation: "המשפט הנכון הוא: 'She took out her camera and took a photograph of it.' (היא הוציאה את המצלמה שלה וצילמה את זה)."
+      },
+      {
+        id: 4,
         paragraphIndex: 1,
         linesHint: "lines 6-10",
         type: "open",
@@ -126,13 +194,43 @@ export const PRE_GENERATED_UNSEENS: Record<"Easy" | "Medium" | "Hard", UnseenDat
         explanation: "התשובה המוצעת היא שלקח לה שלושה שבועות להבין את המסר (three weeks)."
       },
       {
-        id: 3,
+        id: 5,
+        paragraphIndex: 1,
+        linesHint: "lines 7-9",
+        type: "mcq",
+        question: "Where did Clara read old books to understand the message?",
+        options: [
+          "In a small desert school",
+          "In the library",
+          "At her friend's house",
+          "Near the desert water tree"
+        ],
+        answerIndex: 1,
+        explanation: "נכון! בפסקה 2 מצוין שהיא קראה ספרים ישנים בספרייה (in the library)."
+      },
+      {
+        id: 6,
         paragraphIndex: 2,
         linesHint: "lines 11-15",
         type: "copy",
         question: "Copy the sentence that tells us what Clara found instead of gold.",
         targetSentence: "When she arrived, she did not find gold, but she did find a special plant.",
         explanation: "המשפט הנכון הוא: 'When she arrived, she did not find gold, but she did find a special plant.' (כשהיא הגיעה, היא לא מצאה זהב, אלא מצאה צמח מיוחד)."
+      },
+      {
+        id: 7,
+        paragraphIndex: 2,
+        linesHint: "lines 12-14",
+        type: "mcq",
+        question: "Who used the special plant to make new medicines?",
+        options: [
+          "Local desert explorers",
+          "University scientists",
+          "Doctors",
+          "Clara's family members"
+        ],
+        answerIndex: 2,
+        explanation: "נכון מאוד! בפסקה 3 כתוב שרופאים (doctors) השתמשו בצמח כדי להכין תרופות חדשות."
       }
     ],
     globalQuestion: {
@@ -181,6 +279,25 @@ export const PRE_GENERATED_UNSEENS: Record<"Easy" | "Medium" | "Hard", UnseenDat
       },
       {
         id: 2,
+        paragraphIndex: 0,
+        linesHint: "lines 2-3",
+        type: "open",
+        question: "According to paragraph 1, how far can the whale songs travel?",
+        suggestedAnswer: "They can travel for hundreds of kilometers.",
+        keywords: ["travel", "hundreds", "kilometers", "hundreds of kilometers"],
+        explanation: "נכון מאוד! בפסקה 1 נאמר שהשירה שלהם יכולה לנוע לאורך מאות קילומטרים (hundreds of kilometers)."
+      },
+      {
+        id: 3,
+        paragraphIndex: 0,
+        linesHint: "lines 3-4",
+        type: "copy",
+        question: "Copy the sentence that states that these songs are not random noises.",
+        targetSentence: "These ocean sounds are not random noises; they are structured melodies with repeating patterns.",
+        explanation: "המשפט הנכון הוא: 'These ocean sounds are not random noises; they are structured melodies with repeating patterns.' (קולות האוקיינוס האלה אינם רעשים אקראיים; הם מנגינות מובנות בעלות דפוסים חוזרים)."
+      },
+      {
+        id: 4,
         paragraphIndex: 1,
         linesHint: "lines 7-12",
         type: "copy",
@@ -189,7 +306,22 @@ export const PRE_GENERATED_UNSEENS: Record<"Easy" | "Medium" | "Hard", UnseenDat
         explanation: "המשפט הנכון הוא: 'If a humpback whale from a different region joins the group, the others might learn its song and combine it with their own.' (אם לווייתן מאזור אחר מצטרף לקבוצה, האחרים עשויים ללמוד את שירתו ולשלב אותה בשלהם)."
       },
       {
-        id: 3,
+        id: 5,
+        paragraphIndex: 1,
+        linesHint: "lines 9-11",
+        type: "mcq",
+        question: "What does the whales' ability to learn songs from other regions demonstrate?",
+        options: [
+          "That they have poor memory",
+          "That they have a form of cultural learning",
+          "That they prefer swimming alone",
+          "That they communicate using echo sounds"
+        ],
+        answerIndex: 1,
+        explanation: "נכון! היכולת ללמוד שירים חדשים מלווייתנים מאזורים אחרים מראה על למידה תרבותית (cultural learning)."
+      },
+      {
+        id: 6,
         paragraphIndex: 2,
         linesHint: "lines 13-18",
         type: "open",
@@ -197,6 +329,21 @@ export const PRE_GENERATED_UNSEENS: Record<"Easy" | "Medium" | "Hard", UnseenDat
         suggestedAnswer: "It disrupts their communication and forces them to change their singing patterns.",
         keywords: ["disrupts", "communication", "hear each other", "singing patterns"],
         explanation: "התשובה המוצעת היא שהרעש מפריע לתקשורת שלהם ומאלץ אותם לשנות את דפוסי השירה (disrupts their communication)."
+      },
+      {
+        id: 7,
+        paragraphIndex: 2,
+        linesHint: "lines 15-18",
+        type: "mcq",
+        question: "What solution do environmental groups suggest to protect the whales from ship noise?",
+        options: [
+          "Moving the whales to specialized research aquariums",
+          "Building quieter engines and establishing ship speed limits",
+          "Cleaning the plastic pollution from the ocean surface",
+          "Teaching the whales to sing louder in noisy zones"
+        ],
+        answerIndex: 1,
+        explanation: "נכון מאוד! בפסקה 3 כתוב שהם רוצים שהממשלות יקבעו מגבלות מהירות לאוניות ויבנו מנועים שקטים יותר."
       }
     ],
     globalQuestion: {

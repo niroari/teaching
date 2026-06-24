@@ -99,20 +99,39 @@ CRITICAL RULES:
       }
     };
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(requestBody)
-      }
-    );
+    const modelsToTry = ["gemini-2.5-flash", "gemini-1.5-flash"];
+    let response: Response | null = null;
+    let errorText = "";
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Gemini API Error response:", errorText);
+    for (const model of modelsToTry) {
+      try {
+        console.log(`Attempting generation with model: ${model}`);
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(requestBody)
+          }
+        );
+
+        if (res.ok) {
+          response = res;
+          break;
+        } else {
+          errorText = await res.text();
+          console.warn(`Model ${model} failed with status ${res.status}:`, errorText);
+        }
+      } catch (err: any) {
+        errorText = err.message || String(err);
+        console.warn(`Model ${model} request threw error:`, err);
+      }
+    }
+
+    if (!response || !response.ok) {
+      console.error("All Gemini API models failed. Last error:", errorText);
       return NextResponse.json(
         { success: false, reason: "api_error", message: errorText },
         { status: 502 }

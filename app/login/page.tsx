@@ -72,15 +72,19 @@ function LoginContent() {
       const redirectUrl = searchParams.get("redirect") || "/";
       router.push(redirectUrl);
     } catch (err: any) {
-      console.error(err);
+      console.error("Authentication error details:", err);
       if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") {
         setError("כתובת האימייל או הסיסמה אינם נכונים.");
       } else if (err.code === "auth/email-already-in-use") {
         setError("כתובת האימייל הזו כבר רשומה במערכת.");
       } else if (err.code === "auth/invalid-email") {
         setError("כתובת האימייל אינה תקינה.");
+      } else if (err.code === "auth/operation-not-allowed") {
+        setError("הרשמה באמצעות אימייל וסיסמה אינה מופעלת בפרויקט Firebase זה. אנא הפעילו את אפשרות ה-Email/Password תחת Authentication -> Sign-in method בקונסולת Firebase.");
+      } else if (err.code === "auth/weak-password") {
+        setError("הסיסמה חלשה מדי. אנא בחרו סיסמה חזקה יותר.");
       } else {
-        setError("אירעה שגיאה. אנא נסו שוב מאוחר יותר.");
+        setError(`אירעה שגיאה: ${err.message || err.code || "אנא נסו שוב מאוחר יותר."}`);
       }
     } finally {
       setLoading(false);

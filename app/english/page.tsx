@@ -26,6 +26,14 @@ const ENGLISH_SECTIONS = [
     bgUrl: "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&w=800&q=80",
     link: "/english/adjectives",
     badge: "מצגת למידה"
+  },
+  {
+    slug: "simone-biles",
+    title: "Simone Biles: Present Tenses",
+    desc: "תרגול זמני הווה (Present Simple & Progressive) לכיתה ז׳ המבוסס על סיפורה מעורר ההשראה של סימון ביילס.",
+    bgUrl: "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&w=800&q=80",
+    link: "/english/simone-biles",
+    badge: "תרגול ומשחק"
   }
 ];
 
@@ -57,7 +65,7 @@ export default function EnglishHubPage() {
         </div>
 
         {/* Sections Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full mt-4">
           {ENGLISH_SECTIONS.map((sec) => (
             <Link
               key={sec.slug}

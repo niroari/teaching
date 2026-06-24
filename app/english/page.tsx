@@ -18,6 +18,14 @@ const ENGLISH_SECTIONS = [
     bgUrl: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=800&q=80",
     link: "/english/vocab-trainer",
     badge: "תרגול אישי"
+  },
+  {
+    slug: "adjectives",
+    title: "שמות תואר (Adjectives)",
+    desc: "מצגת למידה אינטראקטיבית בנושא שמות תואר באנגלית, תפקידם במשפט ושימוש נכון לתיאור שמות עצם.",
+    bgUrl: "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&w=800&q=80",
+    link: "/english/adjectives",
+    badge: "מצגת למידה"
   }
 ];
 
@@ -49,7 +57,7 @@ export default function EnglishHubPage() {
         </div>
 
         {/* Sections Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mt-4">
           {ENGLISH_SECTIONS.map((sec) => (
             <Link
               key={sec.slug}

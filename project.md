@@ -34,10 +34,10 @@ This document serves as a comprehensive index of the site's architecture, pages,
     * *Spelling:* Audio dictation matching and verification.
     * *Match Game:* Fast-paced tile correlation grid.
 * **Unseen Text Practice (`/english/unseen-practice`):**
-  * Implements an interactive strategy training game that teaches students how to solve reading comprehensions without reading the entire text first (paragraph-by-paragraph question solving).
+  * Implements an interactive strategy training game that teaches students how to solve reading comprehensions without reading the entire text first. Features a mix of question formats (Multiple Choice, Sentence Copying, and Open Text Answer) with custom check inputs.
   * Includes three difficulty levels: Easy, Medium, and Hard.
   * Dynamically blurs out non-target paragraphs to enforce focus.
-  * **Gemini AI Dynamic Generation:** Integrates with a Next.js server API endpoint calling Gemini (`gemini-2.5-flash`) to generate custom, on-demand readings, multiple-choice questions, and Hebrew explanations.
+  * **Gemini AI Dynamic Generation:** Integrates with a Next.js server API endpoint calling Gemini (`gemini-2.5-flash`) to generate custom, on-demand readings, multiple-choice, open-answer, and sentence-copying questions, along with Hebrew explanations.
   * Built-in Comfort Reading Mode switch persisting choices.
 * **Adjectives (שמות תואר) (`/english/adjectives`):**
   * Embeds an interactive presentation about adjectives using Gamma.app. Includes responsive layouts and custom loading states.

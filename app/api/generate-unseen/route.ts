@@ -36,15 +36,15 @@ You must return a raw JSON object matching the following TypeScript schema exact
   "title": "Title of the story",
   "difficulty": "Easy" | "Medium" | "Hard",
   "paragraphs": [
-    "Paragraph 1 text (approx 40-70 words)",
-    "Paragraph 2 text (approx 40-70 words)",
-    "Paragraph 3 text (approx 40-70 words)"
+    "Paragraph 1 text (approx 80-100 words)",
+    "Paragraph 2 text (approx 80-100 words)",
+    "Paragraph 3 text (approx 80-100 words)"
   ],
   "questions": [
     {
       "id": 1,
       "paragraphIndex": 0,
-      "linesHint": "lines 1-3",
+      "linesHint": "lines 1-6",
       "type": "mcq",
       "question": "Question text in English?",
       "options": ["Option A", "Option B", "Option C", "Option D"],
@@ -54,7 +54,7 @@ You must return a raw JSON object matching the following TypeScript schema exact
     {
       "id": 2,
       "paragraphIndex": 1,
-      "linesHint": "lines 4-7",
+      "linesHint": "lines 7-12",
       "type": "copy",
       "question": "Instruction in English to copy a specific sentence from paragraph 2 (e.g., 'Copy the sentence that shows Clara was happy.')",
       "targetSentence": "The exact sentence copied verbatim from paragraph 2",
@@ -63,7 +63,7 @@ You must return a raw JSON object matching the following TypeScript schema exact
     {
       "id": 3,
       "paragraphIndex": 2,
-      "linesHint": "lines 8-11",
+      "linesHint": "lines 13-18",
       "type": "open",
       "question": "Factual or inferential question in English about paragraph 3",
       "suggestedAnswer": "Suggested correct model answer in English (1 short sentence)",
@@ -92,7 +92,8 @@ CRITICAL RULES:
 3. Keep the line range hints accurate in relation to the generated paragraph structures.
 4. Question types must be strictly: Question 1 = 'mcq', Question 2 = 'copy', Question 3 = 'open'.
 5. For Question 2 ('copy'), the 'targetSentence' MUST exist exactly verbatim in paragraph 2 (index 1 of paragraphs).
-6. Do not include markdown code block syntax (like \`\`\`json) in the response. Return only the JSON object.`;
+6. Do not include markdown code block syntax (like \`\`\`json) in the response. Return only the JSON object.
+7. The total reading text must be longer, approximately 25-30 lines of text (about 80-100 words per paragraph, totaling around 250-300 words).`;
 
     const requestBody = {
       contents: [

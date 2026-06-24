@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Alef } from "next/font/google";
+import { AuthProvider } from "@/lib/context/AuthContext";
 import "./globals.css";
 
 const alef = Alef({
@@ -24,7 +25,9 @@ export default function RootLayout({
       dir="rtl"
       className={`${alef.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }

@@ -1,24 +1,9 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { initializeApp, getApps } from "firebase/app";
-import { getDatabase, ref, onValue, set, remove, runTransaction } from "firebase/database";
+import { ref, onValue, set, remove, runTransaction } from "firebase/database";
+import { db } from "@/lib/firebase";
 import { Gavel, Users, ClipboardList, Share2, Award, X, Copy, Check, LogOut, ArrowLeft } from "lucide-react";
-
-// Firebase Config
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDMwQXeiDibuy6q0q_emHGAmxB3xSqRVbU",
-  authDomain: "values-auction-ed09c.firebaseapp.com",
-  databaseURL: "https://values-auction-ed09c-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "values-auction-ed09c",
-  storageBucket: "values-auction-ed09c.firebasestorage.app",
-  messagingSenderId: "157059499738",
-  appId: "1:157059499738:web:c1c20c62219f91168b87e3"
-};
-
-// Initialize Firebase
-const app = getApps().length === 0 ? initializeApp(FIREBASE_CONFIG) : getApps()[0];
-const db = getDatabase(app);
 
 // Default lists
 const DEFAULT_STUDENTS = [

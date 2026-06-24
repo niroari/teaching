@@ -14,18 +14,22 @@ import {
   X,
   RotateCcw,
   BookOpen,
+  BookmarkCheck,
   Layers,
   HelpCircle,
   FileText,
   Sparkles,
   Trophy,
-  HelpCircle as QuestionIcon,
-  Play,
-  ExternalLink,
-  ChevronRight,
   VolumeX,
-  BookmarkCheck
+  LogIn,
+  LogOut,
+  User,
+  CloudLightning,
+  RefreshCw
 } from "lucide-react";
+import { useAuth } from "@/lib/context/AuthContext";
+import { dbFirestore } from "@/lib/firebase";
+import { collection, doc, setDoc, deleteDoc, getDocs, writeBatch } from "firebase/firestore";
 
 interface Word {
   id: string;
@@ -82,6 +86,8 @@ interface MatchCard {
 }
 
 export default function VocabTrainerPage() {
+  const { user, logout, loading: authLoading } = useAuth();
+
   // Navigation & Core state
   const [activeTab, setActiveTab] = useState<"manage" | "flashcards" | "quiz" | "spelling" | "match">("manage");
   const [words, setWords] = useState<Word[]>([]);
@@ -90,6 +96,10 @@ export default function VocabTrainerPage() {
   // Sound & Speech Synthesis
   const [speechSupported, setSpeechSupported] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
+
+  // Syncing states
+  const [isMerging, setIsMerging] = useState(false);
+  const [hasLocalWordsToMerge, setHasLocalWordsToMerge] = useState(false);
 
   // --- Manage Words Tab States ---
   const [searchQuery, setSearchQuery] = useState("");
@@ -128,34 +138,145 @@ export default function VocabTrainerPage() {
   const [matchCompleted, setMatchCompleted] = useState(false);
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Load words from localStorage on mount
+  // Load local storage fallback list
+  const loadLocalWords = () => {
+    const stored = localStorage.getItem("teaching-site-vocab-words");
+    if (stored) {
+      try {
+        setWords(JSON.parse(stored));
+      } catch (e) {
+        setWords(DEFAULT_WORDS);
+      }
+    } else {
+      setWords(DEFAULT_WORDS);
+      localStorage.setItem("teaching-site-vocab-words", JSON.stringify(DEFAULT_WORDS));
+    }
+  };
+
+  // Load words from Firestore or LocalStorage on user status change
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("teaching-site-vocab-words");
-      if (stored) {
+    if (authLoading) return;
+
+    const loadData = async () => {
+      setIsLoaded(false);
+      if (user) {
         try {
-          setWords(JSON.parse(stored));
-        } catch (e) {
-          setWords(DEFAULT_WORDS);
+          const querySnapshot = await getDocs(collection(dbFirestore, "users", user.uid, "words"));
+          const firestoreWords: Word[] = [];
+          querySnapshot.forEach((doc) => {
+            firestoreWords.push(doc.data() as Word);
+          });
+
+          // Sort newer words first (by numeric comparison of ID, which is Date.now().toString())
+          firestoreWords.sort((a, b) => Number(b.id) - Number(a.id));
+          setWords(firestoreWords);
+
+          // Check if local storage has unsynced local words
+          const localStr = localStorage.getItem("teaching-site-vocab-words");
+          if (localStr) {
+            const localWords = JSON.parse(localStr) as Word[];
+            const hasNewLocal = localWords.some(
+              lw => !firestoreWords.some(fw => fw.english.toLowerCase() === lw.english.toLowerCase())
+            );
+            setHasLocalWordsToMerge(hasNewLocal);
+          }
+        } catch (error) {
+          console.error("Error loading words from Firestore:", error);
+          loadLocalWords();
         }
       } else {
-        setWords(DEFAULT_WORDS);
-        localStorage.setItem("teaching-site-vocab-words", JSON.stringify(DEFAULT_WORDS));
+        // Logged out: load from local storage
+        loadLocalWords();
+        setHasLocalWordsToMerge(false);
       }
       setIsLoaded(true);
+    };
 
-      // Check for SpeechSynthesis support
-      if ("speechSynthesis" in window) {
-        setSpeechSupported(true);
-      }
+    loadData();
+
+    // Check for SpeechSynthesis support
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      setSpeechSupported(true);
     }
-  }, []);
+  }, [user, authLoading]);
 
-  // Save words to localStorage
-  const saveWords = (newWords: Word[]) => {
+  // Save words state, update local storage cache, and sync to Firestore
+  const saveWords = async (newWords: Word[]) => {
+    const previousWords = words;
     setWords(newWords);
+
     if (typeof window !== "undefined") {
       localStorage.setItem("teaching-site-vocab-words", JSON.stringify(newWords));
+    }
+
+    if (user) {
+      try {
+        // Find deleted words
+        const deleted = previousWords.filter(w => !newWords.some(nw => nw.id === w.id));
+        // Find added or updated words
+        const updated = newWords.filter(nw => {
+          const prev = previousWords.find(w => w.id === nw.id);
+          return !prev || JSON.stringify(prev) !== JSON.stringify(nw);
+        });
+
+        const batch = writeBatch(dbFirestore);
+
+        deleted.forEach(w => {
+          const docRef = doc(dbFirestore, "users", user.uid, "words", w.id);
+          batch.delete(docRef);
+        });
+
+        updated.forEach(w => {
+          const docRef = doc(dbFirestore, "users", user.uid, "words", w.id);
+          batch.set(docRef, w);
+        });
+
+        await batch.commit();
+      } catch (error) {
+        console.error("Error syncing to Firestore:", error);
+      }
+    }
+  };
+
+  // Merge Local Words to cloud
+  const handleMergeLocalWords = async () => {
+    if (!user || isMerging) return;
+    setIsMerging(true);
+    try {
+      const localStr = localStorage.getItem("teaching-site-vocab-words");
+      if (localStr) {
+        const localWords = JSON.parse(localStr) as Word[];
+        
+        // Find local words not in current Firestore list
+        const toAdd = localWords.filter(
+          lw => !words.some(fw => fw.english.toLowerCase() === lw.english.toLowerCase())
+        );
+        
+        if (toAdd.length > 0) {
+          const batch = writeBatch(dbFirestore);
+          toAdd.forEach(w => {
+            // Re-assign id to ensure unique key in Firestore if needed, or use existing
+            const docRef = doc(dbFirestore, "users", user.uid, "words", w.id);
+            batch.set(docRef, w);
+          });
+          await batch.commit();
+
+          const merged = [...toAdd, ...words].sort((a, b) => Number(b.id) - Number(a.id));
+          setWords(merged);
+          
+          confetti({
+            particleCount: 80,
+            spread: 60,
+            origin: { y: 0.6 }
+          });
+        }
+      }
+      setHasLocalWordsToMerge(false);
+    } catch (error) {
+      console.error("Error merging words:", error);
+      alert("מיזוג המילים נכשל. אנא נסו שוב.");
+    } finally {
+      setIsMerging(false);
     }
   };
 
@@ -605,7 +726,8 @@ export default function VocabTrainerPage() {
             <span>חזרה לאנגלית</span>
           </Link>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+            {/* Audio Toggle */}
             <button
               onClick={() => setSoundEnabled(!soundEnabled)}
               className="px-3 py-1.5 rounded-lg border border-border-custom bg-surface hover:bg-surface-hover text-text-muted hover:text-white transition-all text-xs flex items-center gap-1.5 cursor-pointer"
@@ -622,6 +744,31 @@ export default function VocabTrainerPage() {
                 </>
               )}
             </button>
+
+            {/* Auth Dropdown/State */}
+            {user ? (
+              <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-1.5 bg-surface border border-border-custom rounded-lg px-3 py-1.5 text-xs text-zinc-300">
+                  <User className="w-3.5 h-3.5 text-cyan-400" />
+                  <span className="font-semibold">{user.displayName || user.email || "תלמיד/ה"}</span>
+                </div>
+                <button
+                  onClick={() => logout()}
+                  className="px-3 py-1.5 rounded-lg border border-red-950/40 bg-red-950/10 hover:bg-red-900/20 text-red-400 text-xs font-bold cursor-pointer transition-all flex items-center gap-1"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>התנתק</span>
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/login?redirect=/english/vocab-trainer"
+                className="px-3.5 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-zinc-950 text-xs font-bold cursor-pointer transition-all flex items-center gap-1"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>התחבר לשמירה בענן</span>
+              </Link>
+            )}
           </div>
         </div>
 
@@ -732,8 +879,38 @@ export default function VocabTrainerPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
-                  className="grid grid-cols-1 lg:grid-cols-12 gap-8"
+                  className="space-y-6"
                 >
+                  {hasLocalWordsToMerge && (
+                    <div className="glass-card rounded-2xl border border-cyan-500/30 bg-cyan-950/15 p-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-right">
+                      <div className="flex items-center gap-3">
+                        <CloudLightning className="w-5 h-5 text-cyan-400 shrink-0" />
+                        <div>
+                          <p className="text-sm font-bold text-white">יש לכם מילים מקומיות בדפדפן זה</p>
+                          <p className="text-xs text-text-muted mt-0.5">מצאנו מילים ששמרתם במחשב זה. האם ברצונכם להעלות ולסנכרן אותן עם החשבון שלכם בענן?</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={handleMergeLocalWords}
+                        disabled={isMerging}
+                        className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-zinc-950 font-bold text-xs shrink-0 transition-all cursor-pointer flex items-center gap-1.5"
+                      >
+                        {isMerging ? (
+                          <>
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            <span>ממזג מילים...</span>
+                          </>
+                        ) : (
+                          <>
+                            <RefreshCw className="w-3.5 h-3.5" />
+                            <span>סנכרן מילים לענן</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                   {/* Left Column: Form to Add Word */}
                   <div className="lg:col-span-4 space-y-6">
                     <div className="glass-card rounded-2xl border border-border-custom p-6">
@@ -825,6 +1002,25 @@ export default function VocabTrainerPage() {
                         מחק את כל המילים
                       </button>
                     </div>
+
+                    {!user && (
+                      <div className="glass-card rounded-2xl border border-cyan-500/20 bg-cyan-950/5 p-5 text-right space-y-3">
+                        <p className="text-xs font-bold text-cyan-400 flex items-center gap-1.5 justify-end">
+                          <span>שמירה בענן</span>
+                          <CloudLightning className="w-3.5 h-3.5 animate-pulse" />
+                        </p>
+                        <p className="text-xs text-text-muted leading-relaxed">
+                          המילים שלכם נשמרות כרגע מקומית בדפדפן זה בלבד. התחברו כדי לשמור אותן בענן ולגשת אליהן מכל מכשיר (מחשב, טאבלט או נייד).
+                        </p>
+                        <Link
+                          href="/login?redirect=/english/vocab-trainer"
+                          className="w-full py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 border border-cyan-400/20"
+                        >
+                          <LogIn className="w-3.5 h-3.5" />
+                          <span>התחברו כעת</span>
+                        </Link>
+                      </div>
+                    )}
                   </div>
 
                   {/* Right Column: Words Table / List */}
@@ -906,8 +1102,9 @@ export default function VocabTrainerPage() {
                       )}
                     </div>
                   </div>
-                </motion.div>
-              )}
+                </div>
+              </motion.div>
+            )}
 
               {/* TAB 2: FLASHCARDS */}
               {activeTab === "flashcards" && words.length > 0 && (

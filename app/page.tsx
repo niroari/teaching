@@ -1,17 +1,54 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
-import { ArrowLeft, GraduationCap } from "lucide-react";
+import { ArrowLeft, GraduationCap, LogIn, LogOut, User } from "lucide-react";
+import { useAuth } from "@/lib/context/AuthContext";
 
 export default function PortalHomePage() {
+  const { user, logout } = useAuth();
+
   return (
     <div className="relative min-h-screen bg-[#080c18] text-[#e8edf8] flex flex-col justify-between overflow-hidden">
+      {/* Top Header Bar */}
+      <header className="w-full max-w-6xl mx-auto px-6 pt-8 flex justify-between items-center relative z-20">
+        <div className="flex items-center gap-2">
+          {/* Subtle decoration or leave empty */}
+        </div>
+        <div>
+          {user ? (
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 bg-surface border border-border-custom rounded-xl px-4 py-2 text-xs text-zinc-300">
+                <User className="w-3.5 h-3.5 text-cyan-400" />
+                <span className="font-bold">שלום, {user.displayName || user.email || "תלמיד/ה"}</span>
+              </div>
+              <button
+                onClick={() => logout()}
+                className="px-3.5 py-2 rounded-xl border border-red-950/40 bg-red-950/10 hover:bg-red-900/20 text-red-400 text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>התנתק</span>
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="px-4 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-950 text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5 shadow-lg shadow-cyan-500/10 border border-cyan-400/20"
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span>התחברות תלמידים</span>
+            </Link>
+          )}
+        </div>
+      </header>
+
       {/* Dynamic Background Gradients */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-amber-500/5 via-transparent to-transparent blur-3xl pointer-events-none rounded-full" />
       <div className="absolute -top-40 -left-40 w-96 h-96 bg-emerald-500/5 blur-3xl rounded-full pointer-events-none" />
       <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-sky-500/5 blur-3xl rounded-full pointer-events-none" />
 
       {/* Main Container */}
-      <div className="relative w-full max-w-6xl mx-auto px-6 py-20 flex-1 flex flex-col justify-center items-center z-10">
+      <div className="relative w-full max-w-6xl mx-auto px-6 py-12 flex-1 flex flex-col justify-center items-center z-10">
         
         {/* Header Section */}
         <div className="text-center mb-20 space-y-4">

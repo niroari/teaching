@@ -20,6 +20,14 @@ const ENGLISH_SECTIONS = [
     badge: "תרגול אישי"
   },
   {
+    slug: "unseen-practice",
+    title: "בלשי האנסין (Unseen Practice)",
+    desc: "למדו את השיטה הסודית לפיצוח קטעי קריאה באנגלית בקלות ובמהירות מבלי לקרוא את כל הטקסט מראש!",
+    bgUrl: "https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=800&q=80",
+    link: "/english/unseen-practice",
+    badge: "תרגול אסטרטגיה"
+  },
+  {
     slug: "adjectives",
     title: "שמות תואר (Adjectives)",
     desc: "מצגת למידה אינטראקטיבית בנושא שמות תואר באנגלית, תפקידם במשפט ושימוש נכון לתיאור שמות עצם.",
@@ -65,7 +73,7 @@ export default function EnglishHubPage() {
         </div>
 
         {/* Sections Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mt-4">
           {ENGLISH_SECTIONS.map((sec) => (
             <Link
               key={sec.slug}

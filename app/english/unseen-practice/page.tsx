@@ -416,7 +416,7 @@ export default function UnseenPracticePage() {
                 {/* Difficulty Selector */}
                 <div className="space-y-2 z-10 relative">
                   <label className="text-xs font-bold block">רמת קושי:</label>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-3 gap-3">
                     {(["Easy", "Medium", "Hard"] as const).map((lvl) => {
                       const isActive = difficulty === lvl;
                       let activeColorClass = "";
@@ -430,17 +430,13 @@ export default function UnseenPracticePage() {
                           key={lvl}
                           type="button"
                           onClick={() => setDifficulty(lvl)}
-                          className={`p-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                          className={`py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                             isActive 
                               ? activeColorClass 
                               : `border-zinc-700/30 ${isLight ? "bg-white hover:bg-zinc-100 text-zinc-700" : "bg-[#080c18]/80 text-[#e8edf8] hover:text-white"}`
                           }`}
                         >
-                          {lvl === "Easy" 
-                            ? "רמה 1 - מתחילים / אוצר מילים בסיסי" 
-                            : lvl === "Medium" 
-                            ? "רמה 2 - בינוני / הבנה בסיסית" 
-                            : "רמה 3 - מתקדמים / רמת שפת אם יסודי"}
+                          {lvl === "Easy" ? "רמה 1" : lvl === "Medium" ? "רמה 2" : "רמה 3"}
                         </button>
                       );
                     })}

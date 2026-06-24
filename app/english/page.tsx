@@ -23,7 +23,7 @@ const ENGLISH_SECTIONS = [
     slug: "unseen-practice",
     title: "בלשי האנסין (Unseen Practice)",
     desc: "למדו את השיטה הסודית לפיצוח קטעי קריאה באנגלית בקלות ובמהירות מבלי לקרוא את כל הטקסט מראש!",
-    bgUrl: "https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=800&q=80",
+    bgUrl: "/detective.png",
     link: "/english/unseen-practice",
     badge: "תרגול אסטרטגיה"
   },

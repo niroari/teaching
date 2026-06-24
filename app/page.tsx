@@ -65,7 +65,7 @@ export default function PortalHomePage() {
 
           {/* Card: אנגלית */}
           <Link
-            href="/english-auction"
+            href="/english"
             className="group glass-card rounded-2xl border border-border-custom hover:border-english/40 hover:shadow-[0_12px_40px_rgba(0,200,255,0.12)] transition-all duration-300 flex flex-col overflow-hidden"
           >
             {/* Header Image */}
@@ -81,13 +81,13 @@ export default function PortalHomePage() {
             <div className="p-8 flex-1 flex flex-col justify-between">
               <div>
                 <h3 className="text-2xl font-bold text-white group-hover:text-english transition-colors">אנגלית</h3>
-                <p className="text-sm font-semibold text-english/80 mt-1.5">The Sentence Auction</p>
+                <p className="text-sm font-semibold text-english/80 mt-1.5">תרגול דקדוק ואוצר מילים</p>
                 <p className="text-text-muted text-sm leading-relaxed mt-4">
-                  משחק מכירה פומבית כיתתי לתרגול ושיפור חוקי הדקדוק ובניית משפטים באנגלית בצורה חווייתית.
+                  משחק מכירה פומבית כיתתי לתרגול חוקי דקדוק, וכלי אינטראקטיבי לשינון ותרגול מותאם אישית של אוצר מילים.
                 </p>
               </div>
               <div className="mt-8 flex items-center gap-2 text-sm font-bold text-english group-hover:translate-x-[-6px] transition-transform">
-                <span>פתח משחק</span>
+                <span>כניסה לתרגול</span>
                 <ArrowLeft className="w-4 h-4" />
               </div>
             </div>

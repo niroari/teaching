@@ -16,11 +16,14 @@ export async function POST(request: Request) {
 
     let difficultyDirections = "";
     if (difficulty === "Easy") {
-      difficultyDirections = "simple vocabulary, short sentences, and direct factual questions, suitable for elementary or early middle school students (A2 level).";
+      difficultyDirections = 
+        "Write an extremely simple A1/Beginner level text. Use ONLY direct factual sentences, very simple present tense (e.g. 'Tom has a dog', 'The dog is white'), and high-frequency everyday vocabulary (animals, colors, basic family, basic verbs). Do NOT use any compound sentences, passive voice, or advanced vocabulary. Questions must be extremely direct and literal using very simple English, and the copy question target sentence must be very short and simple.";
     } else if (difficulty === "Medium") {
-      difficultyDirections = "moderately complex vocabulary, longer sentences, passive voice, and a mix of factual and basic inferential questions, suitable for middle school students (B1 level).";
+      difficultyDirections = 
+        "Write an A2/B1 level text. Use simple past tense, basic vocabulary, and simple descriptions suitable for non-fluent English learners. Avoid academic, advanced, or abstract terms. Questions should be standard comprehension questions using basic sentence structures.";
     } else {
-      difficultyDirections = "advanced vocabulary, abstract themes, complex sentence structures, and deep inferential questions, suitable for high school or advanced students (B2/C1 level).";
+      difficultyDirections = 
+        "Write a text equivalent to a 5th-6th grade native English speaker level (approx. Lexile 800L-1000L) on an interesting educational, historical, or scientific topic. Use compound/complex sentences, abstract themes, and moderate-to-advanced vocabulary. Questions should test deep comprehension, basic inference, advanced vocabulary context, or the author's perspective. The copy question should target a more complex sentence.";
     }
 
     const systemPrompt = `You are an expert English teacher. Generate a reading comprehension activity (unseen) in English.

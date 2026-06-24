@@ -416,7 +416,7 @@ export default function UnseenPracticePage() {
                 {/* Difficulty Selector */}
                 <div className="space-y-2 z-10 relative">
                   <label className="text-xs font-bold block">רמת קושי:</label>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     {(["Easy", "Medium", "Hard"] as const).map((lvl) => {
                       const isActive = difficulty === lvl;
                       let activeColorClass = "";
@@ -430,13 +430,17 @@ export default function UnseenPracticePage() {
                           key={lvl}
                           type="button"
                           onClick={() => setDifficulty(lvl)}
-                          className={`py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                          className={`p-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                             isActive 
                               ? activeColorClass 
                               : `border-zinc-700/30 ${isLight ? "bg-white hover:bg-zinc-100 text-zinc-700" : "bg-[#080c18]/80 text-[#e8edf8] hover:text-white"}`
                           }`}
                         >
-                          {lvl === "Easy" ? "Easy (רמה 1)" : lvl === "Medium" ? "Medium (רמה 2)" : "Hard (רמה 3)"}
+                          {lvl === "Easy" 
+                            ? "רמה 1 - מתחילים / אוצר מילים בסיסי" 
+                            : lvl === "Medium" 
+                            ? "רמה 2 - בינוני / הבנה בסיסית" 
+                            : "רמה 3 - מתקדמים / רמת שפת אם יסודי"}
                         </button>
                       );
                     })}
@@ -844,7 +848,7 @@ export default function UnseenPracticePage() {
                         <h2 className={`text-xl font-bold ${textTitle}`}>{unseen.title}</h2>
                       </div>
                       <span className={`text-[10px] ${textMuted}`}>
-                        רמה: <span className="font-bold text-teal-500">{unseen.difficulty}</span>
+                        רמה: <span className="font-bold text-teal-500">{unseen.difficulty === "Easy" ? "1 - מתחילים" : unseen.difficulty === "Medium" ? "2 - בינוני" : "3 - מתקדמים"}</span>
                       </span>
                     </div>
 
@@ -934,7 +938,7 @@ export default function UnseenPracticePage() {
                     {detectiveName.trim() || "בלש מוסמך"}
                   </p>
                   <p className={`${textMuted} text-xs leading-relaxed max-w-sm mx-auto`}>
-                    על סיום מוצלח של משימת פיצוח קטעי קריאה באנגלית ברמת קושי <span className="font-bold text-teal-400">{unseen.difficulty}</span> באמצעות השיטה הסודית ופירוק הטקסט לפי פסקאות.
+                    על סיום מוצלח של משימת פיצוח קטעי קריאה באנגלית ברמת קושי <span className="font-bold text-teal-400">{unseen.difficulty === "Easy" ? "1 (מתחילים)" : unseen.difficulty === "Medium" ? "2 (בינוני)" : "3 (מתקדמים)"}</span> באמצעות השיטה הסודית ופירוק הטקסט לפי פסקאות.
                   </p>
                 </div>
 

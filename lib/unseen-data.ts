@@ -28,12 +28,12 @@ export interface UnseenData {
 
 export const PRE_GENERATED_UNSEENS: Record<"Easy" | "Medium" | "Hard", UnseenData> = {
   Easy: {
-    title: "The Negev Desert Tree",
+    title: "Max the Small Dog",
     difficulty: "Easy",
     paragraphs: [
-      "Clara is an archaeologist who travels to the Negev desert in Israel. In 2024, she found a very old drawing on a rock. The drawing showed a tree with golden leaves.",
-      "The drawing had a secret code written on it. Clara spent three weeks trying to understand the code. Finally, she discovered that the code was a map pointing to a hidden water source under an ancient acacia tree.",
-      "When she reached the tree, she did not find gold, but she did find a rare plant that only grows under the ground near water. This plant can be used to make new medicines. Clara was very happy with her discovery."
+      "Tom has a small dog. The dog is white. His name is Max. Max has long ears and a short tail. Tom likes Max very much.",
+      "Max sleeps in a warm bed near the door. Every morning, Max runs to Tom's room. Max wakes Tom up because he wants to eat his food.",
+      "In the afternoon, Tom and Max play in the big garden. Max runs after a red ball. Max is very happy when he plays with Tom."
     ],
     questions: [
       {
@@ -41,63 +41,127 @@ export const PRE_GENERATED_UNSEENS: Record<"Easy" | "Medium" | "Hard", UnseenDat
         paragraphIndex: 0,
         linesHint: "lines 1-3",
         type: "mcq",
-        question: "Where did Clara find the old drawing?",
+        question: "What color is Max the dog?",
         options: [
-          "In a big forest",
-          "In the Negev desert",
-          "In a museum",
-          "In her office"
+          "Red",
+          "White",
+          "Black",
+          "Brown"
         ],
         answerIndex: 1,
-        explanation: "נכון מאוד! בפסקה 1 מפורט שקלארה מצאה את הציור העתיק במדבר הנגב (Negev desert)."
+        explanation: "נכון מאוד! בפסקה 1 כתוב שהכלב הוא לבן (white)."
       },
       {
         id: 2,
         paragraphIndex: 1,
         linesHint: "lines 4-7",
         type: "copy",
-        question: "Copy the sentence that tells us how long Clara tried to understand the secret code.",
-        targetSentence: "Clara spent three weeks trying to understand the code.",
-        explanation: "המשפט הנכון להעתקה הוא: 'Clara spent three weeks trying to understand the code.' (קלארה בילתה שלושה שבועות בניסיון להבין את הקוד)."
+        question: "Copy the sentence that tells us where Max sleeps.",
+        targetSentence: "Max sleeps in a warm bed near the door.",
+        explanation: "המשפט הנכון הוא: 'Max sleeps in a warm bed near the door.' (מקס ישן במיטה חמימה ליד הדלת)."
       },
       {
         id: 3,
         paragraphIndex: 2,
         linesHint: "lines 8-11",
         type: "open",
-        question: "According to paragraph 3, what can the rare plant be used for?",
-        suggestedAnswer: "It can be used to make new medicines.",
-        keywords: ["medicines", "medicine", "cure", "make medicines"],
-        explanation: "התשובה המוצעת היא שהצמח משמש להכנת תרופות חדשות (make new medicines)."
+        question: "What does Max run after in the garden?",
+        suggestedAnswer: "He runs after a red ball.",
+        keywords: ["ball", "red ball", "runs after"],
+        explanation: "התשובה המוצעת היא שהוא רץ אחרי כדור אדום (runs after a red ball)."
       }
     ],
     globalQuestion: {
       question: "What is the main idea of this story?",
       options: [
-        "Clara's exciting discovery in the Negev",
-        "How acacia trees grow in dry places",
-        "The history of ancient maps",
-        "Clara's favorite desert foods"
+        "Tom and his dog Max",
+        "How to build a garden",
+        "Why dogs sleep a lot",
+        "Tom's favorite colors"
       ],
       answerIndex: 0,
-      explanation: "כל הכבוד! הסיפור כולו עוסק במסע של קלארה ובגילוי המרתק שלה במדבר הנגב."
+      explanation: "כל הכבוד! הסיפור עוסק כולו בטום ובכלב שלו, מקס."
     },
     vocabularyHints: [
-      { word: "archaeologist", translation: "ארכאולוג" },
-      { word: "desert", translation: "מדבר" },
-      { word: "ancient", translation: "עתיק" },
-      { word: "source", translation: "מקור" },
-      { word: "rare", translation: "נדיר" },
-      { word: "medicine", translation: "תרופה" }
+      { word: "small", translation: "קטן" },
+      { word: "tail", translation: "זנב" },
+      { word: "near", translation: "ליד" },
+      { word: "room", translation: "חדר" },
+      { word: "wake up", translation: "להתעורר" },
+      { word: "run after", translation: "לרוץ אחרי" }
     ]
   },
   Medium: {
-    title: "The Voice of the Whales",
+    title: "The Negev Desert Tree",
     difficulty: "Medium",
+    paragraphs: [
+      "Clara is an explorer who likes to find old things. She travels to the Negev desert in Israel. In 2024, she saw a picture of a tree on a big rock.",
+      "The picture had a secret message written on it. Clara spent three weeks trying to understand the message. Finally, she found out that the message was a map to find water under a big tree.",
+      "Clara walked to the tree. She did not find gold, but she did find a special plant. Doctors can use this plant to make new medicines. Clara was very happy with her discovery."
+    ],
+    questions: [
+      {
+        id: 1,
+        paragraphIndex: 0,
+        linesHint: "lines 1-3",
+        type: "mcq",
+        question: "Where did Clara find the picture of the tree?",
+        options: [
+          "In a school garden",
+          "In a green forest",
+          "In the Negev desert",
+          "In a museum"
+        ],
+        answerIndex: 2,
+        explanation: "נכון מאוד! בפסקה 1 כתוב שקלארה מצאה את התמונה במדבר הנגב (Negev desert)."
+      },
+      {
+        id: 2,
+        paragraphIndex: 1,
+        linesHint: "lines 4-7",
+        type: "open",
+        question: "How long did it take Clara to understand the secret message?",
+        suggestedAnswer: "It took her three weeks to understand it.",
+        keywords: ["three weeks", "3 weeks", "weeks"],
+        explanation: "התשובה המוצעת היא שלקח לה שלושה שבועות להבין את המסר (three weeks)."
+      },
+      {
+        id: 3,
+        paragraphIndex: 2,
+        linesHint: "lines 8-11",
+        type: "copy",
+        question: "Copy the sentence that tells us what Clara found instead of gold.",
+        targetSentence: "She did not find gold, but she did find a special plant.",
+        explanation: "המשפט הנכון הוא: 'She did not find gold, but she did find a special plant.' (היא לא מצאה זהב, אך מצאה צמח מיוחד)."
+      }
+    ],
+    globalQuestion: {
+      question: "What is this story about?",
+      options: [
+        "Clara's discovery in the desert",
+        "How to plant trees in Israel",
+        "The history of gold",
+        "Clara's favorite doctors"
+      ],
+      answerIndex: 0,
+      explanation: "כל הכבוד! הסיפור עוסק במסע של קלארה ובגילוי שלה במדבר."
+    },
+    vocabularyHints: [
+      { word: "explorer", translation: "חוקרת / מגלה" },
+      { word: "picture", translation: "תמונה / ציור" },
+      { word: "message", translation: "מסר / הודעה" },
+      { word: "special", translation: "מיוחד" },
+      { word: "doctor", translation: "רופא" },
+      { word: "medicine", translation: "תרופה" }
+    ]
+  },
+  Hard: {
+    title: "The Voice of the Whales",
+    difficulty: "Hard",
     paragraphs: [
       "Whales are some of the largest creatures on Earth, but they are also famous for their incredible songs. In the deep ocean, blue whales and humpback whales sing complex melodies that can travel for hundreds of kilometers. Scientists believe that whales sing to communicate, find partners, and navigate through the dark waters.",
       "Interestingly, each group of humpback whales has its own unique song. Over time, these songs change. If a humpback whale from a different region joins the group, the others might learn its song. This shows that whales have a form of cultural learning, similar to how humans share music and languages.",
-      "Today, ocean noise from large ships and military sonar makes it difficult for whales to hear each other. This noise pollution disrupts their communication and forces them to change their singing patterns. Environmental groups are now working to create quieter sea zones to protect these intelligent animals."
+      "Today, ocean noise from large ships makes it difficult for whales to hear each other. This noise pollution disrupts their communication and forces them to change their singing patterns. Environmental groups are now working to create quieter sea zones to protect these intelligent animals."
     ],
     questions: [
       {
@@ -119,20 +183,20 @@ export const PRE_GENERATED_UNSEENS: Record<"Easy" | "Medium" | "Hard", UnseenDat
         id: 2,
         paragraphIndex: 1,
         linesHint: "lines 5-8",
-        type: "open",
-        question: "What shows that whales have cultural learning?",
-        suggestedAnswer: "They learn songs from humpback whales that come from other regions.",
-        keywords: ["learn its song", "learn songs", "other regions", "different region", "joins the group"],
-        explanation: "התשובה המוצעת היא שהם לומדים שירים חדשים מלווייתנים המגיעים מאזורים אחרים ומצטרפים אליהם."
+        type: "copy",
+        question: "Copy the sentence that lists what happens when a humpback whale from another region joins the group.",
+        targetSentence: "If a humpback whale from a different region joins the group, the others might learn its song.",
+        explanation: "המשפט הנכון הוא: 'If a humpback whale from a different region joins the group, the others might learn its song.' (אם לווייתן מאזור אחר מצטרף, האחרים עשויים ללמוד את השיר שלו)."
       },
       {
         id: 3,
         paragraphIndex: 2,
         linesHint: "lines 9-12",
-        type: "copy",
-        question: "Copy the sentence that mentions what environmental groups are doing to protect whales.",
-        targetSentence: "Environmental groups are now working to create quieter sea zones to protect these intelligent animals.",
-        explanation: "המשפט הנכון להעתקה הוא: 'Environmental groups are now working to create quieter sea zones to protect these intelligent animals.' (ארגוני סביבה פועלים כעת ליצירת אזורים ימיים שקטים יותר כדי להגן על חיות אינטליגנטיות אלו)."
+        type: "open",
+        question: "According to paragraph 3, how does noise from large ships affect the whales?",
+        suggestedAnswer: "It disrupts their communication and forces them to change their singing patterns.",
+        keywords: ["disrupts", "communication", "hear each other", "singing patterns"],
+        explanation: "התשובה המוצעת היא שהרעש מפריע לתקשורת שלהם ומאלץ אותם לשנות את דפוסי השירה (disrupts their communication)."
       }
     ],
     globalQuestion: {
@@ -144,7 +208,7 @@ export const PRE_GENERATED_UNSEENS: Record<"Easy" | "Medium" | "Hard", UnseenDat
         "To describe the history of ocean exploration"
       ],
       answerIndex: 2,
-      explanation: "כל הכבוד! המאמר מתמקד באסטרטגיית התקשורת של הלווייתנים (השירה שלהם) ובאיומים שרעש אנושי מציב בפניהם."
+      explanation: "כל הכבוד! המאמר עוסק בתקשורת של לווייתנים ובאופן שבו רעש אנושי מאיים עליה."
     },
     vocabularyHints: [
       { word: "creatures", translation: "יצורים" },
@@ -153,71 +217,6 @@ export const PRE_GENERATED_UNSEENS: Record<"Easy" | "Medium" | "Hard", UnseenDat
       { word: "cultural", translation: "תרבותי" },
       { word: "pollution", translation: "זיהום" },
       { word: "disrupts", translation: "משבש" }
-    ]
-  },
-  Hard: {
-    title: "The Rise of Artificial Intelligence",
-    difficulty: "Hard",
-    paragraphs: [
-      "Artificial Intelligence (AI) has transitioned from science fiction to an omnipresent force in modern society. Powered by massive neural networks and sophisticated machine learning algorithms, AI models now perform complex tasks like translating languages, diagnosing medical conditions, and writing software. Proponents argue that AI will unlock unprecedented human productivity and accelerate scientific discovery in areas like genomics and climate modeling.",
-      "However, this rapid integration is not without challenges. Critics frequently highlight ethical dilemmas, including algorithmic bias, the spread of deepfakes, and massive labor displacement. There is a growing concern that without strict regulatory frameworks, AI could be weaponized or perpetuate societal inequalities. Finding a balance between innovation and safety has become a top priority for governments worldwide.",
-      "Ultimately, the future of AI will depend on international cooperation. Ensuring that AI remains aligned with human values requires developers, researchers, and policymakers to collaborate on safety standards. If managed properly, AI could serve as a powerful tool to solve some of the world's most complex challenges; if ignored, the societal risks could be profound."
-    ],
-    questions: [
-      {
-        id: 1,
-        paragraphIndex: 0,
-        linesHint: "lines 1-5",
-        type: "mcq",
-        question: "What is one benefit of AI mentioned by its proponents in paragraph 1?",
-        options: [
-          "It will replace all human relationships",
-          "It will unlock unprecedented human productivity",
-          "It will eliminate climate change instantly",
-          "It will design new neural networks automatically"
-        ],
-        answerIndex: 1,
-        explanation: "נכון מאוד! בפסקה 1 מפורט שתומכי ה-AI טוענים שהיא תשחרר פרודוקטיביות אנושית חסרת תקדים (unlock unprecedented human productivity)."
-      },
-      {
-        id: 2,
-        paragraphIndex: 1,
-        linesHint: "lines 6-9",
-        type: "copy",
-        question: "Copy the sentence that lists the ethical concerns critics have about AI.",
-        targetSentence: "Critics frequently highlight ethical dilemmas, including algorithmic bias, the spread of deepfakes, and massive labor displacement.",
-        explanation: "המשפט הנכון להעתקה הוא: 'Critics frequently highlight ethical dilemmas, including algorithmic bias, the spread of deepfakes, and massive labor displacement.' (מבקרים מדגישים לעתים קרובות דילמות מוסריות, כולל הטיה אלגוריתמית, הפצת דיפפייק, ודחיקה מסיבית של כוח עבודה)."
-      },
-      {
-        id: 3,
-        paragraphIndex: 2,
-        linesHint: "lines 10-13",
-        type: "open",
-        question: "According to paragraph 3, what must developers and policymakers do to ensure AI remains aligned with human values?",
-        suggestedAnswer: "They must collaborate on safety standards and work together internationally.",
-        keywords: ["collaborate", "cooperate", "safety standards", "cooperation", "policymakers"],
-        explanation: "מצוין! בפסקה 3 נאמר ששמירה על ה-AI מתואמת עם ערכי האדם דורשת שיתוף פעולה בינלאומי בסטנדרטים של בטיחות (international cooperation/collaboration on safety standards)."
-      }
-    ],
-    globalQuestion: {
-      question: "Which of the following best captures the author's overall perspective on AI?",
-      options: [
-        "AI is a dangerous technology that should be banned immediately",
-        "AI has great potential to solve global problems but presents significant risks that require regulatory safety standards",
-        "AI is already smarter than humans in every possible task",
-        "The economic benefits of AI far outweigh any potential ethical concerns"
-      ],
-      answerIndex: 1,
-      explanation: "כל הכבוד! המאמר מציג נקודת מבט מאוזנת המכירה הן בפוטנציאל הגדול של ה-AI והן בסיכונים החברתיים והצורך ברגולציה ושיתוף פעולה."
-    },
-    vocabularyHints: [
-      { word: "omnipresent", translation: "נוכח בכל מקום" },
-      { word: "proponents", translation: "תומכים" },
-      { word: "unprecedented", translation: "חסר תקדים" },
-      { word: "ethical", translation: "מוסרי" },
-      { word: "displacement", translation: "דחיקה / החלפה" },
-      { word: "regulatory", translation: "רגולטורי" },
-      { word: "profound", translation: "עמוק / משמעותי" }
     ]
   }
 };

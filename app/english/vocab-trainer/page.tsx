@@ -55,6 +55,61 @@ const DEFAULT_WORDS: Word[] = [
   { id: "10", english: "essential", hebrew: "חיוני, הכרחי", partOfSpeech: "adjective", example: "Vocabulary is essential for communication." }
 ];
 
+const EASY_WORDS: Word[] = [
+  { id: "easy-1", english: "choose", hebrew: "לבחור", partOfSpeech: "verb", example: "Please choose your favorite color." },
+  { id: "easy-2", english: "simple", hebrew: "פשוט", partOfSpeech: "adjective", example: "The English homework was very simple." },
+  { id: "easy-3", english: "understand", hebrew: "להבין", partOfSpeech: "verb", example: "Do you understand this question?" },
+  { id: "easy-4", english: "always", hebrew: "תמיד", partOfSpeech: "adverb", example: "She always reads books before bed." },
+  { id: "easy-5", english: "garden", hebrew: "גינה", partOfSpeech: "noun", example: "There are beautiful flowers in the garden." },
+  { id: "easy-6", english: "friend", hebrew: "חבר", partOfSpeech: "noun", example: "A good friend is always helpful." },
+  { id: "easy-7", english: "learn", hebrew: "ללמוד", partOfSpeech: "verb", example: "It is fun to learn new words in English." },
+  { id: "easy-8", english: "family", hebrew: "משפחה", partOfSpeech: "noun", example: "We had a great dinner with our family." },
+  { id: "easy-9", english: "animal", hebrew: "בעל חיים", partOfSpeech: "noun", example: "The lion is a very strong animal." },
+  { id: "easy-10", english: "summer", hebrew: "קיץ", partOfSpeech: "noun", example: "The weather is very hot in the summer." },
+  { id: "easy-11", english: "kitchen", hebrew: "מטבח", partOfSpeech: "noun", example: "My mom is cooking dinner in the kitchen." },
+  { id: "easy-12", english: "travel", hebrew: "לנסוע, לטייל", partOfSpeech: "verb", example: "They like to travel to new places." },
+  { id: "easy-13", english: "happy", hebrew: "שמח", partOfSpeech: "adjective", example: "He was very happy to win the game." },
+  { id: "easy-14", english: "language", hebrew: "שפה", partOfSpeech: "noun", example: "English is a global language." },
+  { id: "easy-15", english: "practice", hebrew: "תרגול, לתרגל", partOfSpeech: "verb", example: "You must practice to get better." }
+];
+
+const MEDIUM_WORDS: Word[] = [
+  { id: "medium-1", english: "determine", hebrew: "לקבוע, להחליט", partOfSpeech: "verb", example: "Your attitude determines your direction." },
+  { id: "medium-2", english: "influence", hebrew: "להשפיע, השפעה", partOfSpeech: "verb", example: "Good books can influence your behavior." },
+  { id: "medium-3", english: "challenge", hebrew: "אתגר, לאתגר", partOfSpeech: "noun", example: "Learning English is a fun challenge." },
+  { id: "medium-4", english: "opportunity", hebrew: "הזדמנות", partOfSpeech: "noun", example: "Every day is a new opportunity to learn." },
+  { id: "medium-5", english: "improve", hebrew: "לשפר, להשתפר", partOfSpeech: "verb", example: "Practice is the best way to improve." },
+  { id: "medium-6", english: "constant", hebrew: "קבוע, רציף", partOfSpeech: "adjective", example: "Learning requires constant effort." },
+  { id: "medium-7", english: "essential", hebrew: "חיוני, הכרחי", partOfSpeech: "adjective", example: "Vocabulary is essential for communication." },
+  { id: "medium-8", english: "describe", hebrew: "לתאר", partOfSpeech: "verb", example: "Can you describe the person you saw?" },
+  { id: "medium-9", english: "succeed", hebrew: "להצליח", partOfSpeech: "verb", example: "If you study hard, you will succeed." },
+  { id: "medium-10", english: "discover", hebrew: "לגלות", partOfSpeech: "verb", example: "Scientists want to discover new planets." },
+  { id: "medium-11", english: "explorer", hebrew: "חוקר, מגלה ארצות", partOfSpeech: "noun", example: "The explorer traveled to the Negev Desert." },
+  { id: "medium-12", english: "behavior", hebrew: "התנהגות", partOfSpeech: "noun", example: "His polite behavior impressed the teacher." },
+  { id: "medium-13", english: "pattern", hebrew: "תבנית, דפוס", partOfSpeech: "noun", example: "The stripes on the zebra form a pattern." },
+  { id: "medium-14", english: "connection", hebrew: "חיבור, קשר", partOfSpeech: "noun", example: "There is a strong connection between health and exercise." },
+  { id: "medium-15", english: "typical", hebrew: "טיפוסי, אופייני", partOfSpeech: "adjective", example: "A typical school day starts at eight." }
+];
+
+const HARD_WORDS: Word[] = [
+  { id: "hard-1", english: "accomplish", hebrew: "להשיג, להשלים", partOfSpeech: "verb", example: "You can accomplish anything with hard work." },
+  { id: "hard-2", english: "significant", hebrew: "משמעותי, בעל ערך", partOfSpeech: "adjective", example: "This is a significant discovery for science." },
+  { id: "hard-3", english: "acquire", hebrew: "לרכוש (ידע או מיומנות)", partOfSpeech: "verb", example: "It takes time to acquire a new language." },
+  { id: "hard-4", english: "evaluate", hebrew: "להעריך", partOfSpeech: "verb", example: "Teachers evaluate students' writing practice." },
+  { id: "hard-5", english: "analyze", hebrew: "לנתח", partOfSpeech: "verb", example: "We need to analyze the data before writing the report." },
+  { id: "hard-6", english: "comprehend", hebrew: "להבין", partOfSpeech: "verb", example: "The text was hard to comprehend without a dictionary." },
+  { id: "hard-7", english: "advocate", hebrew: "לתמוך, להמליץ", partOfSpeech: "verb", example: "Many teachers advocate for healthy lifestyle habits." },
+  { id: "hard-8", english: "investigate", hebrew: "לחקור", partOfSpeech: "verb", example: "Police officers investigate crimes." },
+  { id: "hard-9", english: "alternative", hebrew: "חלופה, אלטרנטיבה", partOfSpeech: "noun", example: "Is there an alternative way to solve this?" },
+  { id: "hard-10", english: "consequence", hebrew: "תוצאה, השלכה", partOfSpeech: "noun", example: "Every action has a natural consequence." },
+  { id: "hard-11", english: "diminish", hebrew: "להפחית, לצמצם", partOfSpeech: "verb", example: "Taking medicine will diminish the pain." },
+  { id: "hard-12", english: "emphasize", hebrew: "להגביה, להדגיש", partOfSpeech: "verb", example: "The teacher wanted to emphasize the spelling rules." },
+  { id: "hard-13", english: "restrict", hebrew: "להגביל", partOfSpeech: "verb", example: "The school wants to restrict phone usage in class." },
+  { id: "hard-14", english: "vocabulary", hebrew: "אוצר מילים", partOfSpeech: "noun", example: "Reading books is the best way to expand your vocabulary." },
+  { id: "hard-15", english: "sequence", hebrew: "רצף, סדר", partOfSpeech: "noun", example: "Connectors help organize the sequence of ideas in an essay." }
+];
+
+
 const FALLBACK_DISTRACTORS = [
   { english: "explore", hebrew: "לחקור" },
   { english: "create", hebrew: "ליצור" },
@@ -94,6 +149,11 @@ export default function VocabTrainerPage() {
   const [activeTab, setActiveTab] = useState<"manage" | "flashcards" | "quiz" | "spelling" | "match">("manage");
   const [words, setWords] = useState<Word[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+
+  // Quiz Configuration States
+  const [quizConfigured, setQuizConfigured] = useState(false);
+  const [quizWordSource, setQuizWordSource] = useState<"custom" | "random">("custom");
+  const [quizDifficulty, setQuizDifficulty] = useState<"easy" | "medium" | "hard">("easy");
 
   // Sound & Speech Synthesis
   const [speechSupported, setSpeechSupported] = useState(false);
@@ -432,11 +492,12 @@ export default function VocabTrainerPage() {
   };
 
   // --- Quiz Logic ---
-  const startNewQuiz = () => {
-    if (words.length === 0) return;
+  const startNewQuiz = (customList?: Word[]) => {
+    const listToUse = customList || words;
+    if (listToUse.length === 0) return;
     
-    const shuffledWords = [...words].sort(() => Math.random() - 0.5);
-    const selectedWords = shuffledWords.slice(0, Math.min(10, words.length));
+    const shuffledWords = [...listToUse].sort(() => Math.random() - 0.5);
+    const selectedWords = shuffledWords.slice(0, Math.min(10, listToUse.length));
     
     const questions: QuizQuestion[] = selectedWords.map(word => {
       const qTypes: Array<"en-to-he" | "he-to-en" | "fill-blank"> = ["en-to-he", "he-to-en"];
@@ -464,7 +525,7 @@ export default function VocabTrainerPage() {
 
       const distractors: string[] = [];
       const isEnglishAnswer = chosenType === "he-to-en" || chosenType === "fill-blank";
-      const listSources = words.filter(w => w.id !== word.id);
+      const listSources = listToUse.filter(w => w.id !== word.id);
       
       while (distractors.length < 3) {
         if (listSources.length > distractors.length) {
@@ -691,14 +752,14 @@ export default function VocabTrainerPage() {
   };
 
   useEffect(() => {
-    if (words.length > 0) {
-      if (activeTab === "quiz") {
-        startNewQuiz();
-      } else if (activeTab === "spelling") {
-        startNewSpelling();
-      } else if (activeTab === "match") {
-        startNewMatchGame();
-      }
+    if (activeTab === "quiz") {
+      setQuizConfigured(false);
+      setQuizQuestions([]);
+      setQuizFinished(false);
+    } else if (activeTab === "spelling") {
+      if (words.length > 0) startNewSpelling();
+    } else if (activeTab === "match") {
+      if (words.length >= 4) startNewMatchGame();
     }
     setIsCardFlipped(false);
     
@@ -706,7 +767,7 @@ export default function VocabTrainerPage() {
       clearInterval(timerIntervalRef.current);
       setMatchGameActive(false);
     }
-  }, [activeTab, words.length]);
+  }, [activeTab]);
 
   useEffect(() => {
     return () => {
@@ -867,8 +928,7 @@ export default function VocabTrainerPage() {
 
           <button
             onClick={() => setActiveTab("quiz")}
-            disabled={words.length === 0}
-            className={`px-4 py-2 rounded-xl text-xs md:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 border disabled:opacity-50 disabled:cursor-not-allowed ${getTabClass("quiz")}`}
+            className={`px-4 py-2 rounded-xl text-xs md:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 border ${getTabClass("quiz")}`}
           >
             <HelpCircle className="w-4 h-4" />
             <span>מבחן אמריקאי</span>
@@ -1337,7 +1397,7 @@ export default function VocabTrainerPage() {
               )}
 
               {/* TAB 3: QUIZ */}
-              {activeTab === "quiz" && words.length > 0 && (
+              {activeTab === "quiz" && (
                 <motion.div
                   key="quiz"
                   initial={{ opacity: 0, y: 10 }}
@@ -1345,7 +1405,120 @@ export default function VocabTrainerPage() {
                   exit={{ opacity: 0, y: -10 }}
                   className="max-w-xl mx-auto space-y-6"
                 >
-                  {quizQuestions.length === 0 ? (
+                  {!quizConfigured ? (
+                    /* QUIZ CONFIGURATION PANEL */
+                    <div className={`rounded-2xl border p-8 text-right space-y-6 ${cardStyle}`}>
+                      <div className={`border-b pb-4 mb-4 ${borderTheme}`}>
+                        <h3 className={`text-xl font-bold flex items-center gap-2 ${textTitle}`}>
+                          <HelpCircle className="w-5 h-5 text-cyan-500" />
+                          <span>הגדרת מבחן אוצר מילים</span>
+                        </h3>
+                        <p className={`text-xs mt-1 ${textMuted}`}>בחרו את מקור המילים ורמת הקושי למבחן שלכם</p>
+                      </div>
+
+                      {/* Source Selection */}
+                      <div className="space-y-3">
+                        <label className={`text-xs font-bold ${textTitle}`}>מקור המילים:</label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {/* Option A: Custom Words */}
+                          <button
+                            onClick={() => setQuizWordSource("custom")}
+                            disabled={words.length === 0}
+                            className={`p-4 border rounded-xl text-right transition-all flex flex-col justify-between h-24 disabled:opacity-50 disabled:cursor-not-allowed ${
+                              quizWordSource === "custom" && words.length > 0
+                                ? "border-cyan-500 bg-cyan-500/5 text-cyan-400 font-bold"
+                                : isLight ? "border-zinc-200 bg-white hover:bg-zinc-50" : "border-border-custom bg-surface hover:bg-surface-hover"
+                            }`}
+                          >
+                            <span className={`text-sm ${quizWordSource === "custom" && words.length > 0 ? "text-cyan-500" : textTitle}`}>המילים שלי ({words.length})</span>
+                            <span className={`text-[10px] font-normal leading-normal ${textMuted}`}>
+                              {words.length === 0 ? "מאגר המילים שלכם ריק" : "מבחן המורכב מהמילים שהוספתם למאגר"}
+                            </span>
+                          </button>
+
+                          {/* Option B: Random Words */}
+                          <button
+                            onClick={() => setQuizWordSource("random")}
+                            className={`p-4 border rounded-xl text-right transition-all flex flex-col justify-between h-24 ${
+                              quizWordSource === "random"
+                                ? "border-cyan-500 bg-cyan-500/5 text-cyan-400 font-bold"
+                                : isLight ? "border-zinc-200 bg-white hover:bg-zinc-50" : "border-border-custom bg-surface hover:bg-surface-hover"
+                            }`}
+                          >
+                            <span className={`text-sm ${quizWordSource === "random" ? "text-cyan-500" : textTitle}`}>מילים אקראיות מהמערכת</span>
+                            <span className={`text-[10px] font-normal leading-normal ${textMuted}`}>מבחן מבוסס על מאגר מילים מובנה ומסווג לפי רמת קושי</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Difficulty Selection (only shown if random source is selected) */}
+                      {quizWordSource === "random" && (
+                        <div className="space-y-3 pt-2">
+                          <label className={`text-xs font-bold ${textTitle}`}>רמת קושי:</label>
+                          <div className="grid grid-cols-3 gap-3">
+                            <button
+                              onClick={() => setQuizDifficulty("easy")}
+                              className={`py-3 px-2 border rounded-xl text-xs font-bold transition-all ${
+                                quizDifficulty === "easy"
+                                  ? "border-cyan-500 bg-cyan-500/5 text-cyan-500"
+                                  : isLight ? "border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700" : "border-border-custom bg-surface hover:bg-surface-hover text-zinc-300"
+                              }`}
+                            >
+                              רמה 1 (קל)
+                            </button>
+                            <button
+                              onClick={() => setQuizDifficulty("medium")}
+                              className={`py-3 px-2 border rounded-xl text-xs font-bold transition-all ${
+                                quizDifficulty === "medium"
+                                  ? "border-cyan-500 bg-cyan-500/5 text-cyan-500"
+                                  : isLight ? "border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700" : "border-border-custom bg-surface hover:bg-surface-hover text-zinc-300"
+                              }`}
+                            >
+                              רמה 2 (בינוני)
+                            </button>
+                            <button
+                              onClick={() => setQuizDifficulty("hard")}
+                              className={`py-3 px-2 border rounded-xl text-xs font-bold transition-all ${
+                                quizDifficulty === "hard"
+                                  ? "border-cyan-500 bg-cyan-500/5 text-cyan-500"
+                                  : isLight ? "border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700" : "border-border-custom bg-surface hover:bg-surface-hover text-zinc-300"
+                              }`}
+                            >
+                              רמה 3 (קשה)
+                            </button>
+                          </div>
+                          <p className={`text-[10px] leading-relaxed italic ${textMuted}`}>
+                            {quizDifficulty === "easy" && "* רמה 1 כוללת מילים יומיומיות ובסיסיות כמו simple, happy, garden ו-travel."}
+                            {quizDifficulty === "medium" && "* רמה 2 כוללת מילות קישור ותיאור נפוצות כמו determine, improve, challenge ו-typical."}
+                            {quizDifficulty === "hard" && "* רמה 3 כוללת מילים גבוהות להבעה וניתוח כגון accomplish, analyze, significant ו-evaluate."}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Start Quiz Action */}
+                      <div className="pt-4 flex justify-end">
+                        <button
+                          onClick={() => {
+                            if (quizWordSource === "custom") {
+                              startNewQuiz(words);
+                            } else {
+                              const chosenList = quizDifficulty === "easy" 
+                                ? EASY_WORDS 
+                                : quizDifficulty === "medium" 
+                                  ? MEDIUM_WORDS 
+                                  : HARD_WORDS;
+                              startNewQuiz(chosenList);
+                            }
+                            setQuizConfigured(true);
+                          }}
+                          className="px-6 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+                        >
+                          <span>התחל מבחן</span>
+                          <ArrowRight className="w-4 h-4 rotate-180" />
+                        </button>
+                      </div>
+                    </div>
+                  ) : quizQuestions.length === 0 ? (
                     <div className={`text-center py-10 ${textMuted}`}>מייצר שאלות...</div>
                   ) : !quizFinished ? (
                     <div className={`rounded-2xl border p-8 text-right space-y-6 ${cardStyle}`}>
@@ -1461,11 +1634,33 @@ export default function VocabTrainerPage() {
 
                       <div className="flex justify-center gap-3">
                         <button
-                          onClick={startNewQuiz}
+                          onClick={() => {
+                            if (quizWordSource === "custom") {
+                              startNewQuiz(words);
+                            } else {
+                              const chosenList = quizDifficulty === "easy" 
+                                ? EASY_WORDS 
+                                : quizDifficulty === "medium" 
+                                  ? MEDIUM_WORDS 
+                                  : HARD_WORDS;
+                              startNewQuiz(chosenList);
+                            }
+                          }}
                           className="px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs transition-all cursor-pointer flex items-center gap-2 shadow-sm"
                         >
                           <RotateCcw className="w-4 h-4" />
                           <span>בוחן חדש</span>
+                        </button>
+
+                        <button
+                          onClick={() => setQuizConfigured(false)}
+                          className={`px-5 py-2.5 rounded-xl border text-xs font-semibold cursor-pointer transition-colors ${
+                            isLight
+                              ? "border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700"
+                              : "border-border-custom bg-surface hover:bg-surface-hover text-zinc-300 hover:text-white"
+                          }`}
+                        >
+                          הגדרות מבחן
                         </button>
 
                         <button

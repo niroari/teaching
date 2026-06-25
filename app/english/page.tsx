@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { ArrowLeft, BookOpen } from "lucide-react";
+import { ArrowLeft, BookOpen, Presentation, Gamepad2, GraduationCap } from "lucide-react";
 
 const ENGLISH_SECTIONS = [
   {
@@ -9,7 +9,8 @@ const ENGLISH_SECTIONS = [
     desc: "משחק מכירה פומבית כיתתי מהנה ומאתגר לתרגול ושיפור חוקי הדקדוק ובניית משפטים באנגלית.",
     bgUrl: "/sentence_auction_cover.png",
     link: "/english-auction",
-    badge: "משחק כיתתי"
+    badge: "משחק כיתתי",
+    category: "משחקים"
   },
   {
     slug: "vocab-trainer",
@@ -17,7 +18,8 @@ const ENGLISH_SECTIONS = [
     desc: "הוסיפו את המילים שאתם צריכים ללמוד, ותרגלו אותן דרך כרטיסיות, בחנים אינטראקטיביים ומשחקי התאמה מהירים.",
     bgUrl: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=800&q=80",
     link: "/english/vocab-trainer",
-    badge: "תרגול אישי"
+    badge: "תרגול אישי",
+    category: "למידה ותרגול"
   },
   {
     slug: "unseen-practice",
@@ -25,7 +27,8 @@ const ENGLISH_SECTIONS = [
     desc: "למדו את השיטה הסודית לפיצוח קטעי קריאה באנגלית בקלות ובמהירות מבלי לקרוא את כל הטקסט מראש!",
     bgUrl: "/detective.png",
     link: "/english/unseen-practice",
-    badge: "תרגול אסטרטגיה"
+    badge: "תרגול אסטרטגיה",
+    category: "למידה ותרגול"
   },
   {
     slug: "adjectives",
@@ -33,7 +36,8 @@ const ENGLISH_SECTIONS = [
     desc: "מצגת למידה אינטראקטיבית בנושא שמות תואר באנגלית, תפקידם במשפט ושימוש נכון לתיאור שמות עצם.",
     bgUrl: "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&w=800&q=80",
     link: "/english/adjectives",
-    badge: "מצגת למידה"
+    badge: "מצגת למידה",
+    category: "מצגות"
   },
   {
     slug: "simone-biles",
@@ -41,7 +45,8 @@ const ENGLISH_SECTIONS = [
     desc: "תרגול זמני הווה (Present Simple & Progressive) לכיתה ז׳ המבוסס על סיפורה מעורר ההשראה של סימון ביילס.",
     bgUrl: "/simone_biles_cover.png",
     link: "/english/simone-biles",
-    badge: "מצגת למידה"
+    badge: "מצגת למידה",
+    category: "מצגות"
   },
   {
     slug: "past-simple",
@@ -49,7 +54,8 @@ const ENGLISH_SECTIONS = [
     desc: "מצגת למידה כיתתית בנושא עבר פשוט (Past Simple), חוקי הדקדוק, הוספת d/ed/ied לפעלים רגילים, פעלים יוצאי דופן (Irregular Verbs) ומבנה משפטי חיוב ושלילה.",
     bgUrl: "/past_simple_cover.png",
     link: "/english/past-simple",
-    badge: "מצגת למידה"
+    badge: "מצגת למידה",
+    category: "מצגות"
   },
   {
     slug: "writing-practice",
@@ -57,11 +63,39 @@ const ENGLISH_SECTIONS = [
     desc: "שפרו את מיומנות הכתיבה שלכם באנגלית. כיתבו חיבורים או מכתבים וקבלו משוב מיידי מבוסס בינה מלאכותית על דקדוק, מבנה ואוצר מילים.",
     bgUrl: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=800&q=80",
     link: "/english/writing-practice",
-    badge: "אימון כתיבה"
+    badge: "אימון כתיבה",
+    category: "למידה ותרגול"
   }
 ];
 
 export default function EnglishHubPage() {
+  const CATEGORIES = [
+    {
+      id: "presentations",
+      title: "מצגות",
+      subtitle: "מצגות למידה והסברי דקדוק אינטראקטיביים",
+      icon: Presentation,
+      colorClass: "text-sky-400 bg-sky-500/10 border-sky-500/20",
+      items: ENGLISH_SECTIONS.filter(sec => sec.category === "מצגות")
+    },
+    {
+      id: "games",
+      title: "משחקים",
+      subtitle: "משחקים כיתתיים ואינטראקטיביים לתרגול חווייתי",
+      icon: Gamepad2,
+      colorClass: "text-amber-400 bg-amber-500/10 border-amber-500/20",
+      items: ENGLISH_SECTIONS.filter(sec => sec.category === "משחקים")
+    },
+    {
+      id: "practice",
+      title: "למידה ותרגול",
+      subtitle: "שינון אוצר מילים, כתיבה ושיפור מיומנויות",
+      icon: GraduationCap,
+      colorClass: "text-teal-400 bg-teal-500/10 border-teal-500/20",
+      items: ENGLISH_SECTIONS.filter(sec => sec.category === "למידה ותרגול")
+    }
+  ];
+
   return (
     <div className="relative min-h-screen bg-[#080c18] text-[#e8edf8] flex flex-col justify-between overflow-hidden">
       {/* Background Glow */}
@@ -88,46 +122,69 @@ export default function EnglishHubPage() {
           <p className="text-text-muted text-sm mt-2">בחרו כלי לתרגול דקדוק או שינון אוצר מילים</p>
         </div>
 
-        {/* Sections Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mt-4">
-          {ENGLISH_SECTIONS.map((sec) => (
-            <Link
-              key={sec.slug}
-              href={sec.link}
-              className="group glass-card rounded-2xl border border-border-custom hover:border-english/40 hover:shadow-[0_12px_40px_rgba(0,200,255,0.1)] transition-all duration-300 flex flex-col overflow-hidden"
-            >
-              {/* Header Image with Gradient overlay */}
-              <div
-                className="h-48 bg-cover bg-center relative"
-                style={{
-                  backgroundImage: `url('${sec.bgUrl}')`
-                }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-t from-[#080c18] via-transparent to-transparent opacity-80" />
-                
-                {/* Badge */}
-                <span className="absolute top-4 right-4 text-[10px] font-bold px-2.5 py-1 bg-surface/80 border border-border-custom rounded-full text-text-muted group-hover:text-english group-hover:border-english/30 transition-all">
-                  {sec.badge}
-                </span>
-              </div>
+        {/* Categories Sections */}
+        <div className="space-y-16 w-full mt-4">
+          {CATEGORIES.map((cat) => {
+            const IconComponent = cat.icon;
+            if (cat.items.length === 0) return null;
 
-              {/* Body */}
-              <div className="p-8 flex-1 flex flex-col justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold text-white group-hover:text-english transition-colors">
-                    {sec.title}
-                  </h3>
-                  <p className="text-text-muted text-sm leading-relaxed mt-4">
-                    {sec.desc}
-                  </p>
+            return (
+              <div key={cat.id} className="relative space-y-6">
+                {/* Section Header */}
+                <div className="flex items-center gap-3 border-b border-[#1e293b]/70 pb-4 justify-start">
+                  <div className={`p-2 rounded-xl border ${cat.colorClass} flex items-center justify-center shrink-0`}>
+                    <IconComponent className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-white">{cat.title}</h2>
+                    <p className="text-text-muted text-xs mt-0.5">{cat.subtitle}</p>
+                  </div>
                 </div>
-                <div className="mt-8 flex items-center gap-2 text-sm font-bold text-english group-hover:translate-x-[-6px] transition-transform">
-                  <span>כניסה לפעילות</span>
-                  <ArrowLeft className="w-4 h-4" />
+
+                {/* Cards Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+                  {cat.items.map((sec) => (
+                    <Link
+                      key={sec.slug}
+                      href={sec.link}
+                      className="group glass-card rounded-2xl border border-border-custom hover:border-english/40 hover:shadow-[0_12px_40px_rgba(0,200,255,0.1)] transition-all duration-300 flex flex-col overflow-hidden"
+                    >
+                      {/* Header Image with Gradient overlay */}
+                      <div
+                        className="h-40 bg-cover bg-center relative"
+                        style={{
+                          backgroundImage: `url('${sec.bgUrl}')`
+                        }}
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#080c18] via-transparent to-transparent opacity-80" />
+                        
+                        {/* Badge */}
+                        <span className="absolute top-4 right-4 text-[10px] font-bold px-2.5 py-1 bg-surface/80 border border-border-custom rounded-full text-text-muted group-hover:text-english group-hover:border-english/30 transition-all">
+                          {sec.badge}
+                        </span>
+                      </div>
+
+                      {/* Body */}
+                      <div className="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                          <h3 className="text-xl font-bold text-white group-hover:text-english transition-colors">
+                            {sec.title}
+                          </h3>
+                          <p className="text-text-muted text-xs leading-relaxed mt-3">
+                            {sec.desc}
+                          </p>
+                        </div>
+                        <div className="mt-6 flex items-center gap-2 text-xs font-bold text-english group-hover:translate-x-[-4px] transition-transform">
+                          <span>כניסה לפעילות</span>
+                          <ArrowLeft className="w-3.5 h-3.5" />
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
               </div>
-            </Link>
-          ))}
+            );
+          })}
         </div>
 
       </div>

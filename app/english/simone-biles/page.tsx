@@ -1,11 +1,35 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowRight, BookOpen, RefreshCw } from "lucide-react";
 
 export default function SimoneBilesPage() {
   const [iframeLoading, setIframeLoading] = useState(true);
+  const router = useRouter();
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const replaceCalled = useRef(false);
+
+  useEffect(() => {
+    // Prevent iframe history pollution by using location.replace
+    if (iframeRef.current && !replaceCalled.current) {
+      replaceCalled.current = true;
+      iframeRef.current.contentWindow?.location.replace("https://gamma.app/embed/7djedatyxrp4fbu");
+    }
+
+    // Intercept browser back button
+    window.history.pushState(null, "", window.location.href);
+    
+    const handlePopState = () => {
+      router.push("/english");
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [router]);
 
   return (
     <div className="relative min-h-screen bg-[#080c18] text-[#e8edf8] flex flex-col justify-between overflow-hidden">
@@ -31,7 +55,7 @@ export default function SimoneBilesPage() {
             <span>זמני הווה לכיתה ז׳ (Present Tenses)</span>
           </div>
           <h1 className="text-3xl font-black text-white">Simone Biles – A Real Hero</h1>
-          <p className="text-text-muted text-xs mt-1.5">תרגול אינטראקטיבי של Present Simple & Present Progressive המבוסס על סיפורה של סימון ביילס</p>
+          <p className="text-text-muted text-xs mt-1.5">תרגול אינטראקטיבי של Present Simple & Present Progressive המבוסס על סיפורה מעורר ההשראה של סימון ביילס</p>
         </div>
 
         {/* Embedded Presentation Container */}
@@ -44,11 +68,15 @@ export default function SimoneBilesPage() {
           )}
           
           <iframe
-            src="https://gamma.app/embed/7djedatyxrp4fbu"
+            ref={iframeRef}
             allowFullScreen
             loading="lazy"
             title="Simone Biles – A Real Hero"
-            onLoad={() => setIframeLoading(false)}
+            onLoad={() => {
+              if (replaceCalled.current) {
+                setIframeLoading(false);
+              }
+            }}
             className="w-full h-full border-0 absolute inset-0"
             allow="fullscreen"
           />

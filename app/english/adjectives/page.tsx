@@ -1,11 +1,35 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowRight, BookOpen, RefreshCw } from "lucide-react";
 
 export default function AdjectivesPage() {
   const [iframeLoading, setIframeLoading] = useState(true);
+  const router = useRouter();
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const replaceCalled = useRef(false);
+
+  useEffect(() => {
+    // Prevent iframe history pollution by using location.replace
+    if (iframeRef.current && !replaceCalled.current) {
+      replaceCalled.current = true;
+      iframeRef.current.contentWindow?.location.replace("https://gamma.app/embed/n3mqlktb3wvzfl0");
+    }
+
+    // Intercept browser back button
+    window.history.pushState(null, "", window.location.href);
+    
+    const handlePopState = () => {
+      router.push("/english");
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [router]);
 
   return (
     <div className="relative min-h-screen bg-[#080c18] text-[#e8edf8] flex flex-col justify-between overflow-hidden">
@@ -44,11 +68,15 @@ export default function AdjectivesPage() {
           )}
           
           <iframe
-            src="https://gamma.app/embed/n3mqlktb3wvzfl0"
+            ref={iframeRef}
             allowFullScreen
             loading="lazy"
             title="Adjectives: Words That Describe!"
-            onLoad={() => setIframeLoading(false)}
+            onLoad={() => {
+              if (replaceCalled.current) {
+                setIframeLoading(false);
+              }
+            }}
             className="w-full h-full border-0 absolute inset-0"
             allow="fullscreen"
           />
@@ -63,3 +91,4 @@ export default function AdjectivesPage() {
     </div>
   );
 }
+

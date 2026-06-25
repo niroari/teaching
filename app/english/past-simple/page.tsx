@@ -1,15 +1,39 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowRight, BookOpen, RefreshCw } from "lucide-react";
 
 export default function PastSimplePresentationPage() {
   const [iframeLoading, setIframeLoading] = useState(true);
+  const router = useRouter();
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const replaceCalled = useRef(false);
 
   // REPLACE the URL below with your own Google Slides embed link:
   // How to get it: File -> Share -> Publish to web -> Embed -> Copy the src URL inside the iframe tag.
   const googleSlidesEmbedUrl = "https://docs.google.com/presentation/d/e/2PACX-1vS3QJ63YyCbxmP8ALhBiXGOAiSRb-0yrwxfprGe3nPHYDoiDQVQyQ_hvSdY_Agft5yZyUryp5_gMY3A/pubembed?start=false&loop=false&delayms=30000";
+
+  useEffect(() => {
+    // Prevent iframe history pollution by using location.replace
+    if (iframeRef.current && !replaceCalled.current) {
+      replaceCalled.current = true;
+      iframeRef.current.contentWindow?.location.replace(googleSlidesEmbedUrl);
+    }
+
+    // Intercept browser back button
+    window.history.pushState(null, "", window.location.href);
+    
+    const handlePopState = () => {
+      router.push("/english");
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [router, googleSlidesEmbedUrl]);
 
   return (
     <div className="relative min-h-screen bg-[#080c18] text-[#e8edf8] flex flex-col justify-between overflow-hidden">
@@ -48,11 +72,15 @@ export default function PastSimplePresentationPage() {
           )}
           
           <iframe
-            src={googleSlidesEmbedUrl}
+            ref={iframeRef}
             allowFullScreen
             loading="lazy"
             title="Past Simple Presentation"
-            onLoad={() => setIframeLoading(false)}
+            onLoad={() => {
+              if (replaceCalled.current) {
+                setIframeLoading(false);
+              }
+            }}
             className="w-full h-full border-0 absolute inset-0"
             allow="fullscreen"
           />

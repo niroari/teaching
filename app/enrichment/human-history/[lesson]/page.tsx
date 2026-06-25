@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { ArrowLeft, BookOpen } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { ArrowLeft, BookOpen, RefreshCw } from "lucide-react";
 
 interface LessonData {
   title: string;
@@ -46,8 +46,35 @@ const LESSONS_DATA: Record<string, LessonData> = {
 
 export default function LessonPresentationPage() {
   const { lesson } = useParams();
+  const router = useRouter();
   const slug = typeof lesson === "string" ? lesson : "";
   const data = LESSONS_DATA[slug];
+
+  const [iframeLoading, setIframeLoading] = useState(true);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const replaceCalled = useRef(false);
+
+  useEffect(() => {
+    if (!data) return;
+
+    // Prevent iframe history pollution by using location.replace
+    if (iframeRef.current && !replaceCalled.current) {
+      replaceCalled.current = true;
+      iframeRef.current.contentWindow?.location.replace(data.embedUrl);
+    }
+
+    // Intercept browser back button
+    window.history.pushState(null, "", window.location.href);
+    
+    const handlePopState = () => {
+      router.push("/enrichment/human-history");
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [router, data]);
 
   if (!data) {
     return (
@@ -90,12 +117,24 @@ export default function LessonPresentationPage() {
         </div>
 
         {/* Embedded Presentation Container */}
-        <div className="flex-1 w-full bg-surface border border-border-custom rounded-2xl overflow-hidden shadow-2xl relative min-h-[500px] lg:min-h-[600px] flex">
+        <div className="flex-1 w-full bg-surface border border-border-custom rounded-2xl overflow-hidden shadow-2xl relative min-h-[500px] lg:min-h-[600px] flex items-center justify-center">
+          {iframeLoading && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#080c18]/80 z-20 space-y-3">
+              <RefreshCw className="w-8 h-8 text-amber-500 animate-spin" />
+              <span className="text-sm text-text-muted">טוען שיעור...</span>
+            </div>
+          )}
+          
           <iframe
-            src={data.embedUrl}
+            ref={iframeRef}
             allowFullScreen
             loading="lazy"
             title={data.title}
+            onLoad={() => {
+              if (replaceCalled.current) {
+                setIframeLoading(false);
+              }
+            }}
             className="w-full h-full border-0 absolute inset-0"
             allow="fullscreen"
           />

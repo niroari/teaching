@@ -71,6 +71,14 @@ const ENGLISH_SECTIONS = [
 export default function EnglishHubPage() {
   const CATEGORIES = [
     {
+      id: "practice",
+      title: "למידה ותרגול",
+      subtitle: "שינון אוצר מילים, כתיבה ושיפור מיומנויות",
+      icon: GraduationCap,
+      colorClass: "text-teal-400 bg-teal-500/10 border-teal-500/20",
+      items: ENGLISH_SECTIONS.filter(sec => sec.category === "למידה ותרגול")
+    },
+    {
       id: "presentations",
       title: "מצגות",
       subtitle: "מצגות למידה והסברי דקדוק אינטראקטיביים",
@@ -85,14 +93,6 @@ export default function EnglishHubPage() {
       icon: Gamepad2,
       colorClass: "text-amber-400 bg-amber-500/10 border-amber-500/20",
       items: ENGLISH_SECTIONS.filter(sec => sec.category === "משחקים")
-    },
-    {
-      id: "practice",
-      title: "למידה ותרגול",
-      subtitle: "שינון אוצר מילים, כתיבה ושיפור מיומנויות",
-      icon: GraduationCap,
-      colorClass: "text-teal-400 bg-teal-500/10 border-teal-500/20",
-      items: ENGLISH_SECTIONS.filter(sec => sec.category === "למידה ותרגול")
     }
   ];
 

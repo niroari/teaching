@@ -166,7 +166,13 @@ export default function VocabTrainerPage() {
       setIsLoaded(false);
       if (user) {
         try {
-          const querySnapshot = await getDocs(collection(dbFirestore, "users", user.uid, "words"));
+          // Race getDocs against a 2.5-second timeout to prevent page hangs if Firestore is offline or blocked
+          const fetchPromise = getDocs(collection(dbFirestore, "users", user.uid, "words"));
+          const timeoutPromise = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error("Firestore fetch timeout")), 2500)
+          );
+
+          const querySnapshot = await Promise.race([fetchPromise, timeoutPromise]);
           const firestoreWords: Word[] = [];
           querySnapshot.forEach((doc) => {
             firestoreWords.push(doc.data() as Word);

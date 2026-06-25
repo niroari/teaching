@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, BookOpen, RefreshCw } from "lucide-react";
 
-export default function PresentSimplePresentationPage() {
+export default function PastSimplePresentationPage() {
   const [iframeLoading, setIframeLoading] = useState(true);
 
   // REPLACE the URL below with your own Google Slides embed link:
@@ -32,10 +32,10 @@ export default function PresentSimplePresentationPage() {
         <div className="text-right mb-8">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-surface border border-border-custom rounded-full text-xs font-bold text-english mb-3">
             <BookOpen className="w-3.5 h-3.5" />
-            <span>הווה פשוט (Present Simple)</span>
+            <span>עבר פשוט (Past Simple)</span>
           </div>
-          <h1 className="text-3xl font-black text-white">Present Simple - Class Presentation</h1>
-          <p className="text-text-muted text-xs mt-1.5">מצגת למידה כיתתית לתרגול חוקי הדקדוק, הוספת s/es/ies לפעלים ומבנה משפטי חיוב ושלילה</p>
+          <h1 className="text-3xl font-black text-white">Past Simple - Class Presentation</h1>
+          <p className="text-text-muted text-xs mt-1.5">מצגת למידה כיתתית לתרגול חוקי הדקדוק, הוספת d/ed/ied לפעלים רגילים, פעלים יוצאי דופן (Irregular Verbs) ומבנה משפטי חיוב ושלילה</p>
         </div>
 
         {/* Embedded Presentation Container */}
@@ -51,7 +51,7 @@ export default function PresentSimplePresentationPage() {
             src={googleSlidesEmbedUrl}
             allowFullScreen
             loading="lazy"
-            title="Present Simple Presentation"
+            title="Past Simple Presentation"
             onLoad={() => setIframeLoading(false)}
             className="w-full h-full border-0 absolute inset-0"
             allow="fullscreen"

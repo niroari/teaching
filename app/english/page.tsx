@@ -44,11 +44,11 @@ const ENGLISH_SECTIONS = [
     badge: "מצגת למידה"
   },
   {
-    slug: "present-simple",
-    title: "הווה פשוט (Present Simple)",
-    desc: "מצגת למידה כיתתית בנושא הווה פשוט (Present Simple), חוקי הדקדוק, הוספת s/es/ies לפעלים ומבנה משפטי חיוב ושלילה.",
-    bgUrl: "/present_simple_cover.png",
-    link: "/english/present-simple",
+    slug: "past-simple",
+    title: "עבר פשוט (Past Simple)",
+    desc: "מצגת למידה כיתתית בנושא עבר פשוט (Past Simple), חוקי הדקדוק, הוספת d/ed/ied לפעלים רגילים, פעלים יוצאי דופן (Irregular Verbs) ומבנה משפטי חיוב ושלילה.",
+    bgUrl: "/past_simple_cover.png",
+    link: "/english/past-simple",
     badge: "מצגת למידה"
   }
 ];

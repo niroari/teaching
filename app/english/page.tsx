@@ -50,6 +50,14 @@ const ENGLISH_SECTIONS = [
     bgUrl: "/past_simple_cover.png",
     link: "/english/past-simple",
     badge: "מצגת למידה"
+  },
+  {
+    slug: "writing-practice",
+    title: "תרגול כתיבה (Writing Practice)",
+    desc: "שפרו את מיומנות הכתיבה שלכם באנגלית. כיתבו חיבורים או מכתבים וקבלו משוב מיידי מבוסס בינה מלאכותית על דקדוק, מבנה ואוצר מילים.",
+    bgUrl: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=800&q=80",
+    link: "/english/writing-practice",
+    badge: "אימון כתיבה"
   }
 ];
 

@@ -9,7 +9,7 @@ export default function PastSimplePresentationPage() {
 
   // REPLACE the URL below with your own Google Slides embed link:
   // How to get it: File -> Share -> Publish to web -> Embed -> Copy the src URL inside the iframe tag.
-  const googleSlidesEmbedUrl = "https://docs.google.com/presentation/d/e/2PACX-1vQG_YOUR_PRESENTATION_ID_HERE/embed?start=false&loop=false&delayms=3000";
+  const googleSlidesEmbedUrl = "https://docs.google.com/presentation/d/e/2PACX-1vS3QJ63YyCbxmP8ALhBiXGOAiSRb-0yrwxfprGe3nPHYDoiDQVQyQ_hvSdY_Agft5yZyUryp5_gMY3A/pubembed?start=false&loop=false&delayms=30000";
 
   return (
     <div className="relative min-h-screen bg-[#080c18] text-[#e8edf8] flex flex-col justify-between overflow-hidden">

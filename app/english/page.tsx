@@ -39,9 +39,9 @@ const ENGLISH_SECTIONS = [
     slug: "simone-biles",
     title: "Simone Biles: Present Tenses",
     desc: "תרגול זמני הווה (Present Simple & Progressive) לכיתה ז׳ המבוסס על סיפורה מעורר ההשראה של סימון ביילס.",
-    bgUrl: "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&w=800&q=80",
+    bgUrl: "/simone_biles_cover.png",
     link: "/english/simone-biles",
-    badge: "תרגול ומשחק"
+    badge: "מצגת למידה"
   }
 ];
 

@@ -42,6 +42,14 @@ const ENGLISH_SECTIONS = [
     bgUrl: "/simone_biles_cover.png",
     link: "/english/simone-biles",
     badge: "מצגת למידה"
+  },
+  {
+    slug: "present-simple",
+    title: "הווה פשוט (Present Simple)",
+    desc: "מצגת למידה כיתתית בנושא הווה פשוט (Present Simple), חוקי הדקדוק, הוספת s/es/ies לפעלים ומבנה משפטי חיוב ושלילה.",
+    bgUrl: "/present_simple_cover.png",
+    link: "/english/present-simple",
+    badge: "מצגת למידה"
   }
 ];
 

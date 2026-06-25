@@ -26,6 +26,32 @@ import {
 import { useAuth } from "@/lib/context/AuthContext";
 import { PRE_GENERATED_UNSEENS, UnseenData } from "@/lib/unseen-data";
 
+// Helper function to calculate Levenshtein distance for spelling tolerance
+const getLevenshteinDistance = (a: string, b: string): number => {
+  const matrix = Array.from({ length: a.length + 1 }, () =>
+    Array(b.length + 1).fill(0)
+  );
+
+  for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
+  for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
+
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      if (a[i - 1] === b[j - 1]) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j] + 1,    // Deletion
+          matrix[i][j - 1] + 1,    // Insertion
+          matrix[i - 1][j - 1] + 1 // Substitution
+        );
+      }
+    }
+  }
+
+  return matrix[a.length][b.length];
+};
+
 export default function UnseenPracticePage() {
   const router = useRouter();
   const { user } = useAuth();
@@ -208,7 +234,32 @@ export default function UnseenPracticePage() {
     const userClean = clean(openAnswerText);
     const targetClean = clean(activeQuestion.targetSentence || "");
 
-    const isCorrectChoice = userClean === targetClean;
+    // 1. Check for exact match
+    let isCorrectChoice = userClean === targetClean;
+
+    // 2. Check for partial matching and typos if not exact
+    if (!isCorrectChoice && targetClean) {
+      // Check if user answer is a substring of the target, and contains a minimum amount of words/characters
+      const isSubstring = targetClean.includes(userClean) || userClean.includes(targetClean);
+      const userWordsCount = userClean.split(" ").filter(Boolean).length;
+      const targetWordsCount = targetClean.split(" ").filter(Boolean).length;
+
+      // Allow partial matches if they typed at least 3 words and at least 35% of the target words
+      const hasMinLength = userClean.length >= Math.min(10, targetClean.length * 0.3);
+      const hasMinWords = userWordsCount >= Math.min(3, Math.ceil(targetWordsCount * 0.35));
+
+      if (isSubstring && hasMinLength && hasMinWords) {
+        isCorrectChoice = true;
+      } else {
+        // Also check spelling tolerance (Levenshtein distance <= 15% of length, min 2 edits)
+        const dist = getLevenshteinDistance(userClean, targetClean);
+        const maxAllowedDist = Math.max(2, Math.floor(targetClean.length * 0.15));
+        if (dist <= maxAllowedDist) {
+          isCorrectChoice = true;
+        }
+      }
+    }
+
     setIsCorrect(isCorrectChoice);
     setAttempts((prev) => prev + 1);
     setShowFeedback(true);

@@ -7,7 +7,7 @@ const ENGLISH_SECTIONS = [
     slug: "sentence-auction",
     title: "The Sentence Auction",
     desc: "משחק מכירה פומבית כיתתי מהנה ומאתגר לתרגול ושיפור חוקי הדקדוק ובניית משפטים באנגלית.",
-    bgUrl: "https://negativespace.co/wp-content/uploads/2017/04/negative-space-closeup-vintage-typewriter-Custom-1.jpg",
+    bgUrl: "/sentence_auction_cover.png",
     link: "/english-auction",
     badge: "משחק כיתתי"
   },

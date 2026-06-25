@@ -79,7 +79,7 @@ export default function PortalHomePage() {
             <div
               className="h-48 bg-cover bg-center relative"
               style={{
-                backgroundImage: `url('https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Ardon_Mountain%2C_Ramon_Makhtesh%2C_Negev%2C_Israel_%D7%94%D7%A8_%D7%90%D7%A8%D7%93%D7%95%D7%9F%2C_%D7%9E%D7%9B%D7%AA%D7%A9_%D7%A8%D7%9E%D7%95%D7%9F%2C_%D7%9ה%D7%A8_%D7%9ה%D7%A0%D7%92%D7%91_-_panoramio.jpg/1000px-Ardon_Mountain%2C_Ramon_Makhtesh%2C_Negev%2C_Israel_%D7%94%D7%A8_%D7%90%D7%A8%D7%93%D7%95%D7%9F%2C_%D7%9E%D7%9B%D7%AA%D7%A9_%D7%A8%D7%9E%D7%95%D7%9F%2C_%D7%9ה%D7%A8_%D7%9ה%D7%A0%D7%92%D7%91_-_panoramio.jpg')`
+                backgroundImage: `url('/shelach_cover.png')`
               }}
             >
               <div className="absolute inset-0 bg-gradient-to-t from-[#080c18] via-transparent to-transparent opacity-80" />
@@ -109,7 +109,7 @@ export default function PortalHomePage() {
             <div
               className="h-48 bg-cover bg-center relative"
               style={{
-                backgroundImage: `url('https://negativespace.co/wp-content/uploads/2017/04/negative-space-closeup-vintage-typewriter-Custom-1.jpg')`
+                backgroundImage: `url('/english_cover.png')`
               }}
             >
               <div className="absolute inset-0 bg-gradient-to-t from-[#080c18] via-transparent to-transparent opacity-80" />

@@ -146,7 +146,7 @@ CRITICAL RULES:
       }
     };
 
-    const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-flash-latest"];
+    const modelsToTry = ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-flash-latest", "gemini-pro-latest", "gemini-2.5-flash-lite"];
     let response: Response | null = null;
     let errorText = "";
 

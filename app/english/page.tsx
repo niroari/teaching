@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { ArrowLeft, BookOpen, Presentation, Gamepad2, GraduationCap } from "lucide-react";
+import { ArrowLeft, BookOpen, Presentation, Gamepad2, GraduationCap, Sparkles } from "lucide-react";
 
 const ENGLISH_SECTIONS = [
   {
@@ -65,6 +65,15 @@ const ENGLISH_SECTIONS = [
     link: "/english/writing-practice",
     badge: "אימון כתיבה",
     category: "למידה ותרגול"
+  },
+  {
+    slug: "chat-masters",
+    title: "שיחה עם חבר AI (Chat Masters)",
+    desc: "נהלו שיחה באנגלית עם חבר בינה מלאכותית, בחרו את האופי שלו ותרגלו שיחה יומיומית באנגלית בסביבה תומכת ללא לחץ.",
+    bgUrl: "https://images.unsplash.com/photo-1531747118685-ca8fa6e08806?auto=format&fit=crop&w=800&q=80",
+    link: "/english/chat-masters",
+    badge: "פרויקט כיתתי",
+    category: "פרויקטים"
   }
 ];
 
@@ -93,6 +102,14 @@ export default function EnglishHubPage() {
       icon: Gamepad2,
       colorClass: "text-amber-400 bg-amber-500/10 border-amber-500/20",
       items: ENGLISH_SECTIONS.filter(sec => sec.category === "משחקים")
+    },
+    {
+      id: "projects",
+      title: "פרויקטים",
+      subtitle: "פרויקטים מעשיים ושימוש בבינה מלאכותית לתרגול שפה",
+      icon: Sparkles,
+      colorClass: "text-purple-400 bg-purple-500/10 border-purple-500/20",
+      items: ENGLISH_SECTIONS.filter(sec => sec.category === "פרויקטים")
     }
   ];
 

@@ -692,7 +692,7 @@ ${formattedTranscript}
                   {GUIDE_STEPS[currentGuideStep - 1].starters.length > 0 && (
                     <div className="mt-6 space-y-3">
                       <h4 className={`text-xs font-bold ${textTitle} border-r-2 border-purple-500 pr-2 mb-2`}>
-                        רעיונות למשפטים באנגלית (קליק להעתקה):
+                        רעיונות למשפטים באנגלית:
                       </h4>
                       <div className="space-y-2.5 max-h-[220px] overflow-y-auto pl-1 pr-0.5">
                         {GUIDE_STEPS[currentGuideStep - 1].starters.map((starter, sIdx) => {

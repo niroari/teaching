@@ -195,6 +195,7 @@ export default function ChatMastersPage() {
   
   // Setup inputs
   const [studentName, setStudentName] = useState("");
+  const [studentClass, setStudentClass] = useState("");
   const [selectedChar, setSelectedChar] = useState<Character>(CHARACTERS[0]);
   
   // Chat states
@@ -295,6 +296,7 @@ export default function ChatMastersPage() {
                 const charObj = CHARACTERS.find(c => c.id === updatedData.character);
                 if (charObj) setSelectedChar(charObj);
               }
+              if (updatedData.studentClass) setStudentClass(updatedData.studentClass);
               if (updatedData.studentName) setStudentName(updatedData.studentName);
               if (updatedData.messages) {
                 setMessages(updatedData.messages.map((m: any) => ({
@@ -422,9 +424,15 @@ export default function ChatMastersPage() {
       return;
     }
     
-    if (isAssignmentMode && !user) {
-      alert("אנא התחברו למערכת כדי להתחיל את הפעילות כמשימה להגשה!");
-      return;
+    if (isAssignmentMode) {
+      if (!user) {
+        alert("אנא התחברו למערכת כדי להתחיל את הפעילות כמשימה להגשה!");
+        return;
+      }
+      if (!studentClass.trim()) {
+        alert("אנא הקלידו את כיתתכם (לדוגמה: ז׳1, ז׳3) כדי להתחיל את המשימה להגשה!");
+        return;
+      }
     }
     
     // Set initial message
@@ -569,6 +577,7 @@ export default function ChatMastersPage() {
         const docRef = await addDoc(collection(dbFirestore, "chat_assignments"), {
           studentId: user.uid,
           studentName: studentName.trim(),
+          studentClass: studentClass.trim(),
           studentEmail: user.email || "",
           character: selectedChar.id,
           messages: messages.map(m => ({
@@ -789,6 +798,25 @@ ${formattedTranscript}
                     />
                   </div>
                 </div>
+
+                {/* Class Input (Only if Assignment Mode is enabled) */}
+                {isAssignmentMode && (
+                  <div className="space-y-3">
+                    <label className={`block text-sm font-bold ${textTitle} text-right`}>
+                      הכיתה שלך (לדוגמה: ז׳1, ז׳3, ח׳2):
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={studentClass}
+                        onChange={(e) => setStudentClass(e.target.value)}
+                        placeholder="הקלידו כיתה..."
+                        className={`w-full px-4 py-3 rounded-xl border outline-none text-right transition-all font-bold ${inputStyle}`}
+                        required={isAssignmentMode}
+                      />
+                    </div>
+                  </div>
+                )}
 
                 {/* Character Selector */}
                 <div className="space-y-4">

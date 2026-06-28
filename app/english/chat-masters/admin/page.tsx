@@ -33,6 +33,7 @@ interface ChatAssignment {
   status: "submitted" | "graded";
   score: number | null;
   feedback: string | null;
+  studentClass?: string;
 }
 
 const CHARACTERS_MAP: Record<string, { name: string; avatar: string; themeColor: string }> = {
@@ -419,7 +420,9 @@ export default function ChatMastersAdmin() {
                           {/* Student Details */}
                           <div className="flex items-center gap-3">
                             <div className="text-right">
-                              <h4 className={`text-xs font-bold ${textTitle}`}>{sub.studentName}</h4>
+                              <h4 className={`text-xs font-bold ${textTitle}`}>
+                                {sub.studentName} {sub.studentClass ? `(${sub.studentClass})` : ""}
+                              </h4>
                               <p className="text-[10px] text-text-muted mt-0.5">{sub.studentEmail}</p>
                               <div className="flex gap-2 items-center justify-end mt-1.5 text-[9px] text-text-muted">
                                 <span>הוגש ב: {dateStr}</span>
@@ -459,7 +462,9 @@ export default function ChatMastersAdmin() {
                         isLight ? "bg-zinc-50" : "bg-[#0b0f19]/70"
                       }`}>
                         <div className="text-right">
-                          <h3 className={`text-sm font-black ${textTitle}`}>{selectedSub.studentName}</h3>
+                          <h3 className={`text-sm font-black ${textTitle}`}>
+                            {selectedSub.studentName} {selectedSub.studentClass ? `(${selectedSub.studentClass})` : ""}
+                          </h3>
                           <p className="text-[10px] text-text-muted mt-0.5">{selectedSub.studentEmail}</p>
                         </div>
                         <div className="flex items-center gap-2">

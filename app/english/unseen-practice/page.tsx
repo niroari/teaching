@@ -1085,48 +1085,20 @@ export default function UnseenPracticePage() {
                         })();
                         const linesPerParagraph = Math.ceil(maxLineNum / 3) || 5;
                         const startLineNum = idx * linesPerParagraph + 1;
-
-                        const words = para ? para.trim().split(/\s+/) : [];
-                        const totalWords = words.length;
-                        const wordsPerLine = totalWords > 0 ? Math.ceil(totalWords / linesPerParagraph) : 0;
-                        const paragraphLines: string[] = [];
-                        let curIdx = 0;
-                        
-                        for (let i = 0; i < linesPerParagraph; i++) {
-                          if (i === linesPerParagraph - 1) {
-                            paragraphLines.push(words.slice(curIdx).join(" "));
-                          } else {
-                            paragraphLines.push(words.slice(curIdx, curIdx + wordsPerLine).join(" "));
-                            curIdx += wordsPerLine;
-                          }
-                        }
+                        const endLineNum = startLineNum + linesPerParagraph - 1;
 
                         return (
                           <div
                             key={idx}
-                            className={`p-4 rounded-xl border ${borderStyle} transition-all duration-300 ${blurClass} relative`}
+                            className={`p-5 rounded-2xl border ${borderStyle} transition-all duration-300 ${blurClass} relative`}
                           >
-                            <span className="absolute -top-3 left-4 text-[9px] font-black bg-teal-500/10 px-2 py-0.5 rounded-full border border-teal-500/20 text-teal-400 select-none">
-                              Paragraph {idx + 1}
+                            <span className="absolute -top-3 left-4 text-[9px] font-black bg-teal-500/10 px-2.5 py-0.5 rounded-full border border-teal-500/20 text-teal-400 select-none">
+                              Paragraph {idx + 1} (Lines {startLineNum}-{endLineNum})
                             </span>
                             
-                            <div className="space-y-2 pt-2">
-                              {paragraphLines.map((lineText, lineIdx) => {
-                                const lineNum = startLineNum + lineIdx;
-                                const showLineNum = lineNum === 1 || lineNum % 5 === 0;
-
-                                return (
-                                  <div key={lineIdx} className="flex items-start gap-3">
-                                    <div className="w-6 flex shrink-0 justify-end select-none text-[11px] font-black font-mono pt-1 text-teal-500/70" style={{ minWidth: "1.5rem" }}>
-                                      {showLineNum ? lineNum : ""}
-                                    </div>
-                                    <p className="flex-1 text-sm md:text-base leading-relaxed text-zinc-100 font-medium select-text text-left" style={{ color: isLight ? '#27272a' : '#f4f4f5' }}>
-                                      {lineText}
-                                    </p>
-                                  </div>
-                                );
-                              })}
-                            </div>
+                            <p className="text-sm md:text-base leading-relaxed text-zinc-100 font-medium select-text text-left pt-1" style={{ color: isLight ? '#27272a' : '#f4f4f5' }}>
+                              {para}
+                            </p>
                           </div>
                         );
                       })}

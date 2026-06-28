@@ -200,6 +200,7 @@ export default function ChatMastersPage() {
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [currentGuideStep, setCurrentGuideStep] = useState(1);
+  const [completedPhases, setCompletedPhases] = useState<boolean[]>([false, false, false, false, false, false]);
   
   // Translation helper states
   const [hebrewInput, setHebrewInput] = useState("");
@@ -232,6 +233,79 @@ export default function ChatMastersPage() {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, isTyping]);
+
+  // Heuristic Phase Detector
+  useEffect(() => {
+    if (messages.length === 0) return;
+
+    // Filter user messages
+    const userMsgs = messages.filter((m) => m.sender === "user");
+    if (userMsgs.length === 0) return;
+
+    const lastUserMsg = userMsgs[userMsgs.length - 1].text.toLowerCase();
+
+    setCompletedPhases((prev) => {
+      const next = [...prev];
+      let updated = false;
+
+      // Phase 1: Greeting & Intro
+      if (!next[0]) {
+        const hasGreeting = /\b(hi|hello|hey|greetings|howdy)\b/i.test(lastUserMsg);
+        const hasIntro = /\b(i'm|i am|my name|name is|from israel|live in|old)\b/i.test(lastUserMsg);
+        if (hasGreeting || hasIntro || userMsgs.length >= 1) {
+          next[0] = true;
+          updated = true;
+        }
+      }
+
+      // Phase 2: Share Likes
+      if (next[0] && !next[1]) {
+        const hasLikes = /\b(like|don't like|dislike|love|hate|favorite|prefer|enjoy)\b/i.test(lastUserMsg);
+        if (hasLikes) {
+          next[1] = true;
+          updated = true;
+        }
+      }
+
+      // Phase 3: Ask AI Questions
+      if (next[1] && !next[2]) {
+        const hasQuestion = lastUserMsg.includes("?") || /\b(what|do you|are you|how|why|who|can you|tell me)\b/i.test(lastUserMsg);
+        if (hasQuestion) {
+          next[2] = true;
+          updated = true;
+        }
+      }
+
+      // Phase 4: Share Hobbies & Routines
+      if (next[2] && !next[3]) {
+        const hasRoutines = /\b(play|hobby|hobbies|draw|read|wake|routine|school|soccer|basketball|game|minecraft|music|watch)\b/i.test(lastUserMsg);
+        if (hasRoutines) {
+          next[3] = true;
+          updated = true;
+        }
+      }
+
+      // Phase 5: Response to AI/Active conversation
+      if (next[3] && !next[4]) {
+        if (userMsgs.length >= 5) {
+          next[4] = true;
+          updated = true;
+        }
+      }
+
+      if (updated) {
+        // Auto-advance stepper to first uncompleted phase
+        const firstUncompleted = next.findIndex((val) => !val);
+        if (firstUncompleted !== -1) {
+          setCurrentGuideStep(firstUncompleted + 1);
+        } else {
+          setCurrentGuideStep(6);
+        }
+        return next;
+      }
+      return prev;
+    });
+  }, [messages]);
 
   const toggleTheme = () => {
     const nextTheme = comfortMode === "dark" ? "light" : "dark";
@@ -596,8 +670,11 @@ ${formattedTranscript}
                     <span className="text-[10px] font-bold px-2 py-0.5 bg-purple-500/10 border border-purple-500/20 rounded-full text-purple-400">
                       {GUIDE_STEPS[currentGuideStep - 1].title}
                     </span>
-                    <h2 className={`text-xl font-bold ${textTitle} mt-2`}>
-                      {GUIDE_STEPS[currentGuideStep - 1].hebrewTitle}
+                    <h2 className={`text-xl font-bold ${textTitle} mt-2 flex items-center justify-end gap-2`}>
+                      {completedPhases[currentGuideStep - 1] && (
+                        <CheckCircle className="w-4.5 h-4.5 text-emerald-400 shrink-0" />
+                      )}
+                      <span>{GUIDE_STEPS[currentGuideStep - 1].hebrewTitle}</span>
                     </h2>
                   </div>
 
@@ -743,6 +820,37 @@ ${formattedTranscript}
                     <span className="text-3xl shrink-0 p-1 bg-surface-hover rounded-xl border border-border-custom-hover">
                       {selectedChar.avatar}
                     </span>
+                  </div>
+                </div>
+
+                {/* Current Active Goal Banner */}
+                <div className={`px-6 py-2.5 border-b ${borderStyle} flex flex-col sm:flex-row gap-2 items-center justify-between text-xs bg-purple-500/5`}>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-purple-400 animate-ping" />
+                    <span className="font-semibold text-purple-300">
+                      🎯 היעד הנוכחי: {GUIDE_STEPS[currentGuideStep - 1].hebrewTitle}
+                    </span>
+                  </div>
+                  <div className="flex gap-1" dir="ltr">
+                    {[1, 2, 3, 4, 5, 6].map((num) => {
+                      const isCompleted = completedPhases[num - 1];
+                      const isActive = currentGuideStep === num;
+                      return (
+                        <span 
+                          key={num} 
+                          className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold border transition-colors ${
+                            isCompleted 
+                              ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-400" 
+                              : isActive
+                                ? "bg-purple-500/20 border-purple-500/40 text-purple-400 animate-pulse font-extrabold"
+                                : "bg-zinc-800/40 border-zinc-700/30 text-zinc-500"
+                          }`}
+                          title={GUIDE_STEPS[num - 1].hebrewTitle}
+                        >
+                          {isCompleted ? "✓" : num}
+                        </span>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -951,6 +1059,7 @@ ${formattedTranscript}
                     ]);
                     setExitTicketLearned("");
                     setExitTicketPenPal("");
+                    setCompletedPhases([false, false, false, false, false, false]);
                     setCurrentGuideStep(1);
                     setStep("chat");
                   }}

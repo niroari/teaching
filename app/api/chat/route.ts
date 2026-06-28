@@ -90,12 +90,25 @@ Format your output as a simple text response. Do not use markdown headers or bol
     // Map client-side message objects to Gemini REST API format
     // Client-side format: { sender: 'user'|'bot', text: string }
     // Gemini API format: { role: 'user'|'model', parts: [{ text: string }] }
-    const formattedContents = messages
-      .filter((msg: any) => msg.text && msg.text.trim())
-      .map((msg: any) => ({
-        role: msg.sender === "user" ? "user" : "model",
-        parts: [{ text: msg.text }]
-      }));
+    // The Gemini API requires the multi-turn conversation history to start with a 'user' turn.
+    // If the history starts with a bot greeting, we prepend a simulated user turn.
+    const formattedContents: Array<{ role: "user" | "model"; parts: Array<{ text: string }> }> = [];
+
+    if (messages.length > 0 && messages[0].sender === "bot") {
+      formattedContents.push({
+        role: "user",
+        parts: [{ text: "Hello!" }]
+      });
+    }
+
+    messages.forEach((msg: any) => {
+      if (msg.text && msg.text.trim()) {
+        formattedContents.push({
+          role: msg.sender === "user" ? "user" : "model",
+          parts: [{ text: msg.text }]
+        });
+      }
+    });
 
     const requestBody = {
       contents: formattedContents,

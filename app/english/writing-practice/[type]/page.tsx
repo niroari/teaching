@@ -230,7 +230,7 @@ export default function WritingWorkspacePage() {
     setIsSubmitting(true);
     setSubmittedDocId(null);
     try {
-      const docRef = await addDoc(collection(dbFirestore, "writing_assignments"), {
+      const uploadPromise = addDoc(collection(dbFirestore, "writing_assignments"), {
         studentId: user.uid,
         studentName: studentName.trim(),
         studentClass: studentClass.trim(),
@@ -245,6 +245,12 @@ export default function WritingWorkspacePage() {
         scoreTeacher: null,
         feedbackTeacher: null
       });
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Database connection timeout")), 8000)
+      );
+
+      const docRef = await Promise.race([uploadPromise, timeoutPromise]) as any;
       setSubmittedDocId(docRef.id);
     } catch (err) {
       console.error("Error submitting writing assignment:", err);

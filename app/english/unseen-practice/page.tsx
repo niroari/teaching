@@ -218,7 +218,7 @@ export default function UnseenPracticePage() {
     if (!user) return;
     setIsSubmitting(true);
     try {
-      const docRef = await addDoc(collection(dbFirestore, "unseen_assignments"), {
+      const uploadPromise = addDoc(collection(dbFirestore, "unseen_assignments"), {
         studentId: user.uid,
         studentName: detectiveName.trim(),
         studentClass: studentClass.trim(),
@@ -233,6 +233,12 @@ export default function UnseenPracticePage() {
         scoreTeacher: null,
         feedbackTeacher: null
       });
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Database connection timeout")), 8000)
+      );
+
+      const docRef = await Promise.race([uploadPromise, timeoutPromise]) as any;
       setSubmittedDocId(docRef.id);
     } catch (err) {
       console.error("Error submitting unseen assignment:", err);

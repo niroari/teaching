@@ -25,6 +25,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/context/AuthContext";
 import { PRE_GENERATED_UNSEENS, UnseenData } from "@/lib/unseen-data";
+import { dbFirestore } from "@/lib/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 // Helper function to calculate Levenshtein distance for spelling tolerance
 const getLevenshteinDistance = (a: string, b: string): number => {
@@ -86,6 +88,10 @@ export default function UnseenPracticePage() {
   const [totalQuestionsAnswered, setTotalQuestionsAnswered] = useState(0);
   const [correctOnFirstTry, setCorrectOnFirstTry] = useState(0);
   const [detectiveName, setDetectiveName] = useState("");
+  const [isAssignmentMode, setIsAssignmentMode] = useState(false);
+  const [studentClass, setStudentClass] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submittedDocId, setSubmittedDocId] = useState<string | null>(null);
 
   // Load theme preference from localStorage
   useEffect(() => {
@@ -120,6 +126,21 @@ export default function UnseenPracticePage() {
 
   // Trigger Gemini AI generation endpoint
   const handleAiGeneration = async () => {
+    if (!detectiveName.trim()) {
+      alert("אנא הכניסו את שמכם כדי להתחיל!");
+      return;
+    }
+    if (isAssignmentMode) {
+      if (!user) {
+        alert("עלייך להתחבר למערכת כדי להתחיל משימה להגשה.");
+        return;
+      }
+      if (!studentClass.trim()) {
+        alert("אנא הכניסו את כיתתכם במצב משימה.");
+        return;
+      }
+    }
+
     setAiGenerating(true);
     setAiError(null);
     try {
@@ -173,9 +194,51 @@ export default function UnseenPracticePage() {
   };
 
   const startWithLocalPassage = () => {
+    if (!detectiveName.trim()) {
+      alert("אנא הכניסו את שמכם כדי להתחיל!");
+      return;
+    }
+    if (isAssignmentMode) {
+      if (!user) {
+        alert("עלייך להתחבר למערכת כדי להתחיל משימה להגשה.");
+        return;
+      }
+      if (!studentClass.trim()) {
+        alert("אנא הכניסו את כיתתכם במצב משימה.");
+        return;
+      }
+    }
+
     setUnseen(PRE_GENERATED_UNSEENS[difficulty]);
     setAiError(null);
     setCurrentStep("rules");
+  };
+
+  const submitUnseenAssignment = async () => {
+    if (!user) return;
+    setIsSubmitting(true);
+    try {
+      const docRef = await addDoc(collection(dbFirestore, "unseen_assignments"), {
+        studentId: user.uid,
+        studentName: detectiveName.trim(),
+        studentClass: studentClass.trim(),
+        studentEmail: user.email || "",
+        unseenTitle: unseen.title,
+        difficulty: unseen.difficulty,
+        score: score,
+        correctOnFirstTry: correctOnFirstTry,
+        totalQuestions: 8,
+        submittedAt: serverTimestamp(),
+        status: "submitted",
+        scoreTeacher: null,
+        feedbackTeacher: null
+      });
+      setSubmittedDocId(docRef.id);
+    } catch (err) {
+      console.error("Error submitting unseen assignment:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const startQuiz = () => {
@@ -189,6 +252,7 @@ export default function UnseenPracticePage() {
     setAttempts(0);
     setTotalQuestionsAnswered(0);
     setCorrectOnFirstTry(0);
+    setSubmittedDocId(null);
     setCurrentStep("game");
   };
 
@@ -321,6 +385,9 @@ export default function UnseenPracticePage() {
     } else {
       // Finished all questions
       setCurrentStep("completed");
+      if (isAssignmentMode && user) {
+        submitUnseenAssignment();
+      }
       // Fire big confetti celebration
       confetti({
         particleCount: 150,
@@ -462,6 +529,62 @@ export default function UnseenPracticePage() {
                     onChange={(e) => setDetectiveName(e.target.value)}
                     className={`w-full h-10 px-4 rounded-xl text-sm outline-none transition-colors border ${inputStyle}`}
                   />
+                </div>
+
+                {/* Assignment Mode Toggle */}
+                <div className={`p-4 rounded-xl border ${borderStyle} ${isLight ? "bg-zinc-50" : "bg-[#0b0f19]/30"} space-y-3 z-10 relative text-right`}>
+                  <div className="flex items-center justify-between flex-row-reverse">
+                    <label className={`text-xs font-bold ${textTitle} flex items-center gap-2 cursor-pointer select-none`}>
+                      <input 
+                        type="checkbox"
+                        checked={isAssignmentMode}
+                        onChange={(e) => {
+                          setIsAssignmentMode(e.target.checked);
+                          setSubmittedDocId(null);
+                        }}
+                        className="w-4 h-4 rounded border-zinc-300 text-teal-600 focus:ring-teal-500 accent-teal-600"
+                      />
+                      <span>הפיכת הפעילות למשימה להגשה (מצב משימה)</span>
+                    </label>
+                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 font-bold">
+                      אופציונלי
+                    </span>
+                  </div>
+                  
+                  {isAssignmentMode && (
+                    <div className="pt-2 text-right space-y-4">
+                      {/* Class Input (Compact & right-aligned) */}
+                      <div className="space-y-1.5 max-w-[220px] mr-auto">
+                        <label className={`block text-[11px] font-bold ${textTitle} text-right`}>
+                          הכיתה שלך (לדוגמה: ז׳1, ז׳3):
+                        </label>
+                        <input
+                          type="text"
+                          value={studentClass}
+                          onChange={(e) => setStudentClass(e.target.value)}
+                          placeholder="ז׳3"
+                          className={`w-full px-3 py-2 text-xs rounded-xl border outline-none text-right transition-all font-bold ${inputStyle}`}
+                          required={isAssignmentMode}
+                        />
+                      </div>
+
+                      {user ? (
+                        <div className="text-[11px] text-emerald-400 font-medium flex items-center justify-end gap-1.5">
+                          <span>מחובר/ת כעת בתור: <b>{user.displayName || user.email}</b>. המשימה תישמר תחת חשבון זה.</span>
+                          <CheckCircle className="w-3.5 h-3.5" />
+                        </div>
+                      ) : (
+                        <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg space-y-2 text-right">
+                          <p className="text-xs text-amber-300">
+                            עלייך להתחבר למערכת כדי שתוכל/י להגיש את המשימה.
+                          </p>
+                          <Link href="/login?redirect=/english/unseen-practice" className="inline-block text-xs text-teal-400 hover:underline font-bold">
+                            התחברות כעת ←
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Difficulty Selector */}
@@ -1053,6 +1176,32 @@ export default function UnseenPracticePage() {
                     <p className="text-3xl font-extrabold text-teal-400 mt-1">{correctOnFirstTry} / 8</p>
                   </div>
                 </div>
+
+                {isAssignmentMode && (
+                  <div className="pt-4 border-t border-dashed border-teal-500/20 text-center">
+                    {submittedDocId ? (
+                      <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold mx-auto">
+                        <CheckCircle className="w-4 h-4 text-emerald-400" />
+                        <span>המשימה הוגשה למורה בהצלחה! ✓ (כיתה: {studentClass})</span>
+                      </div>
+                    ) : isSubmitting ? (
+                      <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-400 text-xs font-bold mx-auto animate-pulse">
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        <span>שולח משימה למורה...</span>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <p className="text-xs text-rose-400 font-bold">המשימה טרם הוגשה למורה.</p>
+                        <button
+                          onClick={submitUnseenAssignment}
+                          className="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-zinc-950 font-bold text-xs transition-all cursor-pointer shadow-md mx-auto"
+                        >
+                          נסה להגיש שוב
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
 
               </div>
 

@@ -27,5 +27,23 @@ service cloud.firestore {
       // No one can delete submissions
       allow delete: if false;
     }
+
+    match /unseen_assignments/{assignmentId} {
+      allow create: if request.auth != null && 
+        request.resource.data.studentId == request.auth.uid;
+      allow read: if request.auth != null && 
+        (resource.data.studentId == request.auth.uid || isAdmin());
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
+    match /writing_assignments/{assignmentId} {
+      allow create: if request.auth != null && 
+        request.resource.data.studentId == request.auth.uid;
+      allow read: if request.auth != null && 
+        (resource.data.studentId == request.auth.uid || isAdmin());
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
   }
 }

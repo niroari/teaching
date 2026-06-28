@@ -3,6 +3,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { useAuth } from "@/lib/context/AuthContext";
+import { dbFirestore } from "@/lib/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { 
   ArrowRight, 
   Mail, 
@@ -150,6 +153,19 @@ export default function WritingWorkspacePage() {
   const [result, setResult] = useState<EvaluationResult | null>(null);
   const [showWarningModal, setShowWarningModal] = useState(false);
 
+  const { user } = useAuth();
+  const [isAssignmentMode, setIsAssignmentMode] = useState(false);
+  const [studentName, setStudentName] = useState("");
+  const [studentClass, setStudentClass] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submittedDocId, setSubmittedDocId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user?.displayName) {
+      setStudentName(user.displayName);
+    }
+  }, [user]);
+
   // Editor Ref
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
@@ -209,10 +225,49 @@ export default function WritingWorkspacePage() {
     }
   };
 
+  const submitWritingAssignment = async (evalData: EvaluationResult) => {
+    if (!user) return;
+    setIsSubmitting(true);
+    setSubmittedDocId(null);
+    try {
+      const docRef = await addDoc(collection(dbFirestore, "writing_assignments"), {
+        studentId: user.uid,
+        studentName: studentName.trim(),
+        studentClass: studentClass.trim(),
+        studentEmail: user.email || "",
+        taskType: taskType,
+        prompt: activePrompt,
+        studentText: text,
+        score: evalData.score,
+        evaluation: evalData,
+        submittedAt: serverTimestamp(),
+        status: "submitted",
+        scoreTeacher: null,
+        feedbackTeacher: null
+      });
+      setSubmittedDocId(docRef.id);
+    } catch (err) {
+      console.error("Error submitting writing assignment:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleEvaluate = async (forceSubmit = false) => {
     if (!text.trim()) {
       setErrorMsg("נא לכתוב טקסט לפני ההגשה.");
       return;
+    }
+
+    if (isAssignmentMode) {
+      if (!user) {
+        setErrorMsg("עלייך להתחבר למערכת כדי להגיש את המשימה.");
+        return;
+      }
+      if (!studentName.trim() || !studentClass.trim()) {
+        setErrorMsg("אנא מלאו שם מלא וכיתה לפני ההגשה במצב משימה.");
+        return;
+      }
     }
 
     if (!forceSubmit && (isLineCountTooShort || isLineCountTooLong)) {
@@ -241,6 +296,9 @@ export default function WritingWorkspacePage() {
       const data = await res.json();
       if (res.ok && data.success) {
         setResult(data.data);
+        if (isAssignmentMode && user) {
+          submitWritingAssignment(data.data);
+        }
         // Scroll to results
         setTimeout(() => {
           document.getElementById("results-section")?.scrollIntoView({ behavior: "smooth" });
@@ -509,6 +567,98 @@ export default function WritingWorkspacePage() {
                     </div>
                   ))}
                 </div>
+              </div>
+
+              {/* Assignment Mode Toggle */}
+              <div className={`p-4 mb-4 rounded-xl border ${borderTheme} ${isLight ? "bg-zinc-50" : "bg-[#0b0f19]/30"} space-y-3 text-right`}>
+                <div className="flex items-center justify-between flex-row-reverse">
+                  <label className={`text-xs font-bold ${textTitle} flex items-center gap-2 cursor-pointer select-none`}>
+                    <input 
+                      type="checkbox"
+                      checked={isAssignmentMode}
+                      onChange={(e) => {
+                        setIsAssignmentMode(e.target.checked);
+                        setSubmittedDocId(null);
+                      }}
+                      className="w-4 h-4 rounded border-zinc-300 text-cyan-600 focus:ring-cyan-500 accent-cyan-600"
+                    />
+                    <span>הפיכת הפעילות למשימה להגשה (מצב משימה)</span>
+                  </label>
+                  <span className="text-[9px] px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 font-bold">
+                    אופציונלי
+                  </span>
+                </div>
+                
+                {isAssignmentMode && (
+                  <div className="pt-2 text-right space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Name Input */}
+                      <div className="space-y-1.5">
+                        <label className={`block text-[11px] font-bold ${textTitle} text-right`}>
+                          שם התלמיד/ה:
+                        </label>
+                        <input
+                          type="text"
+                          value={studentName}
+                          onChange={(e) => setStudentName(e.target.value)}
+                          placeholder="הכניסו שם מלא..."
+                          className={`w-full px-3 py-2 text-xs rounded-xl border outline-none text-right transition-all font-bold ${inputStyle}`}
+                          required={isAssignmentMode}
+                        />
+                      </div>
+
+                      {/* Class Input */}
+                      <div className="space-y-1.5">
+                        <label className={`block text-[11px] font-bold ${textTitle} text-right`}>
+                          הכיתה שלך (לדוגמה: ז׳1, ז׳3):
+                        </label>
+                        <input
+                          type="text"
+                          value={studentClass}
+                          onChange={(e) => setStudentClass(e.target.value)}
+                          placeholder="ז׳3"
+                          className={`w-full px-3 py-2 text-xs rounded-xl border outline-none text-right transition-all font-bold ${inputStyle}`}
+                          required={isAssignmentMode}
+                        />
+                      </div>
+                    </div>
+
+                    {user ? (
+                      <div className="text-[11px] text-emerald-400 font-medium flex items-center justify-end gap-1.5 font-bold">
+                        {submittedDocId ? (
+                          <span className="flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                            <b>המשימה הוגשה למורה בהצלחה! ✓</b>
+                          </span>
+                        ) : isSubmitting ? (
+                          <span>שולח משימה למערכת...</span>
+                        ) : result ? (
+                          <div className="flex flex-col items-end gap-2">
+                            <span className="text-rose-400">המשימה טרם הוגשה למערכת.</span>
+                            <button
+                              type="button"
+                              onClick={() => submitWritingAssignment(result)}
+                              className="px-3 py-1 bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-[10px] rounded-lg transition-all cursor-pointer shadow-md"
+                            >
+                              הגש משימה כעת
+                            </button>
+                          </div>
+                        ) : (
+                          <span>מחובר/ת כעת בתור: <b>{user.displayName || user.email}</b>. המשימה תוגש אוטומטית בעת בדיקת ה-AI.</span>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg space-y-2 text-right">
+                        <p className="text-xs text-amber-300">
+                          עלייך להתחבר למערכת כדי שתוכל/י להגיש את המשימה.
+                        </p>
+                        <Link href={`/login?redirect=/english/writing-practice/${taskType}`} className="inline-block text-xs text-cyan-400 hover:underline font-bold">
+                          התחברות כעת ←
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Text Area */}

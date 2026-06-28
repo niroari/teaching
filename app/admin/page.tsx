@@ -24,6 +24,7 @@ import {
 import { useAuth } from "@/lib/context/AuthContext";
 import { dbFirestore } from "@/lib/firebase";
 import { collection, query, getDocs, updateDoc, doc, orderBy } from "firebase/firestore";
+import { UnseenDashboardView, WritingDashboardView } from "./components/UnseenWritingViews";
 
 interface ChatAssignment {
   id: string;
@@ -40,6 +41,46 @@ interface ChatAssignment {
   score: number | null;
   feedback: string | null;
   customCharacterName?: string;
+}
+
+interface UnseenAssignment {
+  id: string;
+  studentId: string;
+  studentName: string;
+  studentClass: string;
+  studentEmail: string;
+  unseenTitle: string;
+  difficulty: string;
+  score: number;
+  correctOnFirstTry: number;
+  totalQuestions: number;
+  submittedAt: any;
+  status: "submitted" | "graded";
+  scoreTeacher: number | null;
+  feedbackTeacher: string | null;
+}
+
+interface WritingAssignment {
+  id: string;
+  studentId: string;
+  studentName: string;
+  studentClass: string;
+  studentEmail: string;
+  taskType: "letter" | "essay";
+  prompt: string;
+  studentText: string;
+  score: number;
+  evaluation: {
+    score: number;
+    grammarFeedback: string;
+    improvedVersion: string;
+    structureFeedback: { passed: boolean; details: string };
+    corrections: Array<{ original: string; corrected: string; explanation: string }>;
+  };
+  submittedAt: any;
+  status: "submitted" | "graded";
+  scoreTeacher: number | null;
+  feedbackTeacher: string | null;
 }
 
 const CHARACTERS_MAP: Record<string, { name: string; avatar: string; themeColor: string }> = {
@@ -93,12 +134,21 @@ export default function GeneralTeacherAdmin() {
   const [mounted, setMounted] = useState(false);
   
   // Tab state
-  const [currentTab, setCurrentTab] = useState<"chat-masters" | "future-projects" | "settings">("chat-masters");
+  const [currentTab, setCurrentTab] = useState<"chat-masters" | "unseen-practice" | "writing-practice" | "future-projects" | "settings">("chat-masters");
   
   // Chat Masters Submissions data states
   const [submissions, setSubmissions] = useState<ChatAssignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSub, setSelectedSub] = useState<ChatAssignment | null>(null);
+
+  // Unseen and Writing Practice states
+  const [unseenSubmissions, setUnseenSubmissions] = useState<UnseenAssignment[]>([]);
+  const [loadingUnseen, setLoadingUnseen] = useState(true);
+  const [selectedUnseen, setSelectedUnseen] = useState<UnseenAssignment | null>(null);
+
+  const [writingSubmissions, setWritingSubmissions] = useState<WritingAssignment[]>([]);
+  const [loadingWriting, setLoadingWriting] = useState(true);
+  const [selectedWriting, setSelectedWriting] = useState<WritingAssignment | null>(null);
   
   // Filter and search states
   const [searchQuery, setSearchQuery] = useState("");
@@ -140,17 +190,79 @@ export default function GeneralTeacherAdmin() {
     }
   };
 
+  const fetchUnseenSubmissions = async () => {
+    setLoadingUnseen(true);
+    try {
+      const q = query(
+        collection(dbFirestore, "unseen_assignments"),
+        orderBy("submittedAt", "desc")
+      );
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as UnseenAssignment[];
+      setUnseenSubmissions(data);
+    } catch (err) {
+      console.error("Error fetching unseen submissions:", err);
+    } finally {
+      setLoadingUnseen(false);
+    }
+  };
+
+  const fetchWritingSubmissions = async () => {
+    setLoadingWriting(true);
+    try {
+      const q = query(
+        collection(dbFirestore, "writing_assignments"),
+        orderBy("submittedAt", "desc")
+      );
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as WritingAssignment[];
+      setWritingSubmissions(data);
+    } catch (err) {
+      console.error("Error fetching writing submissions:", err);
+    } finally {
+      setLoadingWriting(false);
+    }
+  };
+
   useEffect(() => {
     // Only fetch if authenticated as admin/teacher
     if (user && (user.email === "niroari@gmail.com" || user.email === "nirozari@gmail.com")) {
       fetchSubmissions();
+      fetchUnseenSubmissions();
+      fetchWritingSubmissions();
     }
   }, [user]);
 
   const handleSelectSub = (sub: ChatAssignment) => {
     setSelectedSub(sub);
+    setSelectedUnseen(null);
+    setSelectedWriting(null);
     setGradeInput(sub.score !== null ? String(sub.score) : "");
     setFeedbackInput(sub.feedback || "");
+    setGradeSuccess(false);
+  };
+
+  const handleSelectUnseen = (sub: UnseenAssignment) => {
+    setSelectedUnseen(sub);
+    setSelectedSub(null);
+    setSelectedWriting(null);
+    setGradeInput(sub.scoreTeacher !== null ? String(sub.scoreTeacher) : "");
+    setFeedbackInput(sub.feedbackTeacher || "");
+    setGradeSuccess(false);
+  };
+
+  const handleSelectWriting = (sub: WritingAssignment) => {
+    setSelectedWriting(sub);
+    setSelectedSub(null);
+    setSelectedUnseen(null);
+    setGradeInput(sub.scoreTeacher !== null ? String(sub.scoreTeacher) : "");
+    setFeedbackInput(sub.feedbackTeacher || "");
     setGradeSuccess(false);
   };
 
@@ -194,6 +306,86 @@ export default function GeneralTeacherAdmin() {
     }
   };
 
+  const handleSaveUnseenGrade = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedUnseen) return;
+    const scoreVal = parseInt(gradeInput);
+    if (isNaN(scoreVal) || scoreVal < 0 || scoreVal > 100) {
+      alert("אנא הזינו ציון תקין בין 0 ל-100");
+      return;
+    }
+
+    setIsGrading(true);
+    try {
+      const docRef = doc(dbFirestore, "unseen_assignments", selectedUnseen.id);
+      await updateDoc(docRef, {
+        status: "graded",
+        scoreTeacher: scoreVal,
+        feedbackTeacher: feedbackInput.trim()
+      });
+
+      setUnseenSubmissions(prev =>
+        prev.map(sub =>
+          sub.id === selectedUnseen.id
+            ? { ...sub, status: "graded" as const, scoreTeacher: scoreVal, feedbackTeacher: feedbackInput.trim() }
+            : sub
+        )
+      );
+
+      setSelectedUnseen(prev =>
+        prev ? { ...prev, status: "graded" as const, scoreTeacher: scoreVal, feedbackTeacher: feedbackInput.trim() } : null
+      );
+
+      setGradeSuccess(true);
+      setTimeout(() => setGradeSuccess(false), 3000);
+    } catch (err) {
+      console.error("Error saving unseen grade:", err);
+      alert("שגיאה בשמירת הציון. נסו שוב.");
+    } finally {
+      setIsGrading(false);
+    }
+  };
+
+  const handleSaveWritingGrade = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedWriting) return;
+    const scoreVal = parseInt(gradeInput);
+    if (isNaN(scoreVal) || scoreVal < 0 || scoreVal > 100) {
+      alert("אנא הזינו ציון תקין בין 0 ל-100");
+      return;
+    }
+
+    setIsGrading(true);
+    try {
+      const docRef = doc(dbFirestore, "writing_assignments", selectedWriting.id);
+      await updateDoc(docRef, {
+        status: "graded",
+        scoreTeacher: scoreVal,
+        feedbackTeacher: feedbackInput.trim()
+      });
+
+      setWritingSubmissions(prev =>
+        prev.map(sub =>
+          sub.id === selectedWriting.id
+            ? { ...sub, status: "graded" as const, scoreTeacher: scoreVal, feedbackTeacher: feedbackInput.trim() }
+            : sub
+        )
+      );
+
+      setSelectedWriting(prev =>
+        prev ? { ...prev, status: "graded" as const, scoreTeacher: scoreVal, feedbackTeacher: feedbackInput.trim() } : null
+      );
+
+      setGradeSuccess(true);
+      setTimeout(() => setGradeSuccess(false), 3000);
+    } catch (err) {
+      console.error("Error saving writing grade:", err);
+      alert("שגיאה בשמירת הציון. נסו שוב.");
+    } finally {
+      setIsGrading(false);
+    }
+  };
+
   const toggleTheme = () => {
     const nextTheme = comfortMode === "dark" ? "light" : "dark";
     setComfortMode(nextTheme);
@@ -222,6 +414,30 @@ export default function GeneralTeacherAdmin() {
       sub.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (sub.studentClass && sub.studentClass.toLowerCase().includes(searchQuery.toLowerCase())) ||
       sub.studentEmail.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    if (activeListTab === "pending") return matchesSearch && sub.status === "submitted";
+    if (activeListTab === "graded") return matchesSearch && sub.status === "graded";
+    return matchesSearch;
+  });
+
+  const filteredUnseenSubmissions = unseenSubmissions.filter(sub => {
+    const matchesSearch = 
+      sub.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (sub.studentClass && sub.studentClass.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      sub.studentEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (sub.unseenTitle && sub.unseenTitle.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    if (activeListTab === "pending") return matchesSearch && sub.status === "submitted";
+    if (activeListTab === "graded") return matchesSearch && sub.status === "graded";
+    return matchesSearch;
+  });
+
+  const filteredWritingSubmissions = writingSubmissions.filter(sub => {
+    const matchesSearch = 
+      sub.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (sub.studentClass && sub.studentClass.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      sub.studentEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (sub.prompt && sub.prompt.toLowerCase().includes(searchQuery.toLowerCase()));
     
     if (activeListTab === "pending") return matchesSearch && sub.status === "submitted";
     if (activeListTab === "graded") return matchesSearch && sub.status === "graded";
@@ -275,7 +491,7 @@ export default function GeneralTeacherAdmin() {
 
       {/* Main Navigation Tabs */}
       {isTeacher && (
-        <nav className={`w-full max-w-6xl mx-auto px-6 pt-6 flex justify-start gap-4 border-b border-zinc-800/20 relative z-10`}>
+        <nav className={`w-full max-w-6xl mx-auto px-6 pt-6 flex flex-wrap justify-start gap-4 border-b border-zinc-800/20 relative z-10`}>
           <button
             onClick={() => setCurrentTab("chat-masters")}
             className={`pb-3 font-bold text-xs border-b-2 cursor-pointer transition-all ${
@@ -285,6 +501,26 @@ export default function GeneralTeacherAdmin() {
             }`}
           >
             הגשות Chat Masters ({totalCount})
+          </button>
+          <button
+            onClick={() => setCurrentTab("unseen-practice")}
+            className={`pb-3 font-bold text-xs border-b-2 cursor-pointer transition-all ${
+              currentTab === "unseen-practice"
+                ? "border-purple-500 text-purple-400"
+                : "border-transparent text-text-muted hover:text-[#e8edf8]"
+            }`}
+          >
+            הגשות אנסין ({unseenSubmissions.length})
+          </button>
+          <button
+            onClick={() => setCurrentTab("writing-practice")}
+            className={`pb-3 font-bold text-xs border-b-2 cursor-pointer transition-all ${
+              currentTab === "writing-practice"
+                ? "border-purple-500 text-purple-400"
+                : "border-transparent text-text-muted hover:text-[#e8edf8]"
+            }`}
+          >
+            הגשות כתיבה ({writingSubmissions.length})
           </button>
           <button
             onClick={() => setCurrentTab("future-projects")}
@@ -710,6 +946,54 @@ export default function GeneralTeacherAdmin() {
             </div>
 
           </div>
+        ) : currentTab === "unseen-practice" ? (
+          <UnseenDashboardView
+            unseenSubmissions={unseenSubmissions}
+            loadingUnseen={loadingUnseen}
+            selectedUnseen={selectedUnseen}
+            handleSelectUnseen={handleSelectUnseen}
+            handleSaveUnseenGrade={handleSaveUnseenGrade}
+            gradeInput={gradeInput}
+            setGradeInput={setGradeInput}
+            feedbackInput={feedbackInput}
+            setFeedbackInput={setFeedbackInput}
+            isGrading={isGrading}
+            gradeSuccess={gradeSuccess}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            activeListTab={activeListTab}
+            setActiveListTab={setActiveListTab}
+            inputStyle={inputStyle}
+            cardStyle={cardStyle}
+            borderStyle={borderStyle}
+            textTitle={textTitle}
+            textMuted={textMuted}
+            isLight={isLight}
+          />
+        ) : currentTab === "writing-practice" ? (
+          <WritingDashboardView
+            writingSubmissions={writingSubmissions}
+            loadingWriting={loadingWriting}
+            selectedWriting={selectedWriting}
+            handleSelectWriting={handleSelectWriting}
+            handleSaveWritingGrade={handleSaveWritingGrade}
+            gradeInput={gradeInput}
+            setGradeInput={setGradeInput}
+            feedbackInput={feedbackInput}
+            setFeedbackInput={setFeedbackInput}
+            isGrading={isGrading}
+            gradeSuccess={gradeSuccess}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            activeListTab={activeListTab}
+            setActiveListTab={setActiveListTab}
+            inputStyle={inputStyle}
+            cardStyle={cardStyle}
+            borderStyle={borderStyle}
+            textTitle={textTitle}
+            textMuted={textMuted}
+            isLight={isLight}
+          />
         ) : currentTab === "future-projects" ? (
           /* TAB 2: FUTURE PROJECTS (All Projects in one place) */
           <div className="space-y-6">

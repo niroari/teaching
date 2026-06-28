@@ -513,22 +513,24 @@ export default function ChatMastersPage() {
           // Subtle progress suggestion
         }
       } else {
+        const errorDetail = data.reason ? ` [Error detail: ${data.reason} - ${data.message || ""}]` : "";
         setMessages((prev) => [
           ...prev,
           {
             sender: "bot",
-            text: `Oh, I didn't catch that. Could you say it again? (סליחה, לא הבנתי, תוכלי/תוכל לכתוב שוב?)`,
+            text: `Oh, I didn't catch that. Could you say it again? (סליחה, לא הבנתי, תוכלי/תוכל לכתוב שוב?)${errorDetail}`,
             timestamp: new Date()
           }
         ]);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to send message:", err);
+      const errMsg = err?.message || String(err);
       setMessages((prev) => [
         ...prev,
         {
           sender: "bot",
-          text: `Sorry, my connection is a bit slow. Let's try again! (אופס, החיבור שלי מעט איטי. בואו ננסה שוב!)`,
+          text: `Sorry, my connection is a bit slow. Let's try again! (אופס, החיבור שלי מעט איטי. בואו ננסה שוב!) [Error detail: ${errMsg}]`,
           timestamp: new Date()
         }
       ]);

@@ -832,24 +832,7 @@ ${formattedTranscript}
                   </div>
                 </div>
 
-                {/* Class Input (Only if Assignment Mode is enabled) */}
-                {isAssignmentMode && (
-                  <div className="space-y-3">
-                    <label className={`block text-sm font-bold ${textTitle} text-right`}>
-                      הכיתה שלך (לדוגמה: ז׳1, ז׳3, ח׳2):
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={studentClass}
-                        onChange={(e) => setStudentClass(e.target.value)}
-                        placeholder="הקלידו כיתה..."
-                        className={`w-full px-4 py-3 rounded-xl border outline-none text-right transition-all font-bold ${inputStyle}`}
-                        required={isAssignmentMode}
-                      />
-                    </div>
-                  </div>
-                )}
+
 
                 {/* Character Selector */}
                 <div className="space-y-4">
@@ -929,7 +912,22 @@ ${formattedTranscript}
                   </div>
                   
                   {isAssignmentMode && (
-                    <div className="pt-2 text-right">
+                    <div className="pt-2 text-right space-y-4">
+                      {/* Class Input (Compact & right-aligned) */}
+                      <div className="space-y-1.5 max-w-[220px] mr-auto">
+                        <label className={`block text-xs font-bold ${textTitle} text-right`}>
+                          הכיתה שלך (לדוגמה: ז׳1, ז׳3):
+                        </label>
+                        <input
+                          type="text"
+                          value={studentClass}
+                          onChange={(e) => setStudentClass(e.target.value)}
+                          placeholder="ז׳3"
+                          className={`w-full px-3 py-2 text-xs rounded-xl border outline-none text-right transition-all font-bold ${inputStyle}`}
+                          required={isAssignmentMode}
+                        />
+                      </div>
+
                       {user ? (
                         <div className="text-xs text-emerald-400 font-medium flex items-center justify-end gap-1.5">
                           <span>מחובר/ת כעת בתור: <b>{user.displayName || user.email}</b>. המשימה תישמר תחת חשבון זה.</span>

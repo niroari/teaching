@@ -898,6 +898,20 @@ export default function UnseenPracticePage() {
                               )}
                             </div>
                           )}
+                          {!showFeedback && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setAttempts(1);
+                                setIsCorrect(false);
+                                setShowFeedback(true);
+                                setScore((prev) => Math.max(prev - 15, 20));
+                              }}
+                              className="w-full mt-3 py-2 text-center text-xs text-rose-400/80 hover:text-rose-400 hover:underline cursor-pointer font-bold"
+                            >
+                              דלגו על השאלה (לא יודעים את התשובה? לחצו כאן)
+                            </button>
+                          )}
                         </div>
 
                         {/* Feedback Explanation */}
@@ -983,16 +997,31 @@ export default function UnseenPracticePage() {
 
                                   {/* Continue trigger */}
                                   <div className="text-left">
-                                    <button
-                                      onClick={isCorrect ? handleNextStep : () => setShowFeedback(false)}
-                                      className={`px-5 py-2 rounded-xl text-zinc-950 font-bold text-xs transition-all cursor-pointer ${
-                                        isCorrect 
-                                          ? "bg-teal-500 hover:bg-teal-400" 
-                                          : isLight ? "bg-zinc-200 hover:bg-zinc-300 text-zinc-700" : "bg-white hover:bg-zinc-100"
-                                      }`}
-                                    >
-                                      {isCorrect ? (gameSubStep < 7 ? "המשך לרמז הבא ←" : "סיום המשימה וקבלת תעודה ←") : "נסו שוב"}
-                                    </button>
+                                    {isCorrect ? (
+                                      <button
+                                        onClick={handleNextStep}
+                                        className="px-5 py-2 rounded-xl text-zinc-950 font-bold text-xs bg-teal-500 hover:bg-teal-400 cursor-pointer transition-all animate-bounce"
+                                      >
+                                        {gameSubStep < 7 ? "המשך לרמז הבא ←" : "סיום המשימה וקבלת תעודה ←"}
+                                      </button>
+                                    ) : (
+                                      <div className="flex gap-3 justify-start flex-row-reverse">
+                                        <button
+                                          onClick={() => setShowFeedback(false)}
+                                          className={`px-4 py-2 rounded-xl font-bold text-xs cursor-pointer transition-all ${
+                                            isLight ? "bg-zinc-200 hover:bg-zinc-300 text-zinc-700" : "bg-white hover:bg-zinc-100 text-zinc-950"
+                                          }`}
+                                        >
+                                          נסו שוב
+                                        </button>
+                                        <button
+                                          onClick={handleNextStep}
+                                          className="px-4 py-2 rounded-xl text-rose-450 bg-rose-500/10 border border-rose-500/25 hover:bg-rose-500/20 font-bold text-xs cursor-pointer transition-all"
+                                        >
+                                          המשך בכל זאת לשאלה הבאה ←
+                                        </button>
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               )}

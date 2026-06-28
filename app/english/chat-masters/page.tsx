@@ -187,6 +187,7 @@ const GUIDE_STEPS: GuideStep[] = [
 
 export default function ChatMastersPage() {
   const { user, signInWithGoogle } = useAuth();
+  const isTeacher = user && (user.email === "niroari@gmail.com" || user.email === "nirozari@gmail.com");
   
   // App states
   const [comfortMode, setComfortMode] = useState<"dark" | "light">("dark");
@@ -671,14 +672,25 @@ ${formattedTranscript}
           <span>→ חזרה לדף אנגלית</span>
         </Link>
         
-        {/* Toggle Theme Button */}
-        <button
-          onClick={toggleTheme}
-          className={`p-2.5 rounded-xl border ${borderStyle} ${isLight ? "bg-white hover:bg-zinc-100" : "bg-[#0f1526]/80 hover:bg-[#161d35]"} transition-colors duration-200`}
-          title="Comfort Reading Mode (שינוי ניגודיות/צבע)"
-        >
-          {isLight ? <Moon className="w-4 h-4 text-purple-600" /> : <Sun className="w-4 h-4 text-amber-400" />}
-        </button>
+        <div className="flex items-center gap-3">
+          {isTeacher && (
+            <Link
+              href="/admin"
+              className="px-3 py-1.5 rounded-lg border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 text-xs font-bold transition-all flex items-center gap-1.5"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>לוח מורה</span>
+            </Link>
+          )}
+          {/* Toggle Theme Button */}
+          <button
+            onClick={toggleTheme}
+            className={`p-2.5 rounded-xl border ${borderStyle} ${isLight ? "bg-white hover:bg-zinc-100" : "bg-[#0f1526]/80 hover:bg-[#161d35]"} transition-colors duration-200`}
+            title="Comfort Reading Mode (שינוי ניגודיות/צבע)"
+          >
+            {isLight ? <Moon className="w-4 h-4 text-purple-600" /> : <Sun className="w-4 h-4 text-amber-400" />}
+          </button>
+        </div>
       </header>
 
       {/* Main Page Layout */}

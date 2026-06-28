@@ -14,7 +14,12 @@ import {
   Sparkles, 
   CheckCircle,
   FileText,
-  Check
+  Check,
+  Settings,
+  Flame,
+  LayoutGrid,
+  TrendingUp,
+  ShieldCheck
 } from "lucide-react";
 import { useAuth } from "@/lib/context/AuthContext";
 import { dbFirestore } from "@/lib/firebase";
@@ -24,6 +29,7 @@ interface ChatAssignment {
   id: string;
   studentId: string;
   studentName: string;
+  studentClass: string;
   studentEmail: string;
   character: string;
   messages: Array<{ sender: "user" | "bot"; text: string; timestamp: string }>;
@@ -33,7 +39,6 @@ interface ChatAssignment {
   status: "submitted" | "graded";
   score: number | null;
   feedback: string | null;
-  studentClass?: string;
 }
 
 const CHARACTERS_MAP: Record<string, { name: string; avatar: string; themeColor: string }> = {
@@ -44,21 +49,59 @@ const CHARACTERS_MAP: Record<string, { name: string; avatar: string; themeColor:
   sam: { name: "Sam", avatar: "🧑", themeColor: "text-purple-400 bg-purple-500/10 border-purple-500/20" }
 };
 
-export default function ChatMastersAdmin() {
+const FUTURE_PROJECTS = [
+  {
+    id: "vocab",
+    title: "מעקב אימון אוצר מילים (Vocab Trainer Logs)",
+    desc: "צפייה ברשימות המילים האישיות של התלמידים, מעקב אחר התקדמות תרגול כרטיסיות ואחוזי הצלחה בבחנים.",
+    badge: "בפיתוח",
+    icon: BookOpen,
+    color: "text-teal-400 border-teal-500/20 bg-teal-500/5"
+  },
+  {
+    id: "auction",
+    title: "מכירה פומבית של משפטים (Sentence Auction)",
+    desc: "ניהול הגשות של דוחות ביצוע כיתתיים, שמירת ההון הקבוצתי שנצבר ומתן ציון לשיפור הדקדוק הקבוצתי.",
+    badge: "בתכנון",
+    icon: Flame,
+    color: "text-amber-400 border-amber-500/20 bg-amber-500/5"
+  },
+  {
+    id: "writing",
+    title: "משימות כתיבה חופשית (Writing Evaluation)",
+    desc: "ממשק לניהול חיבורים ומכתבים שהוגשו על ידי התלמידים, עם אפשרות לדריסת ציון ה-AI וכתיבת משוב מורה מורחב.",
+    badge: "בתכנון",
+    icon: FileText,
+    color: "text-purple-400 border-purple-500/20 bg-purple-500/5"
+  },
+  {
+    id: "snakes",
+    title: "לוח מנצחים כיתתי (Snakes & Ladders Live)",
+    desc: "מעקב אחר משחקי סולמות ונחשים פעילים בכיתה וצפייה בלוח התוצאות הבית-ספרי בזמן אמת.",
+    badge: "בתכנון",
+    icon: LayoutGrid,
+    color: "text-sky-400 border-sky-500/20 bg-sky-500/5"
+  }
+];
+
+export default function GeneralTeacherAdmin() {
   const { user, signInWithGoogle } = useAuth();
   
   // Theme state
   const [comfortMode, setComfortMode] = useState<"dark" | "light">("dark");
   const [mounted, setMounted] = useState(false);
   
-  // Data states
+  // Tab state
+  const [currentTab, setCurrentTab] = useState<"chat-masters" | "future-projects" | "settings">("chat-masters");
+  
+  // Chat Masters Submissions data states
   const [submissions, setSubmissions] = useState<ChatAssignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSub, setSelectedSub] = useState<ChatAssignment | null>(null);
   
   // Filter and search states
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState<"all" | "pending" | "graded">("all");
+  const [activeListTab, setActiveListTab] = useState<"all" | "pending" | "graded">("all");
   
   // Grading form states
   const [gradeInput, setGradeInput] = useState("");
@@ -172,14 +215,15 @@ export default function ChatMastersAdmin() {
     ? "bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400 focus:border-purple-500" 
     : "bg-[#0d1222]/80 border-border-custom text-white placeholder:text-zinc-700 focus:border-purple-500/50";
 
-  // Filter logic
+  // Filter logic for Chat Masters
   const filteredSubmissions = submissions.filter(sub => {
     const matchesSearch = 
       sub.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (sub.studentClass && sub.studentClass.toLowerCase().includes(searchQuery.toLowerCase())) ||
       sub.studentEmail.toLowerCase().includes(searchQuery.toLowerCase());
     
-    if (activeTab === "pending") return matchesSearch && sub.status === "submitted";
-    if (activeTab === "graded") return matchesSearch && sub.status === "graded";
+    if (activeListTab === "pending") return matchesSearch && sub.status === "submitted";
+    if (activeListTab === "graded") return matchesSearch && sub.status === "graded";
     return matchesSearch;
   });
 
@@ -192,7 +236,7 @@ export default function ChatMastersAdmin() {
     : 0;
 
   return (
-    <div className={`min-h-screen ${bgTheme} transition-colors duration-300 flex flex-col font-sans relative overflow-hidden`}>
+    <div className={`min-h-screen ${bgTheme} transition-colors duration-300 flex flex-col font-sans relative overflow-x-hidden`}>
       {/* Background Glows */}
       {!isLight && (
         <>
@@ -204,17 +248,17 @@ export default function ChatMastersAdmin() {
       {/* Main Header */}
       <header className={`w-full max-w-6xl mx-auto px-6 py-5 flex items-center justify-between border-b ${borderStyle} relative z-10`}>
         <Link
-          href="/english"
+          href="/"
           className={`inline-flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-lg border ${borderStyle} ${isLight ? "bg-white hover:bg-zinc-100" : "bg-surface hover:bg-[#111728]"} transition-colors duration-200`}
         >
           <ArrowRight className="w-4 h-4" />
-          <span>חזרה לאנגלית</span>
+          <span>חזרה לדף הבית</span>
         </Link>
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <h1 className={`text-sm md:text-base font-black ${textTitle} flex items-center gap-2`}>
-            <span>לוח מורה: Chat Masters</span>
-            <Sparkles className="w-4.5 h-4.5 text-purple-400" />
+            <span>לוח מורה מרכזי</span>
+            <Sparkles className="w-4.5 h-4.5 text-purple-400 animate-pulse" />
           </h1>
         </div>
 
@@ -227,6 +271,42 @@ export default function ChatMastersAdmin() {
           {isLight ? <Moon className="w-4 h-4 text-purple-600" /> : <Sun className="w-4 h-4 text-amber-400" />}
         </button>
       </header>
+
+      {/* Main Navigation Tabs */}
+      {isTeacher && (
+        <nav className={`w-full max-w-6xl mx-auto px-6 pt-6 flex justify-start gap-4 border-b border-zinc-800/20 relative z-10`}>
+          <button
+            onClick={() => setCurrentTab("chat-masters")}
+            className={`pb-3 font-bold text-xs border-b-2 cursor-pointer transition-all ${
+              currentTab === "chat-masters"
+                ? "border-purple-500 text-purple-400"
+                : "border-transparent text-text-muted hover:text-[#e8edf8]"
+            }`}
+          >
+            הגשות Chat Masters ({totalCount})
+          </button>
+          <button
+            onClick={() => setCurrentTab("future-projects")}
+            className={`pb-3 font-bold text-xs border-b-2 cursor-pointer transition-all ${
+              currentTab === "future-projects"
+                ? "border-purple-500 text-purple-400"
+                : "border-transparent text-text-muted hover:text-[#e8edf8]"
+            }`}
+          >
+            פרויקטים נוספים (All Projects)
+          </button>
+          <button
+            onClick={() => setCurrentTab("settings")}
+            className={`pb-3 font-bold text-xs border-b-2 cursor-pointer transition-all ${
+              currentTab === "settings"
+                ? "border-purple-500 text-purple-400"
+                : "border-transparent text-text-muted hover:text-[#e8edf8]"
+            }`}
+          >
+            הגדרות כיתה
+          </button>
+        </nav>
+      )}
 
       {/* Content Body */}
       <main className="w-full max-w-6xl mx-auto px-6 py-8 flex-1 flex flex-col z-10">
@@ -269,18 +349,18 @@ export default function ChatMastersAdmin() {
               </div>
               <h2 className={`text-xl font-bold ${textTitle}`}>גישה נדחתה (Access Denied)</h2>
               <p className={`text-xs ${textMuted} leading-relaxed`}>
-                אימייל זה אינו מורשה כחשבון מורה באתר. יש להתחבר עם חשבון המורה המתאים (<b>niroari@gmail.com</b>).
+                אימייל זה אינו מורשה כחשבון מורה באתר. יש להתחבר עם חשבון המורה המורשה (<b>niroari@gmail.com</b>).
               </p>
               <Link
-                href="/english"
+                href="/"
                 className="w-full block py-3.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold rounded-xl text-center transition-all border border-zinc-700"
               >
                 חזרה לדף הבית
               </Link>
             </div>
           </div>
-        ) : (
-          /* Authorized Teacher view */
+        ) : currentTab === "chat-masters" ? (
+          /* TAB 1: CHAT MASTERS */
           <div className="space-y-8 flex-1 flex flex-col">
             
             {/* Stats Panel */}
@@ -344,7 +424,7 @@ export default function ChatMastersAdmin() {
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="חיפוש לפי שם תלמיד או אימייל..."
+                      placeholder="חישוב לפי שם, כיתה או אימייל..."
                       className={`w-full pr-10 pl-4 py-2 text-xs rounded-xl border outline-none text-right transition-all font-bold ${inputStyle}`}
                     />
                   </div>
@@ -352,9 +432,9 @@ export default function ChatMastersAdmin() {
                   {/* Tabs */}
                   <div className="grid grid-cols-3 gap-1 bg-zinc-800/40 p-1 rounded-lg text-xs font-bold border border-zinc-700/30">
                     <button
-                      onClick={() => setActiveTab("all")}
+                      onClick={() => setActiveListTab("all")}
                       className={`py-1.5 rounded-md cursor-pointer text-center transition-colors ${
-                        activeTab === "all"
+                        activeListTab === "all"
                           ? "bg-purple-600 text-white"
                           : `${textMuted} hover:text-white`
                       }`}
@@ -362,9 +442,9 @@ export default function ChatMastersAdmin() {
                       הכל ({totalCount})
                     </button>
                     <button
-                      onClick={() => setActiveTab("pending")}
+                      onClick={() => setActiveListTab("pending")}
                       className={`py-1.5 rounded-md cursor-pointer text-center transition-colors ${
-                        activeTab === "pending"
+                        activeListTab === "pending"
                           ? "bg-purple-600 text-white"
                           : `${textMuted} hover:text-white`
                       }`}
@@ -372,9 +452,9 @@ export default function ChatMastersAdmin() {
                       ממתין ({pendingCount})
                     </button>
                     <button
-                      onClick={() => setActiveTab("graded")}
+                      onClick={() => setActiveListTab("graded")}
                       className={`py-1.5 rounded-md cursor-pointer text-center transition-colors ${
-                        activeTab === "graded"
+                        activeListTab === "graded"
                           ? "bg-purple-600 text-white"
                           : `${textMuted} hover:text-white`
                       }`}
@@ -386,7 +466,7 @@ export default function ChatMastersAdmin() {
                 </div>
 
                 {/* Submissions List Card */}
-                <div className={`p-4 rounded-xl ${cardStyle} border ${borderStyle} flex-1 overflow-y-auto max-h-[500px] space-y-2.5`}>
+                <div className={`p-4 rounded-xl ${cardStyle} border ${borderStyle} flex-1 overflow-y-auto max-h-[460px] space-y-2.5`}>
                   {loading ? (
                     <div className="flex flex-col items-center justify-center p-12 space-y-3">
                       <RefreshCw className="w-6 h-6 text-purple-500 animate-spin" />
@@ -488,14 +568,14 @@ export default function ChatMastersAdmin() {
                       </div>
 
                       {/* Content scroll block (Transcripts + Exit Ticket) */}
-                      <div className="flex-1 p-6 overflow-y-auto space-y-6 max-h-[380px]">
+                      <div className="flex-1 p-6 overflow-y-auto space-y-6 max-h-[340px]">
                         
                         {/* Conversation Transcript section */}
                         <div className="space-y-3">
                           <h4 className={`text-xs font-bold ${textTitle} text-right border-r-2 border-purple-500 pr-2`}>
                             תמלול השיחה באנגלית (Chat Transcript)
                           </h4>
-                          <div className={`p-4 rounded-xl border ${borderStyle} ${isLight ? "bg-zinc-100/50" : "bg-[#0b101d]"} space-y-4 max-h-[250px] overflow-y-auto`}>
+                          <div className={`p-4 rounded-xl border ${borderStyle} ${isLight ? "bg-zinc-100/50" : "bg-[#0b101d]"} space-y-4 max-h-[220px] overflow-y-auto`}>
                             {selectedSub.messages.map((msg, idx) => {
                               const isUser = msg.sender === "user";
                               return (
@@ -620,13 +700,93 @@ export default function ChatMastersAdmin() {
             </div>
 
           </div>
+        ) : currentTab === "future-projects" ? (
+          /* TAB 2: FUTURE PROJECTS (All Projects in one place) */
+          <div className="space-y-6">
+            <div className="text-right">
+              <h2 className={`text-xl font-bold ${textTitle} flex items-center justify-end gap-2`}>
+                <span>פרויקטים ומשימות עתידיות</span>
+                <TrendingUp className="w-5 h-5 text-purple-400" />
+              </h2>
+              <p className={`text-xs ${textMuted} mt-1`}>
+                כאן ירוכזו כל מודולי הניהול והערכת המשימות עבור הכלים האינטראקטיביים הנוספים באתר.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+              {FUTURE_PROJECTS.map((proj) => {
+                const IconComp = proj.icon;
+                return (
+                  <div 
+                    key={proj.id} 
+                    className={`p-6 rounded-2xl border ${borderStyle} ${cardStyle} flex flex-col justify-between space-y-6 transition-all hover:scale-[1.01]`}
+                  >
+                    <div className="space-y-4">
+                      {/* Header */}
+                      <div className="flex items-center justify-between flex-row-reverse">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-purple-500/20 bg-purple-500/10 text-purple-400">
+                          {proj.badge}
+                        </span>
+                        <div className={`p-2.5 rounded-xl border ${proj.color} shrink-0`}>
+                          <IconComp className="w-5 h-5" />
+                        </div>
+                      </div>
+                      
+                      {/* Text */}
+                      <div className="text-right space-y-2">
+                        <h3 className={`text-sm font-black ${textTitle}`}>{proj.title}</h3>
+                        <p className={`text-xs ${textMuted} leading-relaxed`}>{proj.desc}</p>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-zinc-800/10 flex justify-end">
+                      <span className="text-[10px] text-text-muted font-bold flex items-center gap-1.5 flex-row-reverse">
+                        <Clock className="w-3.5 h-3.5" />
+                        <span>מתוכנן לפיתוח בשלבים הבאים</span>
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          /* TAB 3: SETTINGS */
+          <div className="max-w-xl mx-auto py-8">
+            <div className={`p-8 rounded-2xl ${cardStyle} border ${borderStyle} space-y-6 text-right`}>
+              <h2 className={`text-lg font-bold ${textTitle} flex items-center justify-end gap-2 border-b pb-4 ${borderStyle}`}>
+                <span>הגדרות וניהול כיתתי</span>
+                <ShieldCheck className="w-5 h-5 text-purple-400" />
+              </h2>
+              
+              <div className="space-y-4 text-xs leading-relaxed">
+                <div className="space-y-1">
+                  <span className={`block font-bold ${textTitle}`}>חשבון מורה מחובר:</span>
+                  <span className={`${textMuted}`}>{user.email}</span>
+                </div>
+                <div className="space-y-1">
+                  <span className={`block font-bold ${textTitle}`}>סטטוס הרשאות:</span>
+                  <span className="text-emerald-400 font-bold flex items-center gap-1.5 justify-end">
+                    <span>מורשה לניהול מערכת (מנהל/ת)</span>
+                    <CheckCircle className="w-3.5 h-3.5" />
+                  </span>
+                </div>
+                <div className="space-y-1 pt-4 border-t border-zinc-800/20">
+                  <span className={`block font-bold ${textTitle}`}>הגדרות סינון כיתה:</span>
+                  <p className={`${textMuted}`}>
+                    במצב ברירת מחדל, תלמידים מקלידים באופן ידני את כיתתם (ז׳1, ז׳3 וכו׳). ניתן לסנן לפי כיתה בשדה החיפוש בטאב הגשות Chat Masters כדי לרכז את הבדיקה של כיתה ספציפית.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
 
       </main>
 
       {/* Footer */}
       <footer className="w-full text-center py-6 border-t border-border-custom text-xs text-text-muted relative z-10 bg-surface/30">
-        <span>© {new Date().getFullYear()} ניר עוז-ארי — לוח בקרה Chat Masters</span>
+        <span>© {new Date().getFullYear()} ניר עוז-ארי — לוח מורה מרכזי</span>
       </footer>
     </div>
   );

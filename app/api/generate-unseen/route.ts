@@ -186,9 +186,13 @@ CRITICAL RULES:
     }
 
     const data = await response.json();
-    const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    
+    const parts = data.candidates?.[0]?.content?.parts;
+    const generatedText = parts 
+      ? parts.map((p: any) => p.text || "").join("").trim()
+      : "";
+
     if (!generatedText) {
+      console.warn("Gemini API returned an empty text candidate for unseen generation. Response:", JSON.stringify(data));
       return NextResponse.json(
         { success: false, reason: "empty_response" },
         { status: 500 }

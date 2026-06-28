@@ -161,16 +161,20 @@ Format your output as a simple text response. Do not use markdown headers or bol
     }
 
     const data = await response.json();
-    const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const parts = data.candidates?.[0]?.content?.parts;
+    const generatedText = parts 
+      ? parts.map((p: any) => p.text || "").join("").trim()
+      : "";
 
     if (!generatedText) {
+      console.warn("Gemini API returned an empty text candidate. Response:", JSON.stringify(data));
       return NextResponse.json(
         { success: false, reason: "empty_response" },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ success: true, text: generatedText.trim() });
+    return NextResponse.json({ success: true, text: generatedText });
   } catch (error: any) {
     console.error("AI Chat handler error:", error);
     return NextResponse.json(

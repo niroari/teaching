@@ -200,7 +200,6 @@ export default function ChatMastersPage() {
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [currentGuideStep, setCurrentGuideStep] = useState(1);
-  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   
   // Translation helper states
   const [hebrewInput, setHebrewInput] = useState("");
@@ -382,9 +381,6 @@ export default function ChatMastersPage() {
     }
   };
 
-  const handleInsertStarter = (starterText: string) => {
-    setInputText(starterText);
-  };
 
   const handleFinishActivity = (e: React.FormEvent) => {
     e.preventDefault();
@@ -623,31 +619,19 @@ ${formattedTranscript}
                       </h4>
                       <div className="space-y-2.5 max-h-[220px] overflow-y-auto pl-1 pr-0.5">
                         {GUIDE_STEPS[currentGuideStep - 1].starters.map((starter, sIdx) => {
-                          const isCopied = copiedIndex === sIdx;
                           return (
                             <div 
                               key={sIdx} 
-                              className={`p-3 rounded-xl border flex justify-between items-center gap-3 transition-colors text-xs font-mono group hover:bg-purple-500/5 ${
+                              className={`p-3 rounded-xl border flex items-center gap-3 transition-colors text-xs font-mono select-none ${
                                 isLight 
                                   ? "bg-zinc-50 border-zinc-200 text-zinc-800" 
                                   : "bg-surface border-border-custom text-zinc-100"
                               }`}
                               dir="ltr"
                             >
-                              <span className="block flex-1 text-left break-words">
+                              <span className="block flex-1 text-left break-words select-none">
                                 {starter}
                               </span>
-                              <button
-                                onClick={() => {
-                                  handleInsertStarter(starter);
-                                  setCopiedIndex(sIdx);
-                                  setTimeout(() => setCopiedIndex(null), 2000);
-                                }}
-                                className="p-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white shrink-0 cursor-pointer transition-colors flex items-center justify-center"
-                                title="העתק לתיבת השיחה"
-                              >
-                                {isCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                              </button>
                             </div>
                           );
                         })}

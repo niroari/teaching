@@ -119,7 +119,7 @@ Format your output as a simple text response. Do not use markdown headers or bol
       }
     };
 
-    const modelsToTry = ["gemini-2.5-flash", "gemini-1.5-flash"];
+    const modelsToTry = ["gemini-2.0-flash", "gemini-1.5-flash"];
     let response: Response | null = null;
     let errorText = "";
 

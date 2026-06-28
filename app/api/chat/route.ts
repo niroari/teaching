@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {
-    const { character, studentName, messages, currentGuideStep } = await request.json();
+    const { character, studentName, messages, currentGuideStep, customCharacterName } = await request.json();
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -39,6 +39,10 @@ export async function POST(request: Request) {
       case "cat":
         characterName = "Luna";
         characterPersonalityPrompt = `You are Luna the Talking Cat. You can speak English, but you occasionally add friendly cat noises (like '*meow*', '*purr*'). You love warm milk, taking cozy naps, and chasing laser dots. Ask the student if they have any pets, or what their favorite animal is!`;
+        break;
+      case "custom":
+        characterName = customCharacterName || "your companion";
+        characterPersonalityPrompt = `You are the famous/known figure ${characterName} (celebrity, historical figure, fictional character, animal, or object). You must fully adopt their personality, typical voice, speech patterns, knowledge, and typical mannerisms. Stay in character at all times.`;
         break;
       default:
         characterName = "Sam";

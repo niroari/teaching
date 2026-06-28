@@ -39,6 +39,7 @@ interface ChatAssignment {
   status: "submitted" | "graded";
   score: number | null;
   feedback: string | null;
+  customCharacterName?: string;
 }
 
 const CHARACTERS_MAP: Record<string, { name: string; avatar: string; themeColor: string }> = {
@@ -479,7 +480,10 @@ export default function GeneralTeacherAdmin() {
                   ) : (
                     filteredSubmissions.map((sub) => {
                       const isSelected = selectedSub?.id === sub.id;
-                      const charDetails = CHARACTERS_MAP[sub.character] || { name: sub.character, avatar: "🤖", themeColor: "" };
+                      const isCustom = sub.character === "custom";
+                      const charDetails = isCustom 
+                        ? { name: sub.customCharacterName || "Custom Figure", avatar: "🎭", themeColor: "text-rose-400 bg-rose-500/10 border-rose-500/20" }
+                        : CHARACTERS_MAP[sub.character] || { name: sub.character, avatar: "🤖", themeColor: "" };
                       const dateStr = sub.submittedAt 
                         ? new Date(sub.submittedAt.seconds * 1000).toLocaleDateString("he-IL") 
                         : "";
@@ -560,9 +564,15 @@ export default function GeneralTeacherAdmin() {
                         </div>
                         <div className="flex items-center gap-2">
                           <span className={`text-xs px-2 py-1 rounded-xl border font-bold flex items-center gap-1 ${
-                            CHARACTERS_MAP[selectedSub.character]?.themeColor || ""
+                            selectedSub.character === "custom"
+                              ? "text-rose-400 bg-rose-500/10 border-rose-500/20"
+                              : CHARACTERS_MAP[selectedSub.character]?.themeColor || ""
                           }`}>
-                            <span>שותף שיחה: {CHARACTERS_MAP[selectedSub.character]?.avatar} {CHARACTERS_MAP[selectedSub.character]?.name}</span>
+                            <span>
+                              שותף שיחה: {selectedSub.character === "custom"
+                                ? `🎭 ${selectedSub.customCharacterName || "Custom"}`
+                                : `${CHARACTERS_MAP[selectedSub.character]?.avatar} ${CHARACTERS_MAP[selectedSub.character]?.name}`}
+                            </span>
                           </span>
                         </div>
                       </div>
@@ -588,7 +598,7 @@ export default function GeneralTeacherAdmin() {
                                         : "bg-surface border border-border-custom text-[#e8edf8] rounded-tr-none shadow-md shadow-black/10"
                                   }`} dir="ltr">
                                     <div className={`text-[9px] mb-1 font-bold ${isUser ? "text-purple-200" : "text-purple-400"}`}>
-                                      {isUser ? selectedSub.studentName : (CHARACTERS_MAP[selectedSub.character]?.name || "AI Partner")}
+                                      {isUser ? selectedSub.studentName : (selectedSub.character === "custom" ? (selectedSub.customCharacterName || "AI Partner") : (CHARACTERS_MAP[selectedSub.character]?.name || "AI Partner"))}
                                     </div>
                                     <p className="text-left break-words">{msg.text}</p>
                                   </div>

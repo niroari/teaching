@@ -91,6 +91,16 @@ const CHARACTERS: Character[] = [
     greeting: "*Meow*! Hello there! I'm Luna. I was just taking a cozy nap in the sun. *Purr*... Do you have any pets at home?",
     themeColor: "border-amber-500 text-amber-400 bg-amber-500/10",
     bgGlow: "from-amber-500/5"
+  },
+  {
+    id: "custom",
+    name: "דמות מפורסמת מוכרת",
+    englishName: "Custom Figure",
+    avatar: "🎭",
+    description: "זמר/ת, מדען/נית, ספורטאי/ת או דמות היסטורית (למשל: Einstein, Messi, Taylor Swift, Harry Potter).",
+    greeting: "Hi there! I am ready to chat with you. Who would you like me to be?",
+    themeColor: "border-rose-500 text-rose-400 bg-rose-500/10",
+    bgGlow: "from-rose-500/5"
   }
 ];
 
@@ -198,6 +208,7 @@ export default function ChatMastersPage() {
   const [studentName, setStudentName] = useState("");
   const [studentClass, setStudentClass] = useState("");
   const [selectedChar, setSelectedChar] = useState<Character>(CHARACTERS[0]);
+  const [customCharName, setCustomCharName] = useState("");
   
   // Chat states
   const [messages, setMessages] = useState<Message[]>([]);
@@ -299,6 +310,7 @@ export default function ChatMastersPage() {
               }
               if (updatedData.studentClass) setStudentClass(updatedData.studentClass);
               if (updatedData.studentName) setStudentName(updatedData.studentName);
+              if (updatedData.customCharacterName) setCustomCharName(updatedData.customCharacterName);
               if (updatedData.messages) {
                 setMessages(updatedData.messages.map((m: any) => ({
                   sender: m.sender,
@@ -435,12 +447,19 @@ export default function ChatMastersPage() {
         return;
       }
     }
+
+    if (selectedChar.id === "custom" && !customCharName.trim()) {
+      alert("אנא הקלידו את שם הדמות שתרצו לשוחח איתה!");
+      return;
+    }
     
     // Set initial message
     setMessages([
       {
         sender: "bot",
-        text: selectedChar.greeting,
+        text: selectedChar.id === "custom"
+          ? `Hi! I am ${customCharName.trim()}. It's great to meet you! How are you today? Let's talk English!`
+          : selectedChar.greeting,
         timestamp: new Date()
       }
     ]);
@@ -473,7 +492,8 @@ export default function ChatMastersPage() {
           character: selectedChar.id,
           studentName: studentName.trim(),
           messages: chatHistory,
-          currentGuideStep: currentGuideStep
+          currentGuideStep: currentGuideStep,
+          customCharacterName: selectedChar.id === "custom" ? customCharName.trim() : undefined
         })
       });
 
@@ -581,6 +601,7 @@ export default function ChatMastersPage() {
           studentClass: studentClass.trim(),
           studentEmail: user.email || "",
           character: selectedChar.id,
+          customCharacterName: selectedChar.id === "custom" ? customCharName.trim() : undefined,
           messages: messages.map(m => ({
             sender: m.sender,
             text: m.text,
@@ -621,7 +642,7 @@ export default function ChatMastersPage() {
 
   const handleDownloadTranscript = () => {
     const formattedTranscript = messages.map(msg => {
-      const name = msg.sender === "user" ? studentName : selectedChar.englishName;
+      const name = msg.sender === "user" ? studentName : (selectedChar.id === "custom" ? customCharName : selectedChar.englishName);
       return `[${msg.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}] ${name}: ${msg.text}`;
     }).join("\n");
 
@@ -629,7 +650,7 @@ export default function ChatMastersPage() {
 PORTFOLIO SUMMARY: CHAT WITH AN AI FRIEND (CHAT MASTERS)
 ==================================================
 Student Name: ${studentName}
-Chat Partner: ${selectedChar.name} (${selectedChar.englishName})
+Chat Partner: ${selectedChar.id === "custom" ? customCharName : selectedChar.name} (${selectedChar.id === "custom" ? "Custom Figure" : selectedChar.englishName})
 Date: ${new Date().toLocaleDateString("he-IL")}
 
 --------------------------------------------------
@@ -867,6 +888,28 @@ ${formattedTranscript}
                     })}
                   </div>
                 </div>
+
+                {/* Custom Character Details Input */}
+                {selectedChar.id === "custom" && (
+                  <div className="space-y-3 pt-2">
+                    <label className={`block text-sm font-bold ${textTitle} text-right`}>
+                      שם הדמות המוכרת שתרצו לדבר איתה (באנגלית או בעברית):
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={customCharName}
+                        onChange={(e) => setCustomCharName(e.target.value)}
+                        placeholder="לדוגמה: Albert Einstein, Taylor Swift, Lionel Messi, Harry Potter..."
+                        className={`w-full px-4 py-3 rounded-xl border outline-none text-right transition-all font-bold ${inputStyle}`}
+                        required={selectedChar.id === "custom"}
+                      />
+                    </div>
+                    <p className={`text-[10px] ${textMuted} text-right leading-relaxed`}>
+                      הערה: ה-AI ייכנס לדמות זו וידבר איתכם כאילו הוא הדמות שבחרתם!
+                    </p>
+                  </div>
+                )}
 
                 {/* Assignment Mode Toggle */}
                 <div className={`p-4 rounded-xl border ${borderStyle} ${isLight ? "bg-zinc-50" : "bg-[#0b0f19]/30"} space-y-3`}>
@@ -1129,15 +1172,19 @@ ${formattedTranscript}
                 }`}>
                   {/* Info Button or character detail */}
                   <div className={`p-2 rounded-xl border text-xs font-bold flex items-center gap-1.5 ${selectedChar.themeColor}`}>
-                    <span>{selectedChar.englishName} is online</span>
+                    <span>{selectedChar.id === "custom" ? customCharName : selectedChar.englishName} is online</span>
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
                   </div>
 
                   {/* Character Avatar & Title */}
                   <div className="flex items-center gap-3 text-right">
                     <div>
-                      <h3 className={`text-sm font-bold ${textTitle}`}>{selectedChar.name}</h3>
-                      <p className={`text-[10px] ${textMuted}`}>{selectedChar.englishName} (AI Friend)</p>
+                      <h3 className={`text-sm font-bold ${textTitle}`}>
+                        {selectedChar.id === "custom" ? customCharName : selectedChar.name}
+                      </h3>
+                      <p className={`text-[10px] ${textMuted}`}>
+                        {selectedChar.id === "custom" ? "Custom Figure" : selectedChar.englishName} (AI Friend)
+                      </p>
                     </div>
                     <span className="text-3xl shrink-0 p-1 bg-surface-hover rounded-xl border border-border-custom-hover">
                       {selectedChar.avatar}
@@ -1197,7 +1244,7 @@ ${formattedTranscript}
                         >
                           {/* Sender name for context */}
                           <div className={`text-[10px] mb-1 font-bold ${isUser ? "text-purple-200" : "text-purple-400"}`}>
-                            {isUser ? studentName : selectedChar.englishName}
+                            {isUser ? studentName : (selectedChar.id === "custom" ? customCharName : selectedChar.englishName)}
                           </div>
                           
                           {/* Text content */}

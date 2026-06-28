@@ -890,9 +890,13 @@ ${formattedTranscript}
                             onClick={async () => {
                               try {
                                 await signInWithGoogle();
-                              } catch (err) {
+                              } catch (err: any) {
                                 console.error(err);
-                                alert("ההתחברות נכשלה. נסו שוב.");
+                                if (err.code === "auth/unauthorized-domain") {
+                                  alert("שגיאה: הדומיין אינו מורשה ב-Firebase. אנא הוסיפו את דומיין האתר הנוכחי לרשימת הדומיינים המורשים בקונסולת Firebase (תחת Authentication -> Settings).");
+                                } else if (err.code !== "auth/popup-closed-by-user") {
+                                  alert("ההתחברות נכשלה. נסו שוב.");
+                                }
                               }
                             }}
                             className="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg text-xs transition-colors flex items-center gap-1.5 mr-auto"

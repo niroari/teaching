@@ -100,7 +100,9 @@ function LoginContent() {
       router.push(redirectUrl);
     } catch (err: any) {
       console.error(err);
-      if (err.code !== "auth/popup-closed-by-user") {
+      if (err.code === "auth/unauthorized-domain") {
+        setError("שגיאה: הדומיין אינו מורשה ב-Firebase. אנא הוסיפו את דומיין האתר הנוכחי לרשימת הדומיינים המורשים בקונסולת Firebase (תחת Authentication -> Settings).");
+      } else if (err.code !== "auth/popup-closed-by-user") {
         setError("החיבור באמצעות גוגל נכשל. אנא נסו שוב.");
       }
     } finally {
@@ -174,6 +176,9 @@ function LoginContent() {
                   </span>
                   <input
                     type="text"
+                    id="displayName"
+                    name="displayName"
+                    autoComplete="name"
                     placeholder="הזינו את שמכם..."
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
@@ -191,6 +196,9 @@ function LoginContent() {
                 </span>
                 <input
                   type="email"
+                  id="email"
+                  name="email"
+                  autoComplete="email"
                   placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -208,6 +216,9 @@ function LoginContent() {
                 </span>
                 <input
                   type="password"
+                  id="password"
+                  name="password"
+                  autoComplete={mode === "signup" ? "new-password" : "current-password"}
                   placeholder="לפחות 6 תווים..."
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

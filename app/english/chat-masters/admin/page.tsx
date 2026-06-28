@@ -243,7 +243,18 @@ export default function ChatMastersAdmin() {
                 כדי לצפות בעבודות התלמידים ולהעריך אותן, עליך להתחבר עם חשבון המורה המורשה שלך.
               </p>
               <button
-                onClick={signInWithGoogle}
+                onClick={async () => {
+                  try {
+                    await signInWithGoogle();
+                  } catch (err: any) {
+                    console.error(err);
+                    if (err.code === "auth/unauthorized-domain") {
+                      alert("שגיאה: הדומיין אינו מורשה ב-Firebase. אנא הוסיפו את דומיין האתר הנוכחי לרשימת הדומיינים המורשים בקונסולת Firebase (תחת Authentication -> Settings).");
+                    } else if (err.code !== "auth/popup-closed-by-user") {
+                      alert("ההתחברות נכשלה. נסו שוב.");
+                    }
+                  }
+                }}
                 className="w-full py-3.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl cursor-pointer shadow-lg shadow-purple-500/25 transition-all text-sm"
               >
                 התחברות עם Google

@@ -31,8 +31,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => unsubscribe();
   }, []);
 
-  const signInWithGoogle = () => {
-    return signInWithPopup(auth, googleProvider);
+  const signInWithGoogle = async () => {
+    try {
+      // Try popup first (better UX on desktop)
+      return await signInWithPopup(auth, googleProvider);
+    } catch (err: any) {
+      console.warn("Google popup sign-in failed/blocked, trying redirect...", err);
+      // Fallback to redirect if popup is blocked, closed, or not supported
+      if (
+        err.code === "auth/popup-blocked" ||
+        err.code === "auth/popup-closed-by-user" ||
+        err.code === "auth/cancelled-popup-request" ||
+        (typeof window !== "undefined" && /mobile|android|iphone|ipad|ipod/i.test(window.navigator.userAgent))
+      ) {
+        const { signInWithRedirect } = await import("firebase/auth");
+        return await signInWithRedirect(auth, googleProvider);
+      }
+      throw err;
+    }
   };
 
   const logout = () => {

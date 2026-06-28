@@ -47,8 +47,18 @@ export async function POST(request: Request) {
     }
 
     let stageInstruction = "";
-    if (currentGuideStep === 3) {
-      stageInstruction = `\nSTAGE-SPECIFIC RULE: The student is currently practicing asking questions (Stage 3). You MUST explicitly prompt and encourage them to ask you questions! For example, say something like: "I love answering questions! What would you like to know about me/space/my superpowers?" or "Do you have any questions for me?" rather than you asking them a question. Encourage them to ask you anything!`;
+    if (currentGuideStep === 1) {
+      stageInstruction = `\nSTAGE-SPECIFIC RULE: The student is currently in Stage 1 (Greeting & Introduction). You must greet them warmly and encourage them to introduce themselves (e.g. tell you their name, age, or where they live in Israel).`;
+    } else if (currentGuideStep === 2) {
+      stageInstruction = `\nSTAGE-SPECIFIC RULE: The student is currently in Stage 2 (Sharing Likes and Dislikes). You must share a quick detail about what you like (e.g. space food, block building, chasing mice) and explicitly encourage them to share their favorite food, sport, or school subjects with you!`;
+    } else if (currentGuideStep === 3) {
+      stageInstruction = `\nSTAGE-SPECIFIC RULE: The student is currently in Stage 3 (Asking Questions). You MUST explicitly prompt and encourage them to ask you questions! For example, say: "I love answering questions! What would you like to know about me, space, or my superpowers?" rather than you asking them. Encourage them to ask you anything!`;
+    } else if (currentGuideStep === 4) {
+      stageInstruction = `\nSTAGE-SPECIFIC RULE: The student is currently in Stage 4 (Hobbies & Daily Routines). Share a quick detail about your routine (e.g. training, building structures, space missions) and encourage them to talk about their routines, hobbies, sports, or what they do after school.`;
+    } else if (currentGuideStep === 5) {
+      stageInstruction = `\nSTAGE-SPECIFIC RULE: The student is currently in Stage 5 (Free Chat & Funny Reactions). Share a playful joke, funny story, or interesting detail related to your persona, and ask them how they feel about it or what they find funny. Keep the chat light and active.`;
+    } else if (currentGuideStep === 6) {
+      stageInstruction = `\nSTAGE-SPECIFIC RULE: The student is wrapping up (Stage 6). Thank them for the wonderful chat, tell them they did a great job practicing their English, and say goodbye warmly!`;
     }
 
     const systemPrompt = `You are a friendly AI companion named ${characterName} chatting with a middle school student from Israel (grades 7-9) named ${studentName || "friend"}.

@@ -627,12 +627,16 @@ ${formattedTranscript}
                           return (
                             <div 
                               key={sIdx} 
-                              className={`p-3 rounded-xl border text-left flex justify-between items-center gap-3 transition-colors text-xs font-mono group hover:bg-purple-500/5 ${
+                              className={`p-3 rounded-xl border flex justify-between items-center gap-3 transition-colors text-xs font-mono group hover:bg-purple-500/5 ${
                                 isLight 
                                   ? "bg-zinc-50 border-zinc-200 text-zinc-800" 
                                   : "bg-surface border-border-custom text-zinc-100"
                               }`}
+                              dir="ltr"
                             >
+                              <span className="block flex-1 text-left break-words">
+                                {starter}
+                              </span>
                               <button
                                 onClick={() => {
                                   handleInsertStarter(starter);
@@ -644,9 +648,6 @@ ${formattedTranscript}
                               >
                                 {isCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                               </button>
-                              <span className="direction-ltr block w-full text-left break-words">
-                                {starter}
-                              </span>
                             </div>
                           );
                         })}
@@ -681,7 +682,8 @@ ${formattedTranscript}
 1. What do you like to do for fun?
 2. Do you have pets?
 3. What is your favorite school subject?"
-                          className={`w-full p-3 rounded-xl border outline-none text-left direction-ltr text-xs transition-all ${inputStyle} min-h-[90px]`}
+                          className={`w-full p-3 rounded-xl border outline-none text-left text-xs transition-all ${inputStyle} min-h-[90px]`}
+                          dir="ltr"
                           required
                         />
                       </div>
@@ -777,6 +779,7 @@ ${formattedTranscript}
                                 ? "bg-white border border-zinc-200 text-zinc-900 rounded-tr-none shadow-sm"
                                 : "bg-surface border border-border-custom text-[#e8edf8] rounded-tr-none shadow-md shadow-black/10"
                           }`}
+                          dir="ltr"
                         >
                           {/* Sender name for context */}
                           <div className={`text-[10px] mb-1 font-bold ${isUser ? "text-purple-200" : "text-purple-400"}`}>
@@ -789,7 +792,7 @@ ${formattedTranscript}
                           </div>
                           
                           {/* Timestamp */}
-                          <div className={`text-[9px] mt-1.5 text-left ${isUser ? "text-purple-300" : "text-text-muted"}`}>
+                          <div className={`text-[9px] mt-1.5 text-right ${isUser ? "text-purple-300" : "text-text-muted"}`}>
                             {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </div>
                         </div>
@@ -818,7 +821,7 @@ ${formattedTranscript}
                   
                   {/* Translate Accordion Header */}
                   <div className="flex justify-between items-center w-full">
-                    <span className="text-[10px] text-purple-400 font-mono">
+                    <span className="text-[10px] text-purple-400 font-mono" dir="ltr">
                       {translationResult ? `English: "${translationResult}"` : ""}
                     </span>
                     <div className="flex items-center gap-1.5 text-right font-bold text-xs text-purple-400">
@@ -892,8 +895,9 @@ ${formattedTranscript}
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     placeholder="כתבו הודעה באנגלית לחבר ה-AI שלכם..."
-                    className={`flex-1 px-4 py-3 rounded-xl border outline-none transition-all font-medium text-sm text-left direction-ltr ${inputStyle}`}
+                    className={`flex-1 px-4 py-3 rounded-xl border outline-none transition-all font-medium text-sm text-left ${inputStyle}`}
                     disabled={isTyping}
+                    dir="ltr"
                   />
                 </form>
 
@@ -937,7 +941,7 @@ ${formattedTranscript}
                 
                 <div>
                   <span className={`font-bold ${textTitle} block`}>שלוש שאלות לחבר לעט מחו״ל:</span>
-                  <p className={`mt-1 text-xs leading-relaxed ${textBody} font-mono bg-purple-500/5 p-3 rounded-lg border border-purple-500/10 text-left direction-ltr whitespace-pre-wrap`}>
+                  <p className={`mt-1 text-xs leading-relaxed ${textBody} font-mono bg-purple-500/5 p-3 rounded-lg border border-purple-500/10 text-left whitespace-pre-wrap`} dir="ltr">
                     {exitTicketPenPal}
                   </p>
                 </div>

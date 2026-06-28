@@ -21,6 +21,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/context/AuthContext";
 import confetti from "canvas-confetti";
+import { dbFirestore } from "@/lib/firebase";
+import { collection, addDoc, query, where, getDocs, onSnapshot, serverTimestamp, doc } from "firebase/firestore";
 
 interface Message {
   sender: "user" | "bot";
@@ -184,7 +186,7 @@ const GUIDE_STEPS: GuideStep[] = [
 ];
 
 export default function ChatMastersPage() {
-  const { user } = useAuth();
+  const { user, signInWithGoogle } = useAuth();
   
   // App states
   const [comfortMode, setComfortMode] = useState<"dark" | "light">("dark");
@@ -201,6 +203,12 @@ export default function ChatMastersPage() {
   const [isTyping, setIsTyping] = useState(false);
   const [currentGuideStep, setCurrentGuideStep] = useState(1);
   const [completedPhases, setCompletedPhases] = useState<boolean[]>([false, false, false, false, false, false]);
+
+  // Assignment states
+  const [isAssignmentMode, setIsAssignmentMode] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [existingAssignment, setExistingAssignment] = useState<any>(null);
+  const [loadingExisting, setLoadingExisting] = useState(false);
   
   // Translation helper states
   const [hebrewInput, setHebrewInput] = useState("");
@@ -233,6 +241,68 @@ export default function ChatMastersPage() {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, isTyping]);
+
+  // Check for existing assignment
+  useEffect(() => {
+    if (!user) {
+      setExistingAssignment(null);
+      return;
+    }
+
+    const checkExisting = async () => {
+      setLoadingExisting(true);
+      try {
+        const q = query(
+          collection(dbFirestore, "chat_assignments"),
+          where("studentId", "==", user.uid)
+        );
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          const docs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          // Sort client-side by submittedAt desc to avoid requiring composite indexes
+          docs.sort((a: any, b: any) => {
+            const timeA = a.submittedAt?.seconds || 0;
+            const timeB = b.submittedAt?.seconds || 0;
+            return timeB - timeA;
+          });
+          const latest = docs[0];
+          setExistingAssignment(latest);
+
+          // Listen for real-time updates on this specific document
+          const docRef = doc(dbFirestore, "chat_assignments", latest.id);
+          const unsubscribe = onSnapshot(docRef, (snapshot) => {
+            if (snapshot.exists()) {
+              const updatedData = snapshot.data();
+              setExistingAssignment({ id: snapshot.id, ...updatedData });
+              
+              // Sync student fields if they already submitted
+              if (updatedData.exitTicketLearned) setExitTicketLearned(updatedData.exitTicketLearned);
+              if (updatedData.exitTicketPenPal) setExitTicketPenPal(updatedData.exitTicketPenPal);
+              if (updatedData.character) {
+                const charObj = CHARACTERS.find(c => c.id === updatedData.character);
+                if (charObj) setSelectedChar(charObj);
+              }
+              if (updatedData.studentName) setStudentName(updatedData.studentName);
+              if (updatedData.messages) {
+                setMessages(updatedData.messages.map((m: any) => ({
+                  sender: m.sender,
+                  text: m.text,
+                  timestamp: new Date(m.timestamp)
+                })));
+              }
+            }
+          });
+          return () => unsubscribe();
+        }
+      } catch (err) {
+        console.error("Error checking existing assignment:", err);
+      } finally {
+        setLoadingExisting(false);
+      }
+    };
+
+    checkExisting();
+  }, [user]);
 
   // Heuristic Phase Detector
   useEffect(() => {
@@ -329,6 +399,11 @@ export default function ChatMastersPage() {
   const handleStartChat = () => {
     if (!studentName.trim()) {
       alert("אנא הקלידו שם לפני שנתחיל!");
+      return;
+    }
+    
+    if (isAssignmentMode && !user) {
+      alert("אנא התחברו למערכת כדי להתחיל את הפעילות כמשימה להגשה!");
       return;
     }
     
@@ -457,11 +532,52 @@ export default function ChatMastersPage() {
   };
 
 
-  const handleFinishActivity = (e: React.FormEvent) => {
+  const handleFinishActivity = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!exitTicketLearned.trim() || !exitTicketPenPal.trim()) {
       alert("אנא מלאו את שני חלקי כרטיס היציאה לפני הסיום!");
       return;
+    }
+
+    if (isAssignmentMode) {
+      if (!user) {
+        alert("עלייך להתחבר למערכת כדי להגיש את המשימה.");
+        return;
+      }
+      setIsSubmitting(true);
+      try {
+        const docRef = await addDoc(collection(dbFirestore, "chat_assignments"), {
+          studentId: user.uid,
+          studentName: studentName.trim(),
+          studentEmail: user.email || "",
+          character: selectedChar.id,
+          messages: messages.map(m => ({
+            sender: m.sender,
+            text: m.text,
+            timestamp: m.timestamp.toISOString()
+          })),
+          exitTicketLearned: exitTicketLearned.trim(),
+          exitTicketPenPal: exitTicketPenPal.trim(),
+          submittedAt: serverTimestamp(),
+          status: "submitted",
+          score: null,
+          feedback: null
+        });
+
+        // Set up real-time listener for this new assignment
+        const unsubscribe = onSnapshot(docRef, (snapshot) => {
+          if (snapshot.exists()) {
+            setExistingAssignment({ id: snapshot.id, ...snapshot.data() });
+          }
+        });
+      } catch (err) {
+        console.error("Error submitting assignment:", err);
+        alert("אירעה שגיאה בשליחת המשימה. אנא נסו שוב.");
+        setIsSubmitting(false);
+        return;
+      } finally {
+        setIsSubmitting(false);
+      }
     }
 
     setStep("finished");
@@ -557,87 +673,212 @@ ${formattedTranscript}
               </p>
             </div>
 
-            {/* Config Card */}
-            <div className={`w-full p-8 rounded-2xl ${cardStyle} border ${borderStyle} space-y-8`}>
-              
-              {/* Name Input */}
-              <div className="space-y-3">
-                <label className={`block text-sm font-bold ${textTitle} text-right`}>
-                  הקלידו את שמכם (באנגלית או בעברית):
-                </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 right-4 flex items-center text-text-muted">
-                    <User className="w-4 h-4" />
-                  </span>
-                  <input
-                    type="text"
-                    value={studentName}
-                    onChange={(e) => setStudentName(e.target.value)}
-                    placeholder="לדוגמה: נועם / Noam"
-                    className={`w-full pr-12 pl-4 py-3 rounded-xl border outline-none text-right transition-all font-bold ${inputStyle}`}
-                  />
+            {/* Config Card / Status Check */}
+            {loadingExisting ? (
+              <div className={`w-full p-12 rounded-2xl ${cardStyle} border ${borderStyle} flex flex-col items-center justify-center space-y-4`}>
+                <RefreshCw className="w-8 h-8 text-purple-500 animate-spin" />
+                <span className={`text-xs ${textMuted}`}>בודק הגשות קודמות...</span>
+              </div>
+            ) : existingAssignment ? (
+              /* If there is an existing submission, show status card */
+              <div className={`w-full p-8 rounded-2xl ${cardStyle} border ${borderStyle} text-right space-y-6 shadow-xl`}>
+                <div className="border-b border-purple-500/10 pb-4">
+                  <h3 className={`text-lg font-bold text-purple-400`}>המשימה שלך הוגשה!</h3>
+                  <p className={`text-xs mt-1 ${textMuted}`}>
+                    הגשת את השיחה עם {CHARACTERS.find(c => c.id === existingAssignment.character)?.name || existingAssignment.character} ב-
+                    {existingAssignment.submittedAt ? new Date(existingAssignment.submittedAt.seconds * 1000).toLocaleString("he-IL") : ""}
+                  </p>
+                </div>
+
+                {existingAssignment.status === "graded" ? (
+                  <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-black text-emerald-400">ציון: {existingAssignment.score} / 100</span>
+                      <span className="text-[10px] px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded-full font-bold">נבדק על ידי המורה</span>
+                    </div>
+                    {existingAssignment.feedback && (
+                      <div className="mt-2 text-xs leading-relaxed text-slate-200">
+                        <span className="font-bold block text-emerald-400">משוב מהמורה:</span>
+                        <p className="mt-1 whitespace-pre-wrap">{existingAssignment.feedback}</p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-center justify-between flex-row-reverse">
+                    <div className="text-right">
+                      <span className="text-sm font-bold text-amber-400 block font-sans">המשימה הוגשה וממתינה לבדיקה</span>
+                      <span className="text-xs text-amber-300/80">המורה יבדוק ויתן ציון בקרוב. תוכלו לצפות בשיחה שהוגשה.</span>
+                    </div>
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+                  <button
+                    onClick={() => {
+                      setIsAssignmentMode(true);
+                      setStep("finished");
+                    }}
+                    className="py-3.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl cursor-pointer shadow-lg shadow-purple-500/25 transition-all flex items-center justify-center gap-2"
+                  >
+                    <span>צפייה בשיחה שהוגשה</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      // Allow re-practicing by clearing local messages but NOT deleting the submission
+                      setMessages([
+                        {
+                          sender: "bot",
+                          text: selectedChar.greeting,
+                          timestamp: new Date()
+                        }
+                      ]);
+                      setCompletedPhases([false, false, false, false, false, false]);
+                      setCurrentGuideStep(1);
+                      setIsAssignmentMode(false); // Disable assignment mode for self-practice
+                      setExistingAssignment(null); // Clear local reference so they can configure
+                      setStep("setup");
+                    }}
+                    className={`py-3.5 rounded-xl border border-purple-500/20 bg-purple-500/5 hover:bg-purple-500/10 text-purple-400 text-xs font-bold cursor-pointer transition-colors flex items-center justify-center gap-2`}
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    <span>תרגול מחדש (ללא הגשה)</span>
+                  </button>
                 </div>
               </div>
+            ) : (
+              /* Config Card */
+              <div className={`w-full p-8 rounded-2xl ${cardStyle} border ${borderStyle} space-y-8`}>
+                
+                {/* Name Input */}
+                <div className="space-y-3">
+                  <label className={`block text-sm font-bold ${textTitle} text-right`}>
+                    הקלידו את שמכם (באנגלית או בעברית):
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 right-4 flex items-center text-text-muted">
+                      <User className="w-4 h-4" />
+                    </span>
+                    <input
+                      type="text"
+                      value={studentName}
+                      onChange={(e) => setStudentName(e.target.value)}
+                      placeholder="לדוגמה: נועם / Noam"
+                      className={`w-full pr-12 pl-4 py-3 rounded-xl border outline-none text-right transition-all font-bold ${inputStyle}`}
+                    />
+                  </div>
+                </div>
 
-              {/* Character Selector */}
-              <div className="space-y-4">
-                <label className={`block text-sm font-bold ${textTitle} text-right`}>
-                  בחרו את החבר/ה לשיחה (AI Friend):
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {CHARACTERS.map((char) => {
-                    const isSelected = selectedChar.id === char.id;
-                    return (
-                      <button
-                        key={char.id}
-                        onClick={() => setSelectedChar(char)}
-                        className={`p-4 rounded-xl border text-right transition-all flex flex-col justify-between min-h-[140px] hover:scale-[1.02] cursor-pointer ${
-                          isSelected 
-                            ? `border-purple-500 ring-2 ring-purple-500/20 bg-purple-500/5` 
-                            : `${borderStyle} ${isLight ? "bg-white hover:bg-zinc-50" : "bg-[#0b0f19] hover:bg-[#111727]"}`
-                        }`}
-                      >
-                        <div className="flex justify-between items-center w-full">
-                          <span className="text-3xl">{char.avatar}</span>
-                          <span className={`text-[10px] px-2 py-0.5 rounded-full border ${char.themeColor} font-bold`}>
-                            {char.englishName}
-                          </span>
+                {/* Character Selector */}
+                <div className="space-y-4">
+                  <label className={`block text-sm font-bold ${textTitle} text-right`}>
+                    בחרו את החבר/ה לשיחה (AI Friend):
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {CHARACTERS.map((char) => {
+                      const isSelected = selectedChar.id === char.id;
+                      return (
+                        <button
+                          key={char.id}
+                          onClick={() => setSelectedChar(char)}
+                          className={`p-4 rounded-xl border text-right transition-all flex flex-col justify-between min-h-[140px] hover:scale-[1.02] cursor-pointer ${
+                            isSelected 
+                              ? `border-purple-500 ring-2 ring-purple-500/20 bg-purple-500/5` 
+                              : `${borderStyle} ${isLight ? "bg-white hover:bg-zinc-50" : "bg-[#0b0f19] hover:bg-[#111727]"}`
+                          }`}
+                        >
+                          <div className="flex justify-between items-center w-full">
+                            <span className="text-3xl">{char.avatar}</span>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full border ${char.themeColor} font-bold`}>
+                              {char.englishName}
+                            </span>
+                          </div>
+                          <div className="mt-3">
+                            <h3 className={`text-sm font-bold ${isSelected ? "text-purple-400" : textTitle}`}>
+                              {char.name}
+                            </h3>
+                            <p className={`text-xs mt-1 leading-normal ${textMuted}`}>
+                              {char.description}
+                            </p>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Assignment Mode Toggle */}
+                <div className={`p-4 rounded-xl border ${borderStyle} ${isLight ? "bg-zinc-50" : "bg-[#0b0f19]/30"} space-y-3`}>
+                  <div className="flex items-center justify-between flex-row-reverse">
+                    <label className={`text-sm font-bold ${textTitle} flex items-center gap-2 cursor-pointer select-none`}>
+                      <input 
+                        type="checkbox"
+                        checked={isAssignmentMode}
+                        onChange={(e) => setIsAssignmentMode(e.target.checked)}
+                        className="w-4.5 h-4.5 rounded border-zinc-300 text-purple-600 focus:ring-purple-500 accent-purple-600"
+                      />
+                      <span>הפיכת הפעילות למשימה להגשה (מצב משימה)</span>
+                    </label>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 font-bold">
+                      אופציונלי
+                    </span>
+                  </div>
+                  
+                  {isAssignmentMode && (
+                    <div className="pt-2 text-right">
+                      {user ? (
+                        <div className="text-xs text-emerald-400 font-medium flex items-center justify-end gap-1.5">
+                          <span>מחובר/ת כעת בתור: <b>{user.displayName || user.email}</b>. המשימה תישמר תחת חשבון זה.</span>
+                          <CheckCircle className="w-3.5 h-3.5" />
                         </div>
-                        <div className="mt-3">
-                          <h3 className={`text-sm font-bold ${isSelected ? "text-purple-400" : textTitle}`}>
-                            {char.name}
-                          </h3>
-                          <p className={`text-xs mt-1 leading-normal ${textMuted}`}>
-                            {char.description}
+                      ) : (
+                        <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg space-y-2">
+                          <p className="text-xs text-amber-300">
+                            כדי שתוכלו להגיש את המשימה למורה ושהציון יישמר, עליכם להתחבר תחילה.
                           </p>
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              try {
+                                await signInWithGoogle();
+                              } catch (err) {
+                                console.error(err);
+                                alert("ההתחברות נכשלה. נסו שוב.");
+                              }
+                            }}
+                            className="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg text-xs transition-colors flex items-center gap-1.5 mr-auto"
+                          >
+                            <span>התחברות עם Google</span>
+                          </button>
                         </div>
-                      </button>
-                    );
-                  })}
+                      )}
+                    </div>
+                  )}
                 </div>
+
+                {/* Instructions Summary */}
+                <div className={`p-4 rounded-xl text-right text-xs leading-relaxed ${isLight ? "bg-zinc-100/50 text-zinc-600" : "bg-surface-hover/40 text-text-muted"} border ${borderStyle}`}>
+                  <p className="font-bold text-purple-400 mb-1">איך הפעילות עובדת?</p>
+                  <ul className="list-disc pr-4 space-y-1">
+                    <li>בצד שמאל יוצג מדריך השיחה צעד-אחר-צעד, כולל הצעות למשפטי פתיחה ודוגמאות.</li>
+                    <li>בצד ימין תוכלו להתכתב עם החבר הדיגיטלי שלכם, שמתאים את עצמו לקצב שלכם.</li>
+                    <li>אם תצטרכו עזרה בתרגום מילים מעברית לאנגלית, תוכלו להשתמש בעוזר התרגום המובנה!</li>
+                    <li>בסיום השיחה, תמלאו כרטיס סיכום קצר ותורידו קובץ מעוצב עם השיחה שלכם להגשה למורה.</li>
+                  </ul>
+                </div>
+
+                {/* Start Button */}
+                <button
+                  onClick={handleStartChat}
+                  className="w-full py-4 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl cursor-pointer shadow-lg shadow-purple-500/25 transition-all flex items-center justify-center gap-2 text-base"
+                >
+                  <span>בואו נתחיל לדבר!</span>
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+
               </div>
-
-              {/* Instructions Summary */}
-              <div className={`p-4 rounded-xl text-right text-xs leading-relaxed ${isLight ? "bg-zinc-100/50 text-zinc-600" : "bg-surface-hover/40 text-text-muted"} border ${borderStyle}`}>
-                <p className="font-bold text-purple-400 mb-1">איך הפעילות עובדת?</p>
-                <ul className="list-disc pr-4 space-y-1">
-                  <li>בצד שמאל יוצג מדריך השיחה צעד-אחר-צעד, כולל הצעות למשפטי פתיחה ודוגמאות.</li>
-                  <li>בצד ימין תוכלו להתכתב עם החבר הדיגיטלי שלכם, שמתאים את עצמו לקצב שלכם.</li>
-                  <li>אם תצטרכו עזרה בתרגום מילים מעברית לאנגלית, תוכלו להשתמש בעוזר התרגום המובנה!</li>
-                  <li>בסיום השיחה, תמלאו כרטיס סיכום קצר ותורידו קובץ מעוצב עם השיחה שלכם להגשה למורה.</li>
-                </ul>
-              </div>
-
-              {/* Start Button */}
-              <button
-                onClick={handleStartChat}
-                className="w-full py-4 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl cursor-pointer shadow-lg shadow-purple-500/25 transition-all flex items-center justify-center gap-2 text-base"
-              >
-                <span>בואו נתחיל לדבר!</span>
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-
-            </div>
+            )}
           </div>
         )}
 
@@ -752,10 +993,26 @@ ${formattedTranscript}
 
                       <button
                         type="submit"
-                        className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl cursor-pointer shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-1.5 text-xs"
+                        disabled={isSubmitting}
+                        className={`w-full py-3 text-white font-bold rounded-xl cursor-pointer shadow-lg transition-all flex items-center justify-center gap-1.5 text-xs ${
+                          isSubmitting 
+                            ? "bg-zinc-700 cursor-not-allowed opacity-50"
+                            : isAssignmentMode
+                              ? "bg-purple-600 hover:bg-purple-500 shadow-purple-500/25"
+                              : "bg-emerald-600 hover:bg-emerald-500 shadow-emerald-500/25"
+                        }`}
                       >
-                        <CheckCircle className="w-4 h-4" />
-                        <span>סיום והורדת סיכום שיחה!</span>
+                        {isSubmitting ? (
+                          <>
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                            <span>מגיש משימה...</span>
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle className="w-4 h-4" />
+                            <span>{isAssignmentMode ? "הגשת משימה לבדיקת המורה" : "סיום והורדת סיכום שיחה!"}</span>
+                          </>
+                        )}
                       </button>
                     </form>
                   )}
@@ -1039,6 +1296,33 @@ ${formattedTranscript}
                   </p>
                 </div>
 
+                {isAssignmentMode && (
+                  <div className="pt-2 text-right">
+                    {existingAssignment && existingAssignment.status === "graded" ? (
+                      <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-lg font-black text-emerald-400">ציון: {existingAssignment.score} / 100</span>
+                          <span className="text-[10px] px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded-full font-bold">נבדק על ידי המורה</span>
+                        </div>
+                        {existingAssignment.feedback && (
+                          <div className="mt-2 text-xs leading-relaxed text-slate-200">
+                            <span className="font-bold block text-emerald-400">משוב מהמורה:</span>
+                            <p className="mt-1 whitespace-pre-wrap">{existingAssignment.feedback}</p>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-center justify-between flex-row-reverse">
+                        <div className="text-right">
+                          <span className="text-sm font-bold text-amber-400 block font-sans">המשימה הוגשה למורה!</span>
+                          <span className="text-xs text-amber-300/80">ממתין לבדיקה ומתן ציון. תוכלו לחזור לדף זה בהמשך כדי לראות את הציון שלכם.</span>
+                        </div>
+                        <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <div className="flex gap-2.5 items-center justify-end text-xs font-bold text-emerald-400">
                   <span>שיחה מלאה הוקלטה בתיקיית הסיכום!</span>
                   <CheckCircle className="w-4 h-4 shrink-0" />
@@ -1062,12 +1346,14 @@ ${formattedTranscript}
                     setExitTicketPenPal("");
                     setCompletedPhases([false, false, false, false, false, false]);
                     setCurrentGuideStep(1);
-                    setStep("chat");
+                    setIsAssignmentMode(false);
+                    setExistingAssignment(null);
+                    setStep("setup");
                   }}
                   className={`py-3.5 rounded-xl border border-purple-500/20 bg-purple-500/5 hover:bg-purple-500/10 text-purple-400 text-xs font-bold cursor-pointer transition-colors flex items-center justify-center gap-2`}
                 >
                   <RefreshCw className="w-4 h-4" />
-                  <span>שיחה חדשה</span>
+                  <span>{isAssignmentMode ? "תרגול מחדש (ללא הגשה)" : "שיחה חדשה"}</span>
                 </button>
 
                 <button

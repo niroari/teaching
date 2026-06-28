@@ -368,7 +368,8 @@ export default function ChatMastersPage() {
         body: JSON.stringify({
           character: selectedChar.id,
           studentName: studentName.trim(),
-          messages: chatHistory
+          messages: chatHistory,
+          currentGuideStep: currentGuideStep
         })
       });
 

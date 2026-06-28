@@ -92,6 +92,7 @@ export default function UnseenPracticePage() {
   const [studentClass, setStudentClass] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedDocId, setSubmittedDocId] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Load theme preference from localStorage
   useEffect(() => {
@@ -217,6 +218,7 @@ export default function UnseenPracticePage() {
   const submitUnseenAssignment = async () => {
     if (!user) return;
     setIsSubmitting(true);
+    setSubmitError(null);
     try {
       const uploadPromise = addDoc(collection(dbFirestore, "unseen_assignments"), {
         studentId: user.uid,
@@ -240,8 +242,9 @@ export default function UnseenPracticePage() {
 
       const docRef = await Promise.race([uploadPromise, timeoutPromise]) as any;
       setSubmittedDocId(docRef.id);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error submitting unseen assignment:", err);
+      setSubmitError(err.message || String(err));
     } finally {
       setIsSubmitting(false);
     }
@@ -259,6 +262,7 @@ export default function UnseenPracticePage() {
     setTotalQuestionsAnswered(0);
     setCorrectOnFirstTry(0);
     setSubmittedDocId(null);
+    setSubmitError(null);
     setCurrentStep("game");
   };
 
@@ -1199,6 +1203,11 @@ export default function UnseenPracticePage() {
                     ) : (
                       <div className="space-y-2">
                         <p className="text-xs text-rose-400 font-bold">המשימה טרם הוגשה למורה.</p>
+                        {submitError && (
+                          <p className="text-[10px] text-rose-300 bg-rose-950/20 border border-rose-900/30 p-2 rounded-lg text-left font-mono max-w-sm mx-auto overflow-x-auto whitespace-pre-wrap" dir="ltr">
+                            Error: {submitError}
+                          </p>
+                        )}
                         <button
                           onClick={submitUnseenAssignment}
                           className="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-zinc-950 font-bold text-xs transition-all cursor-pointer shadow-md mx-auto"

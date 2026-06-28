@@ -159,6 +159,7 @@ export default function WritingWorkspacePage() {
   const [studentClass, setStudentClass] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedDocId, setSubmittedDocId] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user?.displayName) {
@@ -229,6 +230,7 @@ export default function WritingWorkspacePage() {
     if (!user) return;
     setIsSubmitting(true);
     setSubmittedDocId(null);
+    setSubmitError(null);
     try {
       const uploadPromise = addDoc(collection(dbFirestore, "writing_assignments"), {
         studentId: user.uid,
@@ -252,8 +254,9 @@ export default function WritingWorkspacePage() {
 
       const docRef = await Promise.race([uploadPromise, timeoutPromise]) as any;
       setSubmittedDocId(docRef.id);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error submitting writing assignment:", err);
+      setSubmitError(err.message || String(err));
     } finally {
       setIsSubmitting(false);
     }
@@ -640,7 +643,12 @@ export default function WritingWorkspacePage() {
                           <span>שולח משימה למערכת...</span>
                         ) : result ? (
                           <div className="flex flex-col items-end gap-2">
-                            <span className="text-rose-400">המשימה טרם הוגשה למערכת.</span>
+                            <span className="text-rose-400 font-bold">המשימה טרם הוגשה למערכת.</span>
+                            {submitError && (
+                              <p className="text-[10px] text-rose-350 bg-rose-950/20 border border-rose-900/30 p-2 rounded-lg text-left font-mono max-w-sm overflow-x-auto whitespace-pre-wrap" dir="ltr">
+                                Error: {submitError}
+                              </p>
+                            )}
                             <button
                               type="button"
                               onClick={() => submitWritingAssignment(result)}

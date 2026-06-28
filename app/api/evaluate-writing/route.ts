@@ -70,7 +70,7 @@ CRITICAL RULES:
       }
     };
 
-    const modelsToTry = ["gemini-2.5-flash", "gemini-1.5-flash"];
+    const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-flash-latest"];
     let response: Response | null = null;
     let errorText = "";
 

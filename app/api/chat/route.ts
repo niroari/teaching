@@ -141,11 +141,13 @@ Format your output as a simple text response. Do not use markdown headers or bol
           response = res;
           break;
         } else {
-          errorText = await res.text();
-          console.warn(`Model ${model} failed with status ${res.status}:`, errorText);
+          const detail = await res.text();
+          errorText += ` [${model} status ${res.status}: ${detail}]`;
+          console.warn(`Model ${model} failed with status ${res.status}:`, detail);
         }
       } catch (err: any) {
-        errorText = err.message || String(err);
+        const detail = err.message || String(err);
+        errorText += ` [${model} error: ${detail}]`;
         console.warn(`Model ${model} threw error:`, err);
       }
     }

@@ -220,6 +220,7 @@ export default function ChatMastersPage() {
   const [exitTicketPenPal, setExitTicketPenPal] = useState("");
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const unsubscribeRef = useRef<(() => void) | null>(null);
 
   // Load theme preference and set user name
   useEffect(() => {
@@ -251,14 +252,26 @@ export default function ChatMastersPage() {
 
     const checkExisting = async () => {
       setLoadingExisting(true);
+      
+      // Create a 3-second query timeout promise
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Query timeout")), 3000)
+      );
+
       try {
         const q = query(
           collection(dbFirestore, "chat_assignments"),
           where("studentId", "==", user.uid)
         );
-        const querySnapshot = await getDocs(q);
-        if (!querySnapshot.empty) {
-          const docs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Race the getDocs call against the 3-second timeout
+        const querySnapshot = await Promise.race([
+          getDocs(q),
+          timeoutPromise
+        ]) as any;
+
+        if (querySnapshot && !querySnapshot.empty) {
+          const docs = querySnapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }));
           // Sort client-side by submittedAt desc to avoid requiring composite indexes
           docs.sort((a: any, b: any) => {
             const timeA = a.submittedAt?.seconds || 0;
@@ -292,16 +305,23 @@ export default function ChatMastersPage() {
               }
             }
           });
-          return () => unsubscribe();
+          unsubscribeRef.current = unsubscribe;
         }
       } catch (err) {
-        console.error("Error checking existing assignment:", err);
+        console.warn("Error or timeout checking existing assignment:", err);
       } finally {
         setLoadingExisting(false);
       }
     };
 
     checkExisting();
+
+    return () => {
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+        unsubscribeRef.current = null;
+      }
+    };
   }, [user]);
 
   // Heuristic Phase Detector

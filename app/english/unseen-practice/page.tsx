@@ -21,12 +21,16 @@ import {
   Sparkles,
   RefreshCw,
   Info,
-  Clock
+  Clock,
+  Plus,
+  Trash2,
+  Edit2,
+  Check
 } from "lucide-react";
 import { useAuth } from "@/lib/context/AuthContext";
 import { PRE_GENERATED_UNSEENS, UnseenData } from "@/lib/unseen-data";
 import { dbFirestore } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, doc, setDoc, deleteDoc } from "firebase/firestore";
 
 // Helper function to calculate Levenshtein distance for spelling tolerance
 const getLevenshteinDistance = (a: string, b: string): number => {
@@ -53,6 +57,15 @@ const getLevenshteinDistance = (a: string, b: string): number => {
 
   return matrix[a.length][b.length];
 };
+
+interface Word {
+  id: string;
+  english: string;
+  hebrew: string;
+  partOfSpeech: string;
+  example?: string;
+  mastered?: boolean;
+}
 
 export default function UnseenPracticePage() {
   const router = useRouter();
@@ -93,6 +106,134 @@ export default function UnseenPracticePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedDocId, setSubmittedDocId] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Vocabulary Notebook States
+  const [isNotebookOpen, setIsNotebookOpen] = useState(false);
+  const [notebookWords, setNotebookWords] = useState<Word[]>([]);
+  const [notebookInput, setNotebookInput] = useState("");
+  const [notebookLoading, setNotebookLoading] = useState(false);
+  const [notebookError, setNotebookError] = useState<string | null>(null);
+  const [editingWordId, setEditingWordId] = useState<string | null>(null);
+  const [editingHebrewText, setEditingHebrewText] = useState("");
+
+  const handleNotebookAdd = async (englishWord: string) => {
+    const cleanWord = englishWord.trim().toLowerCase();
+    if (!cleanWord) return;
+
+    if (notebookWords.some(w => w.english.toLowerCase() === cleanWord)) {
+      setNotebookError("המילה כבר קיימת בפנקס הנוכחי");
+      return;
+    }
+
+    setNotebookLoading(true);
+    setNotebookError(null);
+
+    try {
+      const res = await fetch("/api/translate-word", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ word: cleanWord }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to translate word");
+      }
+
+      const responseData = await res.json();
+      if (responseData.success && responseData.data) {
+        const translated: Word = {
+          id: Date.now().toString(),
+          english: responseData.data.english || cleanWord,
+          hebrew: responseData.data.hebrew || "",
+          partOfSpeech: responseData.data.partOfSpeech || "noun",
+          example: responseData.data.example || "",
+          mastered: false
+        };
+
+        await syncWordToVocabStore(translated);
+        setNotebookWords(prev => [translated, ...prev]);
+        setNotebookInput("");
+      } else {
+        throw new Error(responseData.reason || "Unknown API error");
+      }
+    } catch (err: any) {
+      console.error("Error translating word:", err);
+      setNotebookError("שגיאה בתרגום המילה. אנא נסו שוב.");
+    } finally {
+      setNotebookLoading(false);
+    }
+  };
+
+  const syncWordToVocabStore = async (newWord: Word) => {
+    const stored = localStorage.getItem("teaching-site-vocab-words");
+    let currentWords: Word[] = [];
+    if (stored) {
+      try {
+        currentWords = JSON.parse(stored);
+      } catch (e) {
+        currentWords = [];
+      }
+    }
+    if (!currentWords.some(w => w.english.toLowerCase() === newWord.english.toLowerCase())) {
+      const updatedWords = [newWord, ...currentWords];
+      localStorage.setItem("teaching-site-vocab-words", JSON.stringify(updatedWords));
+    }
+
+    if (user) {
+      try {
+        const docRef = doc(dbFirestore, "users", user.uid, "words", newWord.id);
+        await setDoc(docRef, newWord);
+      } catch (e) {
+        console.error("Error syncing word to Firestore:", e);
+      }
+    }
+  };
+
+  const handleNotebookDelete = async (wordId: string, english: string) => {
+    setNotebookWords(prev => prev.filter(w => w.id !== wordId));
+
+    const stored = localStorage.getItem("teaching-site-vocab-words");
+    if (stored) {
+      try {
+        const currentWords = JSON.parse(stored) as Word[];
+        const updatedWords = currentWords.filter(w => w.english.toLowerCase() !== english.toLowerCase() && w.id !== wordId);
+        localStorage.setItem("teaching-site-vocab-words", JSON.stringify(updatedWords));
+      } catch (e) {
+        console.error("Local storage delete error:", e);
+      }
+    }
+
+    if (user) {
+      try {
+        const docRef = doc(dbFirestore, "users", user.uid, "words", wordId);
+        await deleteDoc(docRef);
+      } catch (e) {
+        console.error("Firestore delete error:", e);
+      }
+    }
+  };
+
+  const handleNotebookEditStart = (word: Word) => {
+    setEditingWordId(word.id);
+    setEditingHebrewText(word.hebrew);
+  };
+
+  const handleNotebookEditSave = async (wordId: string) => {
+    if (!editingHebrewText.trim()) return;
+
+    setNotebookWords(prev => prev.map(w => {
+      if (w.id === wordId) {
+        const updated = { ...w, hebrew: editingHebrewText.trim() };
+        syncWordToVocabStore(updated);
+        return updated;
+      }
+      return w;
+    }));
+
+    setEditingWordId(null);
+    setEditingHebrewText("");
+  };
+
 
   // Load theme preference from localStorage
   useEffect(() => {
@@ -1061,6 +1202,16 @@ export default function UnseenPracticePage() {
                       </span>
                     </div>
 
+                    {/* Double-click Tip Callout */}
+                    <div className={`p-2.5 rounded-xl border border-dashed text-[10px] sm:text-xs text-right flex items-center gap-2 justify-end ${
+                      isLight 
+                        ? "bg-teal-50 border-teal-200 text-teal-800" 
+                        : "bg-teal-950/10 border-teal-900/30 text-teal-400"
+                    }`}>
+                      <span>נתקלתם במילה קשה בקטע? <strong>לחצו עליה לחיצה כפולה (Double Click)</strong> כדי לתרגם אותה ולשמור אותה אוטומטית ללומדת המילים!</span>
+                      <Sparkles className="w-4 h-4 text-teal-400 shrink-0 animate-pulse" />
+                    </div>
+
                     {/* Paragraph List with active highlight */}
                     <div className="space-y-6" dir="ltr">
                       {unseen.paragraphs.map((para, idx) => {
@@ -1100,7 +1251,20 @@ export default function UnseenPracticePage() {
                               Paragraph {idx + 1} (Lines {startLineNum}-{endLineNum})
                             </span>
                             
-                            <p className="text-sm md:text-base leading-relaxed text-zinc-100 font-medium select-text text-left pt-1" style={{ color: isLight ? '#27272a' : '#f4f4f5' }}>
+                            <p 
+                              className="text-sm md:text-base leading-relaxed font-medium select-text text-left pt-1 cursor-help hover:text-teal-400/80 transition-colors" 
+                              style={{ color: isLight ? '#27272a' : '#f4f4f5' }}
+                              onDoubleClick={(e) => {
+                                const selection = window.getSelection();
+                                if (!selection) return;
+                                const selectedText = selection.toString().trim();
+                                const cleanWord = selectedText.replace(/[^a-zA-Z'\-]/g, "");
+                                if (cleanWord && cleanWord.length > 1) {
+                                  setIsNotebookOpen(true);
+                                  handleNotebookAdd(cleanWord);
+                                }
+                              }}
+                            >
                               {para}
                             </p>
                           </div>
@@ -1262,6 +1426,204 @@ export default function UnseenPracticePage() {
       <footer className={`w-full text-center py-6 border-t ${borderStyle} text-xs ${textMuted} relative z-10 bg-surface/30 shrink-0 transition-colors`}>
         <span>© {new Date().getFullYear()} ניר עוז-ארי — בלשי האנסין באנגלית</span>
       </footer>
+
+      {/* Vocabulary Notebook Drawer Component */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end" dir="rtl">
+        {/* Floating Button (FAB) */}
+        <button
+          onClick={() => setIsNotebookOpen(!isNotebookOpen)}
+          className={`flex items-center gap-2 px-4 py-3 rounded-full shadow-2xl transition-all duration-300 transform hover:scale-105 active:scale-95 cursor-pointer border ${
+            isLight
+              ? "bg-white border-zinc-200 text-teal-600 hover:bg-zinc-50 shadow-teal-900/5"
+              : "bg-teal-500 hover:bg-teal-400 border-teal-600 text-zinc-950 font-bold shadow-teal-500/10"
+          }`}
+        >
+          <BookOpen className="w-4.5 h-4.5 animate-pulse" />
+          <span className="text-xs font-black">פנקס מילים</span>
+          {notebookWords.length > 0 && (
+            <span className="flex items-center justify-center w-5 h-5 text-[10px] font-black rounded-full bg-rose-500 text-white shrink-0 animate-bounce">
+              {notebookWords.length}
+            </span>
+          )}
+        </button>
+
+        {/* Expandable Drawer Panel */}
+        <AnimatePresence>
+          {isNotebookOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 50, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 50, scale: 0.95 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className={`absolute bottom-16 right-0 w-80 sm:w-96 max-h-[70vh] rounded-3xl border shadow-2xl p-5 flex flex-col justify-between overflow-hidden transition-all ${
+                isLight 
+                  ? "bg-white border-zinc-200 text-zinc-800 shadow-teal-900/5" 
+                  : "bg-[#0b101e]/95 border-border-custom text-[#e8edf8] backdrop-blur-md shadow-black/80"
+              }`}
+            >
+              <div className="flex flex-col h-full overflow-hidden max-h-[60vh]">
+                {/* Header */}
+                <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3 shrink-0">
+                  <div className="flex items-center gap-1.5">
+                    <BookOpen className="w-4 h-4 text-teal-400" />
+                    <h3 className={`text-sm font-bold ${textTitle}`}>פנקס מילים חדשות</h3>
+                  </div>
+                  <button 
+                    onClick={() => setIsNotebookOpen(false)}
+                    className="p-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-zinc-400 hover:text-zinc-200 cursor-pointer"
+                  >
+                    <XCircle className="w-4 h-4 text-rose-500" />
+                  </button>
+                </div>
+
+                {/* Body Content */}
+                <div className="flex-1 overflow-y-auto py-3 space-y-4 pr-1 scrollbar-thin">
+                  {/* Guide text */}
+                  <p className={`text-[10px] leading-relaxed ${textMuted}`}>
+                    הקלידו מילה באנגלית ולחצו על הוספה, או <strong>לחצו לחיצה כפולה (Double Click)</strong> על מילה כלשהי בטקסט כדי לתרגם אותה אוטומטית!
+                  </p>
+
+                  {/* Add word form */}
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      dir="ltr"
+                      value={notebookInput}
+                      onChange={(e) => setNotebookInput(e.target.value)}
+                      placeholder="הקלד מילה באנגלית (למשל: focus)"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          handleNotebookAdd(notebookInput);
+                        }
+                      }}
+                      disabled={notebookLoading}
+                      className={`flex-1 px-3 py-1.5 rounded-xl border text-xs text-left font-semibold focus:outline-none transition-all ${
+                        isLight
+                          ? "bg-white border-zinc-200 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 text-zinc-800"
+                          : "bg-surface border-border-custom text-white focus:border-teal-400 focus:ring-1 focus:ring-teal-400"
+                      }`}
+                    />
+                    <button
+                      onClick={() => handleNotebookAdd(notebookInput)}
+                      disabled={notebookLoading || !notebookInput.trim()}
+                      className="px-3 py-1.5 rounded-xl bg-teal-500 hover:bg-teal-400 disabled:opacity-50 text-zinc-950 font-bold text-xs shrink-0 cursor-pointer transition-all flex items-center gap-1"
+                    >
+                      {notebookLoading ? (
+                        <RefreshCw className="w-3 h-3 animate-spin" />
+                      ) : (
+                        <Plus className="w-3.5 h-3.5" />
+                      )}
+                      <span>הוסף</span>
+                    </button>
+                  </div>
+
+                  {notebookError && (
+                    <p className="text-[10px] text-rose-400 font-bold bg-rose-500/10 p-2 rounded-lg border border-rose-500/20 text-center">
+                      {notebookError}
+                    </p>
+                  )}
+
+                  {/* Words List */}
+                  <div className="space-y-2 pt-2">
+                    <h4 className="text-[11px] font-bold text-teal-400">מילים שנוספו השבוע ({notebookWords.length})</h4>
+                    
+                    {notebookWords.length === 0 ? (
+                      <div className="text-center py-6 border border-dashed border-zinc-700/20 rounded-2xl">
+                        <p className={`text-xs ${textMuted}`}>הפנקס ריק כרגע.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2.5">
+                        {notebookWords.map((word) => (
+                          <div 
+                            key={word.id} 
+                            className={`p-3 rounded-xl border flex flex-col gap-2 transition-all ${
+                              isLight ? "bg-zinc-50 border-zinc-150" : "bg-surface/40 border-border-custom"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              {/* Word English and Hebrew */}
+                              <div className="flex items-center gap-2 flex-wrap text-xs">
+                                <span className={`font-black ${isLight ? "text-zinc-900" : "text-white"}`} dir="ltr">{word.english}</span>
+                                <span className="opacity-40">=</span>
+                                
+                                {editingWordId === word.id ? (
+                                  <div className="flex items-center gap-1.5">
+                                    <input
+                                      type="text"
+                                      value={editingHebrewText}
+                                      onChange={(e) => setEditingHebrewText(e.target.value)}
+                                      className={`px-1.5 py-0.5 rounded border text-[11px] font-semibold text-right focus:outline-none ${
+                                        isLight ? "bg-white border-zinc-300 text-zinc-850" : "bg-black/30 border-zinc-700 text-white"
+                                      }`}
+                                      onKeyDown={(e) => {
+                                        if (e.key === "Enter") handleNotebookEditSave(word.id);
+                                      }}
+                                    />
+                                    <button 
+                                      onClick={() => handleNotebookEditSave(word.id)}
+                                      className="p-0.5 rounded bg-teal-500/20 hover:bg-teal-500/40 text-teal-400 cursor-pointer"
+                                    >
+                                      <Check className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-1.5 group">
+                                    <span className="font-bold text-teal-400">{word.hebrew}</span>
+                                    <button 
+                                      onClick={() => handleNotebookEditStart(word)}
+                                      className="p-0.5 text-zinc-500 hover:text-teal-400 cursor-pointer"
+                                    >
+                                      <Edit2 className="w-3 h-3" />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Delete button */}
+                              <button 
+                                onClick={() => handleNotebookDelete(word.id, word.english)}
+                                className="p-1 rounded text-rose-400 hover:bg-rose-500/10 cursor-pointer transition-all"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                            
+                            {word.example && (
+                              <p className={`text-[10px] leading-relaxed ${textMuted}`} dir="ltr">
+                                <strong className="opacity-65">Example:</strong> {word.example}
+                              </p>
+                            )}
+                            <div className="flex items-center gap-1 text-[9px] text-teal-500/70 font-semibold self-start bg-teal-500/5 px-2 py-0.5 rounded-full border border-teal-500/10">
+                              <CheckCircle className="w-2.5 h-2.5 text-teal-400" />
+                              <span>סונכרן ללומדה</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Footer Sync Indicator */}
+                <div className="border-t border-zinc-200 dark:border-zinc-800 pt-2 shrink-0 flex items-center justify-between text-[9px]">
+                  {user ? (
+                    <span className="text-teal-400 font-bold flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-ping" />
+                      <span>מסונכרן לענן ({user.displayName || "משתמש"})</span>
+                    </span>
+                  ) : (
+                    <span className="text-amber-400 font-bold flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                      <span>שמירה מקומית (סנכרון ענן בהתחברות)</span>
+                    </span>
+                  )}
+                  <span className={`${textMuted}`}>בלש אוצר המילים v1.0</span>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

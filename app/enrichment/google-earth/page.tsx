@@ -23,6 +23,7 @@ interface KmlProject {
   fileSize: string;
   downloadUrl: string;
   defaultEarthUrl: string; // The URL to Google Earth Web
+  myMapsId?: string; // Google My Maps ID for direct web embed
   legend: {
     label: string;
     color: string;
@@ -40,6 +41,8 @@ const TECTONICS_PROJECT: KmlProject = {
   downloadUrl: "/Plate_Tectonics_Hebrew.kml",
   // Standard placeholder for opening Google Earth Web. Teachers can customize this link to their Google Drive Shared Project URL.
   defaultEarthUrl: "https://earth.google.com/web/",
+  // Replace with your Google My Maps ID (mid parameter) to embed a 2D map preview directly in the page
+  myMapsId: "",
   legend: [
     {
       label: "גבול פתיחה (Divergent)",
@@ -186,19 +189,29 @@ export default function GoogleEarthTours() {
           }`}>
             <h3 className={`text-md font-bold text-enrichment mb-2 flex items-center gap-2`}>
               <Info className="w-4 h-4" />
-              <span>הנחיות להגדרת הסיור בכיתה (למורים)</span>
+              <span>הנחיות להגדרת הסיור והמטמיע בכיתה (למורים)</span>
             </h3>
             <div className={`text-xs space-y-3 leading-relaxed ${isLight ? "text-zinc-600" : "text-emerald-100/80"}`}>
-              <p>
-                כדי לאפשר לתלמידים לפתוח את מפת טקטוניקת הלוחות ישירות בתוך דפדפן Google Earth בלחיצת כפתור אחת (ללא צורך בייבוא ידני), מומלץ ליצור <strong>פרויקט Google Earth משותף</strong>:
-              </p>
-              <ol className="list-decimal list-inside space-y-1.5 pr-1">
-                <li>הורידו את קובץ ה-KML מכפתור ההורדה למטה.</li>
-                <li>פתחו את <a href="https://earth.google.com/web/" target="_blank" rel="noreferrer" className="underline text-enrichment font-semibold">Google Earth Web</a>, כנסו ללשונית <strong>פרויקטים</strong> (סמל הסיכה והמפה) ולחצו על <strong>ייבוא קובץ KML מהמחשב</strong>.</li>
-                <li>לאחר הטעינה, לחצו על כפתור <strong>שיתוף פרויקט</strong> בראש תפריט הפרויקט (מעביר את הפרויקט לאחסון ב-Google Drive שלכם).</li>
-                <li>שנו את הגדרות השיתוף ל-<strong>"כל מי שקיבל את הקישור יכול לצפות"</strong> והעתיקו את קישור השיתוף שמתקבל.</li>
-                <li>בתוך קוד הקובץ במפתח <code className="px-1.5 py-0.5 bg-black/10 rounded font-mono text-[10px]">TECTONICS_PROJECT.defaultEarthUrl</code> (בשורה 41 בערך בקובץ <code className="px-1 py-0.5 bg-black/10 rounded font-mono text-[10px]">page.tsx</code>), הדביקו את הקישור שהעתקתם.</li>
-              </ol>
+              <div>
+                <h4 className="font-bold mb-1 text-enrichment">1. קישור שיתוף ל-Google Earth 3D (תלת-ממד):</h4>
+                <ol className="list-decimal list-inside space-y-1 pr-1">
+                  <li>הורידו את קובץ ה-KML מכפתור ההורדה למטה.</li>
+                  <li>פתחו את <a href="https://earth.google.com/web/" target="_blank" rel="noreferrer" className="underline text-enrichment font-semibold">Google Earth Web</a>, כנסו ללשונית <strong>פרויקטים</strong> (סמל הסיכה והמפה) ולחצו על <strong>ייבוא קובץ KML מהמחשב</strong>.</li>
+                  <li>לאחר הטעינה, לחצו על כפתור <strong>שיתוף פרויקט</strong> בראש תפריט הפרויקט (מעביר את הפרויקט לאחסון ב-Google Drive שלכם).</li>
+                  <li>שנו את הגדרות השיתוף ל-<strong>"כל מי שקיבל את הקישור יכול לצפות"</strong> והעתיקו את קישור השיתוף שמתקבל.</li>
+                  <li>בתוך קוד הקובץ במפתח <code className="px-1.5 py-0.5 bg-black/10 rounded font-mono text-[10px]">TECTONICS_PROJECT.defaultEarthUrl</code>, הדביקו את הקישור שהעתקתם.</li>
+                </ol>
+              </div>
+              <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800">
+                <h4 className="font-bold mb-1 text-enrichment">2. הטמעת מפת תצוגה מקדימה ישירה (2D) בדף:</h4>
+                <ol className="list-decimal list-inside space-y-1 pr-1">
+                  <li>היכנסו ל- <a href="https://www.google.com/maps/d/" target="_blank" rel="noreferrer" className="underline text-enrichment font-semibold">Google My Maps</a> ולחצו על <strong>צור מפה חדשה</strong>.</li>
+                  <li>לחצו על <strong>ייבוא</strong> והעלו את קובץ ה-KML שהורדתם.</li>
+                  <li>לחצו על <strong>שיתוף</strong> והפעילו את האפשרות <strong>"כל אחד עם הקישור הזה יכול לצפות במפה"</strong>.</li>
+                  <li>העתיקו מכתובת ה-URL של הדפדפן את מזהה המפה (הערך שמופיע אחרי <code className="px-1 py-0.5 bg-black/10 rounded font-mono text-[10px]">mid=</code>).</li>
+                  <li>בתוך קוד הקובץ במפתח <code className="px-1.5 py-0.5 bg-black/10 rounded font-mono text-[10px]">TECTONICS_PROJECT.myMapsId</code>, הדביקו את המזהה שקיבלתם. המפה תופיע מיד ישירות בדף זה עבור כל התלמידים!</li>
+                </ol>
+              </div>
             </div>
           </div>
         )}
@@ -243,6 +256,45 @@ export default function GoogleEarthTours() {
               </a>
             </div>
           </div>
+
+          {/* Live Map Preview */}
+          {TECTONICS_PROJECT.myMapsId ? (
+            <div className="space-y-4 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+              <h3 className={`text-lg font-bold flex items-center gap-2 ${textTitle}`}>
+                <Globe className="w-4 h-4 text-enrichment" />
+                <span>תצוגה מקדימה אינטראקטיבית (2D)</span>
+              </h3>
+              <p className={`text-xs ${textMuted}`}>
+                ניתן לגרור את המפה, להגדיל/להקטין וללחוץ על הלוחות או החצים כדי לראות מידע נוסף.
+              </p>
+              <div className="w-full h-[450px] rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 relative">
+                <iframe
+                  src={`https://www.google.com/maps/d/embed?mid=${TECTONICS_PROJECT.myMapsId}`}
+                  className="w-full h-full border-0 absolute top-0 left-0"
+                  allowFullScreen
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          ) : (
+            <div className={`p-5 rounded-2xl border ${
+              isLight ? "bg-zinc-50 border-zinc-100" : "bg-surface/20 border-border-custom"
+            } space-y-2 border-dashed`}>
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-enrichment shrink-0" />
+                <h4 className={`text-sm font-bold ${textTitle}`}>רוצים להציג את המפה ישירות בדף זה?</h4>
+              </div>
+              <p className={`text-xs leading-relaxed ${textMuted}`}>
+                באפשרותכם להטמיע את המפה האינטראקטיבית ישירות כאן לתלמידים שלכם. לשם כך, יש לייבא את קובץ ה-KML ל-Google My Maps, לשתף אותו באופן ציבורי, ולהזין את מזהה המפה (mid) בקוד.
+              </p>
+              <button
+                onClick={() => setShowTeacherGuide(true)}
+                className="text-xs text-enrichment hover:underline font-bold cursor-pointer"
+              >
+                לחצו כאן למעבר להנחיות המורה ←
+              </button>
+            </div>
+          )}
 
           {/* Graphic Legend (מקרא המפה) */}
           <div className="space-y-4">

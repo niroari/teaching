@@ -20,6 +20,14 @@ const ENRICHMENT_TOPICS = [
     badge: "6 שיעורים"
   },
   {
+    slug: "google-earth",
+    title: "סיורי Google Earth",
+    desc: "סיורים אינטראקטיביים בתלת-ממד. הכירו את לוחות הטקטוניקה של כדור הארץ ועוד.",
+    icon: "🗺️",
+    link: "/enrichment/google-earth",
+    badge: "קובצי KML"
+  },
+  {
     slug: "snakes",
     title: "נחשים בישראל",
     desc: "מצגת אינטראקטיבית ולמידה על סוגי הנחשים השונים בארץ, התגוננות ועזרה ראשונה.",

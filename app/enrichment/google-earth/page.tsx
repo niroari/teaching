@@ -42,7 +42,7 @@ const TECTONICS_PROJECT: KmlProject = {
   // Standard placeholder for opening Google Earth Web. Teachers can customize this link to their Google Drive Shared Project URL.
   defaultEarthUrl: "https://earth.google.com/web/",
   // Replace with your Google My Maps ID (mid parameter) to embed a 2D map preview directly in the page
-  myMapsId: "",
+  myMapsId: "1vhLH13nCPE1Wh4Z482cW2Oe6oKdF5kU",
   legend: [
     {
       label: "גבול פתיחה (Divergent)",

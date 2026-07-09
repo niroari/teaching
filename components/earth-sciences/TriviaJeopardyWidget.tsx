@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Users, 
   Play, 
@@ -12,9 +12,9 @@ import {
   Plus, 
   Minus, 
   Volume2, 
-  HelpCircle as QuestionIcon,
   Sparkles,
-  Maximize2
+  Maximize2,
+  Minimize2
 } from "lucide-react";
 
 interface Question {
@@ -76,6 +76,7 @@ export default function TriviaJeopardyWidget() {
   const [numTeams, setNumTeams] = useState<number>(3);
   const [teams, setTeams] = useState<Team[]>([]);
   const [activeTeamIdx, setActiveTeamIdx] = useState<number>(0);
+  const [isFullScreen, setIsFullScreen] = useState(false);
   
   // Board state: tracks which cell is played (col-row)
   const [playedCells, setPlayedCells] = useState<Record<string, boolean>>({});
@@ -91,6 +92,32 @@ export default function TriviaJeopardyWidget() {
   
   const [answerRevealed, setAnswerRevealed] = useState(false);
   const [gameOver, setGameOver] = useState(false);
+
+  // Sync state with HTML5 Fullscreen API
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullScreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
+  }, []);
+
+  const toggleFullScreen = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.error(`Error attempting to enable fullscreen: ${err.message}`);
+      });
+      setIsFullScreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullScreen(false);
+    }
+  };
 
   // Initialize game
   const handleStartGame = () => {
@@ -171,12 +198,26 @@ export default function TriviaJeopardyWidget() {
     return [...teams].sort((a, b) => b.score - a.score);
   };
 
+  const mainContainerClasses = isFullScreen
+    ? "fixed inset-0 z-[100] bg-slate-950 p-6 flex flex-col justify-between overflow-hidden text-right h-screen w-screen"
+    : "w-full bg-slate-950/20 border border-zinc-800/80 rounded-2xl p-6 text-right relative min-h-[600px] flex flex-col justify-between";
+
   return (
-    <div className="w-full bg-slate-950/20 border border-zinc-800/80 rounded-2xl p-6 text-right relative min-h-[600px] flex flex-col justify-between">
+    <div className={mainContainerClasses}>
       
       {/* 1. SETUP SCREEN */}
       {!gameStarted && (
-        <div className="max-w-md mx-auto py-12 flex flex-col items-center justify-center space-y-6 text-center">
+        <div className="max-w-md mx-auto py-12 flex flex-col items-center justify-center space-y-6 text-center w-full relative">
+          {/* Setup screen fullscreen toggle button */}
+          <button 
+            onClick={toggleFullScreen}
+            className="absolute top-0 left-0 p-2 rounded-xl border border-zinc-800 bg-surface/30 hover:bg-surface-hover/30 text-text-muted hover:text-white transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold"
+            title="מסך מלא"
+          >
+            {isFullScreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+            <span>{isFullScreen ? "חלון רגיל" : "מסך מלא"}</span>
+          </button>
+
           <div className="w-16 h-16 bg-earth/10 border border-earth/20 rounded-full flex items-center justify-center text-earth animate-bounce">
             <Award className="w-8 h-8" />
           </div>
@@ -221,21 +262,32 @@ export default function TriviaJeopardyWidget() {
 
       {/* 2. GAME ACTIVE SCREEN */}
       {gameStarted && !gameOver && (
-        <div className="flex-1 flex flex-col justify-between space-y-6 select-none">
+        <div className="flex-1 flex flex-col justify-between space-y-4 select-none overflow-hidden h-full">
           
           {/* Active Turn banner */}
-          <div className="flex flex-col sm:flex-row justify-between items-center bg-zinc-900/60 border border-zinc-800/80 rounded-2xl p-4 gap-3 text-right">
+          <div className={`flex flex-row justify-between items-center bg-zinc-900/60 border border-zinc-800/80 rounded-2xl gap-3 text-right flex-shrink-0 ${
+            isFullScreen ? "p-3" : "p-4"
+          }`}>
             <div className="flex items-center gap-2">
               <Users className="w-5 h-5 text-earth shrink-0" />
               <div>
                 <span className="text-[10px] text-text-muted font-bold block">תור הקבוצה לבחור משבצת:</span>
-                <span className="text-base font-extrabold text-white">
+                <span className="text-sm md:text-base font-extrabold text-white">
                   👉 {teams[activeTeamIdx]?.name}
                 </span>
               </div>
             </div>
             
             <div className="flex gap-2">
+              {/* Full Screen Toggle Button */}
+              <button
+                onClick={toggleFullScreen}
+                className="px-3 py-1.5 border border-earth/40 bg-earth/10 hover:bg-earth/20 text-xs font-bold text-earth rounded-xl flex items-center gap-1 cursor-pointer transition-colors"
+              >
+                {isFullScreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+                <span>{isFullScreen ? "חלון רגיל" : "מסך מלא"}</span>
+              </button>
+
               <button 
                 onClick={() => {
                   if (confirm("האם ברצונך לאפס את המשחק ולהתחיל מחדש?")) {
@@ -245,27 +297,32 @@ export default function TriviaJeopardyWidget() {
                 className="px-3 py-1.5 border border-zinc-800 hover:bg-zinc-800 text-xs font-bold text-text-muted rounded-xl flex items-center gap-1 cursor-pointer transition-colors"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                <span>אתחול משחק</span>
+                <span className="hidden sm:inline">אתחול משחק</span>
               </button>
               <button 
                 onClick={() => setGameOver(true)}
                 className="px-3 py-1.5 border border-red-500/20 bg-red-950/15 hover:bg-red-950/30 text-xs font-bold text-red-400 rounded-xl flex items-center gap-1 cursor-pointer transition-colors"
               >
                 <X className="w-3.5 h-3.5" />
-                <span>סיום משחק</span>
+                <span className="hidden sm:inline">סיום משחק</span>
               </button>
             </div>
           </div>
 
           {/* Jeopardy Grid Board */}
-          <div className="overflow-x-auto pb-2">
-            <div className="min-w-[640px] grid grid-cols-4 gap-4">
+          <div className={`overflow-x-auto pb-2 flex-grow flex items-center justify-center ${isFullScreen ? "max-h-[54vh] py-1" : "py-2"}`}>
+            <div className="w-full min-w-[640px] grid grid-cols-4 gap-3.5 h-full">
               
               {/* Columns Header */}
               {CATEGORIES.map((cat, idx) => (
-                <div key={idx} className="bg-earth/10 border border-earth/20 rounded-xl p-3 text-center flex flex-col items-center justify-center min-h-[64px] shadow-sm">
-                  <span className="text-[10px] font-bold text-earth block mb-0.5">קטגוריה {idx + 1}</span>
-                  <span className="text-xs font-extrabold text-white leading-tight">{cat}</span>
+                <div 
+                  key={idx} 
+                  className={`bg-earth/10 border border-earth/20 rounded-xl p-2 text-center flex flex-col items-center justify-center shadow-sm ${
+                    isFullScreen ? "h-[8vh] min-h-[48px] max-h-[64px]" : "min-h-[64px]"
+                  }`}
+                >
+                  <span className="text-[9px] font-bold text-earth block">קטגוריה {idx + 1}</span>
+                  <span className={`font-extrabold text-white leading-tight ${isFullScreen ? "text-[10px]" : "text-xs"}`}>{cat}</span>
                 </div>
               ))}
 
@@ -281,14 +338,16 @@ export default function TriviaJeopardyWidget() {
                         key={cellKey}
                         disabled={played}
                         onClick={() => handleCellClick(col, rowIdx, val)}
-                        className={`h-20 rounded-xl border text-center font-black text-lg transition-all flex flex-col items-center justify-center cursor-pointer select-none ${
+                        className={`rounded-xl border text-center font-black transition-all flex flex-col items-center justify-center cursor-pointer select-none ${
+                          isFullScreen ? "h-[7vh] min-h-[38px] max-h-[55px]" : "h-20"
+                        } ${
                           played
                             ? "bg-zinc-900/40 border-zinc-900 text-zinc-700 line-through opacity-30 cursor-default"
-                            : "bg-zinc-900 border-zinc-800 text-amber-500 hover:scale-[1.03] hover:border-amber-500/50 hover:bg-zinc-800/80 shadow-md"
+                            : "bg-zinc-900 border-zinc-800 text-amber-500 hover:scale-[1.03] hover:border-amber-500/50 hover:bg-zinc-800/80 shadow-md text-base md:text-lg"
                         }`}
                       >
                         {played ? (
-                          <Check className="w-5 h-5 text-zinc-600" />
+                          <Check className="w-4 h-4 text-zinc-600" />
                         ) : (
                           <span>{val}</span>
                         )}
@@ -301,9 +360,9 @@ export default function TriviaJeopardyWidget() {
           </div>
 
           {/* Scoreboard block */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-black text-text-muted">לוח ניקוד כיתתי 📊</h4>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="space-y-2 flex-shrink-0">
+            <h4 className="text-[10px] font-black text-text-muted">לוח ניקוד כיתתי 📊</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {teams.map((t, idx) => {
                 const isActive = idx === activeTeamIdx;
                 const colors = [
@@ -316,9 +375,11 @@ export default function TriviaJeopardyWidget() {
                 return (
                   <div
                     key={idx}
-                    className={`rounded-2xl border p-4 flex flex-col justify-between items-center transition-all ${
+                    className={`rounded-2xl border flex flex-col justify-between items-center transition-all ${
                       colors[idx % colors.length]
-                    } ${isActive ? "ring-2 ring-white/30 scale-[1.02] border-white/20" : "opacity-85"}`}
+                    } ${isActive ? "ring-2 ring-white/30 scale-[1.02] border-white/20" : "opacity-85"} ${
+                      isFullScreen ? "p-2" : "p-4"
+                    }`}
                   >
                     {/* Team Name Input */}
                     <div className="flex items-center gap-1.5 w-full justify-center">
@@ -330,13 +391,13 @@ export default function TriviaJeopardyWidget() {
                           updated[idx].name = e.target.value;
                           setTeams(updated);
                         }}
-                        className="bg-transparent border-none text-center font-extrabold text-sm focus:outline-none focus:ring-1 focus:ring-white/30 rounded px-1 text-white w-24"
+                        className="bg-transparent border-none text-center font-extrabold text-xs focus:outline-none focus:ring-1 focus:ring-white/30 rounded px-1 text-white w-20"
                       />
                       <Edit2Icon className="w-3 h-3 text-white/50" />
                     </div>
 
                     {/* Team Score */}
-                    <span className="text-2xl font-black text-white py-2">{t.score}</span>
+                    <span className={`font-black text-white ${isFullScreen ? "text-lg py-0.5" : "text-xl py-2"}`}>{t.score}</span>
 
                     {/* Manual Score adjustments */}
                     <div className="flex gap-2 w-full justify-center">
@@ -365,7 +426,16 @@ export default function TriviaJeopardyWidget() {
 
       {/* 3. GAME OVER OVERLAY SCREEN */}
       {gameStarted && gameOver && (
-        <div className="max-w-md mx-auto py-8 text-center space-y-6 flex flex-col items-center justify-center animate-fade-in select-none">
+        <div className="max-w-md mx-auto py-8 text-center space-y-6 flex flex-col items-center justify-center animate-fade-in select-none w-full relative">
+          {/* Fullscreen toggle button on game over */}
+          <button 
+            onClick={toggleFullScreen}
+            className="absolute top-0 left-0 p-2 rounded-xl border border-zinc-800 bg-surface/30 hover:bg-surface-hover/30 text-text-muted hover:text-white transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold"
+          >
+            {isFullScreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+            <span>{isFullScreen ? "חלון רגיל" : "מסך מלא"}</span>
+          </button>
+
           <div className="relative">
             <Award className="w-20 h-20 text-amber-500 animate-bounce" />
             <Sparkles className="w-6 h-6 text-amber-400 absolute -top-1 -right-1 animate-pulse" />
@@ -417,7 +487,7 @@ export default function TriviaJeopardyWidget() {
 
       {/* 4. ACTIVE QUESTION MODAL WINDOW */}
       {activeQuestion && (
-        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-[110] flex items-center justify-center p-4">
           <div className="w-full max-w-xl bg-slate-900 border border-zinc-800 rounded-3xl p-6 md:p-8 text-right shadow-2xl relative space-y-6 animate-scale-up">
             
             {/* Header info */}

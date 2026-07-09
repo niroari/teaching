@@ -317,12 +317,12 @@ export default function TriviaJeopardyWidget() {
               {CATEGORIES.map((cat, idx) => (
                 <div 
                   key={idx} 
-                  className={`bg-earth/10 border border-earth/20 rounded-xl p-2 text-center flex flex-col items-center justify-center shadow-sm ${
-                    isFullScreen ? "h-[8vh] min-h-[48px] max-h-[64px]" : "min-h-[64px]"
+                  className={`bg-teal-950/30 border border-teal-500/40 rounded-xl p-2 text-center flex flex-col items-center justify-center shadow-md ${
+                    isFullScreen ? "h-[8vh] min-h-[50px] max-h-[70px]" : "min-h-[72px]"
                   }`}
                 >
-                  <span className="text-[9px] font-bold text-earth block">קטגוריה {idx + 1}</span>
-                  <span className={`font-extrabold text-white leading-tight ${isFullScreen ? "text-[10px]" : "text-xs"}`}>{cat}</span>
+                  <span className="text-[10px] md:text-xs font-black text-earth block mb-0.5">קטגוריה {idx + 1}</span>
+                  <span className="text-xs sm:text-sm md:text-base font-black text-white leading-tight">{cat}</span>
                 </div>
               ))}
 

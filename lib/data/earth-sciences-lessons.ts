@@ -144,9 +144,8 @@ export const EARTH_SCIENCES_UNITS: Unit[] = [
           "כוכבי לכת וגלקסיות קרובים זה לזה (קשיים בתפיסת קנה המידה)",
           "כל כוכבי הלכת בנויים מאותם חומרים ובעלי גודל דומה"
         ],
-        hook: "צפו בצילום השדה העמוק של טלסקופ ג'יימס ווב (JWST) המראה גלקסיות במרחק מיליארדי שנות אור. כיצד ניתן למדוד מרחקים כה עצומים בחלל? נסביר את המושג 'שנת אור' ונבין את מקומנו ביקום.",
-        hookVideoId: "libKVRa01L8", // James Webb Space Telescope explanation video
-        hookImageUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80",
+        hook: "צפו בצילום השדה העמוק של טלסקופ ג'יימס ווב (JWST) המראה גלקסיות במרחק מיליארדי שנות אור.\n\nכיצד ניתן למדוד מרחקים כה עצומים בחלל?\n\nנלמד על המושג 'שנת אור' ונבין את מקומנו ביקום.",
+        hookImageUrl: "/webb-deep-field-large.jpg",
         task: {
           description: "מיון והשוואת כוכבי הלכת במערכת השמש:",
           instructions: [

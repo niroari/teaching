@@ -52,6 +52,7 @@ export default function LessonPresenterConsolePage() {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [showInlineWidget, setShowInlineWidget] = useState(false);
   const [showNotebookOverlay, setShowNotebookOverlay] = useState(false);
+  const [lightboxImageUrl, setLightboxImageUrl] = useState<string | null>(null);
 
   // Load theme from localStorage
   useEffect(() => {
@@ -492,7 +493,8 @@ export default function LessonPresenterConsolePage() {
                               <img
                                 src={lessonData.hookImageUrl}
                                 alt="גירוי חזותי"
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-contain cursor-zoom-in hover:scale-[1.02] transition-transform duration-300"
+                                onClick={() => setLightboxImageUrl(lessonData.hookImageUrl || null)}
                               />
                             )}
                           </div>
@@ -678,7 +680,8 @@ export default function LessonPresenterConsolePage() {
                               <img
                                 src={slides[currentSlideIndex].imageUrl}
                                 alt={slides[currentSlideIndex].title}
-                                className="w-full h-full object-contain"
+                                className="w-full h-full object-contain cursor-zoom-in hover:scale-[1.02] transition-transform duration-300"
+                                onClick={() => setLightboxImageUrl(slides[currentSlideIndex].imageUrl || null)}
                               />
                             </div>
                           ) : null}
@@ -944,6 +947,35 @@ export default function LessonPresenterConsolePage() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* IMAGE LIGHTBOX OVERLAY */}
+      {lightboxImageUrl && (
+        <div 
+          className="fixed inset-0 bg-black/95 backdrop-blur-md z-[100] flex flex-col items-center justify-center p-4 cursor-zoom-out select-none animate-fade-in"
+          onClick={() => setLightboxImageUrl(null)}
+        >
+          {/* Close Button */}
+          <button 
+            onClick={() => setLightboxImageUrl(null)}
+            className="fixed top-6 left-6 p-2 rounded-xl bg-zinc-900/80 border border-zinc-800 hover:bg-zinc-800 text-white cursor-pointer z-[110]"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          
+          <div className="relative max-w-[90vw] max-h-[85vh] flex items-center justify-center">
+            <img 
+              src={lightboxImageUrl} 
+              alt="תמונה מוגדלת" 
+              className="max-w-full max-h-full object-contain rounded-xl shadow-2xl border border-zinc-800"
+              onClick={(e) => e.stopPropagation()} 
+            />
+          </div>
+          
+          <span className="text-zinc-400 text-xs font-bold mt-4 tracking-wider">
+            לחץ בכל מקום או על ה-X ליציאה
+          </span>
         </div>
       )}
     </div>

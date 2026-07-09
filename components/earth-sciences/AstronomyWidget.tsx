@@ -38,6 +38,7 @@ export default function AstronomyWidget() {
   const [playAnim, setPlayAnim] = useState(true);
   const [revolutionStep, setRevolutionStep] = useState<number>(0); // 0: קיץ צפוני, 1: סתיו, 2: חורף צפוני, 3: אביב
   const [moonPhaseIndex, setMoonPhaseIndex] = useState<number>(4); // 0-7 positions of Moon
+  const [moonSimSubMode, setMoonSimSubMode] = useState<"basic" | "advanced">("basic");
 
   const MOON_PHASES = [
     { name: "מולד הירח (New Moon)", desc: "הירח נמצא בין הארץ לשמש. הצד המואר פונה הרחק מאיתנו, ולכן הירח חשוך לחלוטין עבור צופה בכדור הארץ." },
@@ -534,88 +535,141 @@ export default function AstronomyWidget() {
 
             {/* Mode 3: Moon Phases */}
             {simMode === "moon" && (
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
-                <div className="md:col-span-3 flex justify-center items-center bg-zinc-950/40 border border-border-custom rounded-2xl p-6 relative h-[300px]">
-                  {/* Sun (far left) */}
-                  <div className="absolute left-2 top-1/2 -translate-y-1/2 text-amber-500 flex flex-col items-center">
-                    <Sun className="w-10 h-10" />
-                    <span className="text-[9px] font-bold">אור שמש</span>
-                  </div>
-
-                  {/* Central Earth */}
-                  <div className="absolute w-12 h-12 bg-blue-600 rounded-full border border-sky-400 flex items-center justify-center z-10">
-                    <Globe className="w-7 h-7 text-emerald-400" />
-                  </div>
-
-                  {/* Moon Orbit */}
-                  <div className="absolute w-[180px] h-[180px] border border-dashed border-zinc-700/60 rounded-full z-0" />
-
-                  {/* Moon positions (8 angles: 0, 45, 90, 135, 180, 225, 270, 315) */}
-                  {Array.from({ length: 8 }).map((_, i) => {
-                    const angle = (((i + 4) % 8) * Math.PI) / 4;
-                    const x = Math.cos(angle) * 90;
-                    const y = Math.sin(angle) * 90;
-                    const isSelected = moonPhaseIndex === i;
-                    
-                    return (
-                      <button
-                        key={i}
-                        className={`absolute w-6 h-6 rounded-full border border-zinc-500 bg-black flex items-center justify-center z-20 cursor-pointer overflow-hidden transition-all hover:scale-110 ${
-                          isSelected ? "ring-2 ring-earth scale-125 border-white" : "opacity-75"
-                        }`}
-                        style={{ transform: `translate(${x}px, ${y}px)` }}
-                        onClick={() => setMoonPhaseIndex(i)}
-                      >
-                        {/* Moon shading - Sun is on the left (x < 0) */}
-                        {/* We simulate the illuminated part facing left. Force dir="ltr" to prevent RTL flex order reversal */}
-                        <div className="absolute inset-0 flex" dir="ltr">
-                          <div className="w-1/2 h-full bg-zinc-300" /> {/* Left half is always sunlit in space */}
-                          <div className="w-1/2 h-full bg-zinc-950" /> {/* Right half is dark in space */}
-                        </div>
-                        <span className="absolute text-[8px] font-black z-30 text-zinc-900">{i + 1}</span>
-                      </button>
-                    );
-                  })}
+              <div className="flex flex-col gap-4">
+                {/* Sub-mode selector */}
+                <div className="flex gap-2 bg-surface-hover/30 p-1 rounded-xl border border-border-custom self-start select-none">
+                  <button
+                    onClick={() => setMoonSimSubMode("basic")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      moonSimSubMode === "basic" ? "bg-earth text-white" : "text-text-muted hover:text-white"
+                    }`}
+                  >
+                    הדמיה בסיסית (עברית)
+                  </button>
+                  <button
+                    onClick={() => setMoonSimSubMode("advanced")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      moonSimSubMode === "advanced" ? "bg-earth text-white" : "text-text-muted hover:text-white"
+                    }`}
+                  >
+                    סימולטור מורחב (PBS / UNL 🌐)
+                  </button>
                 </div>
 
-                <div className="md:col-span-2 space-y-4 text-right">
-                  <h4 className="font-bold text-white text-base">מופעי הירח (Moon Phases)</h4>
-                  <p className="text-xs text-text-muted leading-relaxed">
-                    הירח מקיף את כדור הארץ פעם בחודש (כ-29.5 ימים). 
-                    <br /><br />
-                    כיוון שהירח אינו מייצר אור עצמי אלא רק מחזיר את אור השמש, המראה שלו מהארץ משתנה לפי הזווית שבה אנו רואים את החצי המואר שלו.
-                  </p>
-
-                  <div className="bg-earth/5 border border-earth/20 rounded-xl p-4 space-y-2">
-                    <div className="flex justify-between items-center">
-                      <div className="text-right">
-                        <span className="text-[10px] text-earth font-bold block">עמדה נבחרת: {moonPhaseIndex + 1} מתוך 8</span>
-                        <h5 className="font-bold text-white text-xs">{MOON_PHASES[moonPhaseIndex].name}</h5>
+                {moonSimSubMode === "basic" ? (
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+                    <div className="md:col-span-3 flex justify-center items-center bg-zinc-950/40 border border-border-custom rounded-2xl p-6 relative h-[300px]">
+                      {/* Sun (far left) */}
+                      <div className="absolute left-2 top-1/2 -translate-y-1/2 text-amber-500 flex flex-col items-center">
+                        <Sun className="w-10 h-10" />
+                        <span className="text-[9px] font-bold">אור שמש</span>
                       </div>
-                      <div className="shrink-0 bg-zinc-950 p-1.5 rounded-xl border border-zinc-800 flex items-center justify-center">
-                        {renderMoonPhasePreview(moonPhaseIndex)}
+
+                      {/* Central Earth */}
+                      <div className="absolute w-12 h-12 bg-blue-600 rounded-full border border-sky-400 flex items-center justify-center z-10">
+                        <Globe className="w-7 h-7 text-emerald-400" />
+                      </div>
+
+                      {/* Moon Orbit */}
+                      <div className="absolute w-[180px] h-[180px] border border-dashed border-zinc-700/60 rounded-full z-0" />
+
+                      {/* Moon positions (8 angles: 0, 45, 90, 135, 180, 225, 270, 315) */}
+                      {Array.from({ length: 8 }).map((_, i) => {
+                        const angle = (((i + 4) % 8) * Math.PI) / 4;
+                        const x = Math.cos(angle) * 90;
+                        const y = Math.sin(angle) * 90;
+                        const isSelected = moonPhaseIndex === i;
+                        
+                        return (
+                          <button
+                            key={i}
+                            className={`absolute w-6 h-6 rounded-full border border-zinc-500 bg-black flex items-center justify-center z-20 cursor-pointer overflow-hidden transition-all hover:scale-110 ${
+                              isSelected ? "ring-2 ring-earth scale-125 border-white" : "opacity-75"
+                            }`}
+                            style={{ transform: `translate(${x}px, ${y}px)` }}
+                            onClick={() => setMoonPhaseIndex(i)}
+                          >
+                            <div className="absolute inset-0 flex" dir="ltr">
+                              <div className="w-1/2 h-full bg-zinc-300" />
+                              <div className="w-1/2 h-full bg-zinc-950" />
+                            </div>
+                            <span className="absolute text-[8px] font-black z-30 text-zinc-900">{i + 1}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="md:col-span-2 space-y-4 text-right">
+                      <h4 className="font-bold text-white text-base">מופעי הירח (Moon Phases)</h4>
+                      <p className="text-xs text-text-muted leading-relaxed">
+                        הירח מקיף את כדור הארץ פעם בחודש (כ-29.5 ימים). 
+                        <br /><br />
+                        כיוון שהירח אינו מייצר אור עצמי אלא רק מחזיר את אור השמש, המראה שלו מהארץ משתנה לפי הזווית שבה אנו רואים את החצי המואר שלו.
+                      </p>
+
+                      <div className="bg-earth/5 border border-earth/20 rounded-xl p-4 space-y-2">
+                        <div className="flex justify-between items-center">
+                          <div className="text-right">
+                            <span className="text-[10px] text-earth font-bold block">עמדה נבחרת: {moonPhaseIndex + 1} מתוך 8</span>
+                            <h5 className="font-bold text-white text-xs">{MOON_PHASES[moonPhaseIndex].name}</h5>
+                          </div>
+                          <div className="shrink-0 bg-zinc-950 p-1.5 rounded-xl border border-zinc-800 flex items-center justify-center">
+                            {renderMoonPhasePreview(moonPhaseIndex)}
+                          </div>
+                        </div>
+                        <p className="text-[11px] text-text-muted leading-relaxed">
+                          {MOON_PHASES[moonPhaseIndex].desc}
+                        </p>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setMoonPhaseIndex(prev => (prev === 0 ? 7 : prev - 1))}
+                          className="flex-1 py-1 bg-surface hover:bg-surface-hover border border-border-custom text-[10px] font-bold rounded-lg cursor-pointer transition-all"
+                        >
+                          ← הקודם
+                        </button>
+                        <button
+                          onClick={() => setMoonPhaseIndex(prev => (prev === 7 ? 0 : prev + 1))}
+                          className="flex-1 py-1 bg-surface hover:bg-surface-hover border border-border-custom text-[10px] font-bold rounded-lg cursor-pointer transition-all"
+                        >
+                          הבא ←
+                        </button>
                       </div>
                     </div>
-                    <p className="text-[11px] text-text-muted leading-relaxed">
-                      {MOON_PHASES[moonPhaseIndex].desc}
-                    </p>
                   </div>
-
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setMoonPhaseIndex(prev => (prev === 0 ? 7 : prev - 1))}
-                      className="flex-1 py-1 bg-surface hover:bg-surface-hover border border-border-custom text-[10px] font-bold rounded-lg cursor-pointer transition-all"
-                    >
-                      ← הקודם
-                    </button>
-                    <button
-                      onClick={() => setMoonPhaseIndex(prev => (prev === 7 ? 0 : prev + 1))}
-                      className="flex-1 py-1 bg-surface hover:bg-surface-hover border border-border-custom text-[10px] font-bold rounded-lg cursor-pointer transition-all"
-                    >
-                      הבא ←
-                    </button>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="bg-earth/5 border border-earth/20 rounded-xl p-4 flex gap-3 text-xs md:text-sm text-text-muted leading-relaxed text-right">
+                      <HelpCircle className="w-5 h-5 text-earth shrink-0 mt-0.5" />
+                      <div>
+                        <span className="font-bold text-white block mb-1">הנחיות לסימולטור המורחב:</span>
+                        לפניכם הדמיה מלאה של מופעי הירח שפותחה ב-HTML5 על ידי אוניברסיטת נברסקה (UNL). 
+                        ניתן לגרור את הירח סביב כדור הארץ, לשנות את זווית השמש, ולראות בזמן אמת את החלק המואר (שמאל למעלה) ואת מופע הירח כפי שהוא נראה מכדור הארץ (ימין למטה).
+                      </div>
+                    </div>
+                    
+                    <div className="w-full h-[550px] rounded-2xl overflow-hidden border border-border-custom bg-zinc-950 relative">
+                      <iframe 
+                        src="https://ccnmtl.github.io/astro-interactives/lunar-phase-simulator/"
+                        className="w-full h-full border-0"
+                        title="UNL Lunar Phase Simulator"
+                      />
+                    </div>
+                    
+                    <div className="flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-text-muted bg-surface-hover/20 border border-border-custom rounded-xl p-3">
+                      <span>מקור הדמיה: Nebraska Astronomy Applet Project (Columbia Interactive HTML5 Port)</span>
+                      <a 
+                        href="https://www.pbslearningmedia.org/resource/buac19-68-sci-ess-moonphaseint/lunar-phases-simulation/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-earth hover:underline font-bold inline-flex items-center gap-1 cursor-pointer"
+                      >
+                        לפתיחת הסימולטור המקורי ב-PBS LearningMedia ↗
+                      </a>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
           </div>

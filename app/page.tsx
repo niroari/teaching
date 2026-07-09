@@ -78,7 +78,7 @@ export default function PortalHomePage() {
         </div>
 
         {/* Subjects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
           
           {/* Card: של"ח */}
           <Link
@@ -95,15 +95,15 @@ export default function PortalHomePage() {
               <div className="absolute inset-0 bg-gradient-to-t from-[#080c18] via-transparent to-transparent opacity-80" />
             </div>
             {/* Body */}
-            <div className="p-8 flex-1 flex flex-col justify-between">
+            <div className="p-6 flex-1 flex flex-col justify-between">
               <div>
-                <h3 className="text-2xl font-bold text-white group-hover:text-shelach transition-colors">של״ח</h3>
-                <p className="text-sm font-semibold text-shelach/80 mt-1.5">לימודי ארץ ישראל</p>
-                <p className="text-text-muted text-sm leading-relaxed mt-4">
+                <h3 className="text-xl font-bold text-white group-hover:text-shelach transition-colors">של״ח</h3>
+                <p className="text-xs font-semibold text-shelach/80 mt-1">לימודי ארץ ישראל</p>
+                <p className="text-text-muted text-xs leading-relaxed mt-3">
                   סדנאות למידה אינטראקטיביות העוסקות בהיסטוריה, גיאוגרפיה, טבע ורב-תרבותיות בארץ ישראל.
                 </p>
               </div>
-              <div className="mt-8 flex items-center gap-2 text-sm font-bold text-shelach group-hover:translate-x-[-6px] transition-transform">
+              <div className="mt-6 flex items-center gap-2 text-xs font-bold text-shelach group-hover:translate-x-[-6px] transition-transform">
                 <span>כניסה לסדנאות</span>
                 <ArrowLeft className="w-4 h-4" />
               </div>
@@ -125,15 +125,15 @@ export default function PortalHomePage() {
               <div className="absolute inset-0 bg-gradient-to-t from-[#080c18] via-transparent to-transparent opacity-80" />
             </div>
             {/* Body */}
-            <div className="p-8 flex-1 flex flex-col justify-between">
+            <div className="p-6 flex-1 flex flex-col justify-between">
               <div>
-                <h3 className="text-2xl font-bold text-white group-hover:text-english transition-colors">אנגלית</h3>
-                <p className="text-sm font-semibold text-english/80 mt-1.5">תרגול דקדוק ואוצר מילים</p>
-                <p className="text-text-muted text-sm leading-relaxed mt-4">
+                <h3 className="text-xl font-bold text-white group-hover:text-english transition-colors">אנגלית</h3>
+                <p className="text-xs font-semibold text-english/80 mt-1">תרגול דקדוק ואוצר מילים</p>
+                <p className="text-text-muted text-xs leading-relaxed mt-3">
                   משחק מכירה פומבית כיתתי לתרגול חוקי דקדוק, וכלי אינטראקטיבי לשינון ותרגול מותאם אישית של אוצר מילים.
                 </p>
               </div>
-              <div className="mt-8 flex items-center gap-2 text-sm font-bold text-english group-hover:translate-x-[-6px] transition-transform">
+              <div className="mt-6 flex items-center gap-2 text-xs font-bold text-english group-hover:translate-x-[-6px] transition-transform">
                 <span>כניסה לתרגול</span>
                 <ArrowLeft className="w-4 h-4" />
               </div>
@@ -155,16 +155,46 @@ export default function PortalHomePage() {
               <div className="absolute inset-0 bg-gradient-to-t from-[#080c18] via-transparent to-transparent opacity-80" />
             </div>
             {/* Body */}
-            <div className="p-8 flex-1 flex flex-col justify-between">
+            <div className="p-6 flex-1 flex flex-col justify-between">
               <div>
-                <h3 className="text-2xl font-bold text-white group-hover:text-enrichment transition-colors">העשרה</h3>
-                <p className="text-sm font-semibold text-enrichment/80 mt-1.5">מחוץ לתוכנית הלימודים</p>
-                <p className="text-text-muted text-sm leading-relaxed mt-4">
+                <h3 className="text-xl font-bold text-white group-hover:text-enrichment transition-colors">העשרה</h3>
+                <p className="text-xs font-semibold text-enrichment/80 mt-1">מחוץ לתוכנית הלימודים</p>
+                <p className="text-text-muted text-xs leading-relaxed mt-3">
                   לומדות בנושאים מרתקים ומדעיים, כולל מודולים אינטראקטיביים מעמיקים בנושא אבולוציה.
                 </p>
               </div>
-              <div className="mt-8 flex items-center gap-2 text-sm font-bold text-enrichment group-hover:translate-x-[-6px] transition-transform">
+              <div className="mt-6 flex items-center gap-2 text-xs font-bold text-enrichment group-hover:translate-x-[-6px] transition-transform">
                 <span>כניסה ללומדות</span>
+                <ArrowLeft className="w-4 h-4" />
+              </div>
+            </div>
+          </Link>
+
+          {/* Card: מדעי כדור הארץ */}
+          <Link
+            href="/earth-sciences"
+            className="group glass-card rounded-2xl border border-border-custom hover:border-earth/40 hover:shadow-[0_12px_40px_rgba(13,148,136,0.12)] transition-all duration-300 flex flex-col overflow-hidden"
+          >
+            {/* Header Image */}
+            <div
+              className="h-48 bg-cover bg-center relative"
+              style={{
+                backgroundImage: `url('https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?auto=format&fit=crop&w=600&q=80')`
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-[#080c18] via-transparent to-transparent opacity-80" />
+            </div>
+            {/* Body */}
+            <div className="p-6 flex-1 flex flex-col justify-between">
+              <div>
+                <h3 className="text-xl font-bold text-white group-hover:text-earth transition-colors">מדעי כדור הארץ</h3>
+                <p className="text-xs font-semibold text-earth/80 mt-1">תוכנית לימודים שנתית</p>
+                <p className="text-text-muted text-xs leading-relaxed mt-3">
+                  מצגות, מערכי שיעור אינטראקטיביים ויישומונים מדעיים באסטרונומיה, אטמוספרה, גאוספרה ומשאבים.
+                </p>
+              </div>
+              <div className="mt-6 flex items-center gap-2 text-xs font-bold text-earth group-hover:translate-x-[-6px] transition-transform">
+                <span>כניסה לתוכנית</span>
                 <ArrowLeft className="w-4 h-4" />
               </div>
             </div>

@@ -14,6 +14,7 @@
   --accent-shelach: 24 95% 53%;    /* #f97316 */
   --accent-english: 195 100% 50%;  /* #00c8ff */
   --accent-enrichment: 142 70% 45%; /* #22c55e */
+  --accent-earth: 174 85% 45%;      /* Teal for Earth Sciences */
 }
 
 @theme inline {
@@ -28,6 +29,7 @@
   --color-shelach: hsl(var(--accent-shelach));
   --color-english: hsl(var(--accent-english));
   --color-enrichment: hsl(var(--accent-enrichment));
+  --color-earth: hsl(var(--accent-earth));
   
   --font-sans: var(--font-alef), ui-sans-serif, system-ui, sans-serif;
 }

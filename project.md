@@ -48,7 +48,24 @@ This document serves as a comprehensive index of the site's architecture, pages,
 * **Evolution (`/enrichment/evolution`):** High-quality science lesson interface.
 * **Human History (`/enrichment/human-history`):** Historical timeline/lesson guide including specific route parameters for deep-dives (`/enrichment/human-history/[lesson]`).
 
-### 3. Interactive Classroom Games
+### 3. Earth Sciences & Space (`/earth-sciences`)
+* **Main Dashboard (`/earth-sciences`):**
+  * Lists curriculum units: Unit 1 (Astronomy - Active), Unit 2 (Weather & Climate - Under Dev), Unit 3 (Geosphere - Under Dev), and Unit 4 (Natural Resources - Under Dev).
+  * Features text search across lessons, objectives, and misconceptions, annual progress tracking, tab filters, and Comfort Reading Mode toggle.
+  * In-progress units display a `"בתהליך פיתוח 🛠️"` badge and disable completion toggles.
+* **Interactive Slide Presentation & Lesson Viewer (`/earth-sciences/[unit]/[lesson]`):**
+  * Intercepts Units 2, 3, and 4 paths to display a glassmorphic "Under Construction" placeholder page.
+  * For Unit 1 lessons, displays three tabs:
+    1. *Classroom Presentation:* Features keyboard navigation, Cinema Mode (full screen), auto-fit media scaling (`object-contain`), local looping GIFs, YouTube video players, and a floating **Notebook Concepts (מושגי מחברת)** panel listing definitions.
+    2. *Interactive Widget:* Renders simulators or the 10-question Earth Explorer Trivia Quiz covering all units.
+    3. *Teacher Guide:* Direct teacher guidelines, time constraints, objectives, and misconceptions.
+* **Completed & Refined Lessons:**
+  * *Lesson 0: Intro to Earth Science (`intro-overview`):* Hook slide with paragraph-separated questions, looping local James Webb deep field GIF, and customized welcome title.
+  * *Lesson 1: The 4 Spheres & Interactions (`intro-spheres`):* Features 8 detailed slides covering individual spheres with engaging student-facing trivia (such as the "mycelium internet" and "meteor shield"), detailed interaction definitions, and a White Island volcano image.
+  * *Lesson 2: Universe & Solar System (`universe-solar-system`):* Slide 2 features a YouTube video about universe scale, Slide 3 holds a looping solar system orbit GIF, Slide 4 shows a planets comparison image, and Slide 5 shows a local gravity concept illustration.
+  * *Lesson 3: Earth & Moon Movements (`earth-moon-movements`):* Embeds local earth rotation, season orbit, and moon orbit GIFs. Slide 5 features a physical "Human Planetarium" classroom roleplay demonstration task.
+
+### 4. Interactive Classroom Games
 * **Values Auction (`/values-auction`):** Interactive group game bidding on different core values using Firebase Realtime Database.
 * **English Auction (`/english-auction` & `/english-auction/game`):** Auction-based grammar and vocab group activities.
 * **Shelach Workshops (`/shelach` & `/shelach/[workshop]`):** Classroom guides for Land of Israel Studies/field activities.

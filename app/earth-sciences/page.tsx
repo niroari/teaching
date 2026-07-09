@@ -439,7 +439,7 @@ export default function EarthSciencesHubPage() {
                         </Link>
 
                         {/* Middle row: Badges of completed classes (only in "all classes" view) */}
-                        {unit.id === 1 && selectedClassFilter === "all" && doneClasses.length > 0 && (
+                        {(unit.id === 1 || unit.id === 2) && selectedClassFilter === "all" && doneClasses.length > 0 && (
                           <div className="mt-3 flex flex-wrap gap-1.5 justify-start select-none">
                             {isAllDone ? (
                               <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[9px] font-extrabold rounded-md">
@@ -458,7 +458,7 @@ export default function EarthSciencesHubPage() {
                         {/* Footer card row */}
                         <div className={`mt-4 pt-3 border-t ${borderTheme} flex justify-between items-center relative z-10`}>
                           {/* Completion Selector / Popover */}
-                          {unit.id === 1 ? (
+                          {(unit.id === 1 || unit.id === 2) ? (
                             selectedClassFilter === "all" ? (
                               <div className="relative">
                                 {/* Toggle Popover Button */}
@@ -546,7 +546,7 @@ export default function EarthSciencesHubPage() {
                           )}
 
                           {/* Indicator for interactive widget */}
-                          {unit.id === 1 && lesson.widgetId && (
+                          {(unit.id === 1 || unit.id === 2) && lesson.widgetId && (
                             <span className="flex items-center gap-1 text-[9px] font-extrabold text-earth bg-earth/10 border border-earth/20 rounded-md px-1.5 py-0.5">
                               <Activity className="w-2.5 h-2.5 animate-pulse" />
                               <span>יישומון אינטראקטיבי</span>

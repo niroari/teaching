@@ -40,6 +40,7 @@ import ClimographWidget from "@/components/earth-sciences/ClimographWidget";
 import TectonicsWidget from "@/components/earth-sciences/TectonicsWidget";
 import FootprintWidget from "@/components/earth-sciences/FootprintWidget";
 import EarthExplorerWidget from "@/components/earth-sciences/EarthExplorerWidget";
+import TriviaJeopardyWidget from "@/components/earth-sciences/TriviaJeopardyWidget";
 
 export default function LessonPresenterConsolePage() {
   const { unit, lesson } = useParams();
@@ -229,6 +230,8 @@ export default function LessonPresenterConsolePage() {
         return <TectonicsWidget />;
       case "footprint":
         return <FootprintWidget />;
+      case "trivia-jeopardy":
+        return <TriviaJeopardyWidget />;
       default:
         return null;
     }

@@ -20,7 +20,7 @@ export interface Lesson {
   summary: string[];
   notebookSummary: NotebookConcept[];
   embedUrl?: string;
-  widgetId?: "astronomy" | "climograph" | "tectonics" | "footprint" | "earth-explorer";
+  widgetId?: "astronomy" | "climograph" | "tectonics" | "footprint" | "earth-explorer" | "trivia-jeopardy";
 }
 
 export interface Unit {
@@ -270,6 +270,33 @@ export const EARTH_SCIENCES_UNITS: Unit[] = [
             definition: "תפיסה לפיה סביבת החלל וסביבת כדור הארץ הן משאב מוגבל ומשותף הדורש ניהול בר-קיימא, שוויוני וזהיר לטובת הדורות הבאים."
           }
         ]
+      },
+      {
+        id: "trivia-jeopardy",
+        title: "חידון מסכם: טריוויה כיתתית 🏆",
+        duration: "שעה",
+        topics: [
+          "חזרה על מושגי יסוד ביחידת אסטרונומיה וחקר החלל",
+          "חידון כיתתי תחרותי בקבוצות (Jeopardy)",
+          "סיכום שנתי וקבלת משוב"
+        ],
+        misconceptions: [
+          "הבנה שטחית של נושאי אסטרונומיה (החידון יעזור לחזק נקודות חולשה)"
+        ],
+        hook: "היום נסכם את כל מה שלמדנו ביחידת האסטרונומיה! נתחלק לקבוצות ונתחרה בחידון טריוויה כיתתי מאתגר (Jeopardy) עם 4 קטגוריות ו-5 רמות קושי. מי תהיה הקבוצה המנצחת?",
+        task: {
+          description: "חידון טריוויה כיתתי מסכם:",
+          instructions: [
+            "התחלקו ל-2 עד 4 קבוצות בכיתה.",
+            "בחרו שם לקבוצה שלכם.",
+            "בכל תור, בחרו קטגוריה ושווי נקודות (100-500) וענו על השאלה במשותף."
+          ]
+        },
+        summary: [
+          "חידון מסכם מקיף את כל חומר היחידה ומסייע לחזרה יעילה לפני מבחן."
+        ],
+        notebookSummary: [],
+        widgetId: "trivia-jeopardy"
       }
     ]
   },

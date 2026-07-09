@@ -75,6 +75,12 @@ export default function TriviaJeopardyWidget() {
   const [gameStarted, setGameStarted] = useState(false);
   const [numTeams, setNumTeams] = useState<number>(3);
   const [teams, setTeams] = useState<Team[]>([]);
+  const [customNames, setCustomNames] = useState<string[]>([
+    "קבוצה א'",
+    "קבוצה ב'",
+    "קבוצה ג'",
+    "קבוצה ד'"
+  ]);
   const [activeTeamIdx, setActiveTeamIdx] = useState<number>(0);
   const [isFullScreen, setIsFullScreen] = useState(false);
   
@@ -122,7 +128,7 @@ export default function TriviaJeopardyWidget() {
   // Initialize game
   const handleStartGame = () => {
     const initializedTeams: Team[] = Array.from({ length: numTeams }).map((_, i) => ({
-      name: `קבוצה ${String.fromCharCode(65 + i)}`, // Group A, B, C, D
+      name: customNames[i] || `קבוצה ${String.fromCharCode(65 + i)}`, // Group A, B, C, D from custom inputs
       score: 0
     }));
     setTeams(initializedTeams);
@@ -236,6 +242,7 @@ export default function TriviaJeopardyWidget() {
                 {[2, 3, 4].map(n => (
                   <button
                     key={n}
+                    type="button"
                     onClick={() => setNumTeams(n)}
                     className={`py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer border ${
                       numTeams === n 
@@ -245,6 +252,29 @@ export default function TriviaJeopardyWidget() {
                   >
                     {n} קבוצות
                   </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Dynamic Group Name Input fields */}
+            <div className="space-y-2 pt-2">
+              <label className="block text-xs font-bold text-text-muted">שמות הקבוצות:</label>
+              <div className="grid grid-cols-1 gap-2">
+                {Array.from({ length: numTeams }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-1.5 focus-within:border-earth transition-colors">
+                    <span className="text-xs font-bold text-earth shrink-0">קבוצה {i + 1}:</span>
+                    <input
+                      type="text"
+                      value={customNames[i] || ""}
+                      onChange={(e) => {
+                        const updated = [...customNames];
+                        updated[i] = e.target.value;
+                        setCustomNames(updated);
+                      }}
+                      className="bg-transparent border-none text-xs font-bold text-white focus:outline-none w-full text-right"
+                      placeholder={`הזן שם לקבוצה ${i + 1}`}
+                    />
+                  </div>
                 ))}
               </div>
             </div>

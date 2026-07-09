@@ -651,7 +651,7 @@ export default function AstronomyWidget() {
                     
                     <div className="w-full h-[550px] rounded-2xl overflow-hidden border border-border-custom bg-zinc-950 relative">
                       <iframe 
-                        src="https://ccnmtl.github.io/astro-interactives/lunar-phase-simulator/"
+                        src="https://ccnmtl.github.io/astro-simulations/lunar-phase-simulator/"
                         className="w-full h-full border-0"
                         title="UNL Lunar Phase Simulator"
                       />

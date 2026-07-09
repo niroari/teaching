@@ -692,6 +692,9 @@ export default function LessonPresenterConsolePage() {
                     {/* Inline Widget activator reminder */}
                     {slides[currentSlideIndex].visualType === "task" && lessonData.widgetId && (
                       <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-3 bg-earth/10 border border-earth/20 rounded-xl p-3 text-xs shrink-0 select-none">
+                        <span className="text-earth font-bold text-right">
+                          💡 תלמידים יקרים, כעת נפנה לתרגול וחקירה בעזרת היישומון הדיגיטלי הבא:
+                        </span>
                         <button
                           onClick={() => setShowInlineWidget(true)}
                           className="px-4 py-1.5 bg-earth hover:bg-teal-600 text-white rounded-lg font-bold cursor-pointer transition-all flex items-center gap-1.5 shrink-0"
@@ -699,9 +702,6 @@ export default function LessonPresenterConsolePage() {
                           <Play className="w-3.5 h-3.5 animate-pulse" />
                           <span>הפעל יישומון להדגמה</span>
                         </button>
-                        <span className="text-earth font-bold text-right">
-                          💡 תלמידים יקרים, כעת נפנה לתרגול וחקירה בעזרת היישומון הדיגיטלי הבא:
-                        </span>
                       </div>
                     )}
                   </div>

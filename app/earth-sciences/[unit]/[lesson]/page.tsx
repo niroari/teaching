@@ -167,8 +167,8 @@ export default function LessonPresenterConsolePage() {
     );
   }
 
-  // Intercept and render a beautiful "Under Construction" placeholder page for Units 2, 3, 4
-  if (unitData.id !== 1) {
+  // Intercept and render a beautiful "Under Construction" placeholder page for Units 3, 4
+  if (unitData.id !== 1 && unitData.id !== 2) {
     return (
       <div className="min-h-screen bg-[#080c18] text-[#e8edf8] flex items-center justify-center p-6 text-right font-sans">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-amber-500/5 via-transparent to-transparent blur-3xl pointer-events-none rounded-full" />

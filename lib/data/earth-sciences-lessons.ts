@@ -20,7 +20,7 @@ export interface Lesson {
   summary: string[];
   notebookSummary: NotebookConcept[];
   embedUrl?: string;
-  widgetId?: "astronomy" | "climograph" | "tectonics" | "footprint" | "earth-explorer" | "trivia-jeopardy";
+  widgetId?: "astronomy" | "climograph" | "tectonics" | "footprint" | "earth-explorer" | "trivia-jeopardy" | "atmosphere";
 }
 
 export interface Unit {
@@ -344,7 +344,7 @@ export const EARTH_SCIENCES_UNITS: Unit[] = [
             definition: "מדד לרמת החזרת קרינת השמש ממשטח כלשהו. נע בין 0 (ספיגה מלאה, משטח כהה) ל-1 (החזרה מלאה, שלג/משטח לבן)."
           }
         ],
-        widgetId: "climograph"
+        widgetId: "atmosphere"
       },
       {
         id: "weather-phenomena",
@@ -388,7 +388,7 @@ export const EARTH_SCIENCES_UNITS: Unit[] = [
             definition: "תנועה אופקית של אוויר מאזור של לחץ ברומטרי גבוה (רמה) לאזור של לחץ ברומטרי נמוך (שקע)."
           }
         ],
-        widgetId: "climograph"
+        widgetId: "atmosphere"
       },
       {
         id: "climate-zones",
@@ -426,7 +426,7 @@ export const EARTH_SCIENCES_UNITS: Unit[] = [
             definition: "ההפרש בין הטמפרטורה הממוצעת של החודש החם ביותר לבין החודש הקר ביותר בשנה."
           }
         ],
-        widgetId: "climograph"
+        widgetId: "atmosphere"
       },
       {
         id: "human-atmosphere-impact",
@@ -464,7 +464,36 @@ export const EARTH_SCIENCES_UNITS: Unit[] = [
             term: "התחממות גלובלית",
             definition: "עליית הטמפרטורה הממוצעת של כדור הארץ בעקבות התגברות מלאכותית של אפקט החממה (על ידי פליטת פחמן דו-חמצני משריפת דלקים)."
           }
-        ]
+        ],
+        widgetId: "atmosphere"
+      },
+      {
+        id: "atmosphere-summary",
+        title: "סיכום, חזרה והערכה מסכמת 🏆",
+        duration: "3 שעות",
+        topics: [
+          "חזרה מרוכזת ופעילה על מושגי היסוד באסטרונומיה ואקלים",
+          "סדנת מיומנויות: ניתוח קלימוגרפים ומפות סינופטיות",
+          "הערכה מסכמת (מבחן מחצית א' או הערכה חלופית)"
+        ],
+        misconceptions: [
+          "הבנה שגויה או מבלבלת של המונחים לקראת המבחן"
+        ],
+        hook: "היום נסכם את כל מה שלמדנו ביחידת האטמוספרה והאקלים! נחזור על מושגים מרכזיים, נתרגל פיענוח מפות סינופטיות ונתכונן להערכה המסכמת.",
+        task: {
+          description: "חזרה כיתתית מרוכזת:",
+          instructions: [
+            "השתמשו ביישומוני האטמוספרה השונים כדי לחזור על אלבדו, לחצי אוויר, רוחות ואפקט החממה.",
+            "פתרו את שאלות המיומנות במפות סינופטיות וקלימוגרפים.",
+            "השלימו את ההכנה למבחן המחצית במשותף."
+          ]
+        },
+        summary: [
+          "ארגון וסינתזה של כל החומר שנלמד במהלך המחצית הראשונה.",
+          "ביסוס המיומנויות הגאוגרפיות הנדרשות לפענוח קלימוגרפים ומפות סינופטיות."
+        ],
+        notebookSummary: [],
+        widgetId: "atmosphere"
       }
     ]
   },

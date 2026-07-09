@@ -36,7 +36,7 @@ interface Slide {
 
 // Import widgets
 import AstronomyWidget from "@/components/earth-sciences/AstronomyWidget";
-import ClimographWidget from "@/components/earth-sciences/ClimographWidget";
+import AtmosphereWidget from "@/components/earth-sciences/AtmosphereWidget";
 import TectonicsWidget from "@/components/earth-sciences/TectonicsWidget";
 import FootprintWidget from "@/components/earth-sciences/FootprintWidget";
 import EarthExplorerWidget from "@/components/earth-sciences/EarthExplorerWidget";
@@ -224,8 +224,13 @@ export default function LessonPresenterConsolePage() {
         return <EarthExplorerWidget />;
       case "astronomy":
         return <AstronomyWidget />;
-      case "climograph":
-        return <ClimographWidget />;
+      case "atmosphere": {
+        let initialTab = 0;
+        if (lessonId === "weather-phenomena") initialTab = 1;
+        else if (lessonId === "climate-zones") initialTab = 2;
+        else if (lessonId === "human-atmosphere-impact") initialTab = 3;
+        return <AtmosphereWidget initialTab={initialTab} />;
+      }
       case "tectonics":
         return <TectonicsWidget />;
       case "footprint":

@@ -17,7 +17,8 @@ import {
   ChevronDown,
   X,
   Layers,
-  Edit2
+  Edit2,
+  FolderOpen
 } from "lucide-react";
 import { EARTH_SCIENCES_UNITS, Unit, Lesson } from "@/lib/data/earth-sciences-lessons";
 
@@ -235,6 +236,19 @@ export default function EarthSciencesHubPage() {
 
           {/* Controls Right */}
           <div className="flex items-center gap-3">
+            {/* Resources Button */}
+            <button
+              onClick={() => {
+                const el = document.getElementById("resources-section");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+              }}
+              className={`p-2 rounded-xl border ${borderTheme} bg-surface/30 hover:bg-surface-hover/30 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold`}
+              title="משאבים ועזרים דיגיטליים"
+            >
+              <FolderOpen className="w-3.5 h-3.5 text-earth" />
+              <span className="hidden sm:inline">משאבים ועזרים</span>
+            </button>
+
             {/* Class Manager Button */}
             <button
               onClick={() => {
@@ -579,6 +593,66 @@ export default function EarthSciencesHubPage() {
             </button>
           </div>
         )}
+
+        {/* Section: משאבים ועזרים */}
+        <div id="resources-section" className={`w-full mt-16 border-t ${borderTheme} pt-12 text-right space-y-8`}>
+          <div className="text-center sm:text-right space-y-2">
+            <h2 className={`text-2xl font-black tracking-tight ${titleText}`}>משאבים ועזרים 🛠️</h2>
+            <p className={`${textMuted} text-xs`}>
+              כלים אינטראקטיביים, סימולטורים ומקורות מידע חיצוניים להעשרת הלמידה במהלך השנה.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+            {/* Tool Card 1: NASA's Eye on the Solar System */}
+            <div className={`group ${cardTheme} rounded-2xl border ${borderTheme} p-5 flex flex-col justify-between gap-5`}>
+              <div className="space-y-2">
+                <h3 className={`text-lg font-bold ${titleText} flex items-center gap-2`}>
+                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                  NASA's Eye on the Solar System 🪐
+                </h3>
+                <p className={`${textMuted} text-xs leading-relaxed`}>
+                  הדמיית תלת-ממד אינטראקטיבית מבית נאס"א המאפשרת לחקור את כדור הארץ, כוכבי הלכת, הירחים, האסטרואידים וחלליות המחקר בזמן אמת על בסיס נתונים מדעיים אמיתיים.
+                </p>
+              </div>
+
+              {/* Interactive Iframe Embed */}
+              <div className={`w-full aspect-video rounded-xl border ${borderTheme} bg-slate-950 overflow-hidden relative shadow-md`}>
+                <iframe 
+                  src="https://eyes.nasa.gov/apps/solar-system/#/earth?featured=false&shareButton=false" 
+                  className="w-full h-full border-none"
+                  allowFullScreen
+                  title="NASA's Eye on the Solar System"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+
+            {/* Tool Card 2: Lunar Phase Simulator */}
+            <div className={`group ${cardTheme} rounded-2xl border ${borderTheme} p-5 flex flex-col justify-between gap-5`}>
+              <div className="space-y-2">
+                <h3 className={`text-lg font-bold ${titleText} flex items-center gap-2`}>
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                  סימולטור מופעי הירח 🌙
+                </h3>
+                <p className={`${textMuted} text-xs leading-relaxed`}>
+                  הדמיה אינטראקטיבית מבית אוניברסיטת נברסקה (UNL) המציגה את הקשר הגיאומטרי שבין כדור הארץ, הירח והשמש, ומסבירה כיצד נוצרים מופעי הירח השונים במהלך החודש.
+                </p>
+              </div>
+
+              {/* Interactive Iframe Embed */}
+              <div className={`w-full aspect-video rounded-xl border ${borderTheme} bg-white overflow-hidden relative shadow-md`}>
+                <iframe 
+                  src="https://ccnmtl.github.io/astro-simulations/lunar-phase-simulator/" 
+                  className="w-full h-full border-none"
+                  allowFullScreen
+                  title="Lunar Phase Simulator"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
 
       {/* Class Manager Modal */}

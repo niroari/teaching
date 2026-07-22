@@ -201,6 +201,42 @@ export default function PortalHomePage() {
           </Link>
 
         </div>
+
+        {/* Section: משאבים ועזרים */}
+        <div className="w-full mt-24 border-t border-border-custom/50 pt-16 text-right space-y-8">
+          <div className="text-center sm:text-right space-y-2">
+            <h2 className="text-3xl font-black tracking-tight text-white">משאבים ועזרים 🛠️</h2>
+            <p className="text-text-muted text-sm">
+              כלים אינטראקטיביים, סימולטורים ומקורות מידע חיצוניים להעשרת הלמידה במהלך השנה.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-8 w-full">
+            {/* Tool Card: NASA's Eye on the Solar System */}
+            <div className="group glass-card rounded-3xl border border-border-custom p-6 flex flex-col gap-6">
+              <div>
+                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                  NASA's Eye on the Solar System 🪐
+                </h3>
+                <p className="text-text-muted text-xs leading-relaxed mt-2 max-w-3xl">
+                  הדמיית תלת-ממד אינטראקטיבית מבית נאס"א המאפשרת לחקור את כדור הארץ, כוכבי הלכת, הירחים, האסטרואידים וחלליות המחקר בזמן אמת על בסיס נתונים מדעיים אמיתיים.
+                </p>
+              </div>
+
+              {/* Interactive Iframe Embed */}
+              <div className="w-full aspect-video md:aspect-[21/9] rounded-2xl border border-border-custom bg-slate-950 overflow-hidden relative shadow-2xl">
+                <iframe 
+                  src="https://eyes.nasa.gov/apps/solar-system/#/earth?featured=false&shareButton=false" 
+                  className="w-full h-full border-none"
+                  allowFullScreen
+                  title="NASA's Eye on the Solar System"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Footer */}

@@ -641,18 +641,18 @@ export default function LessonPresenterConsolePage() {
                           <div className="w-full flex flex-col gap-4 text-center items-stretch justify-center">
                             {/* Massive Wide Image Banner - taking maximum space */}
                             {slides[currentSlideIndex].imageUrl && (
-                              <div className="w-full h-40 sm:h-52 md:h-64 lg:h-[270px] xl:h-[300px] max-h-[40vh] rounded-2xl overflow-hidden border border-zinc-800/40 shadow-xl relative cursor-zoom-in group hover:border-teal-500/30 transition-all duration-300 shrink-0">
+                              <div className="mx-auto relative cursor-zoom-in group transition-all duration-300 w-fit shrink-0">
                                 <img
                                   src={slides[currentSlideIndex].imageUrl}
                                   alt={slides[currentSlideIndex].title}
-                                  className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-500"
+                                  className="w-auto h-40 sm:h-52 md:h-64 lg:h-[270px] xl:h-[300px] max-h-[40vh] object-contain rounded-2xl border border-zinc-800/40 shadow-xl group-hover:scale-[1.01] transition-transform duration-500"
                                   onClick={() => setLightboxImageUrl(slides[currentSlideIndex].imageUrl || null)}
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent pointer-events-none rounded-2xl" />
                                 
                                 {/* Overlay Subtitle Content */}
-                                <div className="absolute bottom-4 right-4 left-4 sm:bottom-6 sm:right-6 sm:left-6 text-right z-10 pointer-events-none">
-                                  <p className="text-white font-black text-base sm:text-lg md:text-xl lg:text-2xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+                                <div className="absolute bottom-4 right-4 left-4 text-right z-10 pointer-events-none">
+                                  <p className="text-white font-black text-xs sm:text-sm md:text-base lg:text-lg drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
                                     {slides[currentSlideIndex].content}
                                   </p>
                                 </div>

@@ -169,10 +169,10 @@ export default function FootprintWidget() {
       <div className="flex border-b border-border-custom bg-surface-hover/30 p-4 justify-between items-center">
         <div className="flex items-center gap-2">
           <TrendingDown className="w-5 h-5 text-earth" />
-          <h3 className="font-bold text-white text-sm md:text-base">מחשבון טביעת רגל אקולוגית כיתתי</h3>
+          <h3 className="font-bold text-white text-base">מחשבון טביעת רגל אקולוגית כיתתי</h3>
         </div>
         {!showResults && (
-          <div className="text-xs text-text-muted bg-surface rounded-lg px-3 py-1 border border-border-custom font-bold">
+          <div className="text-xs sm:text-sm text-text-muted bg-surface rounded-xl px-3.5 py-1.5 border border-border-custom font-bold">
             שאלה {currentStep + 1} מתוך {QUESTIONS.length}
           </div>
         )}
@@ -182,17 +182,17 @@ export default function FootprintWidget() {
         {!showResults ? (
           <div className="space-y-6">
             {/* Intro */}
-            <div className="bg-earth/5 border border-earth/20 rounded-xl p-4 flex gap-3 text-xs md:text-sm text-text-muted leading-relaxed">
+            <div className="bg-earth/5 border border-earth/20 rounded-xl p-4 flex gap-3 text-sm text-text-muted leading-relaxed">
               <HelpCircle className="w-5 h-5 text-earth shrink-0 mt-0.5" />
               <div>
-                <span className="font-bold text-white block mb-1">משאבים וקיימות - טביעת רגל אקולוגית:</span>
+                <span className="font-bold text-white block mb-1 text-base">משאבים וקיימות - טביעת רגל אקולוגית:</span>
                 ענו על שאלון הצריכה הבא כדי לאמוד את רמת ניצול המשאבים האישית שלכם וכדי להבין את השפעתכם על הפלנטה.
               </div>
             </div>
 
             {/* Question Text */}
             <div className="space-y-3">
-              <span className="px-2 py-0.5 rounded bg-zinc-800 text-earth font-semibold text-[10px] uppercase">
+              <span className="px-2 py-0.5 rounded bg-zinc-800 text-earth font-semibold text-xs uppercase">
                 קטגוריה: {
                   activeQuestion.category === "food" ? "תזונה" :
                   activeQuestion.category === "transit" ? "תחבורה" :
@@ -200,27 +200,27 @@ export default function FootprintWidget() {
                   activeQuestion.category === "water" ? "משאבי מים" : "פסולת וצריכה"
                 }
               </span>
-              <h4 className="text-base font-bold text-white text-right leading-snug">
+              <h4 className="text-base md:text-lg font-black text-white text-right leading-snug">
                 {activeQuestion.text}
               </h4>
             </div>
 
             {/* Option Buttons */}
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               {activeQuestion.options.map((opt, i) => {
                 const isSelected = answers[activeQuestion.id] === opt.points;
                 return (
                   <button
                     key={i}
                     onClick={() => handleSelectOption(opt.points)}
-                    className={`w-full p-4 rounded-xl border text-right text-xs transition-all cursor-pointer flex justify-between items-center ${
+                    className={`w-full p-4.5 rounded-xl border text-right text-xs sm:text-sm md:text-base transition-all cursor-pointer flex justify-between items-center ${
                       isSelected
                         ? "border-earth bg-earth/15 text-white ring-2 ring-earth/30 font-bold"
-                        : "border-border-custom bg-surface hover:bg-surface-hover text-text-muted"
+                        : "border-border-custom bg-surface hover:bg-surface-hover text-text-muted font-medium"
                     }`}
                   >
                     <span>{opt.text}</span>
-                    {isSelected && <Check className="w-4 h-4 text-earth shrink-0 ml-2" />}
+                    {isSelected && <Check className="w-4.5 h-4.5 text-earth shrink-0 ml-2" />}
                   </button>
                 );
               })}
@@ -231,7 +231,7 @@ export default function FootprintWidget() {
               <button
                 onClick={handlePrev}
                 disabled={currentStep === 0}
-                className="px-4 py-2 border border-border-custom text-text-muted hover:bg-surface-hover disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold rounded-xl cursor-pointer transition-all"
+                className="px-4 py-2.5 border border-border-custom text-text-muted hover:bg-surface-hover disabled:opacity-40 disabled:cursor-not-allowed text-xs md:text-sm font-bold rounded-xl cursor-pointer transition-all"
               >
                 ← חזרה
               </button>
@@ -239,7 +239,7 @@ export default function FootprintWidget() {
               <button
                 onClick={handleNext}
                 disabled={!isCurrentAnswered}
-                className={`px-6 py-2 text-xs font-bold rounded-xl transition-all ${
+                className={`px-6 py-2.5 text-xs md:text-sm font-bold rounded-xl transition-all ${
                   isCurrentAnswered
                     ? "bg-earth hover:bg-teal-600 text-white cursor-pointer"
                     : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
@@ -255,34 +255,34 @@ export default function FootprintWidget() {
             <div className="flex flex-col items-center text-center p-6 bg-zinc-950/40 border border-border-custom rounded-2xl relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-b from-earth/5 via-transparent to-transparent pointer-events-none" />
 
-              <h4 className="text-sm font-bold text-text-muted">טביעת הרגל האקולוגית שלך דורשת:</h4>
+              <h4 className="text-xs sm:text-sm font-bold text-text-muted">טביעת הרגל האקולוגית שלך דורשת:</h4>
               
               {/* Earths display */}
               <div className="my-6 space-y-1">
-                <span className="text-6xl font-black text-earth block tracking-tight">
-                  {earthsNeeded} <span className="text-xl font-bold text-white">כדורי ארץ</span>
+                <span className="text-5xl sm:text-6xl font-black text-earth block tracking-tight">
+                  {earthsNeeded} <span className="text-lg sm:text-xl font-bold text-white">כדורי ארץ</span>
                 </span>
-                <span className="text-xs text-text-muted">
+                <span className="text-xs sm:text-sm text-text-muted">
                   אם כל אדם בעולם היה צורך משאבים ומייצר פסולת בדיוק כמוך.
                 </span>
               </div>
 
               {/* Dunams equivalent */}
-              <div className="bg-surface border border-border-custom rounded-xl px-4 py-2 text-xs text-text-muted max-w-sm">
+              <div className="bg-surface border border-border-custom rounded-xl px-4 py-2.5 text-xs sm:text-sm text-text-muted max-w-md">
                 שווה ערך ל-<strong>{dunamsNeeded} דונמים</strong> של שטח יבשתי וימי פורה בשנה כדי לקיים את סגנון החיים שלך.
               </div>
             </div>
 
             {/* Scale comparison */}
             <div className="space-y-2">
-              <h5 className="text-xs font-bold text-white text-right">מפת המדדים:</h5>
+              <h5 className="text-xs sm:text-sm font-bold text-white text-right">מפת המדדים:</h5>
               <div className="h-3 w-full bg-zinc-800 rounded-full overflow-hidden flex">
                 <div className="h-full bg-emerald-500 w-1/4" title="1-1.5 כדורים (בר קיימא)" />
                 <div className="h-full bg-yellow-500 w-1/4" title="1.5-2.5 כדורים (בינוני)" />
                 <div className="h-full bg-orange-500 w-1/4" title="2.5-3.5 כדורים (גבוה)" />
                 <div className="h-full bg-red-500 w-1/4" title="3.5+ כדורים (קיצוני)" />
               </div>
-              <div className="flex justify-between text-[9px] text-text-muted font-semibold">
+              <div className="flex justify-between text-[10px] md:text-xs text-text-muted font-semibold">
                 <span>4.0+ (קיצוני)</span>
                 <span>3.0 (גבוה)</span>
                 <span>2.0 (ממוצע)</span>
@@ -292,19 +292,19 @@ export default function FootprintWidget() {
 
             {/* Action Recommendations */}
             <div className="space-y-3">
-              <h5 className="text-xs font-bold text-white flex items-center gap-1.5 justify-start">
-                <Sparkles className="w-4 h-4 text-yellow-400 shrink-0" />
+              <h5 className="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5 justify-start">
+                <Sparkles className="w-4.5 h-4.5 text-yellow-400 shrink-0" />
                 <span>דרכים מומלצות להקטנת טביעת הרגל שלך:</span>
               </h5>
               <div className="grid grid-cols-1 gap-3">
                 {getRecommendations().map((rec, i) => (
                   <div key={i} className="p-4 border border-border-custom bg-surface rounded-xl flex gap-3 text-right">
-                    <div className="w-6 h-6 rounded-full bg-earth/10 flex items-center justify-center shrink-0 mt-0.5">
-                      <span className="text-[10px] text-earth font-bold">{i + 1}</span>
+                    <div className="w-7 h-7 rounded-full bg-earth/10 flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="text-xs text-earth font-bold">{i + 1}</span>
                     </div>
-                    <div className="flex-1 space-y-1">
-                      <strong className="text-white text-xs block">{rec.title}</strong>
-                      <p className="text-[11px] text-text-muted leading-relaxed">{rec.desc}</p>
+                    <div className="flex-1 space-y-1.5">
+                      <strong className="text-white text-xs sm:text-sm block">{rec.title}</strong>
+                      <p className="text-xs sm:text-sm text-text-muted leading-relaxed">{rec.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -315,7 +315,7 @@ export default function FootprintWidget() {
             <div className="flex gap-4 pt-4 border-t border-border-custom justify-end">
               <button
                 onClick={handleReset}
-                className="px-5 py-2.5 bg-earth hover:bg-teal-600 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer transition-all"
+                className="px-6 py-3 bg-earth hover:bg-teal-600 text-white text-xs md:text-sm font-bold rounded-xl flex items-center gap-1.5 cursor-pointer transition-all"
               >
                 <RefreshCw className="w-4 h-4" />
                 <span>מילוי שאלון מחדש</span>

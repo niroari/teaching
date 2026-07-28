@@ -193,18 +193,16 @@ export default function EarthExplorerWidget() {
 
   return (
     <div className="w-full bg-[#090d16] border border-zinc-800/80 rounded-2xl p-6 min-h-[460px] flex flex-col justify-between select-none relative overflow-hidden shadow-2xl">
-      {/* Background radial glow */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(20,184,166,0.1),transparent_70%)] pointer-events-none" />
 
-      {/* WELCOME GAME VIEW */}
       {gameState === "welcome" && (
         <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6 py-6 z-10">
           <div className="w-20 h-20 rounded-full bg-earth/10 border-2 border-earth flex items-center justify-center shadow-lg shadow-teal-500/10 animate-bounce">
             <Compass className="w-10 h-10 text-earth" />
           </div>
-          <div className="space-y-2.5 max-w-lg">
-            <h3 className="text-2xl font-black text-white">חידון כדור הארץ הגדול! 🧠</h3>
-            <p className="text-sm text-text-muted leading-relaxed">
+          <div className="space-y-3 max-w-lg">
+            <h3 className="text-2xl md:text-3xl font-black text-white">חידון כדור הארץ הגדול! 🧠</h3>
+            <p className="text-base text-text-muted leading-relaxed">
               התכוננו לשנת הלימודים הבאה עלינו לטובה!
               לפניכם 5 שאלות טריוויה מפתיעות ומסקרנות על כוכב הלכת הייחודי שלנו.
               נסו לגלות כמה אתם כבר יודעים!
@@ -212,52 +210,48 @@ export default function EarthExplorerWidget() {
           </div>
           <button
             onClick={handleStart}
-            className="px-8 py-3 bg-earth hover:bg-teal-600 text-white font-extrabold rounded-xl transition-all shadow-md shadow-teal-500/20 cursor-pointer animate-pulse-hover text-base"
+            className="px-10 py-4 bg-earth hover:bg-teal-600 text-white font-extrabold rounded-xl transition-all shadow-md shadow-teal-500/20 cursor-pointer animate-pulse-hover text-lg"
           >
             בואו נתחיל לשחק
           </button>
         </div>
       )}
 
-      {/* ACTIVE QUIZ VIEW */}
       {gameState === "quiz" && (
         <div className="flex-1 flex flex-col justify-between z-10 space-y-4">
-          {/* Header Progress Row */}
           <div className="flex justify-between items-center border-b border-zinc-800 pb-3">
-            <span className="text-xs text-text-muted font-bold">
+            <span className="text-sm text-text-muted font-bold">
               שאלה {currentIdx + 1} מתוך {QUESTIONS.length}
             </span>
-            <div className="flex items-center gap-1.5 text-xs text-amber-400 font-extrabold bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-lg">
-              <Award className="w-4 h-4 shrink-0" />
+            <div className="flex items-center gap-2 text-sm text-amber-400 font-extrabold bg-amber-500/10 border border-amber-500/20 px-3.5 py-1.5 rounded-lg">
+              <Award className="w-4.5 h-4.5 shrink-0" />
               <span>ניקוד: {score} נקודות</span>
             </div>
           </div>
 
-          {/* Question Text block */}
           <div className="flex items-start gap-4 text-right py-2">
-            <div className="shrink-0 p-2.5 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-center">
+            <div className="shrink-0 p-3 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-center">
               {QUESTIONS[currentIdx].icon}
             </div>
-            <div className="space-y-1">
-              <span className="text-[10px] text-earth font-black tracking-widest uppercase">אתגר פתיחה</span>
-              <h4 className="text-lg md:text-xl font-black text-white leading-snug">
+            <div className="space-y-1.5">
+              <span className="text-xs text-earth font-black tracking-widest uppercase">אתגר פתיחה</span>
+              <h4 className="text-lg md:text-xl lg:text-2xl font-black text-white leading-snug">
                 {QUESTIONS[currentIdx].text}
               </h4>
             </div>
           </div>
 
-          {/* Options Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 py-2">
             {QUESTIONS[currentIdx].options.map((opt, oIdx) => (
               <button
                 key={oIdx}
                 onClick={() => handleSelectOption(oIdx)}
                 disabled={isChecked}
-                className={`w-full p-3.5 border rounded-xl text-right text-sm font-bold transition-all flex items-center gap-3 cursor-pointer ${getOptionStyle(
+                className={`w-full p-4.5 border rounded-xl text-right text-sm md:text-base font-bold transition-all flex items-center gap-3.5 cursor-pointer ${getOptionStyle(
                   oIdx
                 )}`}
               >
-                <span className={`w-6 h-6 rounded-full border flex items-center justify-center text-xs shrink-0 ${
+                <span className={`w-7 h-7 rounded-full border flex items-center justify-center text-xs md:text-sm shrink-0 ${
                   selectedOption === oIdx 
                     ? "bg-earth/20 border-earth text-earth font-black"
                     : "border-zinc-800 text-zinc-500 bg-zinc-950"
@@ -269,18 +263,17 @@ export default function EarthExplorerWidget() {
             ))}
           </div>
 
-          {/* Feedback & Actions area */}
           <div className="min-h-[110px] flex flex-col justify-end">
             {!isChecked ? (
               <button
                 onClick={handleCheck}
                 disabled={selectedOption === null}
-                className="w-full py-3 bg-earth hover:bg-teal-600 disabled:bg-zinc-900 disabled:text-zinc-600 disabled:border-zinc-800 disabled:cursor-not-allowed text-white font-extrabold rounded-xl transition-all border border-transparent cursor-pointer text-sm flex items-center justify-center gap-1.5"
+                className="w-full py-3.5 bg-earth hover:bg-teal-600 disabled:bg-zinc-900 disabled:text-zinc-600 disabled:border-zinc-800 disabled:cursor-not-allowed text-white font-extrabold rounded-xl transition-all border border-transparent cursor-pointer text-sm md:text-base flex items-center justify-center gap-1.5"
               >
                 <span>בדוק תשובה</span>
               </button>
             ) : (
-              <div className="space-y-3 animate-fade-in text-right">
+              <div className="space-y-3.5 animate-fade-in text-right">
                 <div className={`p-4 border rounded-xl flex gap-3.5 ${
                   selectedOption === QUESTIONS[currentIdx].correctAnswer
                     ? "bg-emerald-950/20 border-emerald-500/25 text-emerald-300"
@@ -293,11 +286,11 @@ export default function EarthExplorerWidget() {
                       <XCircle className="w-5 h-5 text-red-400" />
                     )}
                   </div>
-                  <div className="space-y-1">
-                    <span className="text-xs font-black block">
+                  <div className="space-y-1.5">
+                    <span className="text-sm font-black block">
                       {selectedOption === QUESTIONS[currentIdx].correctAnswer ? "תשובה נכונה! כל הכבוד 🌟" : "תשובה לא נכונה. לא נורא!"}
                     </span>
-                    <p className="text-xs leading-relaxed text-zinc-300 font-medium">
+                    <p className="text-xs md:text-sm leading-relaxed text-zinc-300 font-medium">
                       {QUESTIONS[currentIdx].explanation}
                     </p>
                   </div>
@@ -305,7 +298,7 @@ export default function EarthExplorerWidget() {
 
                 <button
                   onClick={handleNext}
-                  className="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-extrabold rounded-xl transition-all cursor-pointer text-sm flex items-center justify-center gap-1.5"
+                  className="w-full py-3.5 bg-zinc-800 hover:bg-zinc-700 text-white font-extrabold rounded-xl transition-all cursor-pointer text-sm md:text-base flex items-center justify-center gap-1.5"
                 >
                   <span>{currentIdx === QUESTIONS.length - 1 ? "סיום החידון וצפייה בתוצאה" : "שאלה הבאה"}</span>
                   <ArrowLeft className="w-4 h-4" />

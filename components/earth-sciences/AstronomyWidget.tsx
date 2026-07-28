@@ -153,7 +153,7 @@ export default function AstronomyWidget() {
       <div className="flex border-b border-border-custom bg-surface-hover/30">
         <button
           onClick={() => setActiveTab("sorter")}
-          className={`flex-1 py-4 text-sm font-bold transition-all text-center cursor-pointer ${
+          className={`flex-1 py-4 text-sm md:text-base font-bold transition-all text-center cursor-pointer ${
             activeTab === "sorter"
               ? "text-earth border-b-2 border-earth bg-earth/5"
               : "text-text-muted hover:text-foreground"
@@ -163,7 +163,7 @@ export default function AstronomyWidget() {
         </button>
         <button
           onClick={() => setActiveTab("simulator")}
-          className={`flex-1 py-4 text-sm font-bold transition-all text-center cursor-pointer ${
+          className={`flex-1 py-4 text-sm md:text-base font-bold transition-all text-center cursor-pointer ${
             activeTab === "simulator"
               ? "text-earth border-b-2 border-earth bg-earth/5"
               : "text-text-muted hover:text-foreground"
@@ -177,10 +177,10 @@ export default function AstronomyWidget() {
         {/* Tab 1: Planet Sorter */}
         {activeTab === "sorter" && (
           <div className="space-y-6">
-            <div className="bg-earth/5 border border-earth/20 rounded-xl p-4 flex gap-3 text-xs md:text-sm text-text-muted leading-relaxed">
+            <div className="bg-earth/5 border border-earth/20 rounded-xl p-4 flex gap-3 text-sm text-text-muted leading-relaxed">
               <HelpCircle className="w-5 h-5 text-earth shrink-0 mt-0.5" />
               <div>
-                <span className="font-bold text-white block mb-1">הנחיות לתרגול בכיתה:</span>
+                <span className="font-bold text-white block mb-1 text-base">הנחיות לתרגול בכיתה:</span>
                 בחרו כוכב לכת מרשימת הקלפים למטה (הוא יודגש), ולאחר מכן לחצו על אחת משתי הקטגוריות: "כוכבי לכת סלעיים" או "כוכבי לכת גזיים".
                 בסיום המיון, לחצו על כפתור <strong>בדיקת תשובות</strong> כדי לראות אם צדקתם!
               </div>
@@ -199,9 +199,9 @@ export default function AstronomyWidget() {
               >
                 <div className="flex items-center gap-2 mb-4">
                   <Globe className="w-5 h-5 text-amber-500" />
-                  <h4 className="font-bold text-white text-base">כוכבי לכת סלעיים פנימיים</h4>
+                  <h4 className="font-bold text-white text-lg">כוכבי לכת סלעיים פנימיים</h4>
                 </div>
-                <p className="text-[11px] text-text-muted text-center mb-4">ממוקמים קרוב לשמש, בעלי קרום סלעי מוצק, קטנים יחסית, בעלי כבידה נמוכה ומעט ירחים.</p>
+                <p className="text-xs md:text-sm text-text-muted text-center mb-4 leading-relaxed">ממוקמים קרוב לשמש, בעלי קרום סלעי מוצק, קטנים יחסית, בעלי כבידה נמוכה ומעט ירחים.</p>
                 <div className="flex flex-wrap gap-2 justify-center w-full">
                   {PLANETS.filter(p => sortedPlanets[p.name] === "rocky").map(p => (
                     <div
@@ -210,13 +210,13 @@ export default function AstronomyWidget() {
                         e.stopPropagation();
                         setSelectedPlanet(p);
                       }}
-                      className={`px-3 py-1.5 rounded-xl border text-xs font-bold cursor-pointer transition-all ${getPlanetStatusColor(p)}`}
+                      className={`px-4 py-2 rounded-xl border text-sm font-bold cursor-pointer transition-all ${getPlanetStatusColor(p)}`}
                     >
                       {p.name}
                     </div>
                   ))}
                   {PLANETS.filter(p => sortedPlanets[p.name] === "rocky").length === 0 && (
-                    <span className="text-xs text-text-muted/60 italic py-2">גררו או מיינו לכאן קלפים</span>
+                    <span className="text-sm text-text-muted/60 italic py-2">גררו או מיינו לכאן קלפים</span>
                   )}
                 </div>
               </div>
@@ -232,9 +232,9 @@ export default function AstronomyWidget() {
               >
                 <div className="flex items-center gap-2 mb-4">
                   <Globe className="w-5 h-5 text-sky-400" />
-                  <h4 className="font-bold text-white text-base">כוכבי לכת גזיים חיצוניים</h4>
+                  <h4 className="font-bold text-white text-lg">כוכבי לכת גזיים חיצוניים</h4>
                 </div>
-                <p className="text-[11px] text-text-muted text-center mb-4">ממוקמים רחוק מהשמש, עשויים גזים (בעיקר מימן והליום), ענקיים, בעלי כבידה חזקה וירחים רבים.</p>
+                <p className="text-xs md:text-sm text-text-muted text-center mb-4 leading-relaxed">ממוקמים רחוק מהשמש, עשויים גזים (בעיקר מימן והליום), ענקיים, בעלי כבידה חזקה וירחים רבים.</p>
                 <div className="flex flex-wrap gap-2 justify-center w-full">
                   {PLANETS.filter(p => sortedPlanets[p.name] === "gaseous").map(p => (
                     <div
@@ -243,13 +243,13 @@ export default function AstronomyWidget() {
                         e.stopPropagation();
                         setSelectedPlanet(p);
                       }}
-                      className={`px-3 py-1.5 rounded-xl border text-xs font-bold cursor-pointer transition-all ${getPlanetStatusColor(p)}`}
+                      className={`px-4 py-2 rounded-xl border text-sm font-bold cursor-pointer transition-all ${getPlanetStatusColor(p)}`}
                     >
                       {p.name}
                     </div>
                   ))}
                   {PLANETS.filter(p => sortedPlanets[p.name] === "gaseous").length === 0 && (
-                    <span className="text-xs text-text-muted/60 italic py-2">גררו או מיינו לכאן קלפים</span>
+                    <span className="text-sm text-text-muted/60 italic py-2">גררו או מיינו לכאן קלפים</span>
                   )}
                 </div>
               </div>
@@ -257,7 +257,7 @@ export default function AstronomyWidget() {
 
             {/* Planets to be sorted */}
             <div className="space-y-3">
-              <h5 className="text-xs font-bold text-text-muted">בחרו קלף למיון:</h5>
+              <h5 className="text-sm font-bold text-text-muted">בחרו קלף למיון:</h5>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {PLANETS.map(p => {
                   const isSorted = sortedPlanets[p.name] !== null;
@@ -267,7 +267,7 @@ export default function AstronomyWidget() {
                       key={p.name}
                       disabled={isSorted && !showCheck}
                       onClick={() => setSelectedPlanet(isSelected ? null : p)}
-                      className={`p-3 rounded-xl border text-right transition-all flex flex-col justify-between h-24 text-xs cursor-pointer ${
+                      className={`p-3 rounded-xl border text-right transition-all flex flex-col justify-between h-28 text-sm cursor-pointer ${
                         isSelected 
                           ? "border-earth bg-earth/10 ring-2 ring-earth/30" 
                           : isSorted 
@@ -277,9 +277,9 @@ export default function AstronomyWidget() {
                     >
                       <div>
                         <span className="font-bold text-white block">{p.name}</span>
-                        <span className="text-[10px] text-text-muted block mt-1 leading-snug truncate-2-lines">{p.desc}</span>
+                        <span className="text-xs text-text-muted block mt-1.5 leading-snug truncate-2-lines">{p.desc}</span>
                       </div>
-                      <span className="text-[9px] text-text-muted/70 mt-1 block truncate">{p.details}</span>
+                      <span className="text-[11px] text-text-muted/70 mt-1.5 block truncate">{p.details}</span>
                     </button>
                   );
                 })}
@@ -290,7 +290,7 @@ export default function AstronomyWidget() {
             <div className="flex gap-4 pt-4 border-t border-border-custom justify-end">
               <button
                 onClick={handleResetSorter}
-                className="px-4 py-2 border border-border-custom hover:bg-surface-hover text-xs font-bold rounded-xl flex items-center gap-1.5 cursor-pointer transition-all"
+                className="px-4 py-2.5 border border-border-custom bg-surface hover:bg-surface-hover text-xs md:text-sm font-bold rounded-xl flex items-center gap-1.5 cursor-pointer transition-all"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
                 <span>איפוס</span>
@@ -298,7 +298,7 @@ export default function AstronomyWidget() {
               <button
                 onClick={checkResults}
                 disabled={!isAllSorted}
-                className={`px-5 py-2 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all ${
+                className={`px-5 py-2.5 text-xs md:text-sm font-bold rounded-xl flex items-center gap-1.5 transition-all ${
                   isAllSorted
                     ? "bg-earth hover:bg-teal-600 text-white cursor-pointer"
                     : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
@@ -312,8 +312,8 @@ export default function AstronomyWidget() {
             {/* Feedback Message */}
             {showCheck && (
               <div className="bg-surface border border-border-custom rounded-xl p-4 mt-2">
-                <h5 className="font-bold text-white text-sm mb-2">סיכום המיון הכיתתי:</h5>
-                <ul className="text-xs text-text-muted space-y-2 list-disc pr-4">
+                <h5 className="font-bold text-white text-base mb-2">סיכום המיון הכיתתי:</h5>
+                <ul className="text-sm text-text-muted space-y-2 list-disc pr-4">
                   <li>
                     <strong className="text-amber-400">כוכבי הלכת הסלעיים:</strong> מרקורי, נוגה, כדור הארץ ומאדים. כולם קרובים לחום השמש, קטנים ומוצקים.
                   </li>
@@ -365,7 +365,7 @@ export default function AstronomyWidget() {
                   <div className="absolute -left-16 top-1/2 -translate-y-1/2 w-48 h-48 bg-amber-500 rounded-full blur-2xl opacity-30 pointer-events-none" />
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 flex flex-col items-center z-10 text-amber-500">
                     <Sun className="w-16 h-16 animate-pulse" />
-                    <span className="text-[10px] font-bold mt-1">קרינת השמש</span>
+                    <span className="text-xs font-bold mt-1">קרינת השמש</span>
                   </div>
 
                   {/* Earth Sphere representation with rotating axis */}
@@ -375,7 +375,7 @@ export default function AstronomyWidget() {
                     
                     {/* Tilted Axis line */}
                     <div className="absolute w-[2px] h-60 bg-red-500/40 rotate-[23.5deg] z-0 flex items-center justify-center">
-                      <span className="absolute -top-6 text-[9px] text-red-400 font-bold rotate-[-23.5deg]">ציר נטוי 23.5°</span>
+                      <span className="absolute -top-6 text-[11px] text-red-400 font-bold rotate-[-23.5deg]">ציר נטוי 23.5°</span>
                     </div>
 
                     {/* Earth Body */}
@@ -401,22 +401,22 @@ export default function AstronomyWidget() {
                 </div>
 
                 <div className="md:col-span-2 space-y-4 text-right">
-                  <h4 className="font-bold text-white text-base">הסיבוב העצמי של כדור הארץ</h4>
-                  <p className="text-xs text-text-muted leading-relaxed">
+                  <h4 className="font-bold text-white text-lg">הסיבוב העצמי של כדור הארץ</h4>
+                  <p className="text-sm text-text-muted leading-relaxed">
                     כדור הארץ מסתובב סביב צירו (ממערב למזרח) פעם ב-24 שעות. 
                     <br /><br />
                     סיבוב זה הוא הגורם הישיר להיווצרות <strong>מחזור יום ולילה</strong>: 
                     החלק הפונה אל השמש מואר וחווה יום, בעוד החלק הנגדי חשוך וחווה לילה. 
                   </p>
                   
-                  <div className="bg-surface/50 border border-border-custom rounded-xl p-3 text-[11px] text-text-muted space-y-2">
-                    <span className="font-bold text-white block">💡 דגש פדגוגי למניעת טעויות:</span>
+                  <div className="bg-surface/50 border border-border-custom rounded-xl p-3 text-xs md:text-sm text-text-muted space-y-2">
+                    <span className="font-bold text-white block text-sm">💡 דגש פדגוגי למניעת טעויות:</span>
                     <span>תלמידים רבים חושבים שהשמש נעה באמת בשמיים. עלינו להבהיר כי זוהי <strong>תנועה מדומה</strong> - השמש יחסית סטטית במרכז המערכת, והתנועה בשמיים נגרמת בגלל הסיבוב של כדור הארץ עצמו!</span>
                   </div>
 
                   <button
                     onClick={() => setPlayAnim(!playAnim)}
-                    className="w-full py-2 bg-surface hover:bg-surface-hover border border-border-custom text-xs font-bold rounded-xl cursor-pointer transition-all"
+                    className="w-full py-3 bg-surface hover:bg-surface-hover border border-border-custom text-sm font-bold rounded-xl cursor-pointer transition-all"
                   >
                     {playAnim ? "עצור הדמיה" : "הפעל הדמיה"}
                   </button>
@@ -447,7 +447,7 @@ export default function AstronomyWidget() {
                       onClick={() => setRevolutionStep(0)}
                     >
                       <Globe className="w-5 h-5 text-emerald-400 rotate-[23.5deg]" />
-                      <span className="absolute -bottom-6 text-[9px] font-bold text-white whitespace-nowrap bg-zinc-900/80 px-1 py-0.5 rounded">יוני (קיץ צפוני)</span>
+                      <span className="absolute -bottom-6 text-[11px] font-bold text-white whitespace-nowrap bg-zinc-900/80 px-1.5 py-0.5 rounded">יוני (קיץ צפוני)</span>
                     </div>
 
                     {/* Step 1: Autumn Equinox (Top) */}
@@ -459,7 +459,7 @@ export default function AstronomyWidget() {
                       onClick={() => setRevolutionStep(1)}
                     >
                       <Globe className="w-5 h-5 text-emerald-400 rotate-[23.5deg]" />
-                      <span className="absolute -top-6 text-[9px] font-bold text-white whitespace-nowrap bg-zinc-900/80 px-1 py-0.5 rounded">ספטמבר (סתיו)</span>
+                      <span className="absolute -top-6 text-[11px] font-bold text-white whitespace-nowrap bg-zinc-900/80 px-1.5 py-0.5 rounded">ספטמבר (סתיו)</span>
                     </div>
 
                     {/* Step 2: Northern Winter (Left) */}
@@ -471,7 +471,7 @@ export default function AstronomyWidget() {
                       onClick={() => setRevolutionStep(2)}
                     >
                       <Globe className="w-5 h-5 text-emerald-400 rotate-[23.5deg]" />
-                      <span className="absolute -bottom-6 text-[9px] font-bold text-white whitespace-nowrap bg-zinc-900/80 px-1 py-0.5 rounded">דצמבר (חורף צפוני)</span>
+                      <span className="absolute -bottom-6 text-[11px] font-bold text-white whitespace-nowrap bg-zinc-900/80 px-1.5 py-0.5 rounded">דצמבר (חורף צפוני)</span>
                     </div>
 
                     {/* Step 3: Spring Equinox (Bottom) */}
@@ -483,13 +483,13 @@ export default function AstronomyWidget() {
                       onClick={() => setRevolutionStep(3)}
                     >
                       <Globe className="w-5 h-5 text-emerald-400 rotate-[23.5deg]" />
-                      <span className="absolute -bottom-6 text-[9px] font-bold text-white whitespace-nowrap bg-zinc-900/80 px-1 py-0.5 rounded">מרץ (אביב)</span>
+                      <span className="absolute -bottom-6 text-[11px] font-bold text-white whitespace-nowrap bg-zinc-900/80 px-1.5 py-0.5 rounded">מרץ (אביב)</span>
                     </div>
                   </div>
 
                   <div className="md:col-span-2 space-y-4 text-right">
-                    <h4 className="font-bold text-white text-base">ההקפה סביב השמש ועונות השנה</h4>
-                    <div className="text-xs text-text-muted leading-relaxed space-y-2">
+                    <h4 className="font-bold text-white text-lg">ההקפה סביב השמש ועונות השנה</h4>
+                    <div className="text-sm text-text-muted leading-relaxed space-y-2">
                       <p>
                         כדור הארץ מקיף את השמש במסלול אליפטי פעם ב-365.25 ימים. 
                       </p>
@@ -498,8 +498,8 @@ export default function AstronomyWidget() {
                       </p>
                     </div>
 
-                    <div className="bg-earth/5 border border-earth/20 rounded-xl p-3 text-[11px] text-text-muted space-y-1">
-                      <span className="font-bold text-white block">בחרו עונה להסבר במצגת:</span>
+                    <div className="bg-earth/5 border border-earth/20 rounded-xl p-3.5 text-xs md:text-sm text-text-muted space-y-2">
+                      <span className="font-bold text-white block text-sm">בחרו עונה להסבר במצגת:</span>
                       {revolutionStep === 0 && (
                         <span>☀️ <strong>יוני (קיץ בחצי הכדור הצפוני):</strong> חצי הכדור הצפוני נטוי לקראת השמש, קרני האור פוגעות בו בזווית ישרה (מרוכזת), הימים ארוכים והטמפרטורה גבוהה.</span>
                       )}
@@ -516,15 +516,15 @@ export default function AstronomyWidget() {
 
                     {/* Step selection buttons */}
                     <div className="grid grid-cols-2 gap-2">
-                      <button onClick={() => setRevolutionStep(0)} className={`py-1.5 rounded-lg text-[10px] font-bold cursor-pointer transition-all ${revolutionStep === 0 ? "bg-earth text-white" : "bg-surface text-text-muted"}`}>יוני - קיץ</button>
-                      <button onClick={() => setRevolutionStep(1)} className={`py-1.5 rounded-lg text-[10px] font-bold cursor-pointer transition-all ${revolutionStep === 1 ? "bg-earth text-white" : "bg-surface text-text-muted"}`}>ספטמבר - סתיו</button>
-                      <button onClick={() => setRevolutionStep(2)} className={`py-1.5 rounded-lg text-[10px] font-bold cursor-pointer transition-all ${revolutionStep === 2 ? "bg-earth text-white" : "bg-surface text-text-muted"}`}>דצמבר - חורף</button>
-                      <button onClick={() => setRevolutionStep(3)} className={`py-1.5 rounded-lg text-[10px] font-bold cursor-pointer transition-all ${revolutionStep === 3 ? "bg-earth text-white" : "bg-surface text-text-muted"}`}>מרץ - אביב</button>
+                      <button onClick={() => setRevolutionStep(0)} className={`py-2 rounded-xl text-xs md:text-sm font-bold cursor-pointer transition-all ${revolutionStep === 0 ? "bg-earth text-white" : "bg-surface text-text-muted"}`}>יוני - קיץ</button>
+                      <button onClick={() => setRevolutionStep(1)} className={`py-2 rounded-xl text-xs md:text-sm font-bold cursor-pointer transition-all ${revolutionStep === 1 ? "bg-earth text-white" : "bg-surface text-text-muted"}`}>ספטמבר - סתיו</button>
+                      <button onClick={() => setRevolutionStep(2)} className={`py-2 rounded-xl text-xs md:text-sm font-bold cursor-pointer transition-all ${revolutionStep === 2 ? "bg-earth text-white" : "bg-surface text-text-muted"}`}>דצמבר - חורף</button>
+                      <button onClick={() => setRevolutionStep(3)} className={`py-2 rounded-xl text-xs md:text-sm font-bold cursor-pointer transition-all ${revolutionStep === 3 ? "bg-earth text-white" : "bg-surface text-text-muted"}`}>מרץ - אביב</button>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-amber-950/10 border border-amber-500/20 rounded-xl p-3 text-xs flex gap-2 text-amber-400">
+                <div className="bg-amber-950/10 border border-amber-500/20 rounded-xl p-4 text-xs md:text-sm flex gap-2 text-amber-400">
                   <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
                   <span>
                     <strong>הנחיה למורה למניעת תפיסה שגויה:</strong> הדגישו בפני התלמידים כי עונות השנה אינן נגרמות בגלל שינוי במרחק של כדור הארץ מהשמש! למעשה, בינואר (חורף בצפון) כדור הארץ קרוב לשמש מעט יותר מאשר ביולי. הכל תלוי אך ורק ב<strong>זווית פגיעת הקרניים</strong> הנובעת מנטיית הציר!
@@ -537,10 +537,11 @@ export default function AstronomyWidget() {
             {simMode === "moon" && (
               <div className="flex flex-col gap-4">
                 {/* Sub-mode selector */}
-                <div className="flex gap-2 bg-surface-hover/30 p-1 rounded-xl border border-border-custom self-start select-none">
+                {/* Sub-mode selector */}
+                <div className="flex gap-2 bg-surface-hover/30 p-1.5 rounded-xl border border-border-custom self-start select-none">
                   <button
                     onClick={() => setMoonSimSubMode("basic")}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    className={`px-4 py-2 rounded-xl text-xs md:text-sm font-bold transition-all cursor-pointer ${
                       moonSimSubMode === "basic" ? "bg-earth text-white" : "text-text-muted hover:text-white"
                     }`}
                   >
@@ -548,7 +549,7 @@ export default function AstronomyWidget() {
                   </button>
                   <button
                     onClick={() => setMoonSimSubMode("advanced")}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    className={`px-4 py-2 rounded-xl text-xs md:text-sm font-bold transition-all cursor-pointer ${
                       moonSimSubMode === "advanced" ? "bg-earth text-white" : "text-text-muted hover:text-white"
                     }`}
                   >
@@ -562,7 +563,7 @@ export default function AstronomyWidget() {
                       {/* Sun (far left) */}
                       <div className="absolute left-2 top-1/2 -translate-y-1/2 text-amber-500 flex flex-col items-center">
                         <Sun className="w-10 h-10" />
-                        <span className="text-[9px] font-bold">אור שמש</span>
+                        <span className="text-[11px] font-bold">אור שמש</span>
                       </div>
 
                       {/* Central Earth */}
@@ -583,7 +584,7 @@ export default function AstronomyWidget() {
                         return (
                           <button
                             key={i}
-                            className={`absolute w-6 h-6 rounded-full border border-zinc-500 bg-black flex items-center justify-center z-20 cursor-pointer overflow-hidden transition-all hover:scale-110 ${
+                            className={`absolute w-7 h-7 rounded-full border border-zinc-500 bg-black flex items-center justify-center z-20 cursor-pointer overflow-hidden transition-all hover:scale-110 ${
                               isSelected ? "ring-2 ring-earth scale-125 border-white" : "opacity-75"
                             }`}
                             style={{ transform: `translate(${x}px, ${y}px)` }}
@@ -593,15 +594,15 @@ export default function AstronomyWidget() {
                               <div className="w-1/2 h-full bg-zinc-300" />
                               <div className="w-1/2 h-full bg-zinc-950" />
                             </div>
-                            <span className="absolute text-[8px] font-black z-30 text-zinc-900">{i + 1}</span>
+                            <span className="absolute text-[10px] font-black z-30 text-zinc-900">{i + 1}</span>
                           </button>
                         );
                       })}
                     </div>
 
                     <div className="md:col-span-2 space-y-4 text-right">
-                      <h4 className="font-bold text-white text-base">מופעי הירח (Moon Phases)</h4>
-                      <p className="text-xs text-text-muted leading-relaxed">
+                      <h4 className="font-bold text-white text-lg">מופעי הירח (Moon Phases)</h4>
+                      <p className="text-sm text-text-muted leading-relaxed">
                         הירח מקיף את כדור הארץ פעם בחודש (כ-29.5 ימים). 
                         <br /><br />
                         כיוון שהירח אינו מייצר אור עצמי אלא רק מחזיר את אור השמש, המראה שלו מהארץ משתנה לפי הזווית שבה אנו רואים את החצי המואר שלו.
@@ -610,14 +611,14 @@ export default function AstronomyWidget() {
                       <div className="bg-earth/5 border border-earth/20 rounded-xl p-4 space-y-2">
                         <div className="flex justify-between items-center">
                           <div className="text-right">
-                            <span className="text-[10px] text-earth font-bold block">עמדה נבחרת: {moonPhaseIndex + 1} מתוך 8</span>
-                            <h5 className="font-bold text-white text-xs">{MOON_PHASES[moonPhaseIndex].name}</h5>
+                            <span className="text-xs text-earth font-bold block">עמדה נבחרת: {moonPhaseIndex + 1} מתוך 8</span>
+                            <h5 className="font-bold text-white text-sm">{MOON_PHASES[moonPhaseIndex].name}</h5>
                           </div>
-                          <div className="shrink-0 bg-zinc-950 p-1.5 rounded-xl border border-zinc-800 flex items-center justify-center">
+                          <div className="shrink-0 bg-zinc-950 p-2 rounded-xl border border-zinc-800 flex items-center justify-center">
                             {renderMoonPhasePreview(moonPhaseIndex)}
                           </div>
                         </div>
-                        <p className="text-[11px] text-text-muted leading-relaxed">
+                        <p className="text-xs md:text-sm text-text-muted leading-relaxed">
                           {MOON_PHASES[moonPhaseIndex].desc}
                         </p>
                       </div>
@@ -625,13 +626,13 @@ export default function AstronomyWidget() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => setMoonPhaseIndex(prev => (prev === 0 ? 7 : prev - 1))}
-                          className="flex-1 py-1 bg-surface hover:bg-surface-hover border border-border-custom text-[10px] font-bold rounded-lg cursor-pointer transition-all"
+                          className="flex-1 py-2 bg-surface hover:bg-surface-hover border border-border-custom text-xs font-bold rounded-lg cursor-pointer transition-all"
                         >
                           ← הקודם
                         </button>
                         <button
                           onClick={() => setMoonPhaseIndex(prev => (prev === 7 ? 0 : prev + 1))}
-                          className="flex-1 py-1 bg-surface hover:bg-surface-hover border border-border-custom text-[10px] font-bold rounded-lg cursor-pointer transition-all"
+                          className="flex-1 py-2 bg-surface hover:bg-surface-hover border border-border-custom text-xs font-bold rounded-lg cursor-pointer transition-all"
                         >
                           הבא ←
                         </button>

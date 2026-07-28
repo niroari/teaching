@@ -510,7 +510,7 @@ export default function LessonPresenterConsolePage() {
                               <img
                                 src={lessonData.hookImageUrl}
                                 alt="גירוי חזותי"
-                                className={`max-w-full max-h-[320px] md:max-h-[360px] object-contain rounded-2xl border cursor-zoom-in hover:scale-[1.01] transition-transform duration-300 ${
+                                className={`max-w-full max-h-[410px] md:max-h-[470px] object-contain rounded-2xl border cursor-zoom-in hover:scale-[1.01] transition-transform duration-300 ${
                                   cinemaMode 
                                     ? "shadow-[0_15px_50px_rgba(20,184,166,0.25)] border-teal-500/20" 
                                     : "shadow-lg border-zinc-800/40"
@@ -645,7 +645,7 @@ export default function LessonPresenterConsolePage() {
                                 <img
                                   src={slides[currentSlideIndex].imageUrl}
                                   alt={slides[currentSlideIndex].title}
-                                  className="w-auto h-40 sm:h-52 md:h-64 lg:h-[270px] xl:h-[300px] max-h-[40vh] object-contain rounded-2xl border border-zinc-800/40 shadow-xl group-hover:scale-[1.01] transition-transform duration-500"
+                                  className="w-auto h-52 sm:h-68 md:h-[330px] lg:h-[350px] xl:h-[390px] max-h-[52vh] object-contain rounded-2xl border border-zinc-800/40 shadow-xl group-hover:scale-[1.01] transition-transform duration-500"
                                   onClick={() => setLightboxImageUrl(slides[currentSlideIndex].imageUrl || null)}
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent pointer-events-none rounded-2xl" />
@@ -742,7 +742,7 @@ export default function LessonPresenterConsolePage() {
                                 <img
                                   src={slides[currentSlideIndex].imageUrl}
                                   alt={slides[currentSlideIndex].title}
-                                  className={`max-w-full max-h-[320px] md:max-h-[360px] object-contain rounded-2xl border cursor-zoom-in hover:scale-[1.01] transition-transform duration-300 ${
+                                  className={`max-w-full max-h-[416px] md:max-h-[468px] object-contain rounded-2xl border cursor-zoom-in hover:scale-[1.01] transition-transform duration-300 ${
                                     cinemaMode 
                                       ? "shadow-[0_15px_50px_rgba(20,184,166,0.25)] border-teal-500/20" 
                                       : "shadow-lg border-zinc-800/40"

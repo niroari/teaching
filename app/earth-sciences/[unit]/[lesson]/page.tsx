@@ -474,12 +474,12 @@ export default function LessonPresenterConsolePage() {
                           </div>
                           
                           {/* Media on Left */}
-                          <div className={`aspect-video bg-zinc-900 rounded-2xl overflow-hidden border shrink-0 relative flex items-center justify-center ${
-                            cinemaMode 
-                              ? "w-full md:w-6/12 lg:w-7/12 shadow-[0_15px_50px_rgba(20,184,166,0.25)] border-teal-500/20" 
-                              : "w-full md:w-5/12 shadow-lg border-zinc-800/40"
-                          }`}>
-                            {lessonData.hookVideoId ? (
+                          {lessonData.hookVideoId ? (
+                            <div className={`aspect-video bg-zinc-900 rounded-2xl overflow-hidden border shrink-0 relative flex items-center justify-center ${
+                              cinemaMode 
+                                ? "w-full md:w-6/12 lg:w-7/12 shadow-[0_15px_50px_rgba(20,184,166,0.25)] border-teal-500/20" 
+                                : "w-full md:w-5/12 shadow-lg border-zinc-800/40"
+                            }`}>
                               <iframe
                                 src={`https://www.youtube.com/embed/${lessonData.hookVideoId}?rel=0&modestbranding=1`}
                                 title="סרטון פתיחה"
@@ -487,27 +487,38 @@ export default function LessonPresenterConsolePage() {
                                 allowFullScreen
                                 className="w-full h-full border-0"
                               />
-                            ) : lessonData.hookImageUrl === "rotating-earth-css" ? (
-                              <>
-                                {/* Stars background space simulation */}
-                                <div className="absolute inset-0 bg-[#020617] bg-[radial-gradient(circle_at_center,rgba(15,23,42,0.4)_0%,rgba(3,7,18,1)_100%)] flex items-center justify-center" />
-                                
-                                {/* Earth GIF (Zoomed out: w-32 h-32 md:w-36 md:h-36) */}
-                                <img
-                                  src="/blue-marble-rotating.gif"
-                                  alt="כדור הארץ מסתובב"
-                                  className="w-32 h-32 md:w-36 md:h-36 object-contain z-10 rounded-full shadow-[0_0_40px_rgba(14,165,233,0.2)] border border-sky-500/10"
-                                />
-                              </>
-                            ) : (
+                            </div>
+                          ) : lessonData.hookImageUrl === "rotating-earth-css" ? (
+                            <div className={`aspect-video bg-[#020617] bg-[radial-gradient(circle_at_center,rgba(15,23,42,0.4)_0%,rgba(3,7,18,1)_100%)] rounded-2xl overflow-hidden border shrink-0 relative flex items-center justify-center ${
+                              cinemaMode 
+                                ? "w-full md:w-6/12 lg:w-7/12 shadow-[0_15px_50px_rgba(20,184,166,0.25)] border-teal-500/20" 
+                                : "w-full md:w-5/12 shadow-lg border-zinc-800/40"
+                            }`}>
+                              {/* Earth GIF (Zoomed out: w-32 h-32 md:w-36 md:h-36) */}
+                              <img
+                                src="/blue-marble-rotating.gif"
+                                alt="כדור הארץ מסתובב"
+                                className="w-32 h-32 md:w-36 md:h-36 object-contain z-10 rounded-full shadow-[0_0_40px_rgba(14,165,233,0.2)] border border-sky-500/10"
+                              />
+                            </div>
+                          ) : (
+                            <div className={`shrink-0 relative flex items-center justify-center ${
+                              cinemaMode 
+                                ? "w-full md:w-6/12 lg:w-7/12" 
+                                : "w-full md:w-5/12"
+                            }`}>
                               <img
                                 src={lessonData.hookImageUrl}
                                 alt="גירוי חזותי"
-                                className="w-full h-full object-contain cursor-zoom-in hover:scale-[1.02] transition-transform duration-300"
+                                className={`max-w-full max-h-[320px] md:max-h-[360px] object-contain rounded-2xl border cursor-zoom-in hover:scale-[1.01] transition-transform duration-300 ${
+                                  cinemaMode 
+                                    ? "shadow-[0_15px_50px_rgba(20,184,166,0.25)] border-teal-500/20" 
+                                    : "shadow-lg border-zinc-800/40"
+                                }`}
                                 onClick={() => setLightboxImageUrl(lessonData.hookImageUrl || null)}
                               />
-                            )}
-                          </div>
+                            </div>
+                          )}
                         </>
                       ) : slides[currentSlideIndex].visualType === "notebook" ? (
                         /* NOTEBOOK DESIGN SLIDE */
@@ -723,15 +734,19 @@ export default function LessonPresenterConsolePage() {
                                 />
                               </div>
                             ) : slides[currentSlideIndex].imageUrl ? (
-                              <div className={`aspect-video bg-zinc-900 rounded-2xl overflow-hidden border shrink-0 relative flex items-center justify-center ${
+                              <div className={`shrink-0 relative flex items-center justify-center ${
                                 cinemaMode 
-                                  ? "w-full md:w-6/12 lg:w-7/12 shadow-[0_15px_50px_rgba(20,184,166,0.25)] border-teal-500/20" 
-                                  : "w-full md:w-5/12 shadow-lg border-zinc-800/40"
+                                  ? "w-full md:w-6/12 lg:w-7/12" 
+                                  : "w-full md:w-5/12"
                               }`}>
                                 <img
                                   src={slides[currentSlideIndex].imageUrl}
                                   alt={slides[currentSlideIndex].title}
-                                  className="w-full h-full object-contain cursor-zoom-in hover:scale-[1.02] transition-transform duration-300"
+                                  className={`max-w-full max-h-[320px] md:max-h-[360px] object-contain rounded-2xl border cursor-zoom-in hover:scale-[1.01] transition-transform duration-300 ${
+                                    cinemaMode 
+                                      ? "shadow-[0_15px_50px_rgba(20,184,166,0.25)] border-teal-500/20" 
+                                      : "shadow-lg border-zinc-800/40"
+                                  }`}
                                   onClick={() => setLightboxImageUrl(slides[currentSlideIndex].imageUrl || null)}
                                 />
                               </div>

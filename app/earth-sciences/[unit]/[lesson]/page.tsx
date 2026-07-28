@@ -623,77 +623,118 @@ export default function LessonPresenterConsolePage() {
                         </div>
                       ) : (
                         /* GENERAL TOPIC SLIDE OR VISUAL SLIDE WITH imageUrl */
-                        <div className="w-full flex flex-col md:flex-row gap-8 items-center justify-center">
-                          {/* Text on Right */}
-                          <div className={`flex-1 text-right ${cinemaMode ? "max-w-4xl space-y-6" : "max-w-3xl space-y-5"}`}>
-                            {slides[currentSlideIndex].bullets && slides[currentSlideIndex].bullets!.length > 0 ? (
-                              <div className="space-y-6">
-                                <p className={`font-black border-b border-zinc-800/80 pb-4 ${
-                                  cinemaMode 
-                                    ? "text-xl md:text-2xl lg:text-3xl text-teal-400 leading-relaxed" 
-                                    : `text-lg md:text-xl lg:text-2xl text-teal-400 leading-relaxed`
-                                }`}>
-                                  {slides[currentSlideIndex].content}
-                                </p>
-                                <ul className={`list-none pr-0 ${cinemaMode ? "space-y-5 lg:space-y-6" : "space-y-4"}`}>
-                                  {slides[currentSlideIndex].bullets!.map((bullet: string, bIdx: number) => (
-                                    <li key={bIdx} className="flex gap-3 justify-start items-start">
-                                      <span className={`rounded-full bg-teal-400 shrink-0 ${
-                                        cinemaMode 
-                                          ? "w-3 h-3 mt-2.5 shadow-[0_0_10px_rgba(20,184,166,0.8)]" 
-                                          : "w-2.5 h-2.5 mt-2 shadow-[0_0_8px_rgba(20,184,166,0.6)]"
-                                      }`} />
-                                      <span className={`${
-                                        cinemaMode 
-                                          ? "text-lg md:text-xl lg:text-2xl text-zinc-100 font-medium leading-relaxed" 
-                                          : `text-base md:text-lg ${titleText} font-bold leading-relaxed`
-                                      }`}>{bullet}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            ) : (
-                              /* FALLBACK SIMPLE TOPIC SLIDE */
-                              <p className={`whitespace-pre-line font-bold leading-relaxed ${
+                        slides[currentSlideIndex].layout === "full-width" ? (
+                          /* FULL WIDTH BANNER LAYOUT FOR SUB-TOPIC INTROS */
+                          <div className="w-full flex flex-col gap-6 text-right items-stretch">
+                            {/* Text/Bullets Row */}
+                            <div className="space-y-4">
+                              <p className={`font-black pb-2 ${
                                 cinemaMode 
-                                  ? "text-xl md:text-2xl lg:text-3xl text-zinc-200" 
-                                  : `text-xl ${isLight ? "text-zinc-800" : "text-zinc-200"}`
+                                  ? "text-lg md:text-xl lg:text-2xl text-teal-400 leading-relaxed" 
+                                  : `text-base md:text-lg lg:text-xl text-teal-400 leading-relaxed`
                               }`}>
                                 {slides[currentSlideIndex].content}
                               </p>
+                              
+                              {slides[currentSlideIndex].bullets && slides[currentSlideIndex].bullets!.length > 0 && (
+                                <ul className="grid grid-cols-1 md:grid-cols-3 gap-4 list-none pr-0">
+                                  {slides[currentSlideIndex].bullets!.map((bullet: string, bIdx: number) => (
+                                    <li key={bIdx} className={`p-4 rounded-xl border ${borderTheme} ${cardTheme} flex gap-2.5 justify-start items-start transition-all hover:scale-[1.01]`}>
+                                      <span className="rounded-full bg-teal-400 shrink-0 w-2.5 h-2.5 mt-1.5 shadow-[0_0_8px_rgba(20,184,166,0.6)]" />
+                                      <span className={`text-xs md:text-sm ${titleText} font-bold leading-relaxed`}>{bullet}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+
+                            {/* Massive Wide Image Banner */}
+                            {slides[currentSlideIndex].imageUrl && (
+                              <div className="w-full h-44 sm:h-56 md:h-64 rounded-2xl overflow-hidden border border-zinc-800/40 shadow-xl relative cursor-zoom-in group hover:border-teal-500/30 transition-all duration-300">
+                                <img
+                                  src={slides[currentSlideIndex].imageUrl}
+                                  alt={slides[currentSlideIndex].title}
+                                  className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-500"
+                                  onClick={() => setLightboxImageUrl(slides[currentSlideIndex].imageUrl || null)}
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+                              </div>
                             )}
                           </div>
+                        ) : (
+                          /* GENERAL TOPIC SLIDE OR VISUAL SLIDE WITH imageUrl */
+                          <div className="w-full flex flex-col md:flex-row gap-8 items-center justify-center">
+                            {/* Text on Right */}
+                            <div className={`flex-1 text-right ${cinemaMode ? "max-w-4xl space-y-6" : "max-w-3xl space-y-5"}`}>
+                              {slides[currentSlideIndex].bullets && slides[currentSlideIndex].bullets!.length > 0 ? (
+                                <div className="space-y-6">
+                                  <p className={`font-black border-b border-zinc-800/80 pb-4 ${
+                                    cinemaMode 
+                                      ? "text-xl md:text-2xl lg:text-3xl text-teal-400 leading-relaxed" 
+                                      : `text-lg md:text-xl lg:text-2xl text-teal-400 leading-relaxed`
+                                  }`}>
+                                    {slides[currentSlideIndex].content}
+                                  </p>
+                                  <ul className={`list-none pr-0 ${cinemaMode ? "space-y-5 lg:space-y-6" : "space-y-4"}`}>
+                                    {slides[currentSlideIndex].bullets!.map((bullet: string, bIdx: number) => (
+                                      <li key={bIdx} className="flex gap-3 justify-start items-start">
+                                        <span className={`rounded-full bg-teal-400 shrink-0 ${
+                                          cinemaMode 
+                                            ? "w-3 h-3 mt-2.5 shadow-[0_0_10px_rgba(20,184,166,0.8)]" 
+                                            : "w-2.5 h-2.5 mt-2 shadow-[0_0_8px_rgba(20,184,166,0.6)]"
+                                        }`} />
+                                        <span className={`${
+                                          cinemaMode 
+                                            ? "text-lg md:text-xl lg:text-2xl text-zinc-100 font-medium leading-relaxed" 
+                                            : `text-base md:text-lg ${titleText} font-bold leading-relaxed`
+                                        }`}>{bullet}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              ) : (
+                                /* FALLBACK SIMPLE TOPIC SLIDE */
+                                <p className={`whitespace-pre-line font-bold leading-relaxed ${
+                                  cinemaMode 
+                                    ? "text-xl md:text-2xl lg:text-3xl text-zinc-200" 
+                                    : `text-xl ${isLight ? "text-zinc-800" : "text-zinc-200"}`
+                                }`}>
+                                  {slides[currentSlideIndex].content}
+                                </p>
+                              )}
+                            </div>
 
-                          {/* Optional Image or Video on Left */}
-                          {slides[currentSlideIndex].videoDetailId ? (
-                            <div className={`aspect-video bg-zinc-900 rounded-2xl overflow-hidden border shrink-0 relative flex items-center justify-center ${
-                              cinemaMode 
-                                ? "w-full md:w-6/12 lg:w-7/12 shadow-[0_15px_50px_rgba(20,184,166,0.25)] border-teal-500/20" 
-                                : "w-full md:w-5/12 shadow-lg border-zinc-800/40"
-                            }`}>
-                              <iframe
-                                src={`https://www.youtube.com/embed/${slides[currentSlideIndex].videoDetailId}?rel=0&modestbranding=1`}
-                                title={slides[currentSlideIndex].title}
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                                className="w-full h-full border-0"
-                              />
-                            </div>
-                          ) : slides[currentSlideIndex].imageUrl ? (
-                            <div className={`aspect-video bg-zinc-900 rounded-2xl overflow-hidden border shrink-0 relative flex items-center justify-center ${
-                              cinemaMode 
-                                ? "w-full md:w-6/12 lg:w-7/12 shadow-[0_15px_50px_rgba(20,184,166,0.25)] border-teal-500/20" 
-                                : "w-full md:w-5/12 shadow-lg border-zinc-800/40"
-                            }`}>
-                              <img
-                                src={slides[currentSlideIndex].imageUrl}
-                                alt={slides[currentSlideIndex].title}
-                                className="w-full h-full object-contain cursor-zoom-in hover:scale-[1.02] transition-transform duration-300"
-                                onClick={() => setLightboxImageUrl(slides[currentSlideIndex].imageUrl || null)}
-                              />
-                            </div>
-                          ) : null}
-                        </div>
+                            {/* Optional Image or Video on Left */}
+                            {slides[currentSlideIndex].videoDetailId ? (
+                              <div className={`aspect-video bg-zinc-900 rounded-2xl overflow-hidden border shrink-0 relative flex items-center justify-center ${
+                                cinemaMode 
+                                  ? "w-full md:w-6/12 lg:w-7/12 shadow-[0_15px_50px_rgba(20,184,166,0.25)] border-teal-500/20" 
+                                  : "w-full md:w-5/12 shadow-lg border-zinc-800/40"
+                              }`}>
+                                <iframe
+                                  src={`https://www.youtube.com/embed/${slides[currentSlideIndex].videoDetailId}?rel=0&modestbranding=1`}
+                                  title={slides[currentSlideIndex].title}
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                  allowFullScreen
+                                  className="w-full h-full border-0"
+                                />
+                              </div>
+                            ) : slides[currentSlideIndex].imageUrl ? (
+                              <div className={`aspect-video bg-zinc-900 rounded-2xl overflow-hidden border shrink-0 relative flex items-center justify-center ${
+                                cinemaMode 
+                                  ? "w-full md:w-6/12 lg:w-7/12 shadow-[0_15px_50px_rgba(20,184,166,0.25)] border-teal-500/20" 
+                                  : "w-full md:w-5/12 shadow-lg border-zinc-800/40"
+                              }`}>
+                                <img
+                                  src={slides[currentSlideIndex].imageUrl}
+                                  alt={slides[currentSlideIndex].title}
+                                  className="w-full h-full object-contain cursor-zoom-in hover:scale-[1.02] transition-transform duration-300"
+                                  onClick={() => setLightboxImageUrl(slides[currentSlideIndex].imageUrl || null)}
+                                />
+                              </div>
+                            ) : null}
+                          </div>
+                        )
                       )}
                     </div>
 

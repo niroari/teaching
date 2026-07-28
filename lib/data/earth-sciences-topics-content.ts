@@ -4,6 +4,7 @@ export interface TopicSlideContent {
   bullets: string[];
   imageUrl?: string;
   videoDetailId?: string;
+  layout?: "full-width";
 }
 
 export const TOPICS_CONTENT: Record<string, TopicSlideContent[]> = {
@@ -310,7 +311,8 @@ export const TOPICS_CONTENT: Record<string, TopicSlideContent[]> = {
     {
       title: "מה אתם יודעים על האטמוספירה שלנו?",
       subtitle: "שכבת הגזים הדקה המפרידה בינינו לבין החלל החשוך והקר",
-      imageUrl: "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=1200&q=80",
+      imageUrl: "https://res.cloudinary.com/vlhlar5m/image/upload/v1785226660/mLAg2_mzpujz.jpg",
+      layout: "full-width",
       bullets: [
         "הסתכלו על התמונה: השכבה הכחולה והדקה הזו היא כל מה שמגן על הפלנטה שלנו מריק החלל.",
         "כיצד לדעתכם שכבה בלתי נראית של אוויר מצליחה להגן עלינו מפני מטאוריטים וקרינה קטלנית?",

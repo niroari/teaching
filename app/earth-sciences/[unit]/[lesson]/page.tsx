@@ -32,6 +32,7 @@ interface Slide {
   bullets?: string[];
   imageUrl?: string;
   videoDetailId?: string;
+  layout?: "full-width";
 }
 
 // Import widgets

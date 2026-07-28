@@ -125,6 +125,7 @@ export default function LessonPresenterConsolePage() {
         bullets: richTopic ? richTopic.bullets : [],
         imageUrl: richTopic ? richTopic.imageUrl : undefined,
         videoDetailId: richTopic ? richTopic.videoDetailId : undefined,
+        layout: richTopic ? richTopic.layout : undefined,
         visualType: "topic"
       });
     });

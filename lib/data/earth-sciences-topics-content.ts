@@ -342,6 +342,7 @@ export const TOPICS_CONTENT: Record<string, TopicSlideContent[]> = {
     {
       title: "הגנה פיזית - מגן השכפ\"ץ האטמוספרי",
       subtitle: "כיצד האטמוספרה מונעת מסלעים מהחלל לפגוע בנו?",
+      imageUrl: "https://res.cloudinary.com/vlhlar5m/image/upload/v1785228064/atosphere_protection_expfpo.png",
       bullets: [
         "סלעים מהחלל: בכל יום חודרים לאטמוספרה טונות של מטאוריטים וחלקיקי סלע מהחלל במהירות אדירה של עשרות אלפי קמ\"ש.",
         "חיכוך עצום: כשהסלעים פוגעים באוויר הדחוס של האטמוספרה, נוצר חיכוך קיצוני שמייצר חום של אלפי מעלות.",

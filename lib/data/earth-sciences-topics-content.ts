@@ -363,6 +363,7 @@ export const TOPICS_CONTENT: Record<string, TopicSlideContent[]> = {
     {
       title: "מאזן הקרינה ותהליך האלבדו",
       subtitle: "כיצד נקבעת הטמפרטורה של הפלנטה",
+      imageUrl: "https://res.cloudinary.com/vlhlar5m/image/upload/v1785229337/albedo_ddssxs.png",
       bullets: [
         "אלבדו הוא מדד ליכולת החזרת האור של משטח. נע בין 0 (משטח שחור ובולע חום) ל-1 (משטח לבן ומחזיר אור מלא).",
         "שלג וקרח הם בעלי אלבדו גבוה ביותר (מחזירים כ-80%-90% מהאור), בעוד אוקיינוסים ויערות הם בעלי אלבדו נמוך מאוד.",

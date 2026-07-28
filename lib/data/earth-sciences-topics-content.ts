@@ -322,7 +322,7 @@ export const TOPICS_CONTENT: Record<string, TopicSlideContent[]> = {
     {
       title: "הרכב האוויר - השמיכה הגזית שלנו",
       subtitle: "ממה באמת מורכב האוויר שאנחנו נושמים?",
-      imageUrl: "https://res.cloudinary.com/vlhlar5m/image/upload/v1785226166/KaHk6_fisvn7.jpg",
+      imageUrl: "https://res.cloudinary.com/vlhlar5m/image/upload/v1785227808/gas_g8qwci.png",
       bullets: [
         "חנקן (78%): הגז הנפוץ ביותר באטמוספרה. הוא די עצלן ולא ממהר להגיב עם חומרים אחרים, וטוב שכך - אחרת כל שריפה קטנה הייתה הופכת למדורה פלנטרית!",
         "חמצן (21%): גז החיים! בלעדיו לא היינו יכולים לנשום או להפיק אנרגיה בגוף, וגם אש לא הייתה יכולה לבעור.",
@@ -332,6 +332,7 @@ export const TOPICS_CONTENT: Record<string, TopicSlideContent[]> = {
     {
       title: "סינון קרינה - משקפי השמש של הפלנטה",
       subtitle: "כיצד האטמוספרה מגנה עלינו מפני קרינת השמש המזיקה?",
+      imageUrl: "https://res.cloudinary.com/vlhlar5m/image/upload/v1785227536/ozone_tse5wj.png",
       bullets: [
         "מסנן קרינה טבעי: השמש שולחת לנו אור וחום, אך גם קרינה אולטרה-סגולה (UV) מזיקה שיכולה לגרום לכוויות שמש ולסרטן העור.",
         "שכבת האוזון: ממוקמת בגובה של כ-20-30 ק\"מ (בסטרטוספרה) ומשמשת כ\"מגן קרינה\" הבולע כמעט את כל קרינת ה-UV המסוכנת.",

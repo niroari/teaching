@@ -75,6 +75,23 @@ export default function PortalHomePage() {
           <p className="text-text-muted max-w-xl mx-auto text-base md:text-lg leading-relaxed pt-2">
             בחרו נושא לימוד כדי להתחיל בשיעור, לומדה או משחק כיתתי אינטראקטיבי.
           </p>
+
+          {/* Featured Banner: Opening of the School Year */}
+          <div className="pt-4 flex justify-center">
+            <Link
+              href="/opening-year"
+              className="group inline-flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500/20 via-sky-500/20 to-emerald-500/20 border border-amber-500/40 hover:border-amber-400 text-white font-black text-sm shadow-xl shadow-amber-500/10 hover:scale-105 transition-all"
+            >
+              <span className="text-xl">🚀</span>
+              <span className="bg-gradient-to-r from-amber-300 via-sky-300 to-emerald-300 bg-clip-text text-transparent font-black">
+                פתיחת שנת הלימודים תשפ״ז 2026-2027 (כיתה ח׳2)
+              </span>
+              <span className="text-xs bg-amber-500/30 text-amber-300 px-2 py-0.5 rounded-full font-bold">
+                חדש • מצגת אינטראקטיבית
+              </span>
+              <ArrowLeft className="w-4 h-4 text-amber-400 group-hover:translate-x-[-4px] transition-transform" />
+            </Link>
+          </div>
         </div>
 
         {/* Subjects Grid */}

@@ -4,6 +4,14 @@ import { ArrowLeft, Microscope } from "lucide-react";
 
 const ENRICHMENT_TOPICS = [
   {
+    slug: "israel-game",
+    title: "חידון מפת ישראל",
+    desc: "פעילות כיתתית אינטראקטיבית. מקמו מקומות, ערים, ואתרי מורשת רנדומליים על מפת כיתה פיזית.",
+    icon: "📍",
+    link: "/enrichment/israel-game",
+    badge: "משחק כיתתי"
+  },
+  {
     slug: "evolution",
     title: "אבולוציה",
     desc: "כיצד החיים על כדור הארץ השתנו לאורך מיליארדי שנים — מגוון לומדות אינטראקטיביות.",

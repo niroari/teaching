@@ -913,11 +913,11 @@ export default function UnseenPracticePage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-right items-stretch"
+              className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-right items-start"
             >
               
               {/* Left Column: Questions, Answers & Instructions */}
-              <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
+              <div className="lg:col-span-5 flex flex-col space-y-6 lg:sticky lg:top-24">
                 
                 {/* Score & Progress header */}
                 <div className={`p-4 rounded-2xl border ${borderStyle} ${cardStyle} flex items-center justify-between text-xs`}>
@@ -931,7 +931,7 @@ export default function UnseenPracticePage() {
                 </div>
 
                 {/* The active Question */}
-                <div className={`p-6 rounded-2xl border ${borderStyle} ${cardStyle} space-y-6 shadow-lg flex-1 flex flex-col justify-between`}>
+                <div className={`p-6 rounded-2xl border ${borderStyle} ${cardStyle} space-y-6 shadow-lg flex flex-col`}>
                   {(() => {
                     const activeQuestion = gameSubStep < 7 
                       ? unseen.questions[gameSubStep] 
@@ -939,7 +939,7 @@ export default function UnseenPracticePage() {
                     const qType = activeQuestion.type;
 
                     return (
-                      <div className="space-y-6 flex-1 flex flex-col justify-between">
+                      <div className="space-y-5 flex flex-col">
                         <div className="space-y-4">
                           {/* Header: Clue category */}
                           <div className="flex items-center justify-between">
@@ -1129,50 +1129,60 @@ export default function UnseenPracticePage() {
                                 </div>
                               ) : (
                                 /* Standard check feedback (MCQ, Copy, or completed Open) */
-                                <div className="space-y-4">
-                                  <div className="flex items-start gap-2.5">
-                                    {isCorrect ? (
-                                      <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                                    ) : (
-                                      <XCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
-                                    )}
-                                    <div className="space-y-1 flex-1">
+                                <div className="space-y-3">
+                                  {/* Result & Proceed Action Row directly under question */}
+                                  <div className={`p-3.5 rounded-xl border flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 ${
+                                    isCorrect 
+                                      ? "bg-emerald-500/10 border-emerald-500/30" 
+                                      : "bg-rose-500/10 border-rose-500/30"
+                                  }`}>
+                                    <div className="flex items-center gap-2">
+                                      {isCorrect ? (
+                                        <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
+                                      ) : (
+                                        <XCircle className="w-5 h-5 text-rose-500 shrink-0" />
+                                      )}
                                       <h4 className={`text-xs font-bold ${isCorrect ? "text-emerald-400" : "text-rose-400"}`}>
-                                        {isCorrect ? "תשובה נכונה! כל הכבוד!" : "טעות. נסו שוב כדי ללמוד!"}
+                                        {isCorrect ? "תשובה נכונה! כל הכבוד!" : "טעות. נסו שוב או המשיכו:"}
                                       </h4>
-                                      <p className={`text-xs leading-relaxed ${textMuted}`}>
-                                        {activeQuestion.explanation}
-                                      </p>
+                                    </div>
+
+                                    {/* Action Buttons */}
+                                    <div className="flex items-center gap-2 self-end sm:self-auto">
+                                      {isCorrect ? (
+                                        <button
+                                          onClick={handleNextStep}
+                                          className="px-5 py-2 rounded-xl text-zinc-950 font-bold text-xs bg-teal-500 hover:bg-teal-400 cursor-pointer transition-all shadow-md animate-bounce"
+                                        >
+                                          {gameSubStep < 7 ? "המשך לשאלה הבאה ←" : "סיום המשימה וקבלת תעודה ←"}
+                                        </button>
+                                      ) : (
+                                        <div className="flex gap-2">
+                                          <button
+                                            onClick={() => setShowFeedback(false)}
+                                            className={`px-3 py-1.5 rounded-xl font-bold text-xs cursor-pointer transition-all ${
+                                              isLight ? "bg-zinc-200 hover:bg-zinc-300 text-zinc-700" : "bg-white hover:bg-zinc-100 text-zinc-950"
+                                            }`}
+                                          >
+                                            נסו שוב
+                                          </button>
+                                          <button
+                                            onClick={handleNextStep}
+                                            className="px-3 py-1.5 rounded-xl text-rose-300 bg-rose-500/20 border border-rose-500/30 hover:bg-rose-500/30 font-bold text-xs cursor-pointer transition-all"
+                                          >
+                                            המשך בכל זאת לשאלה הבאה ←
+                                          </button>
+                                        </div>
+                                      )}
                                     </div>
                                   </div>
 
-                                  {/* Continue trigger */}
-                                  <div className="text-left">
-                                    {isCorrect ? (
-                                      <button
-                                        onClick={handleNextStep}
-                                        className="px-5 py-2 rounded-xl text-zinc-950 font-bold text-xs bg-teal-500 hover:bg-teal-400 cursor-pointer transition-all animate-bounce"
-                                      >
-                                        {gameSubStep < 7 ? "המשך לרמז הבא ←" : "סיום המשימה וקבלת תעודה ←"}
-                                      </button>
-                                    ) : (
-                                      <div className="flex gap-3 justify-start flex-row-reverse">
-                                        <button
-                                          onClick={() => setShowFeedback(false)}
-                                          className={`px-4 py-2 rounded-xl font-bold text-xs cursor-pointer transition-all ${
-                                            isLight ? "bg-zinc-200 hover:bg-zinc-300 text-zinc-700" : "bg-white hover:bg-zinc-100 text-zinc-950"
-                                          }`}
-                                        >
-                                          נסו שוב
-                                        </button>
-                                        <button
-                                          onClick={handleNextStep}
-                                          className="px-4 py-2 rounded-xl text-rose-450 bg-rose-500/10 border border-rose-500/25 hover:bg-rose-500/20 font-bold text-xs cursor-pointer transition-all"
-                                        >
-                                          המשך בכל זאת לשאלה הבאה ←
-                                        </button>
-                                      </div>
-                                    )}
+                                  {/* Explanation details */}
+                                  <div className={`p-3 rounded-xl border text-xs leading-relaxed ${borderStyle} ${
+                                    isLight ? "bg-zinc-100/80 text-zinc-700" : "bg-[#0d1222]/40 text-zinc-300"
+                                  }`}>
+                                    <p className="font-bold text-teal-400 mb-1">הסבר בעברית:</p>
+                                    <p className={textMuted}>{activeQuestion.explanation}</p>
                                   </div>
                                 </div>
                               )}
@@ -1186,10 +1196,10 @@ export default function UnseenPracticePage() {
               </div>
 
               {/* Right Column: Reading Passages */}
-              <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
+              <div className="lg:col-span-7 flex flex-col space-y-6">
                 
                 {/* Passage card */}
-                <div className={`p-6 md:p-8 rounded-2xl border ${borderStyle} ${cardStyle} shadow-lg space-y-6 flex-1 flex flex-col justify-between`}>
+                <div className={`p-6 md:p-8 rounded-2xl border ${borderStyle} ${cardStyle} shadow-lg space-y-6 flex flex-col`}>
                   <div className="space-y-6">
                     {/* Header */}
                     <div className="flex items-center justify-between border-b pb-4 border-dashed border-zinc-700/20">

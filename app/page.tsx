@@ -2,12 +2,10 @@
 
 import React from "react";
 import Link from "next/link";
-import { ArrowLeft, GraduationCap, LogIn, LogOut, User, Sparkles } from "lucide-react";
-import { useAuth } from "@/lib/context/AuthContext";
+import { ArrowLeft, GraduationCap } from "lucide-react";
+import NavbarUser from "@/components/NavbarUser";
 
 export default function PortalHomePage() {
-  const { user, logout } = useAuth();
-  const isTeacher = user && (user.email === "niroari@gmail.com" || user.email === "nirozari@gmail.com");
 
   return (
     <div className="relative min-h-screen bg-[#080c18] text-[#e8edf8] flex flex-col justify-between overflow-hidden">
@@ -16,40 +14,7 @@ export default function PortalHomePage() {
         <div className="flex items-center gap-2">
           {/* Subtle decoration or leave empty */}
         </div>
-        <div>
-          {user ? (
-            <div className="flex items-center gap-4">
-              {isTeacher && (
-                <Link
-                  href="/admin"
-                  className="px-3.5 py-2 rounded-xl border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5"
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>לוח מורה</span>
-                </Link>
-              )}
-              <div className="flex items-center gap-2 bg-surface border border-border-custom rounded-xl px-4 py-2 text-xs text-zinc-300">
-                <User className="w-3.5 h-3.5 text-cyan-400" />
-                <span className="font-bold">שלום, {user.displayName || user.email || "תלמיד/ה"}</span>
-              </div>
-              <button
-                onClick={() => logout()}
-                className="px-3.5 py-2 rounded-xl border border-red-950/40 bg-red-950/10 hover:bg-red-900/20 text-red-400 text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span>התנתק</span>
-              </button>
-            </div>
-          ) : (
-            <Link
-              href="/login"
-              className="px-4 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-950 text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5 shadow-lg shadow-cyan-500/10 border border-cyan-400/20"
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              <span>התחברות תלמידים</span>
-            </Link>
-          )}
-        </div>
+        <NavbarUser />
       </header>
 
       {/* Dynamic Background Gradients */}

@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { ArrowLeft, BookOpen, Presentation, Gamepad2, GraduationCap, Sparkles } from "lucide-react";
 import { useAuth } from "@/lib/context/AuthContext";
+import NavbarUser from "@/components/NavbarUser";
 
 const ENGLISH_SECTIONS = [
   {
@@ -132,15 +133,7 @@ export default function EnglishHubPage() {
         >
           <span>→ חזרה לדף הבית</span>
         </Link>
-        {isTeacher && (
-          <Link
-            href="/admin"
-            className="px-3.5 py-1.5 rounded-lg border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 text-xs font-bold transition-all flex items-center gap-1.5"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>לוח מורה</span>
-          </Link>
-        )}
+        <NavbarUser />
       </header>
 
       {/* Main Container */}

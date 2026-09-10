@@ -32,6 +32,13 @@ import {
 import { useAuth } from "@/lib/context/AuthContext";
 import { dbFirestore } from "@/lib/firebase";
 import { collection, doc, setDoc, deleteDoc, getDocs, writeBatch } from "firebase/firestore";
+import {
+  loadScopedLocalWords,
+  saveScopedLocalWords,
+  getGuestWords,
+  clearGuestWords,
+  cleanupLegacyVocabStorage
+} from "@/lib/vocab-storage";
 
 interface Word {
   id: string;
@@ -203,33 +210,31 @@ export default function VocabTrainerPage() {
   const [matchCompleted, setMatchCompleted] = useState(false);
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Load local storage fallback list
-  const loadLocalWords = () => {
-    const stored = localStorage.getItem("teaching-site-vocab-words");
-    if (stored) {
-      try {
-        setWords(JSON.parse(stored));
-      } catch (e) {
-        setWords(DEFAULT_WORDS);
-      }
+  // Load local storage fallback list for a specific user or guest
+  const loadLocalWords = (uid?: string | null) => {
+    const cached = loadScopedLocalWords(uid);
+    if (cached && cached.length > 0) {
+      setWords(cached);
     } else {
       setWords(DEFAULT_WORDS);
-      localStorage.setItem("teaching-site-vocab-words", JSON.stringify(DEFAULT_WORDS));
+      saveScopedLocalWords(DEFAULT_WORDS, uid);
     }
   };
 
-  // Load words from Firestore or LocalStorage on user status change
+  // Load words from Firestore or Scoped LocalStorage on user status change
   useEffect(() => {
     if (authLoading) return;
 
     const loadData = async () => {
       setIsLoaded(false);
+      // Clean up legacy global key to ensure no cross-account pollution occurs
+      cleanupLegacyVocabStorage();
+
       if (user) {
         try {
-          // Race getDocs against a 2.5-second timeout to prevent page hangs if Firestore is offline or blocked
           const fetchPromise = getDocs(collection(dbFirestore, "users", user.uid, "words"));
           const timeoutPromise = new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error("Firestore fetch timeout")), 2500)
+            setTimeout(() => reject(new Error("Firestore fetch timeout")), 6000)
           );
 
           const querySnapshot = await Promise.race([fetchPromise, timeoutPromise]);
@@ -240,24 +245,38 @@ export default function VocabTrainerPage() {
 
           // Sort newer words first
           firestoreWords.sort((a, b) => Number(b.id) - Number(a.id));
-          setWords(firestoreWords);
 
-          // Check if local storage has unsynced local words
-          const localStr = localStorage.getItem("teaching-site-vocab-words");
-          if (localStr) {
-            const localWords = JSON.parse(localStr) as Word[];
-            const hasNewLocal = localWords.some(
-              lw => !firestoreWords.some(fw => fw.english.toLowerCase() === lw.english.toLowerCase())
+          if (firestoreWords.length > 0) {
+            setWords(firestoreWords);
+            saveScopedLocalWords(firestoreWords, user.uid);
+          } else {
+            // First time logged in with no Firestore words: check user's scoped cache or defaults
+            const cached = loadScopedLocalWords(user.uid);
+            if (cached && cached.length > 0) {
+              setWords(cached);
+            } else {
+              setWords(DEFAULT_WORDS);
+              saveScopedLocalWords(DEFAULT_WORDS, user.uid);
+            }
+          }
+
+          // Check if there are truly unauthenticated guest words on this browser to merge
+          const guestWords = getGuestWords();
+          if (guestWords.length > 0) {
+            const hasNewGuest = guestWords.some(
+              gw => !firestoreWords.some(fw => fw.english.toLowerCase() === gw.english.toLowerCase())
             );
-            setHasLocalWordsToMerge(hasNewLocal);
+            setHasLocalWordsToMerge(hasNewGuest);
+          } else {
+            setHasLocalWordsToMerge(false);
           }
         } catch (error) {
-          console.error("Error loading words from Firestore:", error);
-          loadLocalWords();
+          console.error("Error loading words from Firestore, using scoped local cache:", error);
+          loadLocalWords(user.uid);
         }
       } else {
-        // Logged out: load from local storage
-        loadLocalWords();
+        // Logged out: load from guest storage
+        loadLocalWords(null);
         setHasLocalWordsToMerge(false);
       }
       setIsLoaded(true);
@@ -289,14 +308,13 @@ export default function VocabTrainerPage() {
     }
   };
 
-  // Save words state, update local storage cache, and sync to Firestore
+  // Save words state, update user-scoped local storage cache, and sync to Firestore
   const saveWords = async (newWords: Word[]) => {
     const previousWords = words;
     setWords(newWords);
 
-    if (typeof window !== "undefined") {
-      localStorage.setItem("teaching-site-vocab-words", JSON.stringify(newWords));
-    }
+    // Save strictly to the current user's (or guest's) scoped storage
+    saveScopedLocalWords(newWords, user?.uid);
 
     if (user) {
       try {
@@ -327,18 +345,15 @@ export default function VocabTrainerPage() {
     }
   };
 
-  // Merge Local Words to cloud
+  // Merge Guest Words to cloud
   const handleMergeLocalWords = async () => {
     if (!user || isMerging) return;
     setIsMerging(true);
     try {
-      const localStr = localStorage.getItem("teaching-site-vocab-words");
-      if (localStr) {
-        const localWords = JSON.parse(localStr) as Word[];
-        
-        // Find local words not in current Firestore list
-        const toAdd = localWords.filter(
-          lw => !words.some(fw => fw.english.toLowerCase() === lw.english.toLowerCase())
+      const guestWords = getGuestWords();
+      if (guestWords.length > 0) {
+        const toAdd = guestWords.filter(
+          gw => !words.some(fw => fw.english.toLowerCase() === gw.english.toLowerCase())
         );
         
         if (toAdd.length > 0) {
@@ -351,6 +366,7 @@ export default function VocabTrainerPage() {
 
           const merged = [...toAdd, ...words].sort((a, b) => Number(b.id) - Number(a.id));
           setWords(merged);
+          saveScopedLocalWords(merged, user.uid);
           
           confetti({
             particleCount: 80,
@@ -359,6 +375,7 @@ export default function VocabTrainerPage() {
           });
         }
       }
+      clearGuestWords();
       setHasLocalWordsToMerge(false);
     } catch (error) {
       console.error("Error merging words:", error);
@@ -366,6 +383,11 @@ export default function VocabTrainerPage() {
     } finally {
       setIsMerging(false);
     }
+  };
+
+  const handleDismissGuestWords = () => {
+    clearGuestWords();
+    setHasLocalWordsToMerge(false);
   };
 
   // Text-To-Speech Pronounce function
@@ -995,23 +1017,33 @@ export default function VocabTrainerPage() {
                           <p className={`text-xs mt-0.5 ${isLight ? "text-zinc-600" : "text-text-muted"}`}>מצאנו מילים ששמרתם במחשב זה. האם ברצונכם להעלות ולסנכרן אותן עם החשבון שלכם בענן?</p>
                         </div>
                       </div>
-                      <button
-                        onClick={handleMergeLocalWords}
-                        disabled={isMerging}
-                        className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-zinc-950 font-bold text-xs shrink-0 transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
-                      >
-                        {isMerging ? (
-                          <>
-                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                            <span>ממזג מילים...</span>
-                          </>
-                        ) : (
-                          <>
-                            <RefreshCw className="w-3.5 h-3.5" />
-                            <span>סנכרן מילים לענן</span>
-                          </>
-                        )}
-                      </button>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          onClick={handleDismissGuestWords}
+                          className={`px-3 py-2 rounded-xl border text-xs font-semibold cursor-pointer transition-all ${
+                            isLight ? "border-zinc-300 text-zinc-600 hover:bg-zinc-100" : "border-border-custom text-zinc-400 hover:bg-surface-hover"
+                          }`}
+                        >
+                          התעלם ומחק
+                        </button>
+                        <button
+                          onClick={handleMergeLocalWords}
+                          disabled={isMerging}
+                          className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-zinc-950 font-bold text-xs shrink-0 transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+                        >
+                          {isMerging ? (
+                            <>
+                              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                              <span>ממזג מילים...</span>
+                            </>
+                          ) : (
+                            <>
+                              <RefreshCw className="w-3.5 h-3.5" />
+                              <span>סנכרן מילים לענן</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </div>
                   )}
 

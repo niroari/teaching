@@ -35,7 +35,8 @@ import {
 import { useAuth } from "@/lib/context/AuthContext";
 import { PRE_GENERATED_UNSEENS, UnseenData, getRandomUnseen } from "@/lib/unseen-data";
 import { dbFirestore, sanitizeForFirestore } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp, doc, setDoc, deleteDoc } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, doc, setDoc, deleteDoc, getDocs } from "firebase/firestore";
+import { loadScopedLocalWords, saveScopedLocalWords, cleanupLegacyVocabStorage } from "@/lib/vocab-storage";
 
 // Helper function to calculate Levenshtein distance for spelling tolerance
 const getLevenshteinDistance = (a: string, b: string): number => {
@@ -192,18 +193,11 @@ export default function UnseenPracticePage() {
   };
 
   const syncWordToVocabStore = async (newWord: Word) => {
-    const stored = localStorage.getItem("teaching-site-vocab-words");
-    let currentWords: Word[] = [];
-    if (stored) {
-      try {
-        currentWords = JSON.parse(stored);
-      } catch (e) {
-        currentWords = [];
-      }
-    }
+    cleanupLegacyVocabStorage();
+    const currentWords = loadScopedLocalWords(user?.uid);
     if (!currentWords.some(w => w.english.toLowerCase() === newWord.english.toLowerCase())) {
       const updatedWords = [newWord, ...currentWords];
-      localStorage.setItem("teaching-site-vocab-words", JSON.stringify(updatedWords));
+      saveScopedLocalWords(updatedWords, user?.uid);
     }
 
     if (user) {
@@ -219,16 +213,10 @@ export default function UnseenPracticePage() {
   const handleNotebookDelete = async (wordId: string, english: string) => {
     setNotebookWords(prev => prev.filter(w => w.id !== wordId));
 
-    const stored = localStorage.getItem("teaching-site-vocab-words");
-    if (stored) {
-      try {
-        const currentWords = JSON.parse(stored) as Word[];
-        const updatedWords = currentWords.filter(w => w.english.toLowerCase() !== english.toLowerCase() && w.id !== wordId);
-        localStorage.setItem("teaching-site-vocab-words", JSON.stringify(updatedWords));
-      } catch (e) {
-        console.error("Local storage delete error:", e);
-      }
-    }
+    cleanupLegacyVocabStorage();
+    const currentWords = loadScopedLocalWords(user?.uid);
+    const updatedWords = currentWords.filter(w => w.english.toLowerCase() !== english.toLowerCase() && w.id !== wordId);
+    saveScopedLocalWords(updatedWords, user?.uid);
 
     if (user) {
       try {
@@ -262,15 +250,35 @@ export default function UnseenPracticePage() {
   };
 
 
-  // Load theme preference from localStorage
+  // Load theme preference and scoped vocabulary words
   useEffect(() => {
     setMounted(true);
+    cleanupLegacyVocabStorage();
+
     const savedTheme = localStorage.getItem("teaching-site-comfort-mode");
     if (savedTheme === "light" || savedTheme === "dark") {
       setComfortMode(savedTheme);
     }
     if (user?.displayName) {
       setDetectiveName(user.displayName);
+    }
+
+    // Load personal scoped vocabulary notebook
+    const localScoped = loadScopedLocalWords(user?.uid);
+    setNotebookWords(localScoped);
+
+    if (user) {
+      getDocs(collection(dbFirestore, "users", user.uid, "words"))
+        .then((snapshot) => {
+          const fetched: Word[] = [];
+          snapshot.forEach((doc) => fetched.push(doc.data() as Word));
+          if (fetched.length > 0) {
+            fetched.sort((a, b) => Number(b.id) - Number(a.id));
+            setNotebookWords(fetched);
+            saveScopedLocalWords(fetched, user.uid);
+          }
+        })
+        .catch((err) => console.warn("Firestore notebook load:", err));
     }
   }, [user]);
 

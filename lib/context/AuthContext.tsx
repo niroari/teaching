@@ -51,7 +51,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("teaching-site-vocab-words");
+        localStorage.removeItem("teaching-site-vocab-words_guest");
+      } catch (e) {
+        console.error("Error clearing guest vocab on logout:", e);
+      }
+    }
     return signOut(auth);
   };
 

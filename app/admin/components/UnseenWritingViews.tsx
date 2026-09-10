@@ -1,7 +1,26 @@
 "use client";
 
-import React from "react";
-import { Search, RefreshCw, BookOpen, CheckCircle, Check } from "lucide-react";
+import React, { useState } from "react";
+import { 
+  Search, RefreshCw, BookOpen, CheckCircle, Check, 
+  ChevronDown, ChevronUp, FileText, CheckCircle2, XCircle, 
+  AlertCircle, Sparkles, MessageSquare, Award 
+} from "lucide-react";
+
+export interface StudentAnswerRecord {
+  questionId: number;
+  questionNumber: number;
+  type: string;
+  paragraph?: number | string | null;
+  prompt: string;
+  studentAnswer: string;
+  correctAnswer: string;
+  firstTrySuccess: boolean;
+  attempts: number;
+  explanation: string;
+  matchedKeywords?: string[];
+  missingKeywords?: string[];
+}
 
 export interface UnseenAssignment {
   id: string;
@@ -18,6 +37,12 @@ export interface UnseenAssignment {
   status: "submitted" | "graded";
   scoreTeacher: number | null;
   feedbackTeacher: string | null;
+  answers?: StudentAnswerRecord[];
+  passage?: {
+    title: string;
+    difficulty: string;
+    paragraphs: string[];
+  };
 }
 
 export interface WritingAssignment {
@@ -88,6 +113,23 @@ export function UnseenDashboardView({
   textMuted: string;
   isLight: boolean;
 }) {
+  const [showPassageText, setShowPassageText] = useState(false);
+
+  const feedbackPresets = [
+    "עבודה מצוינת! פיצוח מדויק של הטקסט וזיהוי נכון של מילות המפתח.",
+    "יפה מאוד! הבנה טובה של הרעיונות המרכזיים, מומלץ להרחיב מעט בניסוח שאלות פתוחות.",
+    "עבודה טובה! שים לב לשאלת העתקת המשפט - חשוב להעתיק משפט שלם מההתחלה ועד הנקודה.",
+    "כל הכבוד על ההתמדה והמענה על כל השאלות!"
+  ];
+
+  const handleAddPreset = (preset: string) => {
+    if (!feedbackInput) {
+      setFeedbackInput(preset);
+    } else if (!feedbackInput.includes(preset)) {
+      setFeedbackInput(`${feedbackInput}\n${preset}`);
+    }
+  };
+
   const filteredUnseenSubmissions = unseenSubmissions.filter(sub => {
     const matchesSearch = 
       sub.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -241,32 +283,220 @@ export function UnseenDashboardView({
 
                 {/* Review details */}
                 <div className="p-6 flex-1 overflow-y-auto space-y-6 text-right">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-3">
                     <div className={`p-4 rounded-xl border ${borderStyle} ${isLight ? "bg-zinc-50" : "bg-[#0c1222]/30"}`}>
-                      <span className="text-[10px] text-zinc-500 block mb-1">ציון מיומנות פתרון</span>
-                      <span className={`text-2xl font-black ${textTitle}`}>{selectedUnseen.score}</span>
-                      <span className="text-xs text-zinc-500"> מתוך 100</span>
+                      <span className="text-[10px] text-zinc-500 block mb-1">ציון מיומנות</span>
+                      <div className="flex items-baseline gap-1 justify-end">
+                        <span className={`text-2xl font-black ${textTitle}`}>{selectedUnseen.score}</span>
+                        <span className="text-xs text-zinc-500">/ 100</span>
+                      </div>
                     </div>
                     
                     <div className={`p-4 rounded-xl border ${borderStyle} ${isLight ? "bg-zinc-50" : "bg-[#0c1222]/30"}`}>
-                      <span className="text-[10px] text-zinc-500 block mb-1">תשובות נכונות (ניסיון ראשון)</span>
-                      <span className={`text-2xl font-black ${textTitle}`}>{selectedUnseen.correctOnFirstTry}</span>
-                      <span className="text-xs text-zinc-500"> מתוך {selectedUnseen.totalQuestions}</span>
+                      <span className="text-[10px] text-zinc-500 block mb-1">ניסיון ראשון</span>
+                      <div className="flex items-baseline gap-1 justify-end">
+                        <span className={`text-2xl font-black ${textTitle}`}>{selectedUnseen.correctOnFirstTry}</span>
+                        <span className="text-xs text-zinc-500">/ {selectedUnseen.totalQuestions}</span>
+                      </div>
+                    </div>
+
+                    <div className={`p-4 rounded-xl border ${borderStyle} ${isLight ? "bg-zinc-50" : "bg-[#0c1222]/30"}`}>
+                      <span className="text-[10px] text-zinc-500 block mb-1">רמת קושי</span>
+                      <span className="inline-block text-xs font-bold px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-teal-400 mt-1">
+                        {selectedUnseen.difficulty === "Easy" ? "רמה 1 (קל)" : selectedUnseen.difficulty === "Medium" ? "רמה 2 (בינוני)" : "רמה 3 (קשה)"}
+                      </span>
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <span className={`block text-xs font-bold ${textTitle}`}>רמת קושי של המשימה:</span>
-                    <span className="inline-block text-xs font-bold px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-teal-400">
-                      {selectedUnseen.difficulty === "Easy" ? "רמה 1 (קל)" : selectedUnseen.difficulty === "Medium" ? "רמה 2 (בינוני)" : "רמה 3 (קשה)"}
-                    </span>
+                  {/* Passage Text Toggle */}
+                  {selectedUnseen.passage && (
+                    <div className="space-y-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowPassageText(!showPassageText)}
+                        className={`w-full p-3 rounded-xl border flex items-center justify-between text-xs font-bold transition-all cursor-pointer ${
+                          isLight ? "bg-zinc-100 hover:bg-zinc-200 border-zinc-300 text-zinc-800" : "bg-zinc-900/80 hover:bg-zinc-850 border-zinc-700 text-zinc-200"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-purple-400" />
+                          <span>טקסט האנסין המקורי: {selectedUnseen.passage.title || selectedUnseen.unseenTitle}</span>
+                        </div>
+                        {showPassageText ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                      </button>
+
+                      {showPassageText && (
+                        <div className={`p-4 rounded-xl border text-left font-serif leading-relaxed text-sm space-y-3 max-h-60 overflow-y-auto ${
+                          isLight ? "bg-white border-zinc-200 text-zinc-800" : "bg-black/40 border-zinc-800 text-zinc-200"
+                        }`} dir="ltr">
+                          {selectedUnseen.passage.paragraphs.map((para, pIdx) => (
+                            <p key={pIdx}>
+                              <span className="text-purple-400 font-sans font-bold text-xs mr-2">[{pIdx + 1}]</span>
+                              {para}
+                            </p>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Question Answers Inspector */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className={`text-xs font-bold ${textTitle} flex items-center gap-1.5`}>
+                        <BookOpen className="w-4 h-4 text-purple-400" />
+                        פירוט מענה התלמיד לשאלות האנסין ({selectedUnseen.answers?.length || 0} שאלות)
+                      </span>
+                    </div>
+
+                    {(!selectedUnseen.answers || selectedUnseen.answers.length === 0) ? (
+                      <div className={`p-4 rounded-xl border text-center text-xs ${borderStyle} ${textMuted}`}>
+                        הגשה זו נשמרה בגרסה קודמת ללא פירוט שאלות מלא (נשמרו ציונים ומדדים כלליים).
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {selectedUnseen.answers.map((ans, idx) => {
+                          const isCorrect = ans.firstTrySuccess;
+                          const isPartiallyCorrect = !ans.firstTrySuccess && ans.attempts > 1;
+                          const isSkipped = ans.studentAnswer === "skipped";
+
+                          return (
+                            <div 
+                              key={idx} 
+                              className={`p-4 rounded-xl border text-right space-y-2.5 transition-all ${
+                                isCorrect
+                                  ? isLight ? "bg-emerald-50/70 border-emerald-300" : "bg-emerald-950/20 border-emerald-500/30"
+                                  : isPartiallyCorrect
+                                  ? isLight ? "bg-amber-50/70 border-amber-300" : "bg-amber-950/20 border-amber-500/30"
+                                  : isLight ? "bg-red-50/70 border-red-300" : "bg-red-950/20 border-red-500/30"
+                              }`}
+                            >
+                              {/* Header */}
+                              <div className="flex items-center justify-between flex-row-reverse text-xs">
+                                <div className="flex items-center gap-2">
+                                  <span className={`font-black ${textTitle}`}>שאלה {ans.questionNumber || idx + 1}</span>
+                                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700">
+                                    {ans.type === "mcq" ? "אמריקאית" : ans.type === "open" ? "פתוחה" : ans.type === "copy" ? "העתקת משפט" : ans.type === "true_false" ? "נכון/לא נכון" : "השלמת משפט"}
+                                  </span>
+                                  {ans.paragraph && (
+                                    <span className="text-[10px] text-zinc-400" dir="ltr">
+                                      (Par. {ans.paragraph})
+                                    </span>
+                                  )}
+                                </div>
+
+                                <div>
+                                  {isCorrect ? (
+                                    <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                      <CheckCircle2 className="w-3 h-3" />
+                                      נכון (ניסיון 1)
+                                    </span>
+                                  ) : isPartiallyCorrect ? (
+                                    <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                      <AlertCircle className="w-3 h-3" />
+                                      נכון (ניסיון 2)
+                                    </span>
+                                  ) : isSkipped ? (
+                                    <span className="text-[10px] font-bold text-zinc-400 bg-zinc-500/10 border border-zinc-500/30 px-2 py-0.5 rounded-full">
+                                      דולג
+                                    </span>
+                                  ) : (
+                                    <span className="text-[10px] font-bold text-rose-400 bg-rose-500/10 border border-rose-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                      <XCircle className="w-3 h-3" />
+                                      לא נכון
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Prompt in LTR */}
+                              <div className={`text-left font-sans text-xs font-semibold p-2.5 rounded-lg border ${
+                                isLight ? "bg-white/80 border-zinc-200 text-zinc-800" : "bg-black/30 border-white/5 text-zinc-200"
+                              }`} dir="ltr">
+                                {ans.prompt}
+                              </div>
+
+                              {/* Answers Comparison */}
+                              <div className="space-y-1.5 text-xs">
+                                <div className="flex flex-col gap-1">
+                                  <span className="text-[10px] font-bold text-zinc-400">תשובת התלמיד:</span>
+                                  <div className={`p-2 rounded-lg text-left text-xs font-mono ${
+                                    isCorrect
+                                      ? isLight ? "bg-emerald-100/70 text-emerald-900 border border-emerald-300" : "bg-emerald-900/30 text-emerald-200 border border-emerald-700/50"
+                                      : isLight ? "bg-rose-100/70 text-rose-900 border border-rose-300" : "bg-rose-900/30 text-rose-200 border border-rose-700/50"
+                                  }`} dir="ltr">
+                                    {isSkipped ? "(התלמיד בחר לדלג)" : ans.studentAnswer || "(ללא תשובה)"}
+                                  </div>
+                                </div>
+
+                                {!isCorrect && (
+                                  <div className="flex flex-col gap-1">
+                                    <span className="text-[10px] font-bold text-zinc-400">תשובה נכונה מצופה:</span>
+                                    <div className={`p-2 rounded-lg text-left text-xs font-mono ${
+                                      isLight ? "bg-emerald-100/70 text-emerald-900 border border-emerald-300" : "bg-emerald-900/30 text-emerald-200 border border-emerald-700/50"
+                                    }`} dir="ltr">
+                                      {ans.correctAnswer}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Keywords (if open) */}
+                              {ans.type === "open" && (ans.matchedKeywords?.length || ans.missingKeywords?.length) ? (
+                                <div className="pt-1 flex flex-wrap gap-1.5 text-[10px]">
+                                  {ans.matchedKeywords?.map((kw, kIdx) => (
+                                    <span key={kIdx} className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                      ✓ {kw}
+                                    </span>
+                                  ))}
+                                  {ans.missingKeywords?.map((kw, kIdx) => (
+                                    <span key={kIdx} className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700">
+                                      - {kw}
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : null}
+
+                              {/* Explanation */}
+                              {ans.explanation && (
+                                <p className="text-[11px] text-zinc-400 leading-relaxed bg-black/10 p-2 rounded border border-white/5">
+                                  <span className="font-bold text-purple-400">הסבר: </span>
+                                  {ans.explanation}
+                                </p>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {/* Grading Form footer */}
                 <form onSubmit={handleSaveUnseenGrade} className={`p-6 border-t ${borderStyle} ${
-                  isLight ? "bg-zinc-50/50" : "bg-[#0b0f19]/30"
+                  isLight ? "bg-zinc-50/80" : "bg-[#0b0f19]/40"
                 } space-y-4`}>
+                  {/* Feedback Presets */}
+                  <div className="space-y-1.5 text-right">
+                    <span className="text-[10px] text-zinc-400 font-bold block">תבניות משוב מהיר בלחיצה:</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {feedbackPresets.map((preset, pIdx) => (
+                        <button
+                          key={pIdx}
+                          type="button"
+                          onClick={() => handleAddPreset(preset)}
+                          className={`px-2 py-1 rounded-lg text-[10px] font-medium border transition-colors text-right cursor-pointer ${
+                            isLight
+                              ? "bg-white hover:bg-purple-50 text-purple-700 border-purple-200"
+                              : "bg-purple-950/30 hover:bg-purple-900/40 text-purple-300 border-purple-800/50"
+                          }`}
+                        >
+                          + {preset.substring(0, 24)}...
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   <div className="flex gap-4 items-end justify-between flex-row-reverse">
                     <div className="w-24 space-y-1 text-right">
                       <label className={`block text-[11px] font-bold ${textTitle}`}>ציון מורה:</label>
@@ -288,7 +518,7 @@ export function UnseenDashboardView({
                         value={feedbackInput}
                         onChange={(e) => setFeedbackInput(e.target.value)}
                         className={`w-full px-3 py-2 text-xs rounded-xl border outline-none h-14 resize-none ${inputStyle}`}
-                        placeholder="כתוב כאן משוב מפורט..."
+                        placeholder="כתוב כאן משוב מפורט או בחר תבנית..."
                       />
                     </div>
                   </div>

@@ -24,7 +24,7 @@ import {
 import { useAuth } from "@/lib/context/AuthContext";
 import { dbFirestore } from "@/lib/firebase";
 import { collection, query, getDocs, updateDoc, doc, orderBy } from "firebase/firestore";
-import { UnseenDashboardView, WritingDashboardView } from "./components/UnseenWritingViews";
+import { UnseenDashboardView, WritingDashboardView, UnseenAssignment, WritingAssignment, StudentAnswerRecord } from "./components/UnseenWritingViews";
 
 interface ChatAssignment {
   id: string;
@@ -41,46 +41,6 @@ interface ChatAssignment {
   score: number | null;
   feedback: string | null;
   customCharacterName?: string;
-}
-
-interface UnseenAssignment {
-  id: string;
-  studentId: string;
-  studentName: string;
-  studentClass: string;
-  studentEmail: string;
-  unseenTitle: string;
-  difficulty: string;
-  score: number;
-  correctOnFirstTry: number;
-  totalQuestions: number;
-  submittedAt: any;
-  status: "submitted" | "graded";
-  scoreTeacher: number | null;
-  feedbackTeacher: string | null;
-}
-
-interface WritingAssignment {
-  id: string;
-  studentId: string;
-  studentName: string;
-  studentClass: string;
-  studentEmail: string;
-  taskType: "letter" | "essay";
-  prompt: string;
-  studentText: string;
-  score: number;
-  evaluation: {
-    score: number;
-    grammarFeedback: string;
-    improvedVersion: string;
-    structureFeedback: { passed: boolean; details: string };
-    corrections: Array<{ original: string; corrected: string; explanation: string }>;
-  };
-  submittedAt: any;
-  status: "submitted" | "graded";
-  scoreTeacher: number | null;
-  feedbackTeacher: string | null;
 }
 
 const CHARACTERS_MAP: Record<string, { name: string; avatar: string; themeColor: string }> = {
@@ -135,6 +95,7 @@ export default function GeneralTeacherAdmin() {
   
   // Tab state
   const [currentTab, setCurrentTab] = useState<"chat-masters" | "unseen-practice" | "writing-practice" | "future-projects" | "settings">("chat-masters");
+  const [devPreview, setDevPreview] = useState(false);
   
   // Chat Masters Submissions data states
   const [submissions, setSubmissions] = useState<ChatAssignment[]>([]);
@@ -395,7 +356,7 @@ export default function GeneralTeacherAdmin() {
   if (!mounted) return null;
 
   const isLight = comfortMode === "light";
-  const isTeacher = user && (user.email === "niroari@gmail.com" || user.email === "nirozari@gmail.com");
+  const isTeacher = (user && (user.email === "niroari@gmail.com" || user.email === "nirozari@gmail.com")) || devPreview;
 
   // Dynamic Theme Styling
   const bgTheme = isLight ? "bg-[#f1f5f9]" : "bg-[#080c18]";
@@ -549,7 +510,7 @@ export default function GeneralTeacherAdmin() {
       <main className="w-full max-w-6xl mx-auto px-6 py-8 flex-1 flex flex-col z-10">
         
         {/* Auth checks */}
-        {!user ? (
+        {!user && !devPreview ? (
           <div className="flex-1 flex flex-col items-center justify-center max-w-md mx-auto py-16 text-center">
             <div className={`p-8 rounded-2xl ${cardStyle} border ${borderStyle} space-y-6 w-full shadow-2xl`}>
               <div className="p-4 bg-purple-500/10 border border-purple-500/20 rounded-full inline-flex text-purple-400 text-3xl">
@@ -575,6 +536,150 @@ export default function GeneralTeacherAdmin() {
                 className="w-full py-3.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl cursor-pointer shadow-lg shadow-purple-500/25 transition-all text-sm"
               >
                 התחברות עם Google
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setDevPreview(true);
+                  setCurrentTab("unseen-practice");
+                  if (unseenSubmissions.length === 0) {
+                    const demoSubmission: UnseenAssignment = {
+                      id: "demo-unseen-1",
+                      studentId: "student-101",
+                      studentName: "רועי בלש",
+                      studentClass: "כיתה ח'2",
+                      studentEmail: "roy.detective@school.edu",
+                      unseenTitle: "Max the Small Dog",
+                      difficulty: "Easy",
+                      score: 85,
+                      correctOnFirstTry: 7,
+                      totalQuestions: 8,
+                      submittedAt: { seconds: Math.floor(Date.now() / 1000) },
+                      status: "submitted",
+                      scoreTeacher: null,
+                      feedbackTeacher: null,
+                      answers: [
+                        {
+                          questionId: 1,
+                          questionNumber: 1,
+                          type: "mcq",
+                          paragraph: 1,
+                          prompt: "What does Max look like?",
+                          studentAnswer: "He is white with long ears and a short tail",
+                          correctAnswer: "He is white with long ears and a short tail",
+                          firstTrySuccess: true,
+                          attempts: 1,
+                          explanation: "בפסקה 1 רשום בבירור שהכלב לבן, בעל אוזניים ארוכות וזנב קצר."
+                        },
+                        {
+                          questionId: 2,
+                          questionNumber: 2,
+                          type: "mcq",
+                          paragraph: 1,
+                          prompt: "How old is Max?",
+                          studentAnswer: "Three years old",
+                          correctAnswer: "Three years old",
+                          firstTrySuccess: true,
+                          attempts: 1,
+                          explanation: "הטקסט מציין 'Max is three years old'."
+                        },
+                        {
+                          questionId: 3,
+                          questionNumber: 3,
+                          type: "mcq",
+                          paragraph: 1,
+                          prompt: "What does Max see near the big house?",
+                          studentAnswer: "A yellow cat",
+                          correctAnswer: "A yellow cat",
+                          firstTrySuccess: true,
+                          attempts: 1,
+                          explanation: "נכון! בפסקה 1 רשום שמקס רואה חתול צהוב (yellow cat)."
+                        },
+                        {
+                          questionId: 4,
+                          questionNumber: 4,
+                          type: "copy",
+                          paragraph: 1,
+                          prompt: "Copy the sentence that proves Tom gives food to Max.",
+                          studentAnswer: "Tom gives Max a small cookie.",
+                          correctAnswer: "Tom gives Max a small cookie.",
+                          firstTrySuccess: true,
+                          attempts: 1,
+                          explanation: "משפט מלא ומדויק המוכיח שמתן העוגיה הוא האכלה."
+                        },
+                        {
+                          questionId: 5,
+                          questionNumber: 5,
+                          type: "open",
+                          paragraph: 2,
+                          prompt: "Why does Max run to Tom's room every morning?",
+                          studentAnswer: "Because he wants to eat his food and wakes Tom up.",
+                          correctAnswer: "Because he wants to eat his food.",
+                          firstTrySuccess: true,
+                          attempts: 1,
+                          explanation: "תשובה מצוינת! התלמיד ציין את הסיבה המדויקת מהפסקה.",
+                          matchedKeywords: ["eat", "food", "wants"],
+                          missingKeywords: []
+                        },
+                        {
+                          questionId: 6,
+                          questionNumber: 6,
+                          type: "mcq",
+                          paragraph: 2,
+                          prompt: "What does Max drink?",
+                          studentAnswer: "Cold water",
+                          correctAnswer: "Cold water",
+                          firstTrySuccess: false,
+                          attempts: 2,
+                          explanation: "מקס שותה מים קרים מקערה כחולה (He drinks cold water from a blue bowl)."
+                        },
+                        {
+                          questionId: 7,
+                          questionNumber: 7,
+                          type: "open",
+                          paragraph: 3,
+                          prompt: "What does Max do with the red ball?",
+                          studentAnswer: "He runs after the ball and brings it back to Tom.",
+                          correctAnswer: "He runs after the red ball and brings the ball back to Tom.",
+                          firstTrySuccess: true,
+                          attempts: 1,
+                          explanation: "תשובה מדויקת להפליא.",
+                          matchedKeywords: ["runs", "ball", "brings"],
+                          missingKeywords: []
+                        },
+                        {
+                          questionId: 8,
+                          questionNumber: 8,
+                          type: "open",
+                          paragraph: 3,
+                          prompt: "What is this story mostly about?",
+                          studentAnswer: "Max the small dog and what he does every day with Tom.",
+                          correctAnswer: "Tom's dog Max and his daily routine.",
+                          firstTrySuccess: true,
+                          attempts: 1,
+                          explanation: "הבנה גלובלית מלאה של הסיפור.",
+                          matchedKeywords: ["Max", "dog", "Tom"],
+                          missingKeywords: []
+                        }
+                      ],
+                      passage: {
+                        title: "Max the Small Dog",
+                        difficulty: "Easy",
+                        paragraphs: [
+                          "Tom has a small dog. The dog is white. His name is Max. Max has long ears and a short tail. Tom likes Max very much. Max is three years old. Every day, Tom walks with Max. They walk near the big house. Max sees a yellow cat. He does not run after the cat. Max is a good dog. He stands next to Tom. Tom gives Max a small cookie. Max is happy.",
+                          "Max sleeps in a warm bed near the door. The bed is soft and brown. Every morning, Max runs to Tom's room. Max wakes Tom up because he wants to eat his food. Tom gets up from his bed. He walks to the kitchen. Tom puts dog food in a red bowl. Max eats his food fast. He drinks cold water from a blue bowl. Then, Max waits by the door.",
+                          "In the afternoon, Tom and Max play in the big garden. Max runs after a red ball. He brings the ball back to Tom. Tom smiles and pats Max's head. Sometimes, their friend Sarah comes to play. Sarah has a funny hat. Max sniffs the hat and wags his tail. At night, Max lies down in his bed. He closes his eyes and sleeps. Max is a lovely pet."
+                        ]
+                      }
+                    };
+                    setUnseenSubmissions([demoSubmission]);
+                    setSelectedUnseen(demoSubmission);
+                  }
+                }}
+                className="w-full py-2.5 bg-zinc-800/80 hover:bg-zinc-700 text-purple-300 text-xs font-bold rounded-xl text-center border border-purple-500/30 cursor-pointer transition-all flex items-center justify-center gap-2"
+              >
+                <span>⚡ צפייה כיתתית לדוגמה (מצב מורה לבדיקה)</span>
               </button>
             </div>
           </div>
@@ -1056,7 +1161,7 @@ export default function GeneralTeacherAdmin() {
               <div className="space-y-4 text-xs leading-relaxed">
                 <div className="space-y-1">
                   <span className={`block font-bold ${textTitle}`}>חשבון מורה מחובר:</span>
-                  <span className={`${textMuted}`}>{user.email}</span>
+                  <span className={`${textMuted}`}>{user?.email || "מצב תצוגה מקדימה (Demo Preview)"}</span>
                 </div>
                 <div className="space-y-1">
                   <span className={`block font-bold ${textTitle}`}>סטטוס הרשאות:</span>

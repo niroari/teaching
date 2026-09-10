@@ -15,6 +15,7 @@ import {
   FileText,
   AlertTriangle,
   CheckCircle,
+  CheckCircle2,
   XCircle,
   HelpCircle,
   Award,
@@ -25,7 +26,11 @@ import {
   Plus,
   Trash2,
   Edit2,
-  Check
+  Check,
+  Copy,
+  ChevronDown,
+  ChevronUp,
+  ListChecks
 } from "lucide-react";
 import { useAuth } from "@/lib/context/AuthContext";
 import { PRE_GENERATED_UNSEENS, UnseenData } from "@/lib/unseen-data";
@@ -67,6 +72,19 @@ interface Word {
   mastered?: boolean;
 }
 
+export interface StudentAnswerRecord {
+  questionId: number;
+  questionText: string;
+  type: "mcq" | "open" | "copy";
+  paragraphIndex?: number;
+  linesHint?: string;
+  studentAnswer: string;
+  correctAnswer: string;
+  isCorrect: boolean;
+  attempts: number;
+  explanation: string;
+}
+
 export default function UnseenPracticePage() {
   const router = useRouter();
   const { user } = useAuth();
@@ -95,6 +113,11 @@ export default function UnseenPracticePage() {
   const [attempts, setAttempts] = useState(0);
   const [openAnswerText, setOpenAnswerText] = useState("");
   const [selfGraded, setSelfGraded] = useState<boolean | null>(null);
+  
+  // Track all student answers for review & teacher evaluation
+  const [studentAnswers, setStudentAnswers] = useState<StudentAnswerRecord[]>([]);
+  const [showReviewAccordion, setShowReviewAccordion] = useState(true);
+  const [copiedSentenceFeedback, setCopiedSentenceFeedback] = useState<string | null>(null);
   
   // Game Stats
   const [score, setScore] = useState(100);
@@ -356,11 +379,46 @@ export default function UnseenPracticePage() {
     setCurrentStep("rules");
   };
 
-  const submitUnseenAssignment = async () => {
+  const recordStudentAnswer = (
+    studentAnswerText: string,
+    correctAnswerText: string,
+    isCorrectStatus: boolean,
+    attemptsCount: number
+  ) => {
+    const activeQ = gameSubStep < 7 ? unseen.questions[gameSubStep] : unseen.globalQuestion;
+    const qId = (activeQ as any).id || (gameSubStep + 1);
+    const newRecord: StudentAnswerRecord = {
+      questionId: qId,
+      questionText: activeQ.question,
+      type: (activeQ as any).type || "mcq",
+      paragraphIndex: (activeQ as any).paragraphIndex,
+      linesHint: (activeQ as any).linesHint || "General",
+      studentAnswer: studentAnswerText,
+      correctAnswer: correctAnswerText,
+      isCorrect: isCorrectStatus,
+      attempts: attemptsCount,
+      explanation: activeQ.explanation
+    };
+
+    setStudentAnswers((prev) => {
+      const idx = prev.findIndex((a) => a.questionId === qId);
+      if (idx >= 0) {
+        const updated = [...prev];
+        updated[idx] = newRecord;
+        return updated;
+      }
+      return [...prev, newRecord];
+    });
+
+    return newRecord;
+  };
+
+  const submitUnseenAssignment = async (answersOverride?: StudentAnswerRecord[]) => {
     if (!user) return;
     setIsSubmitting(true);
     setSubmitError(null);
     try {
+      const answersToUpload = answersOverride || studentAnswers;
       const uploadPromise = addDoc(collection(dbFirestore, "unseen_assignments"), {
         studentId: user.uid,
         studentName: detectiveName.trim(),
@@ -368,6 +426,12 @@ export default function UnseenPracticePage() {
         studentEmail: user.email || "",
         unseenTitle: unseen.title,
         difficulty: unseen.difficulty,
+        passage: {
+          title: unseen.title,
+          difficulty: unseen.difficulty,
+          paragraphs: unseen.paragraphs
+        },
+        answers: answersToUpload,
         score: score,
         correctOnFirstTry: correctOnFirstTry,
         totalQuestions: 8,
@@ -402,15 +466,18 @@ export default function UnseenPracticePage() {
     setAttempts(0);
     setTotalQuestionsAnswered(0);
     setCorrectOnFirstTry(0);
+    setStudentAnswers([]);
     setSubmittedDocId(null);
     setSubmitError(null);
+    setCopiedSentenceFeedback(null);
     setCurrentStep("game");
   };
 
   const handleOptionClick = (optionIdx: number) => {
     if (showFeedback) return;
     setSelectedOption(optionIdx);
-    setAttempts((prev) => prev + 1);
+    const newAttempts = attempts + 1;
+    setAttempts(newAttempts);
 
     const activeQuestion = gameSubStep < 7 ? unseen.questions[gameSubStep] : unseen.globalQuestion;
     const isCorrectChoice = optionIdx === activeQuestion.answerIndex;
@@ -418,10 +485,13 @@ export default function UnseenPracticePage() {
     setIsCorrect(isCorrectChoice);
     setShowFeedback(true);
 
+    const chosenOptionText = activeQuestion.options?.[optionIdx] || `Option ${optionIdx + 1}`;
+    const correctOptionText = (activeQuestion.answerIndex !== undefined ? activeQuestion.options?.[activeQuestion.answerIndex] : "") || "";
+    recordStudentAnswer(chosenOptionText, correctOptionText, isCorrectChoice, newAttempts);
+
     if (isCorrectChoice) {
       if (attempts === 0) {
         setCorrectOnFirstTry((prev) => prev + 1);
-        // Play success sound / confetti burst for correct answers
         confetti({
           particleCount: 30,
           spread: 40,
@@ -448,25 +518,24 @@ export default function UnseenPracticePage() {
 
     const userClean = clean(openAnswerText);
     const targetClean = clean(activeQuestion.targetSentence || "");
+    const newAttempts = attempts + 1;
+    setAttempts(newAttempts);
 
     // 1. Check for exact match
     let isCorrectChoice = userClean === targetClean;
 
     // 2. Check for partial matching and typos if not exact
     if (!isCorrectChoice && targetClean) {
-      // Check if user answer is a substring of the target, and contains a minimum amount of words/characters
       const isSubstring = targetClean.includes(userClean) || userClean.includes(targetClean);
       const userWordsCount = userClean.split(" ").filter(Boolean).length;
       const targetWordsCount = targetClean.split(" ").filter(Boolean).length;
 
-      // Allow partial matches if they typed at least 3 words and at least 35% of the target words
       const hasMinLength = userClean.length >= Math.min(10, targetClean.length * 0.3);
       const hasMinWords = userWordsCount >= Math.min(3, Math.ceil(targetWordsCount * 0.35));
 
       if (isSubstring && hasMinLength && hasMinWords) {
         isCorrectChoice = true;
       } else {
-        // Also check spelling tolerance (Levenshtein distance <= 15% of length, min 2 edits)
         const dist = getLevenshteinDistance(userClean, targetClean);
         const maxAllowedDist = Math.max(2, Math.floor(targetClean.length * 0.15));
         if (dist <= maxAllowedDist) {
@@ -476,8 +545,14 @@ export default function UnseenPracticePage() {
     }
 
     setIsCorrect(isCorrectChoice);
-    setAttempts((prev) => prev + 1);
     setShowFeedback(true);
+
+    recordStudentAnswer(
+      openAnswerText.trim(),
+      activeQuestion.targetSentence || "",
+      isCorrectChoice,
+      newAttempts
+    );
 
     if (isCorrectChoice) {
       if (attempts === 0) {
@@ -508,6 +583,14 @@ export default function UnseenPracticePage() {
     setSelfGraded(correct);
     setIsCorrect(correct);
 
+    const activeQuestion = unseen.questions[gameSubStep];
+    recordStudentAnswer(
+      openAnswerText.trim(),
+      activeQuestion.suggestedAnswer || "",
+      correct,
+      attempts
+    );
+
     if (correct) {
       if (attempts === 1) { // check if first try
         setCorrectOnFirstTry((prev) => prev + 1);
@@ -523,6 +606,25 @@ export default function UnseenPracticePage() {
     }
   };
 
+  const handleSkipQuestion = () => {
+    const newAttempts = Math.max(attempts, 1);
+    setAttempts(newAttempts);
+    setIsCorrect(false);
+    setShowFeedback(true);
+    setScore((prev) => Math.max(prev - 15, 20));
+
+    const activeQuestion = gameSubStep < 7 ? unseen.questions[gameSubStep] : unseen.globalQuestion;
+    let correctAns = "";
+    if ((activeQuestion as any).type === "mcq" || !(activeQuestion as any).type) {
+      correctAns = (activeQuestion as any).options?.[(activeQuestion as any).answerIndex] || "";
+    } else if ((activeQuestion as any).type === "copy") {
+      correctAns = (activeQuestion as any).targetSentence || "";
+    } else {
+      correctAns = (activeQuestion as any).suggestedAnswer || "";
+    }
+    recordStudentAnswer("דילג על השאלה (לא השיב)", correctAns, false, newAttempts);
+  };
+
   const handleNextStep = () => {
     setSelectedOption(null);
     setShowFeedback(false);
@@ -530,6 +632,7 @@ export default function UnseenPracticePage() {
     setOpenAnswerText("");
     setSelfGraded(null);
     setAttempts(0);
+    setCopiedSentenceFeedback(null);
 
     if (gameSubStep < 7) {
       setGameSubStep((prev) => prev + 1);
@@ -539,7 +642,6 @@ export default function UnseenPracticePage() {
       if (isAssignmentMode && user) {
         submitUnseenAssignment();
       }
-      // Fire big confetti celebration
       confetti({
         particleCount: 150,
         spread: 80,
@@ -583,6 +685,34 @@ export default function UnseenPracticePage() {
           </div>
         </div>
       </header>
+
+      {/* Assignment Mode Sticky Banner */}
+      {isAssignmentMode && (currentStep === "game" || currentStep === "rules") && (
+        <div className={`w-full py-2.5 px-6 border-b z-20 transition-colors shadow-sm ${
+          isLight 
+            ? "bg-teal-500/10 border-teal-500/20 text-teal-950" 
+            : "bg-teal-950/40 border-teal-500/20 text-teal-300"
+        }`}>
+          <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-teal-500 animate-pulse" />
+              <span className="font-black text-teal-600 dark:text-teal-400">מצב משימה כיתתית להגשה פעיל</span>
+              <span className="opacity-40">•</span>
+              <span>תלמיד/ה: <strong className={textTitle}>{detectiveName}</strong></span>
+              {studentClass && (
+                <>
+                  <span className="opacity-40">•</span>
+                  <span>כיתה: <strong className={textTitle}>{studentClass}</strong></span>
+                </>
+              )}
+            </div>
+            <div className="flex items-center gap-1.5 text-[11px] font-semibold text-teal-600 dark:text-teal-400">
+              <CheckCircle className="w-3.5 h-3.5" />
+              <span>התשובות והציון יישמרו ויועברו למורה בסיום</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Area */}
       <main className="flex-1 w-full max-w-5xl mx-auto px-6 py-10 flex flex-col justify-center z-10 relative">
@@ -919,14 +1049,52 @@ export default function UnseenPracticePage() {
               {/* Left Column: Questions, Answers & Instructions */}
               <div className="lg:col-span-5 flex flex-col space-y-6 lg:sticky lg:top-24">
                 
-                {/* Score & Progress header */}
-                <div className={`p-4 rounded-2xl border ${borderStyle} ${cardStyle} flex items-center justify-between text-xs`}>
-                  <div className="flex items-center gap-1">
-                    <span className="font-extrabold text-teal-500">{score}</span>
-                    <span className={textMuted}>נקודות מיומנות</span>
+                {/* Score & Progress Stepper header */}
+                <div className={`p-4 rounded-2xl border ${borderStyle} ${cardStyle} space-y-3 shadow-md`}>
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-1.5">
+                      <Award className="w-4 h-4 text-teal-500" />
+                      <span className="font-black text-base text-teal-500">{score}</span>
+                      <span className={textMuted}>נקודות מיומנות</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs font-bold ${textBody}`}>
+                        שאלה <span className={`font-black text-sm px-2 py-0.5 rounded-md bg-teal-500/10 border border-teal-500/20 ${isLight ? "text-teal-900" : "text-teal-300"}`}>{gameSubStep + 1}</span> מתוך 8
+                      </span>
+                    </div>
                   </div>
-                  <div className={textMuted}>
-                    שאלה <span className="font-bold text-white">{gameSubStep + 1}</span> מתוך 8
+
+                  {/* 8-Step Question Progress Stepper */}
+                  <div className="flex items-center justify-between gap-1 pt-2 border-t border-dashed border-zinc-700/20">
+                    {Array.from({ length: 8 }).map((_, stepIdx) => {
+                      const isCurrent = gameSubStep === stepIdx;
+                      const isCompleted = gameSubStep > stepIdx;
+                      const ansRecord = studentAnswers[stepIdx];
+                      const isAnsCorrect = ansRecord ? ansRecord.isCorrect : false;
+
+                      let dotClass = isLight ? "bg-zinc-200 text-zinc-600" : "bg-surface text-zinc-400";
+                      if (isCurrent) {
+                        dotClass = "bg-teal-500 text-zinc-950 ring-2 ring-teal-400 ring-offset-2 ring-offset-transparent font-black scale-110 shadow-md";
+                      } else if (isCompleted) {
+                        dotClass = isAnsCorrect 
+                          ? "bg-emerald-500 text-white font-bold" 
+                          : "bg-amber-500 text-white font-bold";
+                      }
+
+                      return (
+                        <div
+                          key={stepIdx}
+                          className={`flex-1 h-7 rounded-lg text-[10px] flex items-center justify-center transition-all ${dotClass}`}
+                          title={`שאלה ${stepIdx + 1}${stepIdx === 7 ? " (שאלה מסכמת)" : ""}`}
+                        >
+                          {isCompleted ? (
+                            isAnsCorrect ? "✓" : "•"
+                          ) : (
+                            stepIdx + 1
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -947,9 +1115,12 @@ export default function UnseenPracticePage() {
                               {gameSubStep < 7 ? `רמז לפסקה ${(activeQuestion as any).paragraphIndex !== undefined ? (activeQuestion as any).paragraphIndex + 1 : ""}` : "רמז מסכם"}
                             </span>
                             {gameSubStep < 7 && (
-                              <span className="text-[10px] text-zinc-500 font-bold flex items-center gap-1">
+                              <span className={`text-[11px] font-bold flex items-center gap-1.5 ${isLight ? "text-teal-900" : "text-teal-400"}`}>
                                 <Search className="w-3.5 h-3.5" />
-                                <span>מיקום: {activeQuestion.linesHint}</span>
+                                <span>מיקום:</span>
+                                <span dir="ltr" className="font-extrabold px-1.5 py-0.5 rounded bg-teal-500/10 border border-teal-500/20">
+                                  {activeQuestion.linesHint}
+                                </span>
                               </span>
                             )}
                           </div>
@@ -1001,22 +1172,34 @@ export default function UnseenPracticePage() {
                           {qType === "copy" && (
                             <div className="space-y-4 pt-2">
                               <div className="space-y-2">
-                                <p className={`text-xs font-bold text-teal-400`}>העתיקו את המשפט במדויק מתוך הפסקה המודגשת מימין:</p>
+                                <div className="flex items-center justify-between">
+                                  <p className="text-xs font-bold text-teal-400">העתיקו את המשפט במדויק מתוך הפסקה המודגשת משמאל:</p>
+                                  <span className="text-[10px] text-zinc-500 font-semibold">העתקה מתוך הטקסט</span>
+                                </div>
                                 <input
                                   type="text"
-                                  placeholder="הקלידו או העתיקו והדביקו כאן את המשפט..."
+                                  placeholder="הקלידו או הדביקו כאן את המשפט..."
                                   value={openAnswerText}
                                   onChange={(e) => setOpenAnswerText(e.target.value)}
                                   disabled={showFeedback}
                                   className={`w-full h-11 px-4 rounded-xl text-xs outline-none transition-colors border ${inputStyle}`}
                                   dir="ltr"
                                 />
+                                {copiedSentenceFeedback && (
+                                  <div className="text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5">
+                                    <CheckCircle className="w-3.5 h-3.5" />
+                                    <span>{copiedSentenceFeedback}</span>
+                                  </div>
+                                )}
+                                <p className={`text-[10px] ${textMuted}`}>
+                                  💡 <strong>טיפ לבלש:</strong> תוכלו גם ללחוץ ישירות על המשפט המבוקש בטקסט משמאל כדי להעתיק אותו לשדה התשובה!
+                                </p>
                               </div>
                               {!showFeedback && (
                                 <button
                                   onClick={handleCopyCheck}
                                   disabled={!openAnswerText.trim()}
-                                  className="w-full h-10 rounded-xl bg-teal-600 hover:bg-teal-500 text-zinc-950 font-bold text-xs cursor-pointer transition-colors"
+                                  className="w-full h-10 rounded-xl bg-teal-600 hover:bg-teal-500 text-zinc-950 font-bold text-xs cursor-pointer transition-colors shadow-sm"
                                 >
                                   בדקו את העתקתכם
                                 </button>
@@ -1052,13 +1235,8 @@ export default function UnseenPracticePage() {
                           {!showFeedback && (
                             <button
                               type="button"
-                              onClick={() => {
-                                setAttempts(1);
-                                setIsCorrect(false);
-                                setShowFeedback(true);
-                                setScore((prev) => Math.max(prev - 15, 20));
-                              }}
-                              className="w-full mt-3 py-2 text-center text-xs text-rose-400/80 hover:text-rose-400 hover:underline cursor-pointer font-bold"
+                              onClick={handleSkipQuestion}
+                              className="w-full mt-3 py-2 text-center text-xs text-rose-400 hover:text-rose-500 hover:underline cursor-pointer font-bold transition-colors"
                             >
                               דלגו על השאלה (לא יודעים את התשובה? לחצו כאן)
                             </button>
@@ -1081,48 +1259,64 @@ export default function UnseenPracticePage() {
                                     const kwList = activeQuestion.keywords || [];
                                     const userWords = openAnswerText.toLowerCase();
                                     const matchedKws = kwList.filter(kw => userWords.includes(kw.toLowerCase()));
-                                    if (matchedKws.length > 0) {
-                                      return (
-                                        <div className="text-[11px] text-emerald-500 font-bold bg-emerald-500/5 p-2 rounded-lg border border-emerald-500/10">
-                                          מצוין! שילבתם מילים חשובות בתשובה: {matchedKws.join(", ")}
-                                        </div>
-                                      );
-                                    }
-                                    return null;
+                                    const missingKws = kwList.filter(kw => !userWords.includes(kw.toLowerCase()));
+                                    return (
+                                      <div className="space-y-2">
+                                        {matchedKws.length > 0 && (
+                                          <div className="text-xs text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-500/10 p-2.5 rounded-xl border border-emerald-500/20 flex items-center gap-2">
+                                            <CheckCircle2 className="w-4 h-4 shrink-0" />
+                                            <span>מילות מפתח ששילבתם בהצלחה: {matchedKws.join(", ")}</span>
+                                          </div>
+                                        )}
+                                        {missingKws.length > 0 && (
+                                          <div className="text-xs text-amber-600 dark:text-amber-400 font-medium bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 flex items-center gap-2">
+                                            <Info className="w-4 h-4 shrink-0" />
+                                            <span>מילות מפתח מומלצות נוספות: {missingKws.join(", ")}</span>
+                                          </div>
+                                        )}
+                                      </div>
+                                    );
                                   })()}
                                   
                                   <div className={`space-y-1.5 p-3.5 rounded-xl border ${borderStyle} ${
-                                    isLight ? "bg-zinc-100" : "bg-[#0d1222]/30"
+                                    isLight ? "bg-zinc-100/90 text-zinc-900" : "bg-[#0d1222]/50 text-zinc-200"
                                   }`}>
-                                    <h5 className="text-xs font-bold text-teal-400">תשובה לדוגמה (באנגלית):</h5>
-                                    <p className={`text-xs font-medium italic ${isLight ? "text-zinc-800" : "text-zinc-200"}`} dir="ltr">
+                                    <h5 className="text-xs font-black text-teal-600 dark:text-teal-400">תשובה לדוגמה (באנגלית):</h5>
+                                    <p className="text-xs font-semibold italic select-all" dir="ltr">
                                       {activeQuestion.suggestedAnswer}
                                     </p>
                                   </div>
                                   
                                   <div className="space-y-1.5">
-                                    <h5 className="text-xs font-bold text-teal-400">הסבר בעברית:</h5>
-                                    <p className={`text-xs leading-relaxed ${textMuted}`}>
+                                    <h5 className="text-xs font-black text-teal-600 dark:text-teal-400">הסבר מפורט בעברית:</h5>
+                                    <p className={`text-xs leading-relaxed ${isLight ? "text-zinc-800" : "text-slate-300"}`}>
                                       {activeQuestion.explanation}
                                     </p>
                                   </div>
 
                                   <div className="space-y-3 pt-3 border-t border-dashed border-zinc-700/20">
-                                    <p className={`text-xs font-bold ${isLight ? "text-zinc-800" : "text-white"}`}>
-                                      האם תשובתכם נכונה בהשוואה לתשובה המוצעת?
-                                    </p>
+                                    <div className="space-y-1">
+                                      <p className={`text-xs font-black ${textTitle}`}>
+                                        האם תשובתכם נכונה בהשוואה לתשובה המוצעת?
+                                      </p>
+                                      <p className="text-[10px] text-zinc-500">
+                                        (תנו לעצמכם "כן" אם העברתם את המשמעות הנכונה, גם אם במילים מעט שונות)
+                                      </p>
+                                    </div>
                                     <div className="flex gap-2">
                                       <button
                                         onClick={() => handleSelfGrade(true)}
-                                        className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-zinc-950 font-bold text-xs rounded-xl transition-colors cursor-pointer shadow-sm"
+                                        className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-colors cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
                                       >
-                                        כן, עניתי נכון!
+                                        <CheckCircle className="w-4 h-4" />
+                                        <span>כן, עניתי נכון!</span>
                                       </button>
                                       <button
                                         onClick={() => handleSelfGrade(false)}
-                                        className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-zinc-950 font-bold text-xs rounded-xl transition-colors cursor-pointer shadow-sm"
+                                        className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl transition-colors cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
                                       >
-                                        לא, טעיתי
+                                        <XCircle className="w-4 h-4" />
+                                        <span>לא, טעיתי</span>
                                       </button>
                                     </div>
                                   </div>
@@ -1142,7 +1336,7 @@ export default function UnseenPracticePage() {
                                       ) : (
                                         <XCircle className="w-5 h-5 text-rose-500 shrink-0" />
                                       )}
-                                      <h4 className={`text-xs font-bold ${isCorrect ? "text-emerald-400" : "text-rose-400"}`}>
+                                      <h4 className={`text-xs font-bold ${isCorrect ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
                                         {isCorrect ? "תשובה נכונה! כל הכבוד!" : "טעות. נסו שוב או המשיכו:"}
                                       </h4>
                                     </div>
@@ -1161,14 +1355,14 @@ export default function UnseenPracticePage() {
                                           <button
                                             onClick={() => setShowFeedback(false)}
                                             className={`px-3 py-1.5 rounded-xl font-bold text-xs cursor-pointer transition-all ${
-                                              isLight ? "bg-zinc-200 hover:bg-zinc-300 text-zinc-700" : "bg-white hover:bg-zinc-100 text-zinc-950"
+                                              isLight ? "bg-zinc-200 hover:bg-zinc-300 text-zinc-800" : "bg-white hover:bg-zinc-100 text-zinc-950"
                                             }`}
                                           >
                                             נסו שוב
                                           </button>
                                           <button
                                             onClick={handleNextStep}
-                                            className="px-3 py-1.5 rounded-xl text-rose-300 bg-rose-500/20 border border-rose-500/30 hover:bg-rose-500/30 font-bold text-xs cursor-pointer transition-all"
+                                            className="px-3 py-1.5 rounded-xl text-rose-600 dark:text-rose-300 bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 font-bold text-xs cursor-pointer transition-all"
                                           >
                                             המשך בכל זאת לשאלה הבאה ←
                                           </button>
@@ -1178,11 +1372,11 @@ export default function UnseenPracticePage() {
                                   </div>
 
                                   {/* Explanation details */}
-                                  <div className={`p-3 rounded-xl border text-xs leading-relaxed ${borderStyle} ${
-                                    isLight ? "bg-zinc-100/80 text-zinc-700" : "bg-[#0d1222]/40 text-zinc-300"
+                                  <div className={`p-3.5 rounded-xl border text-xs leading-relaxed ${borderStyle} ${
+                                    isLight ? "bg-zinc-100/90 text-zinc-800" : "bg-[#0d1222]/50 text-zinc-200"
                                   }`}>
-                                    <p className="font-bold text-teal-400 mb-1">הסבר בעברית:</p>
-                                    <p className={textMuted}>{activeQuestion.explanation}</p>
+                                    <p className="font-bold text-teal-600 dark:text-teal-400 mb-1">הסבר מפורט בעברית:</p>
+                                    <p className={isLight ? "text-zinc-800" : "text-slate-300"}>{activeQuestion.explanation}</p>
                                   </div>
                                 </div>
                               )}
@@ -1252,6 +1446,9 @@ export default function UnseenPracticePage() {
                         const startLineNum = idx * linesPerParagraph + 1;
                         const endLineNum = startLineNum + linesPerParagraph - 1;
 
+                        const sentences = para.match(/[^.!?]+[.!?]+(?:\s+|$)/g) || [para];
+                        const isCopyActive = isParagraphActive && gameSubStep < 7 && unseen.questions[gameSubStep]?.type === "copy";
+
                         return (
                           <div
                             key={idx}
@@ -1260,11 +1457,18 @@ export default function UnseenPracticePage() {
                             <span className="absolute -top-3 left-4 text-[9px] font-black bg-teal-500/10 px-2.5 py-0.5 rounded-full border border-teal-500/20 text-teal-400 select-none">
                               Paragraph {idx + 1} (Lines {startLineNum}-{endLineNum})
                             </span>
+
+                            {isCopyActive && !showFeedback && (
+                              <div className="mb-2 text-[10px] text-teal-600 dark:text-teal-400 font-bold flex items-center gap-1.5">
+                                <Copy className="w-3.5 h-3.5 animate-pulse" />
+                                <span>לחצו על המשפט המתאים בפסקה זו כדי להעתיקו אוטומטית לשדה התשובה!</span>
+                              </div>
+                            )}
                             
                             <p 
-                              className="text-sm md:text-base leading-relaxed font-medium select-text text-left pt-1 cursor-help hover:text-teal-400/80 transition-colors" 
-                              style={{ color: isLight ? '#27272a' : '#f4f4f5' }}
-                              onDoubleClick={(e) => {
+                              className="text-sm md:text-base leading-relaxed font-medium select-text text-left pt-1" 
+                              style={{ color: isLight ? '#18181b' : '#f4f4f5' }}
+                              onDoubleClick={() => {
                                 const selection = window.getSelection();
                                 if (!selection) return;
                                 const selectedText = selection.toString().trim();
@@ -1275,7 +1479,28 @@ export default function UnseenPracticePage() {
                                 }
                               }}
                             >
-                              {para}
+                              {sentences.map((sent, sIdx) => {
+                                const trimmed = sent.trim();
+                                return (
+                                  <span
+                                    key={sIdx}
+                                    onClick={() => {
+                                      if (isCopyActive && !showFeedback) {
+                                        setOpenAnswerText(trimmed);
+                                        setCopiedSentenceFeedback(`המשפט הועתק לשדה התשובה: "${trimmed.substring(0, 30)}..." ✓`);
+                                      }
+                                    }}
+                                    className={`inline transition-colors ${
+                                      isCopyActive && !showFeedback
+                                        ? "cursor-pointer hover:bg-teal-500/20 hover:text-teal-700 dark:hover:text-teal-200 rounded px-0.5"
+                                        : ""
+                                    }`}
+                                    title={isCopyActive && !showFeedback ? "לחצו להעתקת משפט זה לתשובה" : undefined}
+                                  >
+                                    {sent}{" "}
+                                  </span>
+                                );
+                              })}
                             </p>
                           </div>
                         );
@@ -1321,20 +1546,26 @@ export default function UnseenPracticePage() {
               className="max-w-xl mx-auto text-center space-y-8"
             >
               {/* Badge Certificate */}
-              <div className={`p-8 md:p-10 rounded-3xl border border-teal-500/20 bg-teal-500/5 relative overflow-hidden shadow-2xl space-y-6`}>
+              <div className={`p-8 md:p-10 rounded-3xl border ${
+                isLight 
+                  ? "bg-white border-teal-500/30 shadow-xl" 
+                  : "border-teal-500/20 bg-teal-500/5 shadow-2xl"
+              } relative overflow-hidden space-y-6`}>
                 
                 {/* Sparkle animations */}
                 <div className="absolute top-4 left-4 text-yellow-400 animate-pulse">
                   <Sparkles className="w-6 h-6" />
                 </div>
-                <div className="absolute bottom-4 right-4 text-teal-400 animate-pulse">
+                <div className="absolute bottom-4 right-4 text-teal-500 animate-pulse">
                   <Sparkles className="w-5 h-5" />
                 </div>
 
                 <div className="space-y-2">
                   <Award className="w-20 h-20 text-yellow-500 mx-auto animate-bounce" />
-                  <h2 className="text-3xl font-black text-white uppercase tracking-tight">תעודת בלש מוסמך</h2>
-                  <p className="text-teal-400 text-xs font-bold uppercase tracking-wider">Unseen Detective Academy</p>
+                  <h2 className={`text-3xl font-black uppercase tracking-tight ${isLight ? "text-zinc-900" : "text-white"}`}>
+                    תעודת בלש מוסמך
+                  </h2>
+                  <p className="text-teal-600 dark:text-teal-400 text-xs font-bold uppercase tracking-wider">Unseen Detective Academy</p>
                 </div>
 
                 {/* Certificate info */}
@@ -1342,48 +1573,48 @@ export default function UnseenPracticePage() {
                   <p className={`${textBody} text-base`}>
                     תעודה זו מוענקת בזאת לבלש/ת
                   </p>
-                  <p className="text-2xl font-black text-white underline decoration-teal-500 decoration-2 underline-offset-4">
+                  <p className={`text-2xl font-black underline decoration-teal-500 decoration-2 underline-offset-4 ${isLight ? "text-zinc-900" : "text-white"}`}>
                     {detectiveName.trim() || "בלש מוסמך"}
                   </p>
                   <p className={`${textMuted} text-xs leading-relaxed max-w-sm mx-auto`}>
-                    על סיום מוצלח של משימת פיצוח קטעי קריאה באנגלית ברמת קושי <span className="font-bold text-teal-400">{unseen.difficulty === "Easy" ? "1 (מתחילים)" : unseen.difficulty === "Medium" ? "2 (בינוני)" : "3 (מתקדמים)"}</span> באמצעות השיטה הסודית ופירוק הטקסט לפי פסקאות.
+                    על סיום מוצלח של משימת פיצוח קטעי קריאה באנגלית ברמת קושי <span className="font-bold text-teal-600 dark:text-teal-400">{unseen.difficulty === "Easy" ? "1 (מתחילים)" : unseen.difficulty === "Medium" ? "2 (בינוני)" : "3 (מתקדמים)"}</span> באמצעות השיטה הסודית ופירוק הטקסט לפי פסקאות.
                   </p>
                 </div>
 
                 {/* Stats grid */}
                 <div className="grid grid-cols-2 divide-x divide-teal-500/20 text-center">
                   <div className="p-2">
-                    <p className="text-[10px] text-slate-400 uppercase font-bold">ציון מיומנות</p>
-                    <p className="text-3xl font-extrabold text-white mt-1">{score}</p>
+                    <p className={`text-[10px] uppercase font-bold ${textMuted}`}>ציון מיומנות</p>
+                    <p className={`text-3xl font-extrabold mt-1 ${isLight ? "text-zinc-900" : "text-white"}`}>{score}</p>
                   </div>
                   <div className="p-2">
-                    <p className="text-[10px] text-slate-400 uppercase font-bold">תשובות נכונות (ניסיון 1)</p>
-                    <p className="text-3xl font-extrabold text-teal-400 mt-1">{correctOnFirstTry} / 8</p>
+                    <p className={`text-[10px] uppercase font-bold ${textMuted}`}>תשובות נכונות (ניסיון 1)</p>
+                    <p dir="ltr" className="text-3xl font-extrabold text-teal-600 dark:text-teal-400 mt-1">{correctOnFirstTry} / 8</p>
                   </div>
                 </div>
 
                 {isAssignmentMode && (
                   <div className="pt-4 border-t border-dashed border-teal-500/20 text-center">
                     {submittedDocId ? (
-                      <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold mx-auto">
-                        <CheckCircle className="w-4 h-4 text-emerald-400" />
+                      <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 font-bold text-xs mx-auto">
+                        <CheckCircle className="w-4 h-4 text-emerald-500" />
                         <span>המשימה הוגשה למורה בהצלחה! ✓ (כיתה: {studentClass})</span>
                       </div>
                     ) : isSubmitting ? (
-                      <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-400 text-xs font-bold mx-auto animate-pulse">
+                      <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-500 font-bold text-xs mx-auto animate-pulse">
                         <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                         <span>שולח משימה למורה...</span>
                       </div>
                     ) : (
                       <div className="space-y-2">
-                        <p className="text-xs text-rose-400 font-bold">המשימה טרם הוגשה למורה.</p>
+                        <p className="text-xs text-rose-500 font-bold">המשימה טרם הוגשה למורה.</p>
                         {submitError && (
-                          <p className="text-[10px] text-rose-300 bg-rose-950/20 border border-rose-900/30 p-2 rounded-lg text-left font-mono max-w-sm mx-auto overflow-x-auto whitespace-pre-wrap" dir="ltr">
+                          <p className="text-[10px] text-rose-400 bg-rose-950/20 border border-rose-900/30 p-2 rounded-lg text-left font-mono max-w-sm mx-auto overflow-x-auto whitespace-pre-wrap" dir="ltr">
                             Error: {submitError}
                           </p>
                         )}
                         <button
-                          onClick={submitUnseenAssignment}
+                          onClick={() => submitUnseenAssignment()}
                           className="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-zinc-950 font-bold text-xs transition-all cursor-pointer shadow-md mx-auto"
                         >
                           נסה להגיש שוב
@@ -1395,9 +1626,95 @@ export default function UnseenPracticePage() {
 
               </div>
 
+              {/* Student Answer Review Section */}
+              <div className={`p-6 rounded-3xl border ${borderStyle} ${cardStyle} text-right space-y-4 shadow-xl`}>
+                <div className="flex items-center justify-between border-b pb-3 border-dashed border-zinc-700/20">
+                  <button
+                    onClick={() => setShowReviewAccordion(!showReviewAccordion)}
+                    className="flex items-center gap-1.5 text-xs text-teal-600 dark:text-teal-400 hover:underline font-bold cursor-pointer transition-colors"
+                  >
+                    <span>{showReviewAccordion ? "הסתר פירוט שאלות" : "הצג פירוט שאלות"}</span>
+                    {showReviewAccordion ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </button>
+                  <div className="flex items-center gap-2">
+                    <h3 className={`text-base font-black ${textTitle}`}>סקירת תשובות הבלש המלאה</h3>
+                    <ListChecks className="w-5 h-5 text-teal-500" />
+                  </div>
+                </div>
+
+                {showReviewAccordion && (
+                  <div className="space-y-3 pt-2 text-right">
+                    {studentAnswers.length === 0 ? (
+                      <p className={`text-xs ${textMuted} text-center py-4`}>אין תשובות מתועדות עדיין.</p>
+                    ) : (
+                      studentAnswers.map((ans, idx) => (
+                        <div
+                          key={idx}
+                          className={`p-4 rounded-2xl border transition-all text-right space-y-2 ${
+                            ans.isCorrect
+                              ? isLight 
+                                ? "bg-emerald-500/5 border-emerald-500/20 text-zinc-900" 
+                                : "bg-emerald-950/10 border-emerald-500/20 text-zinc-100"
+                              : isLight 
+                                ? "bg-rose-500/5 border-rose-500/20 text-zinc-900" 
+                                : "bg-rose-950/10 border-rose-500/20 text-zinc-100"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between flex-row-reverse">
+                            <span className="text-[11px] font-black text-teal-600 dark:text-teal-400 bg-teal-500/10 px-2 py-0.5 rounded-md border border-teal-500/20">
+                              שאלה {idx + 1} ({ans.type === "mcq" ? "רב-ברירה" : ans.type === "copy" ? "העתקת משפט" : "מענה פתוח"})
+                            </span>
+                            <div className="flex items-center gap-1.5 text-xs font-bold">
+                              {ans.isCorrect ? (
+                                <span className="text-emerald-500 flex items-center gap-1">
+                                  <CheckCircle2 className="w-4 h-4" />
+                                  <span>נכון {ans.attempts === 1 ? "(ניסיון 1)" : `(${ans.attempts} ניסיונות)`}</span>
+                                </span>
+                              ) : (
+                                <span className="text-rose-500 flex items-center gap-1">
+                                  <XCircle className="w-4 h-4" />
+                                  <span>שגוי / דולג</span>
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <p className={`text-xs font-bold ${textTitle} pt-1`} dir="ltr">
+                            {ans.questionText}
+                          </p>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
+                            <div className={`p-2.5 rounded-xl border ${borderStyle} ${isLight ? "bg-white" : "bg-surface/50"}`}>
+                              <span className="text-[10px] text-zinc-500 block mb-0.5 font-bold">התשובה שלכם:</span>
+                              <span className={`font-semibold ${ans.isCorrect ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`} dir="ltr">
+                                {ans.studentAnswer || "(לא הוזן מענה)"}
+                              </span>
+                            </div>
+
+                            <div className={`p-2.5 rounded-xl border ${borderStyle} ${isLight ? "bg-white" : "bg-surface/50"}`}>
+                              <span className="text-[10px] text-zinc-500 block mb-0.5 font-bold">תשובה נכונה / מוצעת:</span>
+                              <span className="font-semibold text-teal-600 dark:text-teal-400" dir="ltr">
+                                {ans.correctAnswer}
+                              </span>
+                            </div>
+                          </div>
+
+                          {ans.explanation && (
+                            <div className={`p-2.5 rounded-xl text-[11px] leading-relaxed border ${borderStyle} ${isLight ? "bg-zinc-100/70 text-zinc-800" : "bg-[#0d1222]/30 text-zinc-300"}`}>
+                              <span className="font-bold text-teal-600 dark:text-teal-400 ml-1">הסבר:</span>
+                              <span>{ans.explanation}</span>
+                            </div>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
+
               {/* Strategy Reminder Box */}
               <div className={`p-5 rounded-2xl border ${borderStyle} ${cardStyle} text-right space-y-3`}>
-                <h4 className="text-sm font-bold text-teal-400 flex items-center gap-1.5 justify-end">
+                <h4 className="text-sm font-bold text-teal-500 flex items-center gap-1.5 justify-end">
                   <span>זכרו את השיטה לכל אנסין עתידי:</span>
                   <CheckCircle className="w-4 h-4" />
                 </h4>

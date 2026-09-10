@@ -33,7 +33,7 @@ import {
   ListChecks
 } from "lucide-react";
 import { useAuth } from "@/lib/context/AuthContext";
-import { PRE_GENERATED_UNSEENS, UnseenData } from "@/lib/unseen-data";
+import { PRE_GENERATED_UNSEENS, UnseenData, getRandomUnseen } from "@/lib/unseen-data";
 import { dbFirestore, sanitizeForFirestore } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp, doc, setDoc, deleteDoc } from "firebase/firestore";
 
@@ -330,7 +330,7 @@ export default function UnseenPracticePage() {
         setCurrentStep("rules");
       } else {
         // Handle failure by falling back to pre-generated data and informing the user
-        const fallback = PRE_GENERATED_UNSEENS[difficulty];
+        const fallback = getRandomUnseen(difficulty, unseen?.title);
         setUnseen(fallback);
         console.error("AI Generation failed, using local fallback:", result);
         
@@ -349,7 +349,7 @@ export default function UnseenPracticePage() {
       }
     } catch (error) {
       console.error("Error generating AI text:", error);
-      const fallback = PRE_GENERATED_UNSEENS[difficulty];
+      const fallback = getRandomUnseen(difficulty, unseen?.title);
       setUnseen(fallback);
       setAiError("אירעה שגיאה בחיבור לשרת. טוען קטע קריאה מוכן מראש...");
       
@@ -378,7 +378,8 @@ export default function UnseenPracticePage() {
       }
     }
 
-    setUnseen(PRE_GENERATED_UNSEENS[difficulty]);
+    const chosen = getRandomUnseen(difficulty, unseen?.title);
+    setUnseen(chosen);
     setAiError(null);
     setCurrentStep("rules");
   };

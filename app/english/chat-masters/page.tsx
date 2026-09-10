@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/context/AuthContext";
 import confetti from "canvas-confetti";
-import { dbFirestore } from "@/lib/firebase";
+import { dbFirestore, sanitizeForFirestore } from "@/lib/firebase";
 import { collection, addDoc, query, where, getDocs, onSnapshot, serverTimestamp, doc } from "firebase/firestore";
 
 interface Message {
@@ -597,13 +597,13 @@ export default function ChatMastersPage() {
       }
       setIsSubmitting(true);
       try {
-        const docRef = await addDoc(collection(dbFirestore, "chat_assignments"), {
+        const docRef = await addDoc(collection(dbFirestore, "chat_assignments"), sanitizeForFirestore({
           studentId: user.uid,
           studentName: studentName.trim(),
           studentClass: studentClass.trim(),
           studentEmail: user.email || "",
           character: selectedChar.id,
-          customCharacterName: selectedChar.id === "custom" ? customCharName.trim() : undefined,
+          customCharacterName: selectedChar.id === "custom" ? customCharName.trim() : null,
           messages: messages.map(m => ({
             sender: m.sender,
             text: m.text,
@@ -615,7 +615,7 @@ export default function ChatMastersPage() {
           status: "submitted",
           score: null,
           feedback: null
-        });
+        }));
 
         // Set up real-time listener for this new assignment
         const unsubscribe = onSnapshot(docRef, (snapshot) => {

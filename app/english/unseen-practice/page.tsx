@@ -34,7 +34,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/context/AuthContext";
 import { PRE_GENERATED_UNSEENS, UnseenData } from "@/lib/unseen-data";
-import { dbFirestore } from "@/lib/firebase";
+import { dbFirestore, sanitizeForFirestore } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp, doc, setDoc, deleteDoc } from "firebase/firestore";
 
 // Helper function to calculate Levenshtein distance for spelling tolerance
@@ -74,13 +74,17 @@ interface Word {
 
 export interface StudentAnswerRecord {
   questionId: number;
+  questionNumber?: number;
   questionText: string;
+  prompt?: string;
   type: "mcq" | "open" | "copy";
-  paragraphIndex?: number;
+  paragraphIndex?: number | null;
+  paragraph?: number | string | null;
   linesHint?: string;
   studentAnswer: string;
   correctAnswer: string;
   isCorrect: boolean;
+  firstTrySuccess?: boolean;
   attempts: number;
   explanation: string;
 }
@@ -387,17 +391,22 @@ export default function UnseenPracticePage() {
   ) => {
     const activeQ = gameSubStep < 7 ? unseen.questions[gameSubStep] : unseen.globalQuestion;
     const qId = (activeQ as any).id || (gameSubStep + 1);
+    const parIndex = (activeQ as any).paragraphIndex !== undefined ? (activeQ as any).paragraphIndex : null;
     const newRecord: StudentAnswerRecord = {
       questionId: qId,
-      questionText: activeQ.question,
-      type: (activeQ as any).type || "mcq",
-      paragraphIndex: (activeQ as any).paragraphIndex,
-      linesHint: (activeQ as any).linesHint || "General",
-      studentAnswer: studentAnswerText,
-      correctAnswer: correctAnswerText,
-      isCorrect: isCorrectStatus,
+      questionNumber: gameSubStep + 1,
+      questionText: activeQ?.question || "",
+      prompt: activeQ?.question || "",
+      type: (activeQ as any)?.type || "mcq",
+      paragraphIndex: parIndex,
+      paragraph: parIndex !== null ? parIndex + 1 : null,
+      linesHint: (activeQ as any)?.linesHint || "General",
+      studentAnswer: studentAnswerText || "",
+      correctAnswer: correctAnswerText || "",
+      isCorrect: Boolean(isCorrectStatus),
+      firstTrySuccess: Boolean(isCorrectStatus && attemptsCount === 1),
       attempts: attemptsCount,
-      explanation: activeQ.explanation
+      explanation: activeQ?.explanation || ""
     };
 
     setStudentAnswers((prev) => {
@@ -418,28 +427,53 @@ export default function UnseenPracticePage() {
     setIsSubmitting(true);
     setSubmitError(null);
     try {
-      const answersToUpload = answersOverride || studentAnswers;
-      const uploadPromise = addDoc(collection(dbFirestore, "unseen_assignments"), {
+      const sourceAnswers = answersOverride || studentAnswers;
+      const answersToUpload = sourceAnswers.map((ans, idx) => {
+        const parIndex = ans.paragraphIndex !== undefined ? ans.paragraphIndex : null;
+        return {
+          questionId: ans.questionId ?? (idx + 1),
+          questionNumber: ans.questionNumber ?? (idx + 1),
+          questionText: ans.questionText || ans.prompt || "",
+          prompt: ans.prompt || ans.questionText || "",
+          type: ans.type || "mcq",
+          paragraphIndex: parIndex,
+          paragraph: ans.paragraph ?? (parIndex !== null ? parIndex + 1 : null),
+          linesHint: ans.linesHint || "General",
+          studentAnswer: ans.studentAnswer ?? "",
+          correctAnswer: ans.correctAnswer ?? "",
+          isCorrect: Boolean(ans.isCorrect),
+          firstTrySuccess: ans.firstTrySuccess !== undefined ? ans.firstTrySuccess : (Boolean(ans.isCorrect) && ans.attempts === 1),
+          attempts: ans.attempts ?? 1,
+          explanation: ans.explanation || ""
+        };
+      });
+
+      const payload = {
         studentId: user.uid,
-        studentName: detectiveName.trim(),
+        studentName: detectiveName.trim() || (user.displayName || "תלמיד"),
         studentClass: studentClass.trim(),
         studentEmail: user.email || "",
-        unseenTitle: unseen.title,
-        difficulty: unseen.difficulty,
+        unseenTitle: unseen.title || "Unseen Practice",
+        difficulty: unseen.difficulty || "Easy",
         passage: {
-          title: unseen.title,
-          difficulty: unseen.difficulty,
-          paragraphs: unseen.paragraphs
+          title: unseen.title || "Unseen Practice",
+          difficulty: unseen.difficulty || "Easy",
+          paragraphs: unseen.paragraphs || []
         },
         answers: answersToUpload,
-        score: score,
-        correctOnFirstTry: correctOnFirstTry,
+        score: score ?? 0,
+        correctOnFirstTry: correctOnFirstTry ?? 0,
         totalQuestions: 8,
         submittedAt: serverTimestamp(),
         status: "submitted",
         scoreTeacher: null,
         feedbackTeacher: null
-      });
+      };
+
+      const uploadPromise = addDoc(
+        collection(dbFirestore, "unseen_assignments"),
+        sanitizeForFirestore(payload)
+      );
 
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(() => reject(new Error("Database connection timeout")), 8000)

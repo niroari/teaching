@@ -356,9 +356,10 @@ export function UnseenDashboardView({
                     ) : (
                       <div className="space-y-3">
                         {selectedUnseen.answers.map((ans, idx) => {
-                          const isCorrect = ans.firstTrySuccess;
-                          const isPartiallyCorrect = !ans.firstTrySuccess && ans.attempts > 1;
-                          const isSkipped = ans.studentAnswer === "skipped";
+                          const isSuccess = (ans as any).isCorrect ?? ans.firstTrySuccess;
+                          const isCorrect = ans.firstTrySuccess ?? (isSuccess && ans.attempts === 1);
+                          const isPartiallyCorrect = !isCorrect && isSuccess && ans.attempts > 1;
+                          const isSkipped = ans.studentAnswer === "skipped" || ans.studentAnswer?.includes("דילג");
 
                           return (
                             <div 
@@ -413,7 +414,7 @@ export function UnseenDashboardView({
                               <div className={`text-left font-sans text-xs font-semibold p-2.5 rounded-lg border ${
                                 isLight ? "bg-white/80 border-zinc-200 text-zinc-800" : "bg-black/30 border-white/5 text-zinc-200"
                               }`} dir="ltr">
-                                {ans.prompt}
+                                {ans.prompt || (ans as any).questionText}
                               </div>
 
                               {/* Answers Comparison */}

@@ -22,4 +22,35 @@ export const db = getDatabase(app);
 export const dbFirestore = getFirestore(app);
 export const googleProvider = new GoogleAuthProvider();
 
+/**
+ * Recursively cleans an object for Firestore by removing `undefined` properties
+ * or converting them, while preserving Firestore FieldValues, Timestamps, and Dates.
+ */
+export function sanitizeForFirestore<T>(data: T): T {
+  if (data === undefined) {
+    return null as any;
+  }
+  if (data === null || typeof data !== "object") {
+    return data;
+  }
+  const proto = Object.getPrototypeOf(data);
+  const isPlainObj = proto === null || proto === Object.prototype;
+
+  if (Array.isArray(data)) {
+    return data.map((item) => sanitizeForFirestore(item)) as any;
+  }
+
+  if (!isPlainObj) {
+    return data;
+  }
+
+  const clean: Record<string, any> = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (value !== undefined) {
+      clean[key] = sanitizeForFirestore(value);
+    }
+  }
+  return clean as T;
+}
+
 export default app;

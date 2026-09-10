@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/context/AuthContext";
-import { dbFirestore } from "@/lib/firebase";
+import { dbFirestore, sanitizeForFirestore } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { 
   ArrowRight, 
@@ -232,7 +232,7 @@ export default function WritingWorkspacePage() {
     setSubmittedDocId(null);
     setSubmitError(null);
     try {
-      const uploadPromise = addDoc(collection(dbFirestore, "writing_assignments"), {
+      const uploadPromise = addDoc(collection(dbFirestore, "writing_assignments"), sanitizeForFirestore({
         studentId: user.uid,
         studentName: studentName.trim(),
         studentClass: studentClass.trim(),
@@ -246,7 +246,7 @@ export default function WritingWorkspacePage() {
         status: "submitted",
         scoreTeacher: null,
         feedbackTeacher: null
-      });
+      }));
 
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(() => reject(new Error("Database connection timeout")), 8000)

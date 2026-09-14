@@ -104,6 +104,7 @@ export default function IsraelGamePage() {
   const [remainingPlaces, setRemainingPlaces] = useState<Place[]>([]);
   const [currentPlace, setCurrentPlace] = useState<Place | null>(null);
   const [showHint, setShowHint] = useState(false);
+  const [hintUsed, setHintUsed] = useState(false);
   const [isProjectorMode, setIsProjectorMode] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -204,10 +205,27 @@ export default function IsraelGamePage() {
   // Statistics
   const [historyCount, setHistoryCount] = useState(0);
 
-  // Current place difficulty points
-  const currentPlacePoints = currentPlace
+  // Base points according to difficulty
+  const basePoints = currentPlace
     ? DIFFICULTY_POINTS[currentPlace.difficulty]
     : 10;
+
+  // When hint is revealed, deduct 1/3 rounded to nearest whole number
+  const hintPenalty = Math.round(basePoints / 3);
+  const currentPlacePoints = hintUsed
+    ? Math.max(1, basePoints - hintPenalty)
+    : basePoints;
+
+  // Toggle hint and mark penalty applied
+  const toggleHint = useCallback(() => {
+    setShowHint((prev) => {
+      const next = !prev;
+      if (next) {
+        setHintUsed(true);
+      }
+      return next;
+    });
+  }, []);
 
   // Filter places based on active settings
   const updateFilters = useCallback(() => {
@@ -224,6 +242,7 @@ export default function IsraelGamePage() {
     setCurrentPlace(null);
     setHistoryCount(0);
     setShowHint(false);
+    setHintUsed(false);
     setTimeLeft(settings.timerDuration);
     setIsTimerRunning(false);
   }, [settings]);
@@ -254,6 +273,7 @@ export default function IsraelGamePage() {
       setRemainingPlaces(nextList);
       setHistoryCount((prev) => prev + 1);
       setShowHint(false);
+      setHintUsed(false);
 
       // Reset and trigger timer if enabled
       if (settings.timerDuration > 0) {
@@ -316,18 +336,43 @@ export default function IsraelGamePage() {
       if (e.code === "Space") {
         e.preventDefault();
         selectNextPlace();
-      } else if (e.key === "h" || e.key === "H" || e.key === "י") {
+      } else if (
+        e.code === "KeyH" ||
+        e.key === "h" ||
+        e.key === "H" ||
+        e.key === "י"
+      ) {
         e.preventDefault();
-        setShowHint((prev) => !prev);
-      } else if (e.key === "p" || e.key === "P" || e.key === "פ") {
-        e.preventDefault();
-        setIsProjectorMode((prev) => !prev);
-      } else if (e.key === "t" || e.key === "T" || e.key === "א") {
+        toggleHint();
+      } else if (
+        e.code === "KeyT" ||
+        e.code === "KeyS" ||
+        e.code === "Pause" ||
+        e.key === "t" ||
+        e.key === "T" ||
+        e.key === "א" ||
+        e.key === "s" ||
+        e.key === "S" ||
+        e.key === "ד"
+      ) {
         e.preventDefault();
         if (settings.timerDuration > 0) {
           setIsTimerRunning((prev) => !prev);
         }
-      } else if (e.key === "r" || e.key === "R" || e.key === "ר") {
+      } else if (
+        e.code === "KeyP" ||
+        e.key === "p" ||
+        e.key === "P" ||
+        e.key === "פ"
+      ) {
+        e.preventDefault();
+        setIsProjectorMode((prev) => !prev);
+      } else if (
+        e.code === "KeyR" ||
+        e.key === "r" ||
+        e.key === "R" ||
+        e.key === "ר"
+      ) {
         e.preventDefault();
         resetGame();
       } else if (e.key === "Escape" && isProjectorMode) {
@@ -337,7 +382,7 @@ export default function IsraelGamePage() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectNextPlace, settings.timerDuration, showHint, isProjectorMode]);
+  }, [selectNextPlace, toggleHint, settings.timerDuration, isProjectorMode]);
 
   // Style helpers for difficulty badges
   const getDifficultyBadge = (diff: Place["difficulty"]) => {
@@ -541,9 +586,27 @@ export default function IsraelGamePage() {
                   </span>
 
                   {/* Difficulty points worth badge */}
-                  <span className="text-xs px-2.5 py-1 rounded-full bg-enrichment/15 text-enrichment border border-enrichment/30 font-extrabold flex items-center gap-1">
+                  <span
+                    className={`text-xs px-2.5 py-1 rounded-full border font-extrabold flex items-center gap-1.5 transition-all ${
+                      hintUsed
+                        ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
+                        : "bg-enrichment/15 text-enrichment border border-enrichment/30"
+                    }`}
+                  >
                     <Sparkles className="w-3.5 h-3.5" />
-                    <span>+{currentPlacePoints} נק׳ למציאה</span>
+                    {hintUsed ? (
+                      <span>
+                        +{currentPlacePoints} נק׳{" "}
+                        <span className="line-through opacity-60 mr-1 text-[11px] font-normal">
+                          +{basePoints}
+                        </span>{" "}
+                        <span className="text-[10px] text-amber-300 font-semibold">
+                          (הופחת 1/3 בגלל רמז)
+                        </span>
+                      </span>
+                    ) : (
+                      <span>+{currentPlacePoints} נק׳ למציאה</span>
+                    )}
                   </span>
                 </div>
               ) : (
@@ -719,7 +782,7 @@ export default function IsraelGamePage() {
                   {currentPlace && (
                     <Button
                       variant={showHint ? "default" : "outline"}
-                      onClick={() => setShowHint(!showHint)}
+                      onClick={toggleHint}
                       className={`gap-2 h-12 px-6 text-sm font-bold transition-all duration-200 ${
                         showHint
                           ? "bg-enrichment text-white hover:bg-enrichment/90"
@@ -786,8 +849,8 @@ export default function IsraelGamePage() {
             <div>פעילות למידה חווייתית בגיאוגרפיה ומולדת לכיתה.</div>
             <div className="flex gap-4 font-mono">
               <span>
-                קיצורים: <b>רווח</b> מקום הבא | <b>H</b> רמז | <b>P</b> מקרן |{" "}
-                <b>T</b> טיימר
+                קיצורים: <b>רווח</b> מקום הבא | <b>H</b> רמז (הורדת 1/3 נק׳) |{" "}
+                <b>T</b> / <b>S</b> עצירת/הפעלת טיימר | <b>P</b> מקרן
               </span>
             </div>
           </div>
@@ -813,7 +876,7 @@ export default function IsraelGamePage() {
 
             <div className="flex items-center gap-3">
               <span className="text-xs text-white/40 hidden lg:inline">
-                קיצורים: [רווח] מקום הבא | [H] רמז | [Esc] יציאה
+                קיצורים: [רווח] מקום הבא | [H] רמז (-1/3) | [T / S] עצירת טיימר | [Esc] יציאה
               </span>
 
               {/* Fullscreen button */}
@@ -866,9 +929,27 @@ export default function IsraelGamePage() {
                       רמת {getDifficultyLabel(currentPlace.difficulty)}
                     </span>
                     {/* Points worth badge */}
-                    <span className="text-xs px-3 py-1 rounded-full bg-enrichment/20 text-enrichment border border-enrichment/40 font-extrabold flex items-center gap-1">
+                    <span
+                      className={`text-xs px-3 py-1.5 rounded-full border font-extrabold flex items-center gap-1.5 transition-all ${
+                        hintUsed
+                          ? "bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-sm"
+                          : "bg-enrichment/20 text-enrichment border border-enrichment/40"
+                      }`}
+                    >
                       <Sparkles className="w-3.5 h-3.5" />
-                      <span>+{currentPlacePoints} נקודות</span>
+                      {hintUsed ? (
+                        <span>
+                          +{currentPlacePoints} נקודות{" "}
+                          <span className="line-through opacity-60 mr-1 text-xs font-normal">
+                            +{basePoints}
+                          </span>{" "}
+                          <span className="text-xs text-amber-200 font-semibold">
+                            (הופחת 1/3 בגלל רמז)
+                          </span>
+                        </span>
+                      ) : (
+                        <span>+{currentPlacePoints} נקודות</span>
+                      )}
                     </span>
                   </div>
 
@@ -939,7 +1020,7 @@ export default function IsraelGamePage() {
                 <Button
                   variant="outline"
                   size="lg"
-                  onClick={() => setShowHint(!showHint)}
+                  onClick={toggleHint}
                   className={`border transition-all ${
                     showHint
                       ? "bg-white text-black hover:bg-white/90 font-bold"

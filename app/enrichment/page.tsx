@@ -4,6 +4,14 @@ import { ArrowLeft, Microscope } from "lucide-react";
 
 const ENRICHMENT_TOPICS = [
   {
+    slug: "israeli-politics",
+    title: "עושים סדר בפוליטיקה הישראלית",
+    desc: "שיעור דיאלוג ומצגת אינטראקטיבית: ציר הזמן, שדה הכוחות, אידיאולוגיה מול מחנה ודיון מאוזן ומכבד לקראת הבחירות.",
+    icon: "🗳️",
+    link: "/enrichment/israeli-politics",
+    badge: "שיעור דיאלוג ומצגת"
+  },
+  {
     slug: "israel-game",
     title: "חידון מפת ישראל",
     desc: "פעילות כיתתית אינטראקטיבית. מקמו מקומות, ערים, ואתרי מורשת רנדומליים על מפת כיתה פיזית.",

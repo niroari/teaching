@@ -102,10 +102,10 @@ export default function GoogleEarthTours() {
   const isLight = comfortMode === "light";
   const bgTheme = isLight ? "bg-[#f4f6fa] text-zinc-800" : "bg-[#080c18] text-[#e8edf8]";
   const borderTheme = isLight ? "border-zinc-200" : "border-border-custom";
-  const textTitle = isLight ? "text-zinc-900" : "text-white";
-  const textMuted = isLight ? "text-zinc-500" : "text-text-muted";
+  const textTitle = isLight ? "text-zinc-950 font-black" : "text-white";
+  const textMuted = isLight ? "text-zinc-700 font-medium" : "text-text-muted";
   const cardStyle = isLight 
-    ? "bg-white border-zinc-200 shadow-sm" 
+    ? "bg-white border-zinc-300 shadow-sm" 
     : "glass-card";
 
   return (

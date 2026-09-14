@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { SlidersHorizontal, Volume2, Timer, Globe, Check } from "lucide-react";
+import { SlidersHorizontal, Timer, Globe, Check } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,7 +32,6 @@ export interface GameSettings {
     hard: boolean;
   };
   timerDuration: number;
-  voiceEnabled: boolean;
   englishEnabled: boolean;
 }
 
@@ -212,21 +211,6 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
                   </Button>
                 ))}
               </div>
-            </div>
-
-            {/* TTS Settings */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Volume2 className="w-5 h-5 text-text-muted" />
-                <div>
-                  <div className="text-sm font-semibold text-white">הקראת שמות (קול)</div>
-                  <div className="text-xs text-text-muted">הקראת המקום בקול עם הצגתו</div>
-                </div>
-              </div>
-              <Switch
-                checked={settings.voiceEnabled}
-                onCheckedChange={(checked) => onChange({ ...settings, voiceEnabled: checked })}
-              />
             </div>
 
             {/* English translation settings */}

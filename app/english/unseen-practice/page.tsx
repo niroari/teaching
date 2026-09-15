@@ -156,6 +156,54 @@ export default function UnseenPracticePage() {
     setNotebookLoading(true);
     setNotebookError(null);
 
+    // 1. Instant check: Does the story already have this word in its vocabulary hints?
+    const hintMatch = unseen?.vocabularyHints?.find(
+      h => h.word.toLowerCase().replace(/[^a-z]/g, "") === cleanWord.replace(/[^a-z]/g, "")
+    );
+    if (hintMatch && hintMatch.translation) {
+      const hintTranslated: Word = {
+        id: Date.now().toString(),
+        english: cleanWord,
+        hebrew: hintMatch.translation,
+        partOfSpeech: "noun",
+        example: `From the story text.`,
+        mastered: false
+      };
+      await syncWordToVocabStore(hintTranslated);
+      setNotebookWords(prev => [hintTranslated, ...prev]);
+      setNotebookInput("");
+      setNotebookLoading(false);
+      return;
+    }
+
+    // 2. Instant check: Is it already cached in localStorage?
+    const cacheKey = `trans_cache_${cleanWord}`;
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          const parsedCache = JSON.parse(cached);
+          if (parsedCache && parsedCache.hebrew) {
+            const cachedWord: Word = {
+              id: Date.now().toString(),
+              english: parsedCache.english || cleanWord,
+              hebrew: parsedCache.hebrew,
+              partOfSpeech: parsedCache.partOfSpeech || "noun",
+              example: parsedCache.example || "",
+              mastered: false
+            };
+            await syncWordToVocabStore(cachedWord);
+            setNotebookWords(prev => [cachedWord, ...prev]);
+            setNotebookInput("");
+            setNotebookLoading(false);
+            return;
+          }
+        }
+      } catch (e) {
+        // ignore cache read error
+      }
+    }
+
     try {
       const res = await fetch("/api/translate-word", {
         method: "POST",
@@ -177,6 +225,15 @@ export default function UnseenPracticePage() {
           example: responseData.data.example || "",
           mastered: false
         };
+
+        // Cache in localStorage for all future student interactions
+        if (typeof window !== "undefined") {
+          try {
+            localStorage.setItem(cacheKey, JSON.stringify(responseData.data));
+          } catch (e) {
+            // ignore localStorage quota error
+          }
+        }
 
         await syncWordToVocabStore(translated);
         setNotebookWords(prev => [translated, ...prev]);

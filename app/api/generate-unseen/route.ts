@@ -146,7 +146,7 @@ CRITICAL RULES:
       }
     };
 
-    const modelsToTry = ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-flash-latest", "gemini-pro-latest", "gemini-2.5-flash-lite"];
+    const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash-lite"];
     let response: Response | null = null;
     let errorText = "";
 
@@ -170,6 +170,10 @@ CRITICAL RULES:
         } else {
           errorText = await res.text();
           console.warn(`Model ${model} failed with status ${res.status}:`, errorText);
+          // If rate limited (429), break immediately - all models share the same project quota
+          if (res.status === 429) {
+            break;
+          }
         }
       } catch (err: any) {
         errorText = err.message || String(err);

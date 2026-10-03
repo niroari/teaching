@@ -8,6 +8,15 @@ import NavbarUser from "@/components/NavbarUser";
 
 const ENGLISH_SECTIONS = [
   {
+    slug: "crossword-clash",
+    title: "Crossword Clash (קרוסוורד קלאש)",
+    desc: "קרב תשבצים כיתתי חווייתי בהשראת Crossword Master. קבוצות מתחרות בהנחת אותיות בלוח ופענוח הגדרות בזמן אמת.",
+    bgUrl: "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=800&q=80",
+    link: "/english/crossword-clash",
+    badge: "משחק כיתתי חדש",
+    category: "משחקים"
+  },
+  {
     slug: "sentence-auction",
     title: "The Sentence Auction",
     desc: "משחק מכירה פומבית כיתתי מהנה ומאתגר לתרגול ושיפור חוקי הדקדוק ובניית משפטים באנגלית.",

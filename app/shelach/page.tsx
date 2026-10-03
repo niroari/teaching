@@ -32,6 +32,12 @@ const WORKSHOPS = [
     title: "מפגש תרבויות בארץ ישראל",
     desc: "שכבות תרבות, דת ועם שהותירו חותם על הארץ",
     gradient: "from-purple-950 to-purple-700"
+  },
+  {
+    slug: "gicha",
+    title: "גיחה מחנאית",
+    desc: "חלוקת תפקידים כיתתית ל-39 תלמידים, תחומי אחריות וניהול משימות לקראת היציאה לשדה",
+    gradient: "from-orange-950 to-amber-700"
   }
 ];
 

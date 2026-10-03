@@ -192,6 +192,56 @@ class SoundSystem {
     noise.start(now);
     noise.stop(now + duration);
   }
+
+  // Play a snappy pop when placing a tile
+  playPop() {
+    if (!this.enabled) return;
+    const ctx = this.init();
+    if (!ctx) return;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(400, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.08);
+
+    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.08);
+  }
+
+  // Play a triumphant fanfare for word completion
+  playWordComplete() {
+    if (!this.enabled) return;
+    const ctx = this.init();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const notes = [392.00, 523.25, 659.25, 783.99]; // G4, C5, E5, G5
+    
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now + idx * 0.12);
+
+      gain.gain.setValueAtTime(0, now + idx * 0.12);
+      gain.gain.linearRampToValueAtTime(0.25, now + idx * 0.12 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.5);
+
+      osc.start(now + idx * 0.12);
+      osc.stop(now + idx * 0.12 + 0.55);
+    });
+  }
 }
 
 export const sounds = new SoundSystem();

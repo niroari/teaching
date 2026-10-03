@@ -23,6 +23,16 @@ This document serves as a comprehensive index of the site's architecture, pages,
 ## 📚 Features & Pages
 
 ### 1. English Hub (`/english`)
+* **Crossword Clash (`/english/crossword-clash`):**
+  * Interactive, projector-ready classroom crossword game inspired by *Crossword Master*.
+  * Features an 8x10 crossword board with interlocking vocabulary words, clue definitions, and Hebrew hints.
+  * **Classroom Team Modes:** Supports 2 to 6 groups with custom names and colors.
+    * *Simultaneous Clash Mode:* All groups receive their own 5-letter racks and strategize simultaneously with a timer. The teacher logs placed tiles and scores all teams at the end of each round.
+    * *Turn-by-Turn Mode:* Groups take turns placing letters on the board with immediate scoring.
+  * **Scoring Rules:** +10 points per correct letter, -5 points deduction for incorrect letters, +30 points word completion bonus, and +20 points all-rack-cleared bonus.
+  * **Hybrid Generation Engine:** Integrates Gemini AI (`/api/generate-crossword`) for topic/grade-based vocabulary and clue generation, alongside offline curriculum presets and direct import from the teacher's Vocab Trainer.
+  * **Teacher & Classroom Tools:** Sound synthesizer (Web Audio API pop, cheer, buzzer, and fanfare), Web Speech API word pronunciation, teacher hint letter reveal, manual score adjustment, and 1-click printable student worksheet (`/english/crossword-clash/printable`).
+  * Built-in Comfort Reading Mode switch persisting choices.
 * **Vocabulary Practice Tool (`/english/vocab-trainer`):**
   * Supports custom word banks with Firestore backup.
   * **Comfort Reading Mode:** Allows users to toggle between a deep space-dark theme and a high-contrast soft light theme. Saves theme state in `localStorage` under `teaching-site-comfort-mode`.

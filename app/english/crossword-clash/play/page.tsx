@@ -741,6 +741,7 @@ export default function CrosswordClashPlayPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1">
           {/* Left/Center: 8x10 Crossword Grid (8 cols on lg) */}
           <div
+            dir="ltr"
             className={`lg:col-span-7 p-4 md:p-6 rounded-3xl border flex flex-col items-center justify-center transition-all ${
               isLight ? "bg-white border-slate-200 shadow-sm" : "bg-zinc-900/60 border-zinc-800"
             }`}
@@ -748,19 +749,20 @@ export default function CrosswordClashPlayPage() {
             {/* Active Selected Clue Highlight Header */}
             {activeWord ? (
               <div
-                className={`w-full mb-4 px-4 py-2.5 rounded-2xl border flex items-center justify-between text-xs ${
+                dir="ltr"
+                className={`w-full mb-4 px-4 py-2.5 rounded-2xl border flex items-center justify-between text-xs text-left ${
                   isLight ? "bg-indigo-50 border-indigo-200" : "bg-indigo-950/30 border-indigo-500/30"
                 }`}
               >
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-indigo-400">
-                    {activeWord.number} {activeWord.direction === "across" ? "Across (מאוזן)" : "Down (מאונך)"}:
+                <div className="flex items-center gap-2 text-left">
+                  <span className="font-bold text-indigo-400 shrink-0">
+                    {activeWord.number} {activeWord.direction === "across" ? "Across" : "Down"}:
                   </span>
                   <span className="font-semibold">{activeWord.clue}</span>
                 </div>
                 <button
                   onClick={() => speakWord(activeWord.word)}
-                  className="p-1 rounded-lg hover:bg-indigo-500/20 text-indigo-400 transition-colors"
+                  className="p-1 rounded-lg hover:bg-indigo-500/20 text-indigo-400 transition-colors shrink-0"
                   title="הקרא הגדרה באנגלית"
                 >
                   <Volume1 className="w-4 h-4" />
@@ -774,7 +776,8 @@ export default function CrosswordClashPlayPage() {
 
             {/* The Grid Matrix */}
             <div
-              className="inline-grid gap-1.5 p-3 rounded-2xl bg-zinc-950/20 border border-zinc-500/10"
+              dir="ltr"
+              className="inline-grid gap-1.5 p-3 rounded-2xl bg-zinc-950/20 border border-zinc-500/10 select-none"
               style={{
                 gridTemplateColumns: `repeat(${gameState.grid.cols}, minmax(0, 1fr))`
               }}
@@ -877,24 +880,25 @@ export default function CrosswordClashPlayPage() {
           <div className="lg:col-span-5 flex flex-col gap-4">
             {/* Clues Accordion Box */}
             <div
-              className={`p-4 rounded-3xl border flex-1 flex flex-col transition-all overflow-hidden ${
+              dir="ltr"
+              className={`p-4 rounded-3xl border flex-1 flex flex-col transition-all overflow-hidden text-left ${
                 isLight ? "bg-white border-slate-200 shadow-sm" : "bg-zinc-900/60 border-zinc-800"
               }`}
             >
               <div className="flex items-center justify-between pb-3 border-b mb-3">
                 <div className="flex items-center gap-2">
                   <HelpCircle className="w-4 h-4 text-indigo-400" />
-                  <span className="font-bold text-sm">הגדרות התשבץ (Clues)</span>
+                  <span className="font-bold text-sm">Clues (הגדרות התשבץ)</span>
                 </div>
                 <span className="text-xs text-zinc-500">
-                  {gameState.grid.words.filter(w => w.solved).length} / {gameState.grid.words.length} נפתרו
+                  {gameState.grid.words.filter(w => w.solved).length} / {gameState.grid.words.length} solved
                 </span>
               </div>
 
-              <div className="space-y-4 overflow-y-auto max-h-[360px] pr-1">
+              <div className="space-y-4 overflow-y-auto max-h-[360px] pr-1" dir="ltr">
                 {/* Across Clues */}
                 <div>
-                  <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2">
+                  <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2 text-left">
                     Across (מאוזן)
                   </h4>
                   <div className="space-y-2">
@@ -905,12 +909,13 @@ export default function CrosswordClashPlayPage() {
                         return (
                           <div
                             key={w.id}
+                            dir="ltr"
                             onClick={() => {
                               setActiveWordId(w.id);
                               setSelectedCell({ row: w.row, col: w.col });
                               sounds.playPop();
                             }}
-                            className={`p-2.5 rounded-xl border text-xs cursor-pointer transition-all flex items-start gap-2 ${
+                            className={`p-2.5 rounded-xl border text-xs cursor-pointer transition-all flex items-start gap-2 text-left ${
                               isActive
                                 ? "border-indigo-500 bg-indigo-500/15 font-semibold"
                                 : w.solved
@@ -921,7 +926,7 @@ export default function CrosswordClashPlayPage() {
                             }`}
                           >
                             <span className="font-bold text-indigo-400 shrink-0">{w.number}.</span>
-                            <div className="flex-1">
+                            <div className="flex-1 text-left">
                               <p className={w.solved ? "line-through text-zinc-500" : ""}>{w.clue}</p>
                             </div>
                             <span className="text-[10px] text-zinc-500 shrink-0">
@@ -935,7 +940,7 @@ export default function CrosswordClashPlayPage() {
 
                 {/* Down Clues */}
                 <div>
-                  <h4 className="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-2">
+                  <h4 className="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-2 text-left">
                     Down (מאונך)
                   </h4>
                   <div className="space-y-2">
@@ -946,12 +951,13 @@ export default function CrosswordClashPlayPage() {
                         return (
                           <div
                             key={w.id}
+                            dir="ltr"
                             onClick={() => {
                               setActiveWordId(w.id);
                               setSelectedCell({ row: w.row, col: w.col });
                               sounds.playPop();
                             }}
-                            className={`p-2.5 rounded-xl border text-xs cursor-pointer transition-all flex items-start gap-2 ${
+                            className={`p-2.5 rounded-xl border text-xs cursor-pointer transition-all flex items-start gap-2 text-left ${
                               isActive
                                 ? "border-cyan-500 bg-cyan-500/15 font-semibold"
                                 : w.solved
@@ -962,7 +968,7 @@ export default function CrosswordClashPlayPage() {
                             }`}
                           >
                             <span className="font-bold text-cyan-400 shrink-0">{w.number}.</span>
-                            <div className="flex-1">
+                            <div className="flex-1 text-left">
                               <p className={w.solved ? "line-through text-zinc-500" : ""}>{w.clue}</p>
                             </div>
                             <span className="text-[10px] text-zinc-500 shrink-0">
@@ -1120,7 +1126,7 @@ export default function CrosswordClashPlayPage() {
                     </div>
 
                     {/* 5 Letters Row */}
-                    <div className="grid grid-cols-5 gap-1.5">
+                    <div className="grid grid-cols-5 gap-1.5" dir="ltr">
                       {team.rack.map((letter, lIdx) => {
                         const isSelected = isSelectedTeam && selectedRackIndex === lIdx;
                         const isPlaced = Object.values(turnPlacements).some(
@@ -1185,7 +1191,7 @@ export default function CrosswordClashPlayPage() {
               </div>
 
               {/* 5-Letter Rack */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2" dir="ltr">
                 {currentTeam.rack.map((letter, idx) => {
                   const isSelected = selectedRackIndex === idx;
                   const isPlaced = Object.values(turnPlacements).some(

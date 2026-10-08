@@ -696,10 +696,11 @@ export default function CrosswordClashSetupPage() {
               </div>
               <textarea
                 rows={5}
+                dir="ltr"
                 value={customWordsText}
                 onChange={e => setCustomWordsText(e.target.value)}
                 placeholder={"TIGER - A wild cat with stripes\nMONKEY - Loves climbing and bananas\nEAGLE - Bird with sharp eyes"}
-                className={`w-full text-xs p-3 rounded-xl border bg-transparent font-mono outline-none focus:border-indigo-500 ${
+                className={`w-full text-xs p-3 rounded-xl border bg-transparent font-mono outline-none focus:border-indigo-500 text-left ${
                   isLight ? "border-slate-300 text-slate-800" : "border-zinc-700 text-zinc-100"
                 }`}
               />

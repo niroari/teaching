@@ -54,7 +54,7 @@ export default function CrosswordPrintablePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-black p-6 font-sans print:p-0">
+    <div className="min-h-screen bg-white text-black p-6 font-sans print:p-0" dir="ltr">
       {/* Screen Toolbar (hidden in print) */}
       <div className="max-w-4xl mx-auto mb-6 flex items-center justify-between print:hidden">
         <Link
@@ -75,7 +75,7 @@ export default function CrosswordPrintablePage() {
       </div>
 
       {/* Printable Sheet Container */}
-      <div className="max-w-3xl mx-auto border border-black/20 p-6 md:p-8 rounded-xl print:border-none print:p-0">
+      <div className="max-w-3xl mx-auto border border-black/20 p-6 md:p-8 rounded-xl print:border-none print:p-0" dir="ltr">
         {/* Header */}
         <div className="border-b-2 border-black pb-4 mb-6 flex justify-between items-start">
           <div>
@@ -98,6 +98,7 @@ export default function CrosswordPrintablePage() {
         {/* The 8x10 Grid */}
         <div className="flex justify-center mb-6">
           <div
+            dir="ltr"
             className="inline-grid gap-0 border-2 border-black"
             style={{
               gridTemplateColumns: `repeat(${gameState.grid.cols}, minmax(0, 1fr))`
@@ -132,11 +133,11 @@ export default function CrosswordPrintablePage() {
         </div>
 
         {/* Group Rack Section for Students */}
-        <div className="mb-6 p-3 border-2 border-dashed border-black/40 rounded-lg text-center">
+        <div className="mb-6 p-3 border-2 border-dashed border-black/40 rounded-lg text-center" dir="ltr">
           <p className="text-xs font-bold mb-2 uppercase tracking-wide">
             Your Group&apos;s 5 Letters (אותיות הקבוצה לסיבוב זה):
           </p>
-          <div className="flex justify-center gap-2">
+          <div className="flex justify-center gap-2" dir="ltr">
             {[1, 2, 3, 4, 5].map(i => (
               <div
                 key={i}
@@ -147,7 +148,7 @@ export default function CrosswordPrintablePage() {
         </div>
 
         {/* Clues */}
-        <div className="grid grid-cols-2 gap-6 text-xs">
+        <div className="grid grid-cols-2 gap-6 text-xs text-left" dir="ltr">
           {/* Across */}
           <div>
             <h3 className="font-bold border-b border-black pb-1 mb-2 uppercase text-sm">

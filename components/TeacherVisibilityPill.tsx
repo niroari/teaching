@@ -48,14 +48,12 @@ export default function TeacherVisibilityPill({ pathname }: { pathname: string }
       <button
         type="button"
         onClick={() => setCollapsedPersist(false)}
-        className={`fixed bottom-4 left-4 z-[100] w-11 h-11 rounded-full border shadow-lg flex items-center justify-center backdrop-blur transition-colors ${
+        className={`fixed bottom-4 left-4 z-[100] flex h-11 w-11 items-center justify-center rounded-full border shadow-md transition-colors cursor-pointer ${
           previewAsStudent
-            ? "bg-amber-500/90 border-amber-300 text-zinc-950"
-            : item
-            ? isVisible
-              ? "bg-emerald-600/90 border-emerald-300 text-white"
-              : "bg-zinc-800/90 border-zinc-600 text-zinc-300"
-            : "bg-purple-700/90 border-purple-400 text-white"
+            ? "border-amber-500 bg-amber-400 text-zinc-950"
+            : item && isVisible
+            ? "border-emerald-700 bg-emerald-600 text-white"
+            : "border-line-strong bg-card text-fg-muted"
         }`}
         title="פקדי מורה: מה התלמידים רואים"
         aria-label="פתיחת פקדי מורה"
@@ -68,17 +66,15 @@ export default function TeacherVisibilityPill({ pathname }: { pathname: string }
   return (
     <div
       dir="rtl"
-      className="fixed bottom-4 left-4 z-[100] max-w-[calc(100vw-2rem)] rounded-2xl border border-purple-500/40 bg-[#0d1222]/95 text-[#e8edf8] shadow-2xl backdrop-blur p-2 flex flex-wrap items-center gap-2 text-xs font-bold"
+      className="fixed bottom-4 left-4 z-[100] flex max-w-[calc(100vw-2rem)] flex-wrap items-center gap-1 rounded-lg border border-line-strong bg-card p-1.5 text-[13px] font-medium text-fg shadow-lg"
     >
       {item && (
         <button
           type="button"
           onClick={toggleItem}
           disabled={busy}
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border transition-colors cursor-pointer disabled:opacity-60 ${
-            isVisible
-              ? "bg-emerald-500/15 border-emerald-400/50 text-emerald-300 hover:bg-emerald-500/25"
-              : "bg-zinc-700/30 border-zinc-500/50 text-zinc-300 hover:bg-zinc-700/50"
+          className={`flex items-center gap-1.5 rounded-md px-3 py-2 transition-colors cursor-pointer disabled:opacity-60 ${
+            isVisible ? "bg-success-soft text-success" : "bg-subtle text-fg-muted hover:text-fg"
           }`}
           title={isVisible ? "לחצו כדי להסתיר מהתלמידים" : "לחצו כדי לפרסם לתלמידים"}
         >
@@ -97,10 +93,8 @@ export default function TeacherVisibilityPill({ pathname }: { pathname: string }
       <button
         type="button"
         onClick={() => setPreviewAsStudent(!previewAsStudent)}
-        className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border transition-colors cursor-pointer ${
-          previewAsStudent
-            ? "bg-amber-500/20 border-amber-400/60 text-amber-300"
-            : "border-white/10 text-zinc-300 hover:bg-white/5"
+        className={`flex items-center gap-1.5 rounded-md px-3 py-2 transition-colors cursor-pointer ${
+          previewAsStudent ? "bg-warning-soft text-warning" : "text-fg-muted hover:bg-subtle hover:text-fg"
         }`}
         title="לראות את האתר בדיוק כמו תלמיד"
       >
@@ -110,7 +104,7 @@ export default function TeacherVisibilityPill({ pathname }: { pathname: string }
 
       <Link
         href="/admin?tab=visibility"
-        className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-white/10 text-purple-300 hover:bg-white/5 transition-colors"
+        className="flex items-center gap-1.5 rounded-md px-3 py-2 text-fg-muted transition-colors hover:bg-subtle hover:text-fg"
         title="ניהול כל התכנים הגלויים לתלמידים"
       >
         <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -118,14 +112,14 @@ export default function TeacherVisibilityPill({ pathname }: { pathname: string }
       </Link>
 
       {item && !canSee(item.id) && previewAsStudent && (
-        <span className="px-2 text-amber-300/80 font-normal">תלמידים רואים כרגע מסך &quot;לא פתוח&quot;</span>
+        <span className="px-2 font-normal text-warning">תלמידים רואים כרגע מסך &quot;לא פתוח&quot;</span>
       )}
-      {error && <span className="px-2 text-red-300 font-normal">שגיאה בשמירה</span>}
+      {error && <span className="px-2 font-normal text-danger">שגיאה בשמירה</span>}
 
       <button
         type="button"
         onClick={() => setCollapsedPersist(true)}
-        className="p-2 rounded-xl text-zinc-400 hover:bg-white/5 cursor-pointer"
+        className="rounded-md p-2 text-fg-subtle hover:bg-subtle hover:text-fg cursor-pointer"
         title="מזעור"
         aria-label="מזעור פקדי מורה"
       >

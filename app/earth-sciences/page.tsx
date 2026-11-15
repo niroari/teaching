@@ -2,13 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import ActivityBar from "@/components/site/ActivityBar";
+import SiteFooter from "@/components/site/SiteFooter";
 import { 
   Globe, 
   Search, 
   CheckCircle, 
-  Moon, 
-  Sun, 
-  ArrowRight, 
   BookOpen, 
   Clock, 
   Activity,
@@ -25,7 +24,6 @@ import { useVisibility } from "@/lib/context/VisibilityContext";
 import { earthLessonId } from "@/lib/content-registry";
 
 export default function EarthSciencesHubPage() {
-  const [comfortMode, setComfortMode] = useState<"dark" | "light">("dark");
   const [searchQuery, setSearchQuery] = useState("");
   const [activeUnitFilter, setActiveUnitFilter] = useState<number | "all">("all");
   
@@ -49,11 +47,6 @@ export default function EarthSciencesHubPage() {
   // Load state from localStorage
   useEffect(() => {
     if (typeof window !== "undefined") {
-      // Theme
-      const storedTheme = localStorage.getItem("teaching-site-comfort-mode");
-      if (storedTheme === "light" || storedTheme === "dark") {
-        setComfortMode(storedTheme);
-      }
 
       // Classes list
       const storedClasses = localStorage.getItem("teaching-site-classes");
@@ -98,14 +91,6 @@ export default function EarthSciencesHubPage() {
       }
     }
   }, []);
-
-  const toggleComfortMode = () => {
-    const nextTheme = comfortMode === "dark" ? "light" : "dark";
-    setComfortMode(nextTheme);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("teaching-site-comfort-mode", nextTheme);
-    }
-  };
 
   // Toggle class complete for popover mode
   const handleToggleClassComplete = (lessonId: string, classNameStr: string, e: React.MouseEvent) => {
@@ -216,99 +201,57 @@ export default function EarthSciencesHubPage() {
     return count;
   };
 
-  const isLight = comfortMode === "light";
-  const bgTheme = isLight ? "bg-[#f4f6fa] text-zinc-800" : "bg-[#080c18] text-[#e8edf8]";
-  const borderTheme = isLight ? "border-zinc-200" : "border-border-custom";
-  const cardTheme = isLight ? "bg-white border-zinc-200 shadow-sm" : "glass-card";
-  const textMuted = isLight ? "text-zinc-500" : "text-text-muted";
-  const titleText = isLight ? "text-zinc-900" : "text-white";
+  // Colors come from the design tokens in globals.css and follow Comfort Mode.
+  const bgTheme = "bg-canvas text-fg";
+  const borderTheme = "border-line";
+  const cardTheme = "bg-card border-line";
+  const textMuted = "text-fg-muted";
+  const titleText = "text-fg";
 
   return (
-    <div className={`relative min-h-screen ${bgTheme} flex flex-col justify-between overflow-hidden transition-colors duration-300`}>
-      {/* Background decoration (Only visible in dark mode for rich aesthetics) */}
-      {!isLight && (
-        <>
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-teal-500/5 via-transparent to-transparent blur-3xl pointer-events-none rounded-full" />
-          <div className="absolute -top-40 -left-40 w-96 h-96 bg-teal-500/5 blur-3xl rounded-full pointer-events-none" />
-        </>
-      )}
-
-      {/* Header bar */}
-      <header className={`w-full border-b ${borderTheme} py-4 relative z-20 bg-surface/10 backdrop-blur-md`}>
-        <div className="max-w-6xl mx-auto px-6 flex justify-between items-center">
-          {/* Back button */}
-          <Link
-            href="/"
-            className={`inline-flex items-center gap-1.5 text-xs font-bold ${textMuted} hover:text-earth transition-colors cursor-pointer`}
+    <div data-subject="earth" className={`site relative min-h-screen ${bgTheme} flex flex-col`}>
+      <ActivityBar backHref="/" backLabel="חזרה לפורטל" title="מדעי כדור הארץ">
+        {/* Resources Button */}
+        {(showMission || showResources) && (
+          <button
+            onClick={() => {
+              const el = document.getElementById("resources-section");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="inline-flex h-9 items-center gap-1.5 rounded-md border border-line px-3 text-sm font-medium text-fg transition-colors hover:bg-subtle cursor-pointer"
+            title="משאבים ועזרים דיגיטליים"
           >
-            <ArrowRight className="w-3.5 h-3.5" />
-            <span>חזרה לפורטל</span>
-          </Link>
+            <FolderOpen className="h-4 w-4 text-fg-muted" strokeWidth={1.75} />
+            <span className="hidden sm:inline">משאבים ועזרים</span>
+          </button>
+        )}
 
-          {/* Controls Right */}
-          <div className="flex items-center gap-3">
-            {/* Resources Button */}
-            {(showMission || showResources) && (
-            <button
-              onClick={() => {
-                const el = document.getElementById("resources-section");
-                if (el) el.scrollIntoView({ behavior: "smooth" });
-              }}
-              className={`p-2 rounded-xl border ${borderTheme} bg-surface/30 hover:bg-surface-hover/30 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold`}
-              title="משאבים ועזרים דיגיטליים"
-            >
-              <FolderOpen className="w-3.5 h-3.5 text-earth" />
-              <span className="hidden sm:inline">משאבים ועזרים</span>
-            </button>
-            )}
-
-            {/* Class Manager Button */}
-            {showTeacherTools && (
-            <button
-              onClick={() => {
-                setEditingClasses([...classes]);
-                setShowClassManager(true);
-              }}
-              className={`p-2 rounded-xl border ${borderTheme} bg-surface/30 hover:bg-surface-hover/30 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold`}
-              title="ניהול שמות הכיתות"
-            >
-              <Settings className="w-3.5 h-3.5 text-earth" />
-              <span className="hidden sm:inline">ניהול כיתות</span>
-            </button>
-            )}
-
-            {/* Theme Switcher */}
-            <button
-              onClick={toggleComfortMode}
-              className={`p-2 rounded-xl border ${borderTheme} bg-surface/30 hover:bg-surface-hover/30 transition-all cursor-pointer flex items-center gap-2 text-xs font-bold`}
-              title="מצב קריאה נוחה"
-            >
-              {isLight ? (
-                <>
-                  <Moon className="w-4 h-4 text-purple-600" />
-                  <span className="text-zinc-700">מצב כיתה חשוך</span>
-                </>
-              ) : (
-                <>
-                  <Sun className="w-4 h-4 text-amber-400 animate-pulse" />
-                  <span className="text-zinc-300">מצב קריאה בהיר</span>
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      </header>
+        {/* Class Manager Button */}
+        {showTeacherTools && (
+          <button
+            onClick={() => {
+              setEditingClasses([...classes]);
+              setShowClassManager(true);
+            }}
+            className="inline-flex h-9 items-center gap-1.5 rounded-md border border-line px-3 text-sm font-medium text-fg transition-colors hover:bg-subtle cursor-pointer"
+            title="ניהול שמות הכיתות"
+          >
+            <Settings className="h-4 w-4 text-fg-muted" strokeWidth={1.75} />
+            <span className="hidden sm:inline">ניהול כיתות</span>
+          </button>
+        )}
+      </ActivityBar>
 
       {/* Main Page Area */}
       <main className="relative w-full max-w-6xl mx-auto px-6 py-12 flex-1 flex flex-col z-10 text-right">
         
         {/* Main Title Banner */}
         <div className="text-center mb-10 space-y-3">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-earth/10 border border-earth/20 rounded-full text-xs font-bold text-earth">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-accent-soft border border-line rounded-full text-[13px] font-semibold text-accent">
             <Globe className="w-4 h-4" />
             <span>תוכנית לימודים שנתית - כיתה ח׳</span>
           </div>
-          <h1 className={`text-4xl md:text-5xl font-black tracking-tight ${titleText} mt-2`}>
+          <h1 className={`text-4xl md:text-5xl font-semibold tracking-tight ${titleText} mt-2`}>
             מדעי כדור הארץ והיקום
           </h1>
           <p className={`${textMuted} max-w-2xl mx-auto text-sm leading-relaxed`}>
@@ -330,33 +273,33 @@ export default function EarthSciencesHubPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="חפשו שיעור, מושג יסוד או נושא..."
-                className={`w-full py-2.5 pr-10 pl-4 rounded-xl border ${borderTheme} bg-surface/20 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-earth/50 focus:border-earth text-right`}
+                className={`w-full py-2.5 pr-10 pl-4 rounded-md border ${borderTheme} bg-subtle text-[13px] font-semibold focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent text-right`}
               />
             </div>
             
             {/* Class Filter Selector (teacher only) */}
             {showTeacherTools && (
             <div className="flex flex-col sm:flex-row gap-3">
-              <div className={`px-3 py-2 rounded-xl border ${borderTheme} bg-surface/10 flex items-center gap-2 text-xs font-bold justify-between`}>
+              <div className={`px-3 py-2 rounded-md border ${borderTheme} bg-subtle flex items-center gap-2 text-[13px] font-semibold justify-between`}>
                 <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-earth shrink-0" />
+                  <Users className="w-4 h-4 text-accent shrink-0" />
                   <span>מעקב עבור:</span>
                 </div>
                 <select
                   value={selectedClassFilter}
                   onChange={(e) => setSelectedClassFilter(e.target.value)}
-                  className="bg-transparent border-none text-earth focus:outline-none text-xs font-extrabold cursor-pointer px-1 mr-1 text-right"
+                  className="bg-transparent border-none text-accent focus:outline-none text-[13px] font-semibold cursor-pointer px-1 mr-1 text-right"
                 >
-                  <option value="all" className={isLight ? "text-zinc-800" : "text-zinc-950"}>כל הכיתות ({classes.length})</option>
+                  <option value="all" className="text-fg">כל הכיתות ({classes.length})</option>
                   {classes.map(c => (
-                    <option key={c} value={c} className={isLight ? "text-zinc-800" : "text-zinc-950"}>כיתה {c}</option>
+                    <option key={c} value={c} className="text-fg">כיתה {c}</option>
                   ))}
                 </select>
               </div>
 
               {/* Completion tracker badge */}
-              <div className={`px-4 py-2.5 rounded-xl border ${borderTheme} bg-surface/10 flex items-center gap-2 text-xs font-bold justify-center`}>
-                <CheckCircle className="w-4 h-4 text-earth shrink-0" />
+              <div className={`px-4 py-2.5 rounded-md border ${borderTheme} bg-subtle flex items-center gap-2 text-[13px] font-semibold justify-center`}>
+                <CheckCircle className="w-4 h-4 text-accent shrink-0" />
                 <span>
                   {selectedClassFilter === "all" ? (
                     `התקדמות כוללת: ${getCompletedCountForClass("all")} מתוך ${totalLessonsInUnit1 * classes.length} שיעורים`
@@ -373,10 +316,10 @@ export default function EarthSciencesHubPage() {
           <div className="flex flex-row overflow-x-auto scrollbar-none md:flex-nowrap gap-3 pb-2 w-full justify-start items-center">
             <button
               onClick={() => setActiveUnitFilter("all")}
-              className={`px-4 py-2 rounded-xl text-sm font-extrabold transition-all cursor-pointer border whitespace-nowrap ${
+              className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors cursor-pointer border whitespace-nowrap ${
                 activeUnitFilter === "all"
-                  ? "bg-earth text-white border-earth shadow-md shadow-teal-500/10"
-                  : `bg-surface/30 text-text-muted hover:bg-surface-hover/50 ${borderTheme}`
+                  ? "bg-accent text-primary-foreground border-accent shadow-sm"
+                  : `bg-subtle text-fg-muted hover:bg-subtle-hover ${borderTheme}`
               }`}
             >
               כל היחידות ({visibleUnits.reduce((sum, u) => sum + u.lessons.length, 0)})
@@ -385,10 +328,10 @@ export default function EarthSciencesHubPage() {
               <button
                 key={unit.id}
                 onClick={() => setActiveUnitFilter(unit.id)}
-                className={`px-4 py-2 rounded-xl text-sm font-extrabold transition-all cursor-pointer border whitespace-nowrap ${
+                className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors cursor-pointer border whitespace-nowrap ${
                   activeUnitFilter === unit.id
-                    ? "bg-earth text-white border-earth shadow-md shadow-teal-500/10"
-                    : `bg-surface/30 text-text-muted hover:bg-surface-hover/50 ${borderTheme}`
+                    ? "bg-accent text-primary-foreground border-accent shadow-sm"
+                    : `bg-subtle text-fg-muted hover:bg-subtle-hover ${borderTheme}`
                 }`}
               >
                 יחידה {unit.id}: {getShortUnitTitle(unit.id)} ({unit.lessons.length})
@@ -405,14 +348,14 @@ export default function EarthSciencesHubPage() {
                 {/* Unit Header */}
                 <div className={`border-b ${borderTheme} pb-2 text-right`}>
                   <div className="flex justify-between items-end">
-                    <h3 className={`text-xl font-bold ${titleText}`}>
+                    <h3 className={`text-xl font-semibold ${titleText}`}>
                       יחידה {unit.id}: {unit.title}
                     </h3>
-                    <span className={`text-[10px] ${textMuted} font-semibold`}>
+                    <span className={`text-xs ${textMuted} font-semibold`}>
                       מסגרת הוראה: {unit.hours} שעות שנתיות
                     </span>
                   </div>
-                  <p className={`${textMuted} text-xs mt-1 max-w-4xl`}>
+                  <p className={`${textMuted} text-[13px] mt-1 max-w-4xl`}>
                     {unit.description}
                   </p>
                 </div>
@@ -429,7 +372,7 @@ export default function EarthSciencesHubPage() {
                     return (
                       <div
                         key={lesson.id}
-                        className={`group ${cardTheme} rounded-2xl border p-5 flex flex-col justify-between min-h-[240px] transition-all hover:scale-[1.01] hover:border-earth/40 hover:shadow-lg relative`}
+                        className={`group ${cardTheme} rounded-lg border p-5 flex flex-col justify-between min-h-[240px] transition-colors hover:border-line-strong hover: relative`}
                       >
                         {/* Upper card block: Wrap Link around text, not the entire container so buttons stay interactive */}
                         <Link
@@ -438,10 +381,10 @@ export default function EarthSciencesHubPage() {
                         >
                           <div className="space-y-3">
                             {/* Top row */}
-                            <div className="flex justify-between items-center text-[10px] font-bold">
+                            <div className="flex justify-between items-center text-xs font-semibold">
                               {/* Duration Badge */}
-                              <span className={`px-2 py-0.5 rounded-md flex items-center gap-1 bg-surface-hover border ${borderTheme} ${textMuted}`}>
-                                <Clock className="w-3 h-3 text-earth shrink-0" />
+                              <span className={`px-2 py-0.5 rounded-md flex items-center gap-1 bg-subtle border ${borderTheme} ${textMuted}`}>
+                                <Clock className="w-3 h-3 text-accent shrink-0" />
                                 <span>{lesson.duration}</span>
                               </span>
 
@@ -454,15 +397,15 @@ export default function EarthSciencesHubPage() {
                             </div>
 
                             {/* Title */}
-                            <h4 className={`text-base font-bold ${titleText} group-hover:text-earth transition-colors text-right leading-snug`}>
+                            <h4 className={`text-base font-semibold ${titleText} group-hover:text-accent transition-colors text-right leading-snug`}>
                               {lesson.title}
                             </h4>
 
                             {/* Topics List */}
-                            <ul className={`space-y-1.5 text-xs ${textMuted} text-right list-none pr-0`}>
+                            <ul className={`space-y-1.5 text-[13px] ${textMuted} text-right list-none pr-0`}>
                               {lesson.topics.slice(0, 3).map((topic, i) => (
                                 <li key={i} className="flex gap-1.5 justify-start items-start">
-                                  <span className="w-1 h-1 rounded-full bg-earth mt-1.5 shrink-0" />
+                                  <span className="w-1 h-1 rounded-full bg-accent mt-1.5 shrink-0" />
                                   <span className="leading-tight truncate">{topic}</span>
                                 </li>
                               ))}
@@ -474,12 +417,12 @@ export default function EarthSciencesHubPage() {
                         {showTeacherTools && (unit.id === 1 || unit.id === 2) && selectedClassFilter === "all" && doneClasses.length > 0 && (
                           <div className="mt-3 flex flex-wrap gap-1.5 justify-start select-none">
                             {isAllDone ? (
-                              <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[9px] font-extrabold rounded-md">
+                              <span className="px-2 py-0.5 bg-success-soft text-success border border-success/25 text-xs font-semibold rounded-md">
                                 הושלם בכל הכיתות 🎉
                               </span>
                             ) : (
                               doneClasses.map(c => (
-                                <span key={c} className="px-1.5 py-0.5 bg-earth/10 text-earth border border-earth/20 text-[9px] font-extrabold rounded-md">
+                                <span key={c} className="px-1.5 py-0.5 bg-accent-soft text-accent border border-line text-xs font-semibold rounded-md">
                                   כיתה {c}
                                 </span>
                               ))
@@ -502,10 +445,10 @@ export default function EarthSciencesHubPage() {
                                     e.stopPropagation();
                                     setActivePopoverLesson(popoverOpen ? null : lesson.id);
                                   }}
-                                  className={`flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-lg border cursor-pointer transition-all ${
+                                  className={`flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg border cursor-pointer transition-colors ${
                                     doneClasses.length > 0
-                                      ? "bg-earth/15 text-earth border-earth/40 hover:bg-earth/25"
-                                      : `bg-surface/30 border-zinc-700/30 text-text-muted hover:text-white hover:border-zinc-500`
+                                      ? "bg-accent-soft text-accent border-line hover:opacity-90"
+                                      : `bg-subtle border-line text-fg-muted hover:text-fg hover:border-line-strong`
                                   }`}
                                 >
                                   <Users className="w-3.5 h-3.5 shrink-0" />
@@ -521,13 +464,11 @@ export default function EarthSciencesHubPage() {
                                       className="fixed inset-0 z-40" 
                                       onClick={() => setActivePopoverLesson(null)} 
                                     />
-                                    <div className={`absolute bottom-full right-0 mb-2 w-36 rounded-xl border p-2.5 shadow-2xl z-50 text-right ${
-                                      isLight ? "bg-white border-zinc-200 text-zinc-800" : "bg-slate-900 border-zinc-700 text-[#e8edf8]"
-                                    }`}>
-                                      <div className="text-[10px] font-black text-text-muted border-b border-border-custom pb-1.5 mb-1.5 flex justify-between items-center">
+                                    <div className={`absolute bottom-full right-0 mb-2 w-36 rounded-md border p-2.5 z-50 text-right bg-card border-line text-fg`}>
+                                      <div className="text-xs font-semibold text-fg-muted border-b border-line pb-1.5 mb-1.5 flex justify-between items-center">
                                         <button 
                                           onClick={() => setActivePopoverLesson(null)}
-                                          className="hover:text-white cursor-pointer"
+                                          className="hover:text-fg cursor-pointer"
                                         >
                                           <X className="w-3 h-3" />
                                         </button>
@@ -540,12 +481,12 @@ export default function EarthSciencesHubPage() {
                                             <button
                                               key={c}
                                               onClick={(e) => handleToggleClassComplete(lesson.id, c, e)}
-                                              className="w-full flex items-center justify-between text-xs font-bold py-1 px-1.5 hover:bg-surface-hover/40 rounded-lg cursor-pointer transition-colors"
+                                              className="w-full flex items-center justify-between text-[13px] font-semibold py-1 px-1.5 hover:bg-subtle-hover rounded-lg cursor-pointer transition-colors"
                                             >
-                                              <span className={`w-3.5 h-3.5 rounded border flex items-center justify-center text-[9px] ${
+                                              <span className={`w-3.5 h-3.5 rounded border flex items-center justify-center text-xs ${
                                                 checked 
-                                                  ? "bg-earth border-earth text-white" 
-                                                  : "border-zinc-500 bg-transparent"
+                                                  ? "bg-accent border-accent text-primary-foreground" 
+                                                  : "border-line bg-transparent"
                                               }`}>
                                                 {checked && "✓"}
                                               </span>
@@ -562,26 +503,26 @@ export default function EarthSciencesHubPage() {
                               /* Quick Toggle Button for selected class */
                               <button
                                 onClick={(e) => handleToggleSingleClass(lesson.id, e)}
-                                className={`flex items-center gap-1.5 text-[10px] font-bold px-3 py-1 rounded-lg border cursor-pointer transition-all ${
+                                className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-lg border cursor-pointer transition-colors ${
                                   isCompletedForSelected
-                                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20"
-                                    : `bg-surface/30 border-zinc-700/30 text-text-muted hover:text-white hover:border-zinc-500`
+                                    ? "bg-success-soft text-success border-success/25 hover:bg-success-soft"
+                                    : `bg-subtle border-line text-fg-muted hover:text-fg hover:border-line-strong`
                                 }`}
                               >
-                                <CheckCircle className={`w-3.5 h-3.5 ${isCompletedForSelected ? "text-emerald-400" : "text-text-muted"}`} />
+                                <CheckCircle className={`w-3.5 h-3.5 ${isCompletedForSelected ? "text-success" : "text-fg-muted"}`} />
                                 <span>{isCompletedForSelected ? "הועבר בכיתה" : "סמן כבוצע"}</span>
                               </button>
                             )
                           ) : (
                             /* Under Development Badge for Units 2, 3, 4 */
-                            <span className="flex items-center gap-1 text-[10px] font-extrabold text-amber-500 bg-amber-500/10 border border-amber-500/20 rounded-lg px-2.5 py-1">
+                            <span className="flex items-center gap-1 text-xs font-semibold text-warning bg-warning-soft border border-warning/25 rounded-lg px-2.5 py-1">
                               <span>בתהליך פיתוח 🛠️</span>
                             </span>
                           )}
 
                           {/* Indicator for interactive widget */}
                           {(unit.id === 1 || unit.id === 2) && lesson.widgetId && (
-                            <span className="flex items-center gap-1 text-[9px] font-extrabold text-earth bg-earth/10 border border-earth/20 rounded-md px-1.5 py-0.5">
+                            <span className="flex items-center gap-1 text-xs font-semibold text-accent bg-accent-soft border border-line rounded-md px-1.5 py-0.5">
                               <Activity className="w-2.5 h-2.5 animate-pulse" />
                               <span>יישומון אינטראקטיבי</span>
                             </span>
@@ -596,10 +537,10 @@ export default function EarthSciencesHubPage() {
           </div>
         ) : (
           /* Empty search state */
-          <div className={`flex flex-col items-center justify-center p-12 border ${borderTheme} rounded-2xl ${cardTheme} text-center space-y-4`}>
+          <div className={`flex flex-col items-center justify-center p-12 border ${borderTheme} rounded-lg ${cardTheme} text-center space-y-4`}>
             <BookOpen className={`w-12 h-12 ${textMuted}`} />
-            <h3 className={`text-lg font-bold ${titleText}`}>{visibleUnits.length === 0 ? "עדיין אין שיעורים פתוחים" : "לא נמצאו שיעורים מתאימים"}</h3>
-            <p className={`${textMuted} text-xs max-w-sm`}>
+            <h3 className={`text-lg font-semibold ${titleText}`}>{visibleUnits.length === 0 ? "עדיין אין שיעורים פתוחים" : "לא נמצאו שיעורים מתאימים"}</h3>
+            <p className={`${textMuted} text-[13px] max-w-sm`}>
               נסו לשנות את מילת החיפוש או לבחור יחידה אחרת במסננים.
             </p>
             <button
@@ -607,7 +548,7 @@ export default function EarthSciencesHubPage() {
                 setSearchQuery("");
                 setActiveUnitFilter("all");
               }}
-              className="px-4 py-2 bg-earth hover:bg-teal-600 text-white font-bold text-xs rounded-xl cursor-pointer transition-all"
+              className="px-4 py-2 bg-accent hover:opacity-90 text-primary-foreground font-semibold text-[13px] rounded-md cursor-pointer transition-colors"
             >
               איפוס מסננים
             </button>
@@ -618,8 +559,8 @@ export default function EarthSciencesHubPage() {
         {(showMission || showResources) && (
         <div id="resources-section" className={`w-full mt-16 border-t ${borderTheme} pt-12 text-right space-y-8`}>
           <div className="text-center sm:text-right space-y-2">
-            <h2 className={`text-2xl font-black tracking-tight ${titleText}`}>משאבים ועזרים 🛠️</h2>
-            <p className={`${textMuted} text-xs`}>
+            <h2 className={`text-2xl font-semibold tracking-tight ${titleText}`}>משאבים ועזרים 🛠️</h2>
+            <p className={`${textMuted} text-[13px]`}>
               כלים אינטראקטיביים, סימולטורים ומקורות מידע חיצוניים להעשרת הלמידה במהלך השנה.
             </p>
           </div>
@@ -629,19 +570,19 @@ export default function EarthSciencesHubPage() {
             {showMission && (
             <Link
               href="/earth-sciences/mission"
-              className={`lg:col-span-2 group ${cardTheme} rounded-2xl border ${borderTheme} p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-teal-400 transition-colors`}
+              className={`lg:col-span-2 group ${cardTheme} rounded-lg border ${borderTheme} p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-line-strong transition-colors`}
             >
               <div className="space-y-2">
-                <h3 className={`text-lg font-bold ${titleText} flex items-center gap-2`}>
-                  <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
+                <h3 className={`text-lg font-semibold ${titleText} flex items-center gap-2`}>
+                  <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
                   עבודת חקר: משימת בית חדש 🚀
                 </h3>
-                <p className={`${textMuted} text-xs leading-relaxed`}>
+                <p className={`${textMuted} text-[13px] leading-relaxed`}>
                   עבודה בזוגות על יחידה 1: בוחרים יעד ליישוב בחלל, חוקרים אותו לפי כל מונחי היחידה, ומגישים דו&quot;ח
                   לסוכנות החלל. העבודה נשמרת אוטומטית ומוגשת אונליין.
                 </p>
               </div>
-              <span className="shrink-0 self-start sm:self-center px-4 py-2 rounded-xl bg-teal-500 text-zinc-950 text-sm font-bold group-hover:bg-teal-400 transition-colors">
+              <span className="shrink-0 self-start sm:self-center px-4 py-2 rounded-md bg-accent text-primary-foreground text-sm font-semibold group-hover:bg-accent transition-colors">
                 לכניסה למשימה ←
               </span>
             </Link>
@@ -649,19 +590,19 @@ export default function EarthSciencesHubPage() {
 
             {showResources && (<>
             {/* Tool Card 1: NASA's Eye on the Solar System */}
-            <div className={`group ${cardTheme} rounded-2xl border ${borderTheme} p-5 flex flex-col justify-between gap-5`}>
+            <div className={`group ${cardTheme} rounded-lg border ${borderTheme} p-5 flex flex-col justify-between gap-5`}>
               <div className="space-y-2">
-                <h3 className={`text-lg font-bold ${titleText} flex items-center gap-2`}>
-                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                <h3 className={`text-lg font-semibold ${titleText} flex items-center gap-2`}>
+                  <span className="w-2 h-2 rounded-full bg-warning animate-pulse" />
                   NASA's Eye on the Solar System 🪐
                 </h3>
-                <p className={`${textMuted} text-xs leading-relaxed`}>
+                <p className={`${textMuted} text-[13px] leading-relaxed`}>
                   הדמיית תלת-ממד אינטראקטיבית מבית נאס"א המאפשרת לחקור את כדור הארץ, כוכבי הלכת, הירחים, האסטרואידים וחלליות המחקר בזמן אמת על בסיס נתונים מדעיים אמיתיים.
                 </p>
               </div>
 
               {/* Interactive Iframe Embed */}
-              <div className={`w-full aspect-video rounded-xl border ${borderTheme} bg-slate-950 overflow-hidden relative shadow-md`}>
+              <div className={`w-full aspect-video rounded-md border ${borderTheme} bg-card overflow-hidden relative shadow-sm`}>
                 <iframe 
                   src="https://eyes.nasa.gov/apps/solar-system/#/earth?featured=false&shareButton=false" 
                   className="w-full h-full border-none"
@@ -673,19 +614,19 @@ export default function EarthSciencesHubPage() {
             </div>
 
             {/* Tool Card 2: Lunar Phase Simulator */}
-            <div className={`group ${cardTheme} rounded-2xl border ${borderTheme} p-5 flex flex-col justify-between gap-5`}>
+            <div className={`group ${cardTheme} rounded-lg border ${borderTheme} p-5 flex flex-col justify-between gap-5`}>
               <div className="space-y-2">
-                <h3 className={`text-lg font-bold ${titleText} flex items-center gap-2`}>
-                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                <h3 className={`text-lg font-semibold ${titleText} flex items-center gap-2`}>
+                  <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
                   סימולטור מופעי הירח 🌙
                 </h3>
-                <p className={`${textMuted} text-xs leading-relaxed`}>
+                <p className={`${textMuted} text-[13px] leading-relaxed`}>
                   הדמיה אינטראקטיבית מבית אוניברסיטת נברסקה (UNL) המציגה את הקשר הגיאומטרי שבין כדור הארץ, הירח והשמש, ומסבירה כיצד נוצרים מופעי הירח השונים במהלך החודש.
                 </p>
               </div>
 
               {/* Interactive Iframe Embed */}
-              <div className={`w-full aspect-video rounded-xl border ${borderTheme} bg-white overflow-hidden relative shadow-md`}>
+              <div className={`w-full aspect-video rounded-md border ${borderTheme} bg-card overflow-hidden relative shadow-sm`}>
                 <iframe 
                   src="https://ccnmtl.github.io/astro-simulations/lunar-phase-simulator/" 
                   className="w-full h-full border-none"
@@ -703,31 +644,29 @@ export default function EarthSciencesHubPage() {
 
       {/* Class Manager Modal */}
       {showClassManager && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className={`w-full max-w-md rounded-2xl border p-6 text-right shadow-2xl relative ${
-            isLight ? "bg-white border-zinc-200 text-zinc-800" : "bg-slate-900 border-zinc-700 text-[#e8edf8]"
-          }`}>
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className={`w-full max-w-md rounded-lg border p-6 text-right relative bg-card border-line text-fg`}>
             {/* Close Button */}
             <button
               onClick={() => setShowClassManager(false)}
-              className={`absolute top-4 left-4 p-1.5 rounded-lg border ${borderTheme} hover:bg-surface-hover/30 cursor-pointer`}
+              className={`absolute top-4 left-4 p-1.5 rounded-lg border ${borderTheme} hover:bg-subtle-hover cursor-pointer`}
             >
-              <X className="w-4 h-4 text-text-muted" />
+              <X className="w-4 h-4 text-fg-muted" />
             </button>
 
             <div className="flex items-center gap-2 mb-4">
-              <Users className="w-5 h-5 text-earth" />
-              <h3 className="text-lg font-black text-white">ניהול כיתות 🏫</h3>
+              <Users className="w-5 h-5 text-accent" />
+              <h3 className="text-lg font-semibold text-fg">ניהול כיתות 🏫</h3>
             </div>
 
-            <p className={`${textMuted} text-xs leading-relaxed mb-4`}>
+            <p className={`${textMuted} text-[13px] leading-relaxed mb-4`}>
               ערוך את שמות 5 הכיתות שלך כדי להתאים אותן למערכת השעות שלך. השינויים יישמרו וישפיעו על תיוג השיעורים.
             </p>
 
             <div className="space-y-3 mb-6">
               {editingClasses.map((c, i) => (
                 <div key={i} className="flex gap-2 items-center">
-                  <span className="text-xs text-text-muted w-14 font-semibold">כיתה {i+1}:</span>
+                  <span className="text-[13px] text-fg-muted w-14 font-semibold">כיתה {i+1}:</span>
                   <input
                     type="text"
                     value={c}
@@ -738,7 +677,7 @@ export default function EarthSciencesHubPage() {
                     }}
                     placeholder={`כיתה ${i+1}`}
                     maxLength={15}
-                    className={`flex-1 py-1.5 px-3 rounded-lg border ${borderTheme} bg-surface/20 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-earth text-right`}
+                    className={`flex-1 py-1.5 px-3 rounded-lg border ${borderTheme} bg-subtle text-[13px] font-semibold focus:outline-none focus:ring-1 focus:ring-accent/30 text-right`}
                   />
                 </div>
               ))}
@@ -747,13 +686,13 @@ export default function EarthSciencesHubPage() {
             <div className="flex justify-end gap-3 pt-2">
               <button
                 onClick={() => setShowClassManager(false)}
-                className={`px-4 py-2 border ${borderTheme} hover:bg-surface-hover/30 text-xs font-bold rounded-lg cursor-pointer`}
+                className={`px-4 py-2 border ${borderTheme} hover:bg-subtle-hover text-[13px] font-semibold rounded-lg cursor-pointer`}
               >
                 ביטול
               </button>
               <button
                 onClick={handleSaveClasses}
-                className="px-4 py-2 bg-earth hover:bg-teal-600 text-white text-xs font-bold rounded-lg cursor-pointer shadow-md hover:scale-[1.02] transition-all"
+                className="px-4 py-2 bg-accent hover:opacity-90 text-primary-foreground text-[13px] font-semibold rounded-lg cursor-pointer shadow-sm transition-colors"
               >
                 שמור שינויים
               </button>
@@ -762,10 +701,7 @@ export default function EarthSciencesHubPage() {
         </div>
       )}
 
-      {/* Footer */}
-      <footer className={`w-full text-center py-6 border-t ${borderTheme} text-xs ${textMuted} relative z-10 bg-surface/30`}>
-        <span>© {new Date().getFullYear()} ניר עוז-ארי — מדעי כדור הארץ והיקום לכיתה ח׳</span>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

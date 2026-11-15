@@ -1,8 +1,22 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { collection, doc, getDocs, orderBy, query, serverTimestamp, updateDoc } from "firebase/firestore";
-import { CheckCircle2, Clock, Loader2, RefreshCw, RotateCcw, Save, Search, XCircle } from "lucide-react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { collection, doc, getDocs, orderBy, query, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
+  Download,
+  Loader2,
+  RefreshCw,
+  RotateCcw,
+  Save,
+  Search,
+  Sparkles,
+  Upload,
+  Wand2,
+  XCircle,
+} from "lucide-react";
 import { dbFirestore } from "@/lib/firebase";
 import {
   AGE_KEY,
@@ -34,6 +48,31 @@ interface Props {
 }
 
 const TEAMS = "mission_teams";
+// AI grading drafts made with the /grade-mission Claude Code skill. Teacher-only
+// (see firestore.rules); kept off the team doc because students can read that.
+const AI_REVIEWS = "mission_ai_reviews";
+
+interface AiReview {
+  teamId: string;
+  criteria: { id: string; level: "excellent" | "good" | "needs_improvement"; score: number; justification: string }[];
+  bonus: number;
+  bonusReason: string;
+  stageFeedback: Record<string, string>;
+  generalFeedback: string;
+  teacherFlags: string[];
+  total: number;
+}
+
+const LEVEL_LABEL: Record<AiReview["criteria"][number]["level"], string> = {
+  excellent: "מצוין",
+  good: "טוב",
+  needs_improvement: "דרוש שיפור",
+};
+
+const isAiReview = (r: unknown): r is AiReview => {
+  const v = r as AiReview;
+  return Boolean(v && typeof v.teamId === "string" && Array.isArray(v.criteria) && typeof v.total === "number");
+};
 
 const DEMO_TEAM: MissionTeam = {
   id: "DEMO42",
@@ -66,6 +105,30 @@ const DEMO_TEAM: MissionTeam = {
   status: "submitted",
   submittedAt: { seconds: Math.floor(Date.now() / 1000) },
   updatedAt: { seconds: Math.floor(Date.now() / 1000) },
+};
+
+const DEMO_REVIEW: AiReview = {
+  teamId: "DEMO42",
+  criteria: [
+    { id: "terms", level: "good", score: 24, justification: "רוב המונחים מופיעים (שנת אור, כוח הכבידה, נטיית ציר). חסרים מונחי שלב 1 ומופעי הירח." },
+    { id: "accuracy", level: "excellent", score: 22, justification: "תיקון טעות העונות נכון (s3q5). שנת אור הוגדרה כיחידת זמן (s2q4)." },
+    { id: "calc", level: "good", score: 8, justification: "זמן המסע והמשקל נכונים עם דרך. המשקל נבדק כשגוי במערכת 3 פעמים." },
+    { id: "research", level: "excellent", score: 10, justification: "שני הנתונים נמצאו, מקור נאס\"א." },
+    { id: "recommendation", level: "good", score: 12, justification: "חלק מהתשובות חסרות בדוגמה." },
+    { id: "organization", level: "good", score: 8, justification: "חלוקת עבודה מצוינת לשני שלבים בלבד." },
+  ],
+  bonus: 0,
+  bonusReason: "לא נענו שאלות האתגר.",
+  stageFeedback: {
+    s1: "התחלתם יפה בהגדרת מערכת כדור הארץ. נסו להשלים את טבלת הספירות עד הסוף.",
+    s2: "חישוב זמן המסע מסודר וברור – כל הכבוד! שימו לב ששנת אור היא יחידת מרחק ולא זמן.",
+    s3: "הסבר מצוין על העונות: הבנתם שהסיבה היא נטיית הציר ולא המרחק מהשמש.",
+    s4: "חסרה משימת החלל. חפשו משימה אמיתית שחקרה את מאדים, למשל Perseverance.",
+    s5: "כדאי להשלים את המכתב לסוכנות ולהשתמש בו בנתונים שאספתם.",
+  },
+  generalFeedback: "עבדתם בצורה מסודרת והחישובים שלכם ברורים. הדבר החשוב ביותר לשפר: להשלים את כל השאלות. אתם בדרך הנכונה!",
+  teacherFlags: ["זו טיוטת דוגמה (מצב תצוגה)."],
+  total: 84,
 };
 
 const formatDate = (ts?: { seconds: number } | null) =>
@@ -109,10 +172,15 @@ export default function MissionDashboardView({
   const [feedback, setFeedback] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [reviews, setReviews] = useState<Record<string, AiReview>>({});
+  const [importing, setImporting] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
     if (!isTeacher || demo) {
       setTeams(demo ? [DEMO_TEAM] : []);
+      setReviews(demo ? { [DEMO_REVIEW.teamId]: DEMO_REVIEW } : {});
       return;
     }
     setLoading(true);
@@ -124,7 +192,81 @@ export default function MissionDashboardView({
     } finally {
       setLoading(false);
     }
+    try {
+      const snap = await getDocs(collection(dbFirestore, AI_REVIEWS));
+      const next: Record<string, AiReview> = {};
+      snap.docs.forEach((d) => {
+        const r = d.data().result;
+        if (isAiReview(r)) next[d.id] = r;
+      });
+      setReviews(next);
+    } catch (err) {
+      // Usually means the mission_ai_reviews rule has not been published yet.
+      console.error("Error fetching AI reviews:", err);
+    }
   }, [isTeacher, demo]);
+
+  const exportSubmitted = () => {
+    const submitted = teams.filter((t) => t.status === "submitted");
+    if (submitted.length === 0) {
+      window.alert("אין עבודות שממתינות לבדיקה.");
+      return;
+    }
+    // No names or emails leave the dashboard: graders see the work only.
+    const anonymize = (t: MissionTeam) => {
+      const names = new Map(t.members.map((m, i) => [m.name, i === 0 ? "תלמיד א'" : "תלמיד ב'"]));
+      return Object.fromEntries(Object.entries(t.stageOwners ?? {}).map(([s, name]) => [s, names.get(name) ?? "אחד מבני הזוג"]));
+    };
+    const payload = {
+      kind: "mission-export",
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      teams: submitted.map((t) => ({
+        id: t.id,
+        destinationId: t.destinationId,
+        answers: t.answers ?? {},
+        checks: t.checks ?? {},
+        termsChecked: t.termsChecked ?? [],
+        stageOwners: anonymize(t),
+      })),
+    };
+    const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `mission-export-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setNotice(`יוצאו ${submitted.length} עבודות. עכשיו הריצו ב-Claude Code: /grade-mission`);
+  };
+
+  const importReviews = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setImporting(true);
+    try {
+      const parsed = JSON.parse(await file.text());
+      if (parsed?.kind !== "mission-ai-grades" || !Array.isArray(parsed.reviews)) {
+        window.alert("זה לא קובץ טיוטות של /grade-mission (mission-ai-grades.json).");
+        return;
+      }
+      const known = new Set(teams.map((t) => t.id));
+      const valid = (parsed.reviews as unknown[]).filter(isAiReview).filter((r) => known.has(r.teamId));
+      if (!demo) {
+        await Promise.all(
+          valid.map((r) => setDoc(doc(dbFirestore, AI_REVIEWS, r.teamId), { result: r, importedAt: serverTimestamp() })),
+        );
+      }
+      setReviews((prev) => ({ ...prev, ...Object.fromEntries(valid.map((r) => [r.teamId, r])) }));
+      const skipped = parsed.reviews.length - valid.length;
+      setNotice(`יובאו ${valid.length} טיוטות${skipped ? ` (${skipped} דולגו: צוות לא נמצא או קובץ פגום)` : ""}. התלמידים לא רואים אותן עד שתשמרו.`);
+    } catch (err) {
+      console.error("Error importing AI reviews:", err);
+      window.alert("ייבוא הטיוטות נכשל. ודאו שכלל mission_ai_reviews פורסם ב-Firestore.");
+    } finally {
+      setImporting(false);
+    }
+  };
 
   useEffect(() => {
     // Loading from Firestore is the external system this effect syncs with.
@@ -159,6 +301,19 @@ export default function MissionDashboardView({
 
   const clamp = (v: string, max: number) => Math.max(0, Math.min(max, Number(v) || 0));
   const total = RUBRIC.reduce((s, c) => s + clamp(scores[c.id] ?? "", c.max), 0) + clamp(bonus, BONUS_MAX);
+
+  const selectedReview = selected ? reviews[selected.id] : undefined;
+
+  const applyReview = () => {
+    if (!selectedReview) return;
+    const hasWork = Object.values(scores).some((v) => v !== "") || feedback.trim() || Object.values(stageFeedback).some((v) => v?.trim());
+    if (hasWork && !window.confirm("להחליף את הציונים וההערות שכבר בטופס בטיוטת ה-AI?")) return;
+    setScores(Object.fromEntries(RUBRIC.map((c) => [c.id, String(selectedReview.criteria.find((x) => x.id === c.id)?.score ?? "")])));
+    setBonus(selectedReview.bonus ? String(selectedReview.bonus) : "");
+    setStageFeedback(selectedReview.stageFeedback);
+    setFeedback(selectedReview.generalFeedback);
+    setSaved(false);
+  };
 
   const patchLocal = (id: string, patch: Partial<MissionTeam>) =>
     setTeams((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t)));
@@ -287,6 +442,29 @@ export default function MissionDashboardView({
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
           </button>
         </div>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={exportSubmitted}
+            title="מוריד קובץ עם העבודות שממתינות לבדיקה, בלי שמות תלמידים, לבדיקה ב-Claude Code (/grade-mission)"
+            className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold border flex items-center justify-center gap-1.5 cursor-pointer ${borderStyle} ${textMuted} hover:text-purple-400`}
+          >
+            <Download className="w-3.5 h-3.5" /> ייצוא עבודות לבדיקה
+          </button>
+          <button
+            type="button"
+            onClick={() => fileInput.current?.click()}
+            disabled={importing}
+            title="בוחרים את mission-ai-grades.json ש-/grade-mission יצר"
+            className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold border flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60 ${borderStyle} ${textMuted} hover:text-purple-400`}
+          >
+            {importing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />} ייבוא טיוטות AI
+          </button>
+          <input ref={fileInput} type="file" accept="application/json,.json" onChange={importReviews} className="hidden" />
+        </div>
+        {notice && (
+          <p className="text-[11px] rounded-md border border-purple-500/30 bg-purple-500/10 text-purple-400 px-2.5 py-1.5 leading-relaxed">{notice}</p>
+        )}
         <div className="relative">
           <Search className={`absolute right-3 top-2.5 w-4 h-4 ${textMuted}`} />
           <input
@@ -334,6 +512,11 @@ export default function MissionDashboardView({
                   <span className={t.status === "graded" ? "text-emerald-500 font-bold" : t.status === "submitted" ? "text-amber-500 font-bold" : textMuted}>
                     {STATUS_LABEL[t.status]}
                     {t.status === "graded" && ` · ${t.scoreTeacher}`}
+                    {reviews[t.id] && (
+                      <span className="mr-1.5 inline-flex items-center gap-0.5 text-purple-400 font-bold" title={`טיוטת AI: ${reviews[t.id].total}`}>
+                        <Sparkles className="w-3 h-3" /> AI {reviews[t.id].total}
+                      </span>
+                    )}
                   </span>
                   <span className={`flex items-center gap-1 ${textMuted}`}>
                     <Clock className="w-3 h-3" />
@@ -462,6 +645,64 @@ export default function MissionDashboardView({
               </div>
               {answer(selected.answers?.[SOURCES_KEY])}
             </div>
+
+            {selectedReview && (
+              <div className={`rounded-lg border p-5 space-y-3 ${cardStyle} border-purple-500/40`}>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h4 className={`text-base font-semibold flex items-center gap-1.5 ${textTitle}`}>
+                    <Sparkles className="w-4 h-4 text-purple-400" /> טיוטת בדיקה של AI
+                    <span className="text-purple-400 mr-1">{selectedReview.total}</span>
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={applyReview}
+                    className="px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-600 hover:bg-purple-500 text-white flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Wand2 className="w-3.5 h-3.5" /> החל על הטופס
+                  </button>
+                </div>
+                <p className={`text-[11px] ${textMuted}`}>
+                  הטיוטה גלויה רק לכם. &quot;החל על הטופס&quot; ממלא את הציונים וההערות, ואפשר לערוך לפני השמירה.
+                </p>
+                <div className="space-y-1.5">
+                  {RUBRIC.map((c) => {
+                    const r = selectedReview.criteria.find((x) => x.id === c.id);
+                    return (
+                      <div key={c.id} className={`rounded-md border px-3 py-2 text-xs ${soft}`}>
+                        <div className="flex items-center justify-between gap-2">
+                          <b className={textTitle}>{c.title}</b>
+                          <span className="font-bold text-purple-400">
+                            {r?.score ?? "—"}/{c.max} · {r ? LEVEL_LABEL[r.level] : ""}
+                          </span>
+                        </div>
+                        {r?.justification && <p className={`mt-0.5 leading-relaxed ${textMuted}`}>{r.justification}</p>}
+                      </div>
+                    );
+                  })}
+                  <div className={`rounded-md border px-3 py-2 text-xs ${soft}`}>
+                    <div className="flex items-center justify-between gap-2">
+                      <b className={textTitle}>בונוס</b>
+                      <span className="font-bold text-purple-400">
+                        {selectedReview.bonus}/{BONUS_MAX}
+                      </span>
+                    </div>
+                    {selectedReview.bonusReason && <p className={`mt-0.5 ${textMuted}`}>{selectedReview.bonusReason}</p>}
+                  </div>
+                </div>
+                {selectedReview.teacherFlags.length > 0 && (
+                  <div className={`rounded-lg border px-3 py-2 text-xs space-y-1 ${keyBox}`}>
+                    <b className="flex items-center gap-1">
+                      <AlertTriangle className="w-3.5 h-3.5" /> כדאי לבדוק בעצמכם
+                    </b>
+                    <ul className="list-disc pr-4 space-y-0.5">
+                      {selectedReview.teacherFlags.map((f, i) => (
+                        <li key={i}>{f}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
 
             <form onSubmit={saveGrade} className={`rounded-lg border p-5 space-y-3 sticky bottom-4 ${cardStyle} ${borderStyle}`}>
               <h4 className={`text-base font-semibold ${textTitle}`}>ציון לפי המחוון</h4>

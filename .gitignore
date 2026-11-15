@@ -41,3 +41,8 @@ yarn-error.log*
 next-env.d.ts
 .npm-cache
 .npmrc
+
+# student work exported for /grade-mission
+/grading/
+mission-export-*.json
+mission-ai-grades.json

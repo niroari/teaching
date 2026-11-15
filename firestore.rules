@@ -89,6 +89,12 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // AI grading drafts for mission_teams (from the /grade-mission skill).
+    // Teacher only: students must never see a draft before the teacher saves it.
+    match /mission_ai_reviews/{teamId} {
+      allow read, write: if isAdmin();
+    }
+
     match /writing_assignments/{assignmentId} {
       allow create: if request.auth != null && 
         request.resource.data.studentId == request.auth.uid;

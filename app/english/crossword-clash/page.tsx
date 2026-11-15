@@ -27,7 +27,6 @@ import {
 import { colorMap, colorsList } from "@/lib/colors";
 import { sounds } from "@/lib/sounds";
 import { useAuth } from "@/lib/context/AuthContext";
-import { loadScopedLocalWords } from "@/lib/vocab-storage";
 import { PRESET_PACKS, PresetPack } from "@/lib/crossword/presets";
 import { generateCrosswordGrid, dealTeamRack } from "@/lib/crossword/generator";
 import { saveActiveGame } from "@/lib/crossword/game-storage";
@@ -94,19 +93,10 @@ export default function CrosswordClashSetupPage() {
 
   // Custom / Imported Words
   const [customWordsText, setCustomWordsText] = useState("");
-  const [userSavedWords, setUserSavedWords] = useState<any[]>([]);
 
   // Settings
   const [roundTimer, setRoundTimer] = useState<number>(90);
   const [showHebrewHints, setShowHebrewHints] = useState(false);
-
-  // Load saved words from Vocab Trainer on mount
-  useEffect(() => {
-    const words = loadScopedLocalWords(user?.uid);
-    if (words && words.length > 0) {
-      setUserSavedWords(words);
-    }
-  }, [user?.uid]);
 
   // Add Team
   const handleAddTeam = () => {
@@ -133,18 +123,6 @@ export default function CrosswordClashSetupPage() {
       return;
     }
     setTeams(teams.filter(t => t.id !== id));
-  };
-
-  const handleImportVocabTrainer = () => {
-    if (userSavedWords.length === 0) {
-      alert("No saved words found in your Vocab Trainer yet!");
-      return;
-    }
-    const formatted = userSavedWords
-      .slice(0, 15)
-      .map(w => `${w.english} - ${w.hebrew}`)
-      .join("\n");
-    setCustomWordsText(formatted);
   };
 
   // Launch Game
@@ -685,14 +663,6 @@ export default function CrosswordClashSetupPage() {
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold">הזינו מילים (מילה אחת בכל שורה - פורמט: WORD - DEFINITION)</span>
-                {userSavedWords.length > 0 && (
-                  <button
-                    onClick={handleImportVocabTrainer}
-                    className="text-xs text-indigo-400 hover:text-indigo-300 underline font-semibold cursor-pointer"
-                  >
-                    ייבא ממאגר אוצר המילים שלי ({userSavedWords.length} מילים)
-                  </button>
-                )}
               </div>
               <textarea
                 rows={5}

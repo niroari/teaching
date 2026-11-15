@@ -6,8 +6,6 @@ import {
   Eye,
   Rocket,
   MessagesSquare,
-  BookOpenText,
-  PenLine,
   Settings,
   Sparkles,
   Sun,
@@ -20,8 +18,6 @@ import {
 export type AdminTab =
   | "visibility"
   | "chat-masters"
-  | "unseen-practice"
-  | "writing-practice"
   | "mission-new-home"
   | "future-projects"
   | "settings";
@@ -29,8 +25,6 @@ export type AdminTab =
 export const ADMIN_TABS: AdminTab[] = [
   "visibility",
   "chat-masters",
-  "unseen-practice",
-  "writing-practice",
   "mission-new-home",
   "future-projects",
   "settings",
@@ -79,18 +73,6 @@ export const NAV_GROUPS: NavGroup[] = [
         label: "Chat Masters",
         description: "קריאת תמלולי השיחה וכרטיסי היציאה, ומתן ציון ומשוב.",
         icon: MessagesSquare,
-      },
-      {
-        id: "unseen-practice",
-        label: "אנסין",
-        description: "תשובות התלמידים לשאלות האנסין, ציון אוטומטי וציון מורה.",
-        icon: BookOpenText,
-      },
-      {
-        id: "writing-practice",
-        label: "כתיבה",
-        description: "חיבורים ומכתבים של תלמידים, ניתוח AI ומשוב מורה.",
-        icon: PenLine,
       },
     ],
   },

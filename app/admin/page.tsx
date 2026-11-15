@@ -2,11 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, Sun, Moon, BookOpen, FileText, Flame, LayoutGrid, CheckCircle, LucideIcon } from "lucide-react";
+import { Menu, Sun, Moon, Flame, LayoutGrid, CheckCircle, LucideIcon } from "lucide-react";
 import { useAuth } from "@/lib/context/AuthContext";
 import { dbFirestore } from "@/lib/firebase";
 import { collection, query, getDocs, updateDoc, doc, orderBy } from "firebase/firestore";
-import { UnseenDashboardView, WritingDashboardView, UnseenAssignment, WritingAssignment } from "./components/UnseenWritingViews";
 import MissionDashboardView from "./components/MissionDashboardView";
 import VisibilityManager from "./components/VisibilityManager";
 import ChatMastersView, { ChatAssignment } from "./components/ChatMastersView";
@@ -15,25 +14,11 @@ import { isTeacherUser } from "@/lib/auth/teacher";
 
 const FUTURE_PROJECTS: { id: string; title: string; desc: string; badge: string; icon: LucideIcon }[] = [
   {
-    id: "vocab",
-    title: "מעקב אימון אוצר מילים",
-    desc: "רשימות המילים האישיות של התלמידים, התקדמות בתרגול הכרטיסיות ואחוזי הצלחה בבחנים.",
-    badge: "בפיתוח",
-    icon: BookOpen,
-  },
-  {
     id: "auction",
     title: "מכירה פומבית של משפטים",
     desc: "דוחות ביצוע כיתתיים, ההון הקבוצתי שנצבר וציון לשיפור הדקדוק הקבוצתי.",
     badge: "בתכנון",
     icon: Flame,
-  },
-  {
-    id: "writing",
-    title: "משימות כתיבה חופשית",
-    desc: "ניהול חיבורים ומכתבים, עם דריסת ציון ה-AI ומשוב מורה מורחב.",
-    badge: "בתכנון",
-    icon: FileText,
   },
   {
     id: "snakes",
@@ -44,135 +29,6 @@ const FUTURE_PROJECTS: { id: string; title: string; desc: string; badge: string;
   },
 ];
 
-const DEMO_UNSEEN: UnseenAssignment = {
-  id: "demo-unseen-1",
-  studentId: "student-101",
-  studentName: "רועי בלש",
-  studentClass: "כיתה ח'2",
-  studentEmail: "roy.detective@school.edu",
-  unseenTitle: "Max the Small Dog",
-  difficulty: "Easy",
-  score: 85,
-  correctOnFirstTry: 7,
-  totalQuestions: 8,
-  submittedAt: { seconds: Math.floor(Date.now() / 1000) },
-  status: "submitted",
-  scoreTeacher: null,
-  feedbackTeacher: null,
-  answers: [
-    {
-      questionId: 1,
-      questionNumber: 1,
-      type: "mcq",
-      paragraph: 1,
-      prompt: "What does Max look like?",
-      studentAnswer: "He is white with long ears and a short tail",
-      correctAnswer: "He is white with long ears and a short tail",
-      firstTrySuccess: true,
-      attempts: 1,
-      explanation: "בפסקה 1 רשום בבירור שהכלב לבן, בעל אוזניים ארוכות וזנב קצר."
-    },
-    {
-      questionId: 2,
-      questionNumber: 2,
-      type: "mcq",
-      paragraph: 1,
-      prompt: "How old is Max?",
-      studentAnswer: "Three years old",
-      correctAnswer: "Three years old",
-      firstTrySuccess: true,
-      attempts: 1,
-      explanation: "הטקסט מציין 'Max is three years old'."
-    },
-    {
-      questionId: 3,
-      questionNumber: 3,
-      type: "mcq",
-      paragraph: 1,
-      prompt: "What does Max see near the big house?",
-      studentAnswer: "A yellow cat",
-      correctAnswer: "A yellow cat",
-      firstTrySuccess: true,
-      attempts: 1,
-      explanation: "נכון! בפסקה 1 רשום שמקס רואה חתול צהוב (yellow cat)."
-    },
-    {
-      questionId: 4,
-      questionNumber: 4,
-      type: "copy",
-      paragraph: 1,
-      prompt: "Copy the sentence that proves Tom gives food to Max.",
-      studentAnswer: "Tom gives Max a small cookie.",
-      correctAnswer: "Tom gives Max a small cookie.",
-      firstTrySuccess: true,
-      attempts: 1,
-      explanation: "משפט מלא ומדויק המוכיח שמתן העוגיה הוא האכלה."
-    },
-    {
-      questionId: 5,
-      questionNumber: 5,
-      type: "open",
-      paragraph: 2,
-      prompt: "Why does Max run to Tom's room every morning?",
-      studentAnswer: "Because he wants to eat his food and wakes Tom up.",
-      correctAnswer: "Because he wants to eat his food.",
-      firstTrySuccess: true,
-      attempts: 1,
-      explanation: "תשובה מצוינת! התלמיד ציין את הסיבה המדויקת מהפסקה.",
-      matchedKeywords: ["eat", "food", "wants"],
-      missingKeywords: []
-    },
-    {
-      questionId: 6,
-      questionNumber: 6,
-      type: "mcq",
-      paragraph: 2,
-      prompt: "What does Max drink?",
-      studentAnswer: "Cold water",
-      correctAnswer: "Cold water",
-      firstTrySuccess: false,
-      attempts: 2,
-      explanation: "מקס שותה מים קרים מקערה כחולה (He drinks cold water from a blue bowl)."
-    },
-    {
-      questionId: 7,
-      questionNumber: 7,
-      type: "open",
-      paragraph: 3,
-      prompt: "What does Max do with the red ball?",
-      studentAnswer: "He runs after the ball and brings it back to Tom.",
-      correctAnswer: "He runs after the red ball and brings the ball back to Tom.",
-      firstTrySuccess: true,
-      attempts: 1,
-      explanation: "תשובה מדויקת להפליא.",
-      matchedKeywords: ["runs", "ball", "brings"],
-      missingKeywords: []
-    },
-    {
-      questionId: 8,
-      questionNumber: 8,
-      type: "open",
-      paragraph: 3,
-      prompt: "What is this story mostly about?",
-      studentAnswer: "Max the small dog and what he does every day with Tom.",
-      correctAnswer: "Tom's dog Max and his daily routine.",
-      firstTrySuccess: true,
-      attempts: 1,
-      explanation: "הבנה גלובלית מלאה של הסיפור.",
-      matchedKeywords: ["Max", "dog", "Tom"],
-      missingKeywords: []
-    }
-  ],
-  passage: {
-    title: "Max the Small Dog",
-    difficulty: "Easy",
-    paragraphs: [
-      "Tom has a small dog. The dog is white. His name is Max. Max has long ears and a short tail. Tom likes Max very much. Max is three years old. Every day, Tom walks with Max. They walk near the big house. Max sees a yellow cat. He does not run after the cat. Max is a good dog. He stands next to Tom. Tom gives Max a small cookie. Max is happy.",
-      "Max sleeps in a warm bed near the door. The bed is soft and brown. Every morning, Max runs to Tom's room. Max wakes Tom up because he wants to eat his food. Tom gets up from his bed. He walks to the kitchen. Tom puts dog food in a red bowl. Max eats his food fast. He drinks cold water from a blue bowl. Then, Max waits by the door.",
-      "In the afternoon, Tom and Max play in the big garden. Max runs after a red ball. He brings the ball back to Tom. Tom smiles and pats Max's head. Sometimes, their friend Sarah comes to play. Sarah has a funny hat. Max sniffs the hat and wags his tail. At night, Max lies down in his bed. He closes his eyes and sleeps. Max is a lovely pet."
-    ]
-  }
-};
 
 export default function GeneralTeacherAdmin() {
   const { user, signInWithGoogle } = useAuth();
@@ -191,14 +47,6 @@ export default function GeneralTeacherAdmin() {
   const [loading, setLoading] = useState(true);
   const [selectedSub, setSelectedSub] = useState<ChatAssignment | null>(null);
 
-  // Unseen and Writing Practice states
-  const [unseenSubmissions, setUnseenSubmissions] = useState<UnseenAssignment[]>([]);
-  const [loadingUnseen, setLoadingUnseen] = useState(true);
-  const [selectedUnseen, setSelectedUnseen] = useState<UnseenAssignment | null>(null);
-
-  const [writingSubmissions, setWritingSubmissions] = useState<WritingAssignment[]>([]);
-  const [loadingWriting, setLoadingWriting] = useState(true);
-  const [selectedWriting, setSelectedWriting] = useState<WritingAssignment | null>(null);
   
   // Filter and search states
   const [searchQuery, setSearchQuery] = useState("");
@@ -244,79 +92,17 @@ export default function GeneralTeacherAdmin() {
     }
   };
 
-  const fetchUnseenSubmissions = async () => {
-    setLoadingUnseen(true);
-    try {
-      const q = query(
-        collection(dbFirestore, "unseen_assignments"),
-        orderBy("submittedAt", "desc")
-      );
-      const snapshot = await getDocs(q);
-      const data = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as UnseenAssignment[];
-      setUnseenSubmissions(data);
-    } catch (err) {
-      console.error("Error fetching unseen submissions:", err);
-    } finally {
-      setLoadingUnseen(false);
-    }
-  };
-
-  const fetchWritingSubmissions = async () => {
-    setLoadingWriting(true);
-    try {
-      const q = query(
-        collection(dbFirestore, "writing_assignments"),
-        orderBy("submittedAt", "desc")
-      );
-      const snapshot = await getDocs(q);
-      const data = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as WritingAssignment[];
-      setWritingSubmissions(data);
-    } catch (err) {
-      console.error("Error fetching writing submissions:", err);
-    } finally {
-      setLoadingWriting(false);
-    }
-  };
-
   useEffect(() => {
     // Only fetch if authenticated as admin/teacher
     if (user && (user.email === "niroari@gmail.com" || user.email === "nirozari@gmail.com")) {
       fetchSubmissions();
-      fetchUnseenSubmissions();
-      fetchWritingSubmissions();
     }
   }, [user]);
 
   const handleSelectSub = (sub: ChatAssignment) => {
     setSelectedSub(sub);
-    setSelectedUnseen(null);
-    setSelectedWriting(null);
     setGradeInput(sub.score !== null ? String(sub.score) : "");
     setFeedbackInput(sub.feedback || "");
-    setGradeSuccess(false);
-  };
-
-  const handleSelectUnseen = (sub: UnseenAssignment) => {
-    setSelectedUnseen(sub);
-    setSelectedSub(null);
-    setSelectedWriting(null);
-    setGradeInput(sub.scoreTeacher !== null ? String(sub.scoreTeacher) : "");
-    setFeedbackInput(sub.feedbackTeacher || "");
-    setGradeSuccess(false);
-  };
-
-  const handleSelectWriting = (sub: WritingAssignment) => {
-    setSelectedWriting(sub);
-    setSelectedSub(null);
-    setSelectedUnseen(null);
-    setGradeInput(sub.scoreTeacher !== null ? String(sub.scoreTeacher) : "");
-    setFeedbackInput(sub.feedbackTeacher || "");
     setGradeSuccess(false);
   };
 
@@ -354,86 +140,6 @@ export default function GeneralTeacherAdmin() {
       setTimeout(() => setGradeSuccess(false), 3000);
     } catch (err) {
       console.error("Error saving grade:", err);
-      alert("שגיאה בשמירת הציון. נסו שוב.");
-    } finally {
-      setIsGrading(false);
-    }
-  };
-
-  const handleSaveUnseenGrade = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedUnseen) return;
-    const scoreVal = parseInt(gradeInput);
-    if (isNaN(scoreVal) || scoreVal < 0 || scoreVal > 100) {
-      alert("אנא הזינו ציון תקין בין 0 ל-100");
-      return;
-    }
-
-    setIsGrading(true);
-    try {
-      const docRef = doc(dbFirestore, "unseen_assignments", selectedUnseen.id);
-      await updateDoc(docRef, {
-        status: "graded",
-        scoreTeacher: scoreVal,
-        feedbackTeacher: feedbackInput.trim()
-      });
-
-      setUnseenSubmissions(prev =>
-        prev.map(sub =>
-          sub.id === selectedUnseen.id
-            ? { ...sub, status: "graded" as const, scoreTeacher: scoreVal, feedbackTeacher: feedbackInput.trim() }
-            : sub
-        )
-      );
-
-      setSelectedUnseen(prev =>
-        prev ? { ...prev, status: "graded" as const, scoreTeacher: scoreVal, feedbackTeacher: feedbackInput.trim() } : null
-      );
-
-      setGradeSuccess(true);
-      setTimeout(() => setGradeSuccess(false), 3000);
-    } catch (err) {
-      console.error("Error saving unseen grade:", err);
-      alert("שגיאה בשמירת הציון. נסו שוב.");
-    } finally {
-      setIsGrading(false);
-    }
-  };
-
-  const handleSaveWritingGrade = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedWriting) return;
-    const scoreVal = parseInt(gradeInput);
-    if (isNaN(scoreVal) || scoreVal < 0 || scoreVal > 100) {
-      alert("אנא הזינו ציון תקין בין 0 ל-100");
-      return;
-    }
-
-    setIsGrading(true);
-    try {
-      const docRef = doc(dbFirestore, "writing_assignments", selectedWriting.id);
-      await updateDoc(docRef, {
-        status: "graded",
-        scoreTeacher: scoreVal,
-        feedbackTeacher: feedbackInput.trim()
-      });
-
-      setWritingSubmissions(prev =>
-        prev.map(sub =>
-          sub.id === selectedWriting.id
-            ? { ...sub, status: "graded" as const, scoreTeacher: scoreVal, feedbackTeacher: feedbackInput.trim() }
-            : sub
-        )
-      );
-
-      setSelectedWriting(prev =>
-        prev ? { ...prev, status: "graded" as const, scoreTeacher: scoreVal, feedbackTeacher: feedbackInput.trim() } : null
-      );
-
-      setGradeSuccess(true);
-      setTimeout(() => setGradeSuccess(false), 3000);
-    } catch (err) {
-      console.error("Error saving writing grade:", err);
       alert("שגיאה בשמירת הציון. נסו שוב.");
     } finally {
       setIsGrading(false);
@@ -479,8 +185,6 @@ export default function GeneralTeacherAdmin() {
   const pending = <T extends { status: string }>(list: T[]) => list.filter((s) => s.status === "submitted").length;
   const counts: Partial<Record<AdminTab, number>> = {
     "chat-masters": pending(submissions),
-    "unseen-practice": pending(unseenSubmissions),
-    "writing-practice": pending(writingSubmissions),
   };
   const activeItem = NAV_ITEMS.find((i) => i.id === currentTab) ?? NAV_ITEMS[0];
 
@@ -541,14 +245,8 @@ export default function GeneralTeacherAdmin() {
                   type="button"
                   onClick={() => {
                     setDevPreview(true);
-                    selectTab("unseen-practice");
-                    setLoadingUnseen(false);
-                    setLoadingWriting(false);
+                    selectTab("mission-new-home");
                     setLoading(false);
-                    if (unseenSubmissions.length === 0) {
-                      setUnseenSubmissions([DEMO_UNSEEN]);
-                      setSelectedUnseen(DEMO_UNSEEN);
-                    }
                   }}
                   className={`w-full py-2.5 rounded-md border text-sm cursor-pointer transition-colors ${secondaryBtn}`}
                 >
@@ -619,26 +317,6 @@ export default function GeneralTeacherAdmin() {
               selectedSub={selectedSub}
               handleSelectSub={handleSelectSub}
               handleSaveGrade={handleSaveGrade}
-            />
-          ) : currentTab === "unseen-practice" ? (
-            <UnseenDashboardView
-              {...viewProps}
-              {...listProps}
-              unseenSubmissions={unseenSubmissions}
-              loadingUnseen={loadingUnseen}
-              selectedUnseen={selectedUnseen}
-              handleSelectUnseen={handleSelectUnseen}
-              handleSaveUnseenGrade={handleSaveUnseenGrade}
-            />
-          ) : currentTab === "writing-practice" ? (
-            <WritingDashboardView
-              {...viewProps}
-              {...listProps}
-              writingSubmissions={writingSubmissions}
-              loadingWriting={loadingWriting}
-              selectedWriting={selectedWriting}
-              handleSelectWriting={handleSelectWriting}
-              handleSaveWritingGrade={handleSaveWritingGrade}
             />
           ) : currentTab === "mission-new-home" ? (
             <MissionDashboardView {...viewProps} isTeacher={isTeacher} demo={devPreview} />

@@ -61,9 +61,6 @@ export const CONTENT_ITEMS: ContentItem[] = [
   // ── English ──
   { id: "english.crossword-clash", title: "Crossword Clash", subject: "english", kind: "game", path: "/english/crossword-clash" },
   { id: "english.sentence-auction", title: "The Sentence Auction", subject: "english", kind: "game", path: "/english-auction" },
-  { id: "english.vocab-trainer", title: "Vocab Trainer", subject: "english", kind: "tool", path: "/english/vocab-trainer" },
-  { id: "english.unseen-practice", title: "בלשי האנסין (Unseen Practice)", subject: "english", kind: "assignment", path: "/english/unseen-practice" },
-  { id: "english.writing-practice", title: "תרגול כתיבה (Writing Practice)", subject: "english", kind: "assignment", path: "/english/writing-practice" },
   { id: "english.chat-masters", title: "Chat Masters", subject: "english", kind: "assignment", path: "/english/chat-masters" },
   { id: "english.adjectives", title: "שמות תואר (Adjectives)", subject: "english", kind: "presentation", path: "/english/adjectives" },
   { id: "english.simone-biles", title: "Simone Biles: Present Tenses", subject: "english", kind: "presentation", path: "/english/simone-biles" },

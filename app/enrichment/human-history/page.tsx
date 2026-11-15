@@ -1,6 +1,7 @@
 import React from "react";
-import Link from "next/link";
-import { ArrowLeft, BookOpen } from "lucide-react";
+import PageShell from "@/components/site/PageShell";
+import PageHeader from "@/components/site/PageHeader";
+import { LinkCard } from "@/components/site/ui";
 
 const HUMAN_HISTORY_LESSONS = [
   {
@@ -55,65 +56,29 @@ const HUMAN_HISTORY_LESSONS = [
 
 export default function HumanHistoryHubPage() {
   return (
-    <div className="relative min-h-screen bg-[#080c18] text-[#e8edf8] flex flex-col justify-between overflow-hidden">
-      {/* Background Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-amber-500/5 via-transparent to-transparent blur-3xl pointer-events-none rounded-full" />
+    <PageShell
+      subject="enrichment"
+      crumbs={[{ label: "העשרה", href: "/enrichment" }, { label: "קיצור תולדות האנושות" }]}
+    >
+      <PageHeader
+        eyebrow={<span>היסטוריה אנושית</span>}
+        title="קיצור תולדות האנושות"
+        description="שישה שיעורים בעקבות ספרו של פרופ' יובל נוח הררי"
+      />
 
-      {/* Main Container */}
-      <div className="relative w-full max-w-5xl mx-auto px-6 py-16 flex-1 flex flex-col z-10">
-        
-        {/* Back Link */}
-        <Link
-          href="/enrichment"
-          className="self-start inline-flex items-center gap-2 text-sm text-text-muted hover:text-amber-400 transition-colors mb-8"
-        >
-          <span>→ חזרה להעשרה</span>
-        </Link>
-
-        {/* Header */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-surface border border-border-custom rounded-full text-sm font-bold text-amber-500">
-            <BookOpen className="w-4 h-4" />
-            <span>היסטוריה אנושית</span>
-          </div>
-          <h1 className="text-4xl font-black text-white mt-4">קיצור תולדות האנושות</h1>
-          <p className="text-text-muted text-sm mt-2">שישה שיעורים בעקבות ספרו של פרופ' יובל נוח הררי</p>
-        </div>
-
-        {/* Lessons Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full mt-4">
-          {HUMAN_HISTORY_LESSONS.map((l) => (
-            <Link
-              key={l.slug}
-              href={`/enrichment/human-history/${l.slug}`}
-              className={`group glass-card rounded-2xl border border-border-custom transition-all duration-300 p-6 flex flex-col justify-between ${l.borderGlow}`}
-            >
-              <div>
-                <span className="text-text-muted text-[10px] font-bold tracking-wider uppercase">
-                  {l.num}
-                </span>
-                <h3 className="text-lg font-bold text-white group-hover:text-amber-400 transition-colors mt-2">
-                  {l.title}
-                </h3>
-                <p className="text-text-muted text-sm mt-3 leading-relaxed">
-                  {l.desc}
-                </p>
-              </div>
-
-              <div className="mt-8 flex items-center gap-2 text-sm font-bold text-amber-500 group-hover:translate-x-[-6px] transition-transform">
-                <span>פתח מצגת שיעור</span>
-                <ArrowLeft className="w-4 h-4" />
-              </div>
-            </Link>
-          ))}
-        </div>
-
+      {/* Lessons Grid */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {HUMAN_HISTORY_LESSONS.map((l) => (
+          <LinkCard
+            key={l.slug}
+            href={`/enrichment/human-history/${l.slug}`}
+            meta={<span className="text-xs font-medium text-fg-subtle">{l.num}</span>}
+            title={l.title}
+            description={l.desc}
+            cta="פתח מצגת שיעור"
+          />
+        ))}
       </div>
-
-      {/* Footer */}
-      <footer className="w-full text-center py-6 border-t border-border-custom text-xs text-text-muted relative z-10 bg-surface/30">
-        <span>© {new Date().getFullYear()} ניר עוז-ארי — קיצור תולדות האנושות</span>
-      </footer>
-    </div>
+    </PageShell>
   );
 }

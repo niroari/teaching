@@ -1,6 +1,7 @@
 import React from "react";
-import Link from "next/link";
-import { ArrowLeft, Dna } from "lucide-react";
+import PageShell from "@/components/site/PageShell";
+import PageHeader from "@/components/site/PageHeader";
+import { LinkCard } from "@/components/site/ui";
 
 const EVOLUTION_MODULES = [
   {
@@ -51,72 +52,30 @@ const EVOLUTION_MODULES = [
 
 export default function EvolutionHubPage() {
   return (
-    <div className="relative min-h-screen bg-[#080c18] text-[#e8edf8] flex flex-col justify-between overflow-hidden">
-      {/* Background DNA Glow Pattern */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-emerald-500/5 via-transparent to-transparent blur-3xl pointer-events-none rounded-full" />
+    <PageShell subject="enrichment" crumbs={[{ label: "העשרה", href: "/enrichment" }, { label: "אבולוציה" }]}>
+      <PageHeader
+        eyebrow={<span>מדעי החיים</span>}
+        title="לומדות אבולוציה"
+        description="לומדות אינטראקטיביות להעשרה ולחיזוק הידע"
+      />
 
-      {/* Main Container */}
-      <div className="relative w-full max-w-5xl mx-auto px-6 py-12 flex-1 flex flex-col z-10">
-        
-        {/* Back Link */}
-        <Link
-          href="/enrichment"
-          className="self-start inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-enrichment transition-colors mb-8"
-        >
-          <span>→ חזרה להעשרה</span>
-        </Link>
-
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-surface border border-border-custom rounded-full text-xs font-bold text-enrichment">
-            <Dna className="w-3.5 h-3.5" />
-            <span>מדעי החיים</span>
-          </div>
-          <h1 className="text-3xl font-black text-white mt-3">לומדות אבולוציה</h1>
-          <p className="text-text-muted text-xs mt-2">לומדות אינטראקטיביות להעשרה ולחיזוק הידע</p>
-        </div>
-
-        {/* Modules Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full mt-4">
-          {EVOLUTION_MODULES.map((m) => (
-            <Link
-              key={m.slug}
-              href={m.link}
-              className={`group glass-card rounded-2xl border border-border-custom transition-all duration-300 p-6 flex flex-col items-center text-center ${m.accentClass}`}
-            >
-              <span className="text-text-muted text-[10px] font-bold tracking-wider uppercase mb-1">
-                {m.lesson}
+      {/* Modules Grid */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {EVOLUTION_MODULES.map((m) => (
+          <LinkCard
+            key={m.slug}
+            href={m.link}
+            meta={
+              <span className="text-xs font-medium text-fg-subtle">
+                {m.lesson} · {m.stages}
               </span>
-              
-              <span className="text-5xl my-4 group-hover:scale-110 transition-transform duration-300 block">
-                {m.icon}
-              </span>
-
-              <h3 className="text-base font-bold text-white group-hover:text-inherit transition-colors">
-                {m.title}
-              </h3>
-              
-              <p className="text-text-muted text-xs mt-3 leading-relaxed flex-1">
-                {m.desc}
-              </p>
-
-              <span className="text-[10px] text-text-muted font-semibold mt-4 mb-5">
-                {m.stages}
-              </span>
-
-              <span className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${m.badgeClass}`}>
-                להתחיל ←
-              </span>
-            </Link>
-          ))}
-        </div>
-
+            }
+            title={m.title}
+            description={m.desc}
+            cta="להתחיל"
+          />
+        ))}
       </div>
-
-      {/* Footer */}
-      <footer className="w-full text-center py-6 border-t border-border-custom text-[10px] text-text-muted relative z-10 bg-surface/30">
-        <span>© {new Date().getFullYear()} ניר עוז-ארי — אבולוציה ומדעי החיים</span>
-      </footer>
-    </div>
+    </PageShell>
   );
 }

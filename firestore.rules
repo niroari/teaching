@@ -37,6 +37,49 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // "Mission: New Home" research assignment: a shared draft per pair,
+    // addressed by a 6-character team code.
+    match /mission_teams/{teamId} {
+      function isMember() {
+        return request.auth != null && request.auth.uid in resource.data.memberIds;
+      }
+      function changes() {
+        return request.resource.data.diff(resource.data).affectedKeys();
+      }
+
+      // Opening a team: the creator is its only member and it starts as a draft.
+      allow create: if request.auth != null &&
+        request.resource.data.memberIds == [request.auth.uid] &&
+        request.resource.data.status == "draft";
+
+      // Anyone signed in may read one team by its code (needed to join);
+      // listing is limited to a student's own teams, or the teacher.
+      allow get: if request.auth != null;
+      allow list: if request.auth != null &&
+        (isAdmin() || request.auth.uid in resource.data.memberIds);
+
+      // Joining: a draft gains exactly this user, up to two members.
+      allow update: if request.auth != null &&
+        !(request.auth.uid in resource.data.memberIds) &&
+        resource.data.status == "draft" &&
+        changes().hasOnly(["memberIds", "members", "updatedAt"]) &&
+        request.resource.data.memberIds.size() == resource.data.memberIds.size() + 1 &&
+        request.resource.data.memberIds.hasAll(resource.data.memberIds) &&
+        request.auth.uid in request.resource.data.memberIds &&
+        request.resource.data.memberIds.size() <= 2;
+
+      // Working and submitting: members edit their own work while it is a draft,
+      // and may only move it to "submitted". Grading fields stay with the teacher.
+      allow update: if isMember() &&
+        resource.data.status == "draft" &&
+        changes().hasOnly(["answers", "drawings", "checks", "termsChecked", "stageOwners",
+                           "updatedAt", "status", "submittedAt"]) &&
+        request.resource.data.status in ["draft", "submitted"];
+
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
     match /writing_assignments/{assignmentId} {
       allow create: if request.auth != null && 
         request.resource.data.studentId == request.auth.uid;

@@ -604,6 +604,26 @@ export default function EarthSciencesHubPage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+            {/* Research assignment: Mission New Home (Unit 1) */}
+            <Link
+              href="/earth-sciences/mission"
+              className={`lg:col-span-2 group ${cardTheme} rounded-2xl border ${borderTheme} p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-teal-400 transition-colors`}
+            >
+              <div className="space-y-2">
+                <h3 className={`text-lg font-bold ${titleText} flex items-center gap-2`}>
+                  <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
+                  עבודת חקר: משימת בית חדש 🚀
+                </h3>
+                <p className={`${textMuted} text-xs leading-relaxed`}>
+                  עבודה בזוגות על יחידה 1: בוחרים יעד ליישוב בחלל, חוקרים אותו לפי כל מונחי היחידה, ומגישים דו&quot;ח
+                  לסוכנות החלל. העבודה נשמרת אוטומטית ומוגשת אונליין.
+                </p>
+              </div>
+              <span className="shrink-0 self-start sm:self-center px-4 py-2 rounded-xl bg-teal-500 text-zinc-950 text-sm font-bold group-hover:bg-teal-400 transition-colors">
+                לכניסה למשימה ←
+              </span>
+            </Link>
+
             {/* Tool Card 1: NASA's Eye on the Solar System */}
             <div className={`group ${cardTheme} rounded-2xl border ${borderTheme} p-5 flex flex-col justify-between gap-5`}>
               <div className="space-y-2">

@@ -25,6 +25,7 @@ import { useAuth } from "@/lib/context/AuthContext";
 import { dbFirestore } from "@/lib/firebase";
 import { collection, query, getDocs, updateDoc, doc, orderBy } from "firebase/firestore";
 import { UnseenDashboardView, WritingDashboardView, UnseenAssignment, WritingAssignment, StudentAnswerRecord } from "./components/UnseenWritingViews";
+import MissionDashboardView from "./components/MissionDashboardView";
 
 interface ChatAssignment {
   id: string;
@@ -94,7 +95,7 @@ export default function GeneralTeacherAdmin() {
   const [mounted, setMounted] = useState(false);
   
   // Tab state
-  const [currentTab, setCurrentTab] = useState<"chat-masters" | "unseen-practice" | "writing-practice" | "future-projects" | "settings">("chat-masters");
+  const [currentTab, setCurrentTab] = useState<"chat-masters" | "unseen-practice" | "writing-practice" | "mission-new-home" | "future-projects" | "settings">("chat-masters");
   const [devPreview, setDevPreview] = useState(false);
   
   // Chat Masters Submissions data states
@@ -482,6 +483,16 @@ export default function GeneralTeacherAdmin() {
             }`}
           >
             הגשות כתיבה ({writingSubmissions.length})
+          </button>
+          <button
+            onClick={() => setCurrentTab("mission-new-home")}
+            className={`pb-3 font-bold text-xs border-b-2 cursor-pointer transition-all ${
+              currentTab === "mission-new-home"
+                ? "border-purple-500 text-purple-400"
+                : "border-transparent text-text-muted hover:text-[#e8edf8]"
+            }`}
+          >
+            משימת בית חדש 🚀
           </button>
           <button
             onClick={() => setCurrentTab("future-projects")}
@@ -1092,6 +1103,17 @@ export default function GeneralTeacherAdmin() {
             setSearchQuery={setSearchQuery}
             activeListTab={activeListTab}
             setActiveListTab={setActiveListTab}
+            inputStyle={inputStyle}
+            cardStyle={cardStyle}
+            borderStyle={borderStyle}
+            textTitle={textTitle}
+            textMuted={textMuted}
+            isLight={isLight}
+          />
+        ) : currentTab === "mission-new-home" ? (
+          <MissionDashboardView
+            isTeacher={isTeacher}
+            demo={devPreview}
             inputStyle={inputStyle}
             cardStyle={cardStyle}
             borderStyle={borderStyle}

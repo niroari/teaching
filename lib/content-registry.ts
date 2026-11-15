@@ -84,7 +84,6 @@ export const CONTENT_ITEMS: ContentItem[] = [
 
   // ── Pages with no card on the home page ──
   { id: "other.values-auction", title: "מכירה פומבית של ערכים", subject: "other", kind: "game", path: "/values-auction" },
-  { id: "other.opening-year", title: "מצגת פתיחת שנה", subject: "other", kind: "presentation", path: "/opening-year" },
 ];
 
 export const CONTENT_BY_ID = new Map(CONTENT_ITEMS.map((i) => [i.id, i]));

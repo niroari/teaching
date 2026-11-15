@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { doc, onSnapshot } from "firebase/firestore";
-import { ArrowRight, Loader2, LogIn, Moon, Rocket, Sun } from "lucide-react";
+import { ArrowRight, Loader2, LogIn, Moon, Rocket, Sun, UserPlus } from "lucide-react";
 import NavbarUser from "@/components/NavbarUser";
 import { useAuth } from "@/lib/context/AuthContext";
 import { dbFirestore } from "@/lib/firebase";
@@ -132,15 +132,23 @@ export default function MissionNewHomePage() {
         ) : !user ? (
           <section className={`rounded-2xl border p-8 text-center space-y-4 ${t.card} ${t.border}`}>
             <p className="text-[15px] leading-relaxed">
-              כדי לעבוד על המשימה ולשמור את ההתקדמות, התחברו עם חשבון בית הספר.
+              כדי לעבוד על המשימה ולשמור את ההתקדמות, התחברו או צרו משתמש חדש.
             </p>
-            <button
-              type="button"
-              onClick={() => signInWithGoogle()}
-              className={`inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm cursor-pointer ${t.accentButton}`}
-            >
-              <LogIn className="w-4 h-4" /> התחברות עם Google
-            </button>
+            <div className="flex flex-wrap justify-center gap-3">
+              <Link
+                href="/login?redirect=/earth-sciences/mission"
+                className={`inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm cursor-pointer ${t.accentButton}`}
+              >
+                <UserPlus className="w-4 h-4" /> התחברות / הרשמה עם אימייל וסיסמה
+              </Link>
+              <button
+                type="button"
+                onClick={() => signInWithGoogle()}
+                className={`inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm cursor-pointer ${t.ghostButton}`}
+              >
+                <LogIn className="w-4 h-4" /> התחברות עם Google
+              </button>
+            </div>
           </section>
         ) : teamId && team ? (
           <Workspace key={team.id} team={team} theme={t} onLeave={() => openTeam(null)} />

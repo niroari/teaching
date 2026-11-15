@@ -176,6 +176,7 @@ export default function MissionDashboardView({
   const [importing, setImporting] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  const gradeForm = useRef<HTMLFormElement>(null);
 
   const load = useCallback(async () => {
     if (!isTeacher || demo) {
@@ -704,7 +705,12 @@ export default function MissionDashboardView({
               </div>
             )}
 
-            <form onSubmit={saveGrade} className={`rounded-lg border p-5 space-y-3 sticky bottom-4 ${cardStyle} ${borderStyle}`}>
+            <form
+              id="mission-grade-form"
+              ref={gradeForm}
+              onSubmit={saveGrade}
+              className={`rounded-lg border p-5 space-y-3 scroll-mt-4 ${cardStyle} ${borderStyle}`}
+            >
               <h4 className={`text-base font-semibold ${textTitle}`}>ציון לפי המחוון</h4>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {RUBRIC.map((c) => (
@@ -754,6 +760,35 @@ export default function MissionDashboardView({
                 {saved ? "הציון נשמר" : "שמירת ציון ומשוב"}
               </button>
             </form>
+
+            {/* Slim bar that stays in view while reading the work. The full form
+                lives at the end of the page so it never covers the answers. */}
+            <div
+              className={`sticky bottom-4 rounded-lg border px-4 py-2 flex flex-wrap items-center justify-between gap-2 shadow-lg ${cardStyle} ${borderStyle}`}
+            >
+              <span className={`text-sm ${textMuted}`}>
+                סך הכול: <b className="text-purple-400 text-base">{total}</b>
+                {selectedReview && <span className="mr-2 text-[11px] text-purple-400">· טיוטת AI: {selectedReview.total}</span>}
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => gradeForm.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                  className={`px-3 py-1.5 rounded-lg text-xs border cursor-pointer ${borderStyle} ${textMuted} hover:text-purple-400`}
+                >
+                  לטופס הציון ↓
+                </button>
+                <button
+                  type="submit"
+                  form="mission-grade-form"
+                  disabled={saving}
+                  className="px-3 py-1.5 rounded-lg text-xs font-bold bg-violet-600 hover:bg-violet-500 text-white flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
+                >
+                  {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : saved ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Save className="w-3.5 h-3.5" />}
+                  {saved ? "נשמר" : "שמירה"}
+                </button>
+              </div>
+            </div>
           </>
         )}
       </div>

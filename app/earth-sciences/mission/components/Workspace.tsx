@@ -24,6 +24,8 @@ import {
 import IntroStep from "./IntroStep";
 import QuestionField, { type FieldApi } from "./QuestionField";
 import ReviewSubmit from "./ReviewSubmit";
+import InfoSheet from "./InfoSheet";
+import { INFO_SHEETS } from "@/lib/data/mission-info-sheets";
 import { TEAMS } from "./TeamGate";
 import type { MissionTheme } from "./theme";
 
@@ -349,6 +351,9 @@ export default function Workspace({ team, theme: t, onLeave }: Props) {
                 ))}
               </div>
             )}
+            <div className="pt-2">
+              <InfoSheet key={stage.id} sheet={INFO_SHEETS[stage.id]} theme={t} />
+            </div>
             {team.stageFeedback?.[stage.id] && (
               <div className="mt-2 rounded-xl border border-amber-400/40 bg-amber-400/10 p-3 text-sm">
                 <b>הערת המורה:</b> {team.stageFeedback[stage.id]}

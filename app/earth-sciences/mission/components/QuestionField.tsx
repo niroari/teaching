@@ -182,6 +182,27 @@ export default function QuestionField({ q, number, api }: { q: Question; number:
               ))}
             </ul>
           )}
+          {q.steps && (
+            <ol className="space-y-1.5 pt-1">
+              {q.steps(api.destination).map((s, i) => (
+                <li key={s} className="flex items-start gap-2 text-sm">
+                  <span className="shrink-0 w-5 h-5 mt-0.5 rounded-full bg-teal-500 text-white text-[11px] font-black flex items-center justify-center">
+                    {i + 1}
+                  </span>
+                  <span>{s}</span>
+                </li>
+              ))}
+            </ol>
+          )}
+          {q.example && (
+            <div className={`rounded-xl border p-3 text-sm space-y-0.5 ${t.soft}`}>
+              {q.example(api.destination).map((line, i) => (
+                <p key={line} className={i === 0 ? `font-bold ${t.title}` : t.muted}>
+                  {line}
+                </p>
+              ))}
+            </div>
+          )}
           {q.hint && <p className={`text-xs ${t.muted}`}>{q.hint}</p>}
         </div>
       </div>

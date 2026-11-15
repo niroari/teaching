@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/context/AuthContext";
 import ActivityBar from "@/components/site/ActivityBar";
+import SiteFooter from "@/components/site/SiteFooter";
 import confetti from "canvas-confetti";
 import { dbFirestore, sanitizeForFirestore } from "@/lib/firebase";
 import { collection, addDoc, query, where, getDocs, onSnapshot, serverTimestamp, doc } from "firebase/firestore";
@@ -1442,10 +1443,7 @@ ${formattedTranscript}
 
       </main>
 
-      {/* Footer */}
-      <footer className="w-full text-center py-6 border-t border-line text-[13px] text-fg-muted relative z-10 bg-subtle">
-        <span>© {new Date().getFullYear()} ניר עוז-ארי — שיחה עם חבר AI</span>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

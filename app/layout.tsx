@@ -4,6 +4,7 @@ import { AuthProvider } from "@/lib/context/AuthContext";
 import { VisibilityProvider } from "@/lib/context/VisibilityContext";
 import ContentGate from "@/components/ContentGate";
 import { DEFAULT_THEME, THEME_INIT_SCRIPT } from "@/lib/theme/config";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE } from "@/lib/site";
 import "./globals.css";
 
 const plex = IBM_Plex_Sans_Hebrew({
@@ -14,8 +15,8 @@ const plex = IBM_Plex_Sans_Hebrew({
 });
 
 export const metadata: Metadata = {
-  title: "ניר עוז-ארי — חומרי לימוד",
-  description: "פורטל חומרי לימוד אינטראקטיביים — של״ח, אנגלית והעשרה",
+  title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+  description: SITE_DESCRIPTION,
 };
 
 export default function RootLayout({

@@ -6,43 +6,48 @@ import PageShell from "@/components/site/PageShell";
 import { EmptyState, LinkCard, Spinner } from "@/components/site/ui";
 import { useVisibility } from "@/lib/context/VisibilityContext";
 import { CONTENT_ITEMS, Subject } from "@/lib/content-registry";
+import { SITE_NAME, SITE_TAGLINE } from "@/lib/site";
 
-const SUBJECT_CARDS: { subject: Subject; href: string; title: string; subtitle: string; desc: string; cta: string; image: string }[] = [
+const SUBJECT_CARDS: { subject: Subject; href: string; title: string; subtitle: string; desc: string; cta: string; image: string; alt: string }[] = [
   {
     subject: "shelach",
     href: "/shelach",
     title: "של״ח",
-    subtitle: "לימודי ארץ ישראל",
-    desc: "סדנאות למידה אינטראקטיביות העוסקות בהיסטוריה, גיאוגרפיה, טבע ורב-תרבותיות בארץ ישראל.",
-    cta: "כניסה לסדנאות",
-    image: "/shelach_cover.png",
+    subtitle: "שדה, לאום, חברה",
+    desc: "סדנאות על ההיסטוריה, הגאוגרפיה, הטבע והתרבויות של ארץ ישראל, והכנה לגיחות.",
+    cta: "לסדנאות",
+    image: "/images/shelach.jpg",
+    alt: "נוף מדבר יהודה",
   },
   {
     subject: "english",
     href: "/english",
     title: "אנגלית",
-    subtitle: "תרגול דקדוק ואוצר מילים",
-    desc: "משחק מכירה פומבית כיתתי לתרגול חוקי דקדוק, וכלי אינטראקטיבי לשינון ותרגול מותאם אישית של אוצר מילים.",
-    cta: "כניסה לתרגול",
-    image: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=800&q=80",
+    subtitle: "דקדוק, אוצר מילים ושיחה",
+    desc: "מצגות דקדוק, משחקי כיתה ותרגול שיחה באנגלית.",
+    cta: "לפעילויות",
+    image: "/images/english.jpg",
+    alt: "אולם ספרייה ישנה עם מדפי ספרים גבוהים",
   },
   {
     subject: "enrichment",
     href: "/enrichment",
     title: "העשרה",
-    subtitle: "מחוץ לתוכנית הלימודים",
-    desc: "לומדות בנושאים מרתקים ומדעיים, כולל מודולים אינטראקטיביים מעמיקים בנושא אבולוציה.",
-    cta: "כניסה ללומדות",
-    image: "/ev-fossil.jpg",
+    subtitle: "מעבר לתוכנית הלימודים",
+    desc: "אבולוציה, תולדות האדם, אקטואליה וגאוגרפיה: לומדות ומשחקים להרחבת אופקים.",
+    cta: "ללומדות",
+    image: "/images/enrichment.jpg",
+    alt: "ערפילית בצילום טלסקופ החלל ג׳יימס ווב",
   },
   {
     subject: "earth",
     href: "/earth-sciences",
     title: "מדעי כדור הארץ",
-    subtitle: "תוכנית לימודים שנתית",
-    desc: "מצגות, מערכי שיעור אינטראקטיביים ויישומונים מדעיים באסטרונומיה, אטמוספרה, גאוספרה ומשאבים.",
-    cta: "כניסה לתוכנית",
-    image: "/white-island-volcano.jpg",
+    subtitle: "תוכנית שנתית",
+    desc: "שיעורים, סימולציות ומשימות חקר באסטרונומיה, באטמוספרה, בגאוספרה ובמשאבי כדור הארץ.",
+    cta: "לתוכנית הלימודים",
+    image: "/images/earth.jpg",
+    alt: "כדור הארץ בצילום מהחלל",
   },
 ];
 
@@ -56,17 +61,12 @@ export default function PortalHomePage() {
     <PageShell>
       {/* Header Section */}
       <div className="mb-12 max-w-2xl sm:mb-16">
-        <p className="text-sm font-medium text-fg-muted">
-          <span>פורטל פדגוגי דיגיטלי</span>
-        </p>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight text-fg sm:text-5xl">
-          ניר עוז-ארי
-          <span className="mt-2 block text-xl font-normal tracking-normal text-fg-muted sm:text-2xl">
-            חומרי לימוד ולומדות אינטראקטיביות
-          </span>
+        <h1 className="text-4xl font-semibold tracking-tight text-fg sm:text-5xl">
+          {SITE_NAME}
+          <span className="mt-2 block text-xl font-normal tracking-normal text-fg-muted sm:text-2xl">{SITE_TAGLINE}</span>
         </h1>
         <p className="mt-5 text-base leading-relaxed text-fg-muted">
-          בחרו נושא לימוד כדי להתחיל בשיעור, לומדה או משחק כיתתי אינטראקטיבי.
+          שיעורים, מצגות, משימות ומשחקי כיתה במקום אחד. בחרו תחום כדי להתחיל.
         </p>
       </div>
 
@@ -76,8 +76,8 @@ export default function PortalHomePage() {
           <Spinner />
         </div>
       ) : shownCount === 0 ? (
-        <EmptyState icon={<Lock className="h-5 w-5" strokeWidth={1.75} />} title="המורה עוד לא פתח תכנים">
-          כשהמורה יפרסם שיעור, מצגת או משימה, הם יופיעו כאן. אם קיבלתם קישור ישיר מהמורה, אפשר להיכנס דרכו.
+        <EmptyState icon={<Lock className="h-5 w-5" strokeWidth={1.75} />} title="עדיין אין תכנים פתוחים">
+          תכנים חדשים יופיעו כאן ברגע שהמורה יפרסם אותם. קיבלתם קישור ישיר מהמורה? אפשר להיכנס דרכו.
         </EmptyState>
       ) : (
         <div
@@ -97,12 +97,13 @@ export default function PortalHomePage() {
               subject={c.subject}
               href={c.href}
               image={c.image}
+              imageAlt={c.alt}
               priority={i < 2}
               title={c.title}
               subtitle={c.subtitle}
               description={c.desc}
               cta={c.cta}
-              meta={<span className="text-xs text-fg-subtle tabular-nums">{openCount(c.subject)} פריטים</span>}
+              meta={<span className="text-xs text-fg-subtle tabular-nums">{openCount(c.subject)} תכנים</span>}
             />
           ))}
         </div>

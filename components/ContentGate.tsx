@@ -63,7 +63,7 @@ function NotOpenYet() {
       <div className="flex flex-1 items-center justify-center px-4 pb-20 text-center">
         <EmptyState icon={<Lock className="h-5 w-5" strokeWidth={1.75} />} title={<span className="text-xl">התוכן הזה עדיין לא פתוח</span>}>
           <p>
-            המורה עוד לא פתח את העמוד הזה לתלמידים. אם קיבלתם קישור מהמורה, נסו שוב בעוד רגע: התוכן ייפתח כאן אוטומטית ברגע שהוא יפורסם.
+            המורה עדיין לא פתח את העמוד לתלמידים. קיבלתם קישור מהמורה? העמוד ייפתח כאן אוטומטית ברגע שיפורסם.
           </p>
           <div className="flex flex-col justify-center gap-2 pt-6 sm:flex-row">
             <Link href="/" className={btn.primary}>

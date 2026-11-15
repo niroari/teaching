@@ -90,7 +90,7 @@ export const CONTENT_ITEMS: ContentItem[] = [
 export const CONTENT_BY_ID = new Map(CONTENT_ITEMS.map((i) => [i.id, i]));
 
 /** Pages anyone can open, whatever is visible. /admin has its own teacher check. */
-const ALWAYS_OPEN_PREFIXES = ["/login", "/admin"];
+const ALWAYS_OPEN_PREFIXES = ["/login", "/admin", "/credits"];
 
 export function isAlwaysOpenPath(pathname: string) {
   return pathname === "/" || ALWAYS_OPEN_PREFIXES.some((p) => matchesPrefix(pathname, p));

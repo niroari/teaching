@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import NavbarUser from "@/components/NavbarUser";
 import ThemeToggle from "@/components/site/ThemeToggle";
+import { SITE_NAME } from "@/lib/site";
 
 export interface Crumb {
   label: string;
@@ -15,9 +16,9 @@ export default function SiteHeader({ crumbs = [] }: { crumbs?: Crumb[] }) {
       <div className="mx-auto flex h-14 w-full max-w-6xl items-center gap-3 px-4 sm:px-6">
         <Link href="/" className="flex shrink-0 items-center gap-2.5 rounded-md" aria-label="דף הבית">
           <span className="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-xs font-semibold text-primary-foreground">
-            נ
+            {SITE_NAME.charAt(0)}
           </span>
-          <span className={`text-sm font-semibold text-fg ${crumbs.length ? "hidden sm:inline" : ""}`}>ניר עוז-ארי</span>
+          <span className={`text-sm font-semibold text-fg ${crumbs.length ? "hidden sm:inline" : ""}`}>{SITE_NAME}</span>
         </Link>
 
         {crumbs.length > 0 && (

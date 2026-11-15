@@ -10,56 +10,62 @@ import { useVisibility } from "@/lib/context/VisibilityContext";
 const ENGLISH_SECTIONS = [
   {
     slug: "crossword-clash",
-    title: "Crossword Clash (קרוסוורד קלאש)",
-    desc: "קרב תשבצים כיתתי חווייתי בהשראת Crossword Master. קבוצות מתחרות בהנחת אותיות בלוח ופענוח הגדרות בזמן אמת.",
-    bgUrl: "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&w=800&q=80",
+    title: "Crossword Clash",
+    desc: "קרב תשבצים בין קבוצות: מניחים אותיות על הלוח ופותרים הגדרות בזמן אמת.",
+    image: "/images/crossword-clash.jpg",
+    alt: "תשבץ מודפס",
     link: "/english/crossword-clash",
-    badge: "משחק כיתתי חדש",
+    badge: "משחק כיתתי",
     category: "משחקים"
   },
   {
     slug: "sentence-auction",
     title: "The Sentence Auction",
-    desc: "משחק מכירה פומבית כיתתי מהנה ומאתגר לתרגול ושיפור חוקי הדקדוק ובניית משפטים באנגלית.",
-    bgUrl: "/sentence_auction_cover.png",
+    desc: "מכירה פומבית כיתתית של משפטים, לתרגול חוקי הדקדוק ובניית משפטים באנגלית.",
+    image: "/images/sentence-auction.jpg",
+    alt: "פטיש עץ של מכירות פומביות",
     link: "/english-auction",
     badge: "משחק כיתתי",
     category: "משחקים"
   },
   {
     slug: "adjectives",
-    title: "שמות תואר (Adjectives)",
-    desc: "מצגת למידה אינטראקטיבית בנושא שמות תואר באנגלית, תפקידם במשפט ושימוש נכון לתיאור שמות עצם.",
-    bgUrl: "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&w=800&q=80",
+    title: "Adjectives · שמות תואר",
+    desc: "מצגת על שמות תואר: תפקידם במשפט והשימוש בהם לתיאור שמות עצם.",
+    image: "/images/adjectives.jpg",
+    alt: "עפרונות צבעוניים",
     link: "/english/adjectives",
-    badge: "מצגת למידה",
+    badge: "מצגת",
     category: "מצגות"
   },
   {
     slug: "simone-biles",
     title: "Simone Biles: Present Tenses",
-    desc: "תרגול זמני הווה (Present Simple & Progressive) לכיתה ז׳ המבוסס על סיפורה מעורר ההשראה של סימון ביילס.",
-    bgUrl: "/simone_biles_cover.png",
+    desc: "תרגול Present Simple ו-Present Progressive לכיתה ז׳, דרך סיפורה של המתעמלת סימון ביילס.",
+    image: "/images/simone-biles.jpg",
+    alt: "סימון ביילס בקפיצה באולימפיאדת ריו",
     link: "/english/simone-biles",
-    badge: "מצגת למידה",
+    badge: "מצגת",
     category: "מצגות"
   },
   {
     slug: "past-simple",
-    title: "עבר פשוט (Past Simple)",
-    desc: "מצגת למידה כיתתית בנושא עבר פשוט (Past Simple), חוקי הדקדוק, הוספת d/ed/ied לפעלים רגילים, פעלים יוצאי דופן (Irregular Verbs) ומבנה משפטי חיוב ושלילה.",
-    bgUrl: "/past_simple_cover.png",
+    title: "Past Simple · עבר פשוט",
+    desc: "מצגת כיתתית: הוספת d/ed/ied לפעלים רגילים, פעלים יוצאי דופן, ומשפטי חיוב ושלילה.",
+    image: "/images/past-simple.jpg",
+    alt: "שעון כיס ישן",
     link: "/english/past-simple",
-    badge: "מצגת למידה",
+    badge: "מצגת",
     category: "מצגות"
   },
   {
     slug: "chat-masters",
-    title: "שיחה עם חבר AI (Chat Masters)",
-    desc: "נהלו שיחה באנגלית עם חבר בינה מלאכותית, בחרו את האופי שלו ותרגלו שיחה יומיומית באנגלית בסביבה תומכת ללא לחץ.",
-    bgUrl: "https://images.unsplash.com/photo-1531747118685-ca8fa6e08806?auto=format&fit=crop&w=800&q=80",
+    title: "Chat Masters",
+    desc: "שיחה באנגלית עם דמות AI לבחירתכם, לתרגול שיחה יומיומית בקצב שלכם וללא לחץ.",
+    image: "/images/chat-masters.jpg",
+    alt: "אותיות דפוס מעץ",
     link: "/english/chat-masters",
-    badge: "פרויקט כיתתי",
+    badge: "פרויקט להגשה",
     category: "פרויקטים"
   }
 ];
@@ -71,21 +77,21 @@ export default function EnglishHubPage() {
     {
       id: "presentations",
       title: "מצגות",
-      subtitle: "מצגות למידה והסברי דקדוק אינטראקטיביים",
+      subtitle: "הסברי דקדוק עם דוגמאות ותרגול",
       icon: Presentation,
       items: ENGLISH_SECTIONS.filter(sec => canSee(`english.${sec.slug}`) && sec.category === "מצגות")
     },
     {
       id: "games",
       title: "משחקים",
-      subtitle: "משחקים כיתתיים ואינטראקטיביים לתרגול חווייתי",
+      subtitle: "תרגול בקבוצות, מול הלוח",
       icon: Gamepad2,
       items: ENGLISH_SECTIONS.filter(sec => canSee(`english.${sec.slug}`) && sec.category === "משחקים")
     },
     {
       id: "projects",
       title: "פרויקטים",
-      subtitle: "פרויקטים מעשיים ושימוש בבינה מלאכותית לתרגול שפה",
+      subtitle: "משימות מתמשכות, עם אפשרות הגשה למורה",
       icon: Sparkles,
       items: ENGLISH_SECTIONS.filter(sec => canSee(`english.${sec.slug}`) && sec.category === "פרויקטים")
     }
@@ -95,12 +101,10 @@ export default function EnglishHubPage() {
     <PageShell
       subject="english"
       crumbs={[{ label: "אנגלית" }]}
-      footer={<span>© {new Date().getFullYear()} ניר עוז-ארי — לימודי אנגלית</span>}
     >
       <PageHeader
-        eyebrow={<span>אנגלית</span>}
-        title="לימודי אנגלית"
-        description="בחרו כלי לתרגול דקדוק או שינון אוצר מילים"
+        title="אנגלית"
+        description="מצגות, משחקים ופרויקטים לתרגול דקדוק, אוצר מילים ושיחה."
       />
 
       {/* Categories Sections */}
@@ -124,10 +128,12 @@ export default function EnglishHubPage() {
                   <LinkCard
                     key={sec.slug}
                     href={sec.link}
+                    image={sec.image}
+                    imageAlt={sec.alt}
                     title={sec.title}
                     description={sec.desc}
                     meta={<Badge>{sec.badge}</Badge>}
-                    cta="כניסה לפעילות"
+                    cta="לפעילות"
                   />
                 ))}
               </div>

@@ -225,7 +225,7 @@ export default function MissionDashboardView({
     const a = team.answers ?? {};
     const dest = ANSWER_KEY[team.destinationId];
     return (
-      <div key={q.id} className={`rounded-xl border p-3 space-y-2 ${soft}`}>
+      <div key={q.id} className={`rounded-md border p-3 space-y-2 ${soft}`}>
         <p className={`text-xs font-bold ${textTitle}`}>
           {q.challenge ? "★ " : `${n}. `}
           {q.prompt}
@@ -280,9 +280,9 @@ export default function MissionDashboardView({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 text-right" dir="rtl">
       {/* List */}
-      <div className={`lg:col-span-4 rounded-2xl border p-4 space-y-3 ${cardStyle} ${borderStyle}`}>
+      <div className={`lg:col-span-4 rounded-lg border p-4 space-y-3 ${cardStyle} ${borderStyle}`}>
         <div className="flex items-center justify-between">
-          <h2 className={`text-sm font-black ${textTitle}`}>משימת בית חדש ({teams.length})</h2>
+          <h2 className={`text-sm font-semibold ${textTitle}`}>משימת בית חדש ({teams.length})</h2>
           <button type="button" onClick={load} className={`p-1.5 rounded-lg cursor-pointer ${textMuted} hover:text-purple-400`} title="רענון">
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
           </button>
@@ -293,7 +293,7 @@ export default function MissionDashboardView({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="חיפוש שם, כיתה, יעד או קוד"
-            className={`w-full rounded-xl border pr-9 pl-3 py-2 text-xs outline-none ${inputStyle}`}
+            className={`w-full rounded-md border pr-9 pl-3 py-2 text-xs outline-none ${inputStyle}`}
           />
         </div>
         <div className="flex flex-wrap gap-1">
@@ -320,7 +320,7 @@ export default function MissionDashboardView({
                 key={t.id}
                 type="button"
                 onClick={() => select(t)}
-                className={`w-full text-right rounded-xl border p-3 cursor-pointer transition-colors ${
+                className={`w-full text-right rounded-md border p-3 cursor-pointer transition-colors ${
                   selectedId === t.id ? "border-purple-500 bg-purple-500/10" : `${soft} hover:border-purple-400/50`
                 }`}
               >
@@ -349,15 +349,15 @@ export default function MissionDashboardView({
       {/* Detail */}
       <div className="lg:col-span-8 space-y-4">
         {!selected ? (
-          <div className={`rounded-2xl border p-10 text-center text-sm ${cardStyle} ${borderStyle} ${textMuted}`}>
+          <div className={`rounded-lg border p-10 text-center text-sm ${cardStyle} ${borderStyle} ${textMuted}`}>
             בחרו עבודה מהרשימה כדי לבדוק אותה.
           </div>
         ) : (
           <>
-            <div className={`rounded-2xl border p-5 space-y-3 ${cardStyle} ${borderStyle}`}>
+            <div className={`rounded-lg border p-5 space-y-3 ${cardStyle} ${borderStyle}`}>
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <h3 className={`text-lg font-black ${textTitle}`}>
+                  <h3 className={`text-lg font-semibold ${textTitle}`}>
                     {getDestination(selected.destinationId)?.emoji} {getDestination(selected.destinationId)?.name} · קוד {selected.id}
                   </h3>
                   <p className={`text-xs ${textMuted}`}>
@@ -376,7 +376,7 @@ export default function MissionDashboardView({
                 )}
               </div>
 
-              <div className={`rounded-xl border p-3 space-y-2 ${soft}`}>
+              <div className={`rounded-md border p-3 space-y-2 ${soft}`}>
                 <p className={`text-xs font-bold ${textTitle}`}>נתונים חסרים ומקור</p>
                 {getDestination(selected.destinationId)?.blanks.map((b) => (
                   <div key={b.id} className="flex flex-wrap items-center gap-3 text-sm">
@@ -395,9 +395,9 @@ export default function MissionDashboardView({
               const numbers = questionNumbers(stage.sections.flatMap((sec) => sec.questions));
               const notes = ANSWER_KEY[selected.destinationId].notes;
               return (
-                <div key={stage.id} className={`rounded-2xl border p-5 space-y-3 ${cardStyle} ${borderStyle}`}>
+                <div key={stage.id} className={`rounded-lg border p-5 space-y-3 ${cardStyle} ${borderStyle}`}>
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h4 className={`text-base font-black ${textTitle}`}>
+                    <h4 className={`text-base font-semibold ${textTitle}`}>
                       {stage.short}: {stage.title}
                     </h4>
                     <span className={`text-xs ${textMuted}`}>הוביל: {selected.stageOwners?.[stage.id] || "לא צוין"}</span>
@@ -436,14 +436,14 @@ export default function MissionDashboardView({
                     value={stageFeedback[stage.id] ?? ""}
                     onChange={(e) => setStageFeedback((prev) => ({ ...prev, [stage.id]: e.target.value }))}
                     placeholder={`הערה לתלמידים על ${stage.short} (תופיע אצלם בראש השלב)`}
-                    className={`w-full rounded-xl border px-3 py-2 text-xs outline-none ${inputStyle}`}
+                    className={`w-full rounded-md border px-3 py-2 text-xs outline-none ${inputStyle}`}
                   />
                 </div>
               );
             })}
 
-            <div className={`rounded-2xl border p-5 space-y-3 ${cardStyle} ${borderStyle}`}>
-              <h4 className={`text-base font-black ${textTitle}`}>מונחים ומקורות</h4>
+            <div className={`rounded-lg border p-5 space-y-3 ${cardStyle} ${borderStyle}`}>
+              <h4 className={`text-base font-semibold ${textTitle}`}>מונחים ומקורות</h4>
               <div className="flex flex-wrap gap-1.5">
                 {TERM_GROUPS.flatMap((g) => g.terms).map((term) => {
                   const on = selected.termsChecked?.includes(term);
@@ -463,8 +463,8 @@ export default function MissionDashboardView({
               {answer(selected.answers?.[SOURCES_KEY])}
             </div>
 
-            <form onSubmit={saveGrade} className={`rounded-2xl border p-5 space-y-3 sticky bottom-4 ${cardStyle} ${borderStyle}`}>
-              <h4 className={`text-base font-black ${textTitle}`}>ציון לפי המחוון</h4>
+            <form onSubmit={saveGrade} className={`rounded-lg border p-5 space-y-3 sticky bottom-4 ${cardStyle} ${borderStyle}`}>
+              <h4 className={`text-base font-semibold ${textTitle}`}>ציון לפי המחוון</h4>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {RUBRIC.map((c) => (
                   <label key={c.id} className="space-y-1" title={`מצוין: ${c.excellent}`}>
@@ -494,7 +494,7 @@ export default function MissionDashboardView({
                 </label>
                 <div className="flex flex-col justify-end">
                   <span className={`text-[11px] font-bold ${textMuted}`}>סך הכול</span>
-                  <span className="text-2xl font-black text-purple-400">{total}</span>
+                  <span className="text-2xl font-semibold text-purple-400">{total}</span>
                 </div>
               </div>
               <textarea
@@ -502,12 +502,12 @@ export default function MissionDashboardView({
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
                 placeholder="משוב כללי לצוות"
-                className={`w-full rounded-xl border px-3 py-2 text-sm outline-none ${inputStyle}`}
+                className={`w-full rounded-md border px-3 py-2 text-sm outline-none ${inputStyle}`}
               />
               <button
                 type="submit"
                 disabled={saving}
-                className="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl cursor-pointer text-sm flex items-center justify-center gap-2 disabled:opacity-60"
+                className="w-full py-2.5 bg-violet-600 hover:bg-violet-500 text-white font-bold rounded-md cursor-pointer text-sm flex items-center justify-center gap-2 disabled:opacity-60"
               >
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <CheckCircle2 className="w-4 h-4" /> : <Save className="w-4 h-4" />}
                 {saved ? "הציון נשמר" : "שמירת ציון ומשוב"}

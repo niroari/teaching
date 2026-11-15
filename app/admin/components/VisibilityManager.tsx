@@ -53,16 +53,9 @@ export default function VisibilityManager({ isLight, cardStyle, borderStyle, tex
     <div className="space-y-6 text-right">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-        <div>
-          <h2 className={`text-xl font-bold ${textTitle} flex items-center gap-2`}>
-            <Eye className="w-5 h-5 text-purple-400" />
-            <span>מה התלמידים רואים</span>
-          </h2>
-          <p className={`text-xs ${textMuted} mt-1 leading-relaxed max-w-2xl`}>
-            תלמידים ומבקרים שלא התחברו רואים רק את מה שמסומן כאן כגלוי. כל שינוי נשמר מיד ומתעדכן אצל התלמידים בזמן אמת.
-            אפשר גם לפרסם או להסתיר ישירות מתוך כל עמוד, בעזרת הכפתור הצף בפינה.
-          </p>
-        </div>
+        <p className={`text-sm ${textMuted} leading-relaxed max-w-2xl`}>
+          אפשר גם לפרסם או להסתיר ישירות מתוך כל עמוד, בעזרת הכפתור הצף בפינה.
+        </p>
         <div className="flex items-center gap-2 shrink-0">
           <span
             className={`text-xs font-bold px-3 py-1.5 rounded-full border ${
@@ -87,7 +80,7 @@ export default function VisibilityManager({ isLight, cardStyle, borderStyle, tex
 
       {error && (
         <div
-          className={`flex items-start gap-2 p-4 rounded-xl border text-xs leading-relaxed ${
+          className={`flex items-start gap-2 p-4 rounded-md border text-xs leading-relaxed ${
             isLight ? "bg-red-50 border-red-200 text-red-700" : "bg-red-950/30 border-red-500/30 text-red-300"
           }`}
         >
@@ -109,13 +102,13 @@ export default function VisibilityManager({ isLight, cardStyle, borderStyle, tex
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="חיפוש שיעור, מצגת או משימה…"
-            className={`w-full py-2.5 pr-10 pl-3 rounded-xl border text-xs font-semibold focus:outline-none ${inputStyle}`}
+            className={`w-full py-2.5 pr-10 pl-3 rounded-md border text-xs font-semibold focus:outline-none ${inputStyle}`}
           />
         </div>
         <button
           type="button"
           onClick={() => setOnlyVisible((v) => !v)}
-          className={`px-3 py-2.5 rounded-xl border text-xs font-bold transition-colors cursor-pointer ${
+          className={`px-3 py-2.5 rounded-md border text-xs font-bold transition-colors cursor-pointer ${
             onlyVisible ? "border-purple-500 text-purple-400 bg-purple-500/10" : `${borderStyle} ${textMuted}`
           }`}
         >
@@ -124,7 +117,7 @@ export default function VisibilityManager({ isLight, cardStyle, borderStyle, tex
         <button
           type="button"
           onClick={() => setPreviewAsStudent(!previewAsStudent)}
-          className={`px-3 py-2.5 rounded-xl border text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 ${
+          className={`px-3 py-2.5 rounded-md border text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 ${
             previewAsStudent ? "border-amber-500 text-amber-400 bg-amber-500/10" : `${borderStyle} ${textMuted}`
           }`}
           title="לגלוש באתר בדיוק כמו תלמיד (רק בלשונית הזו)"
@@ -136,7 +129,7 @@ export default function VisibilityManager({ isLight, cardStyle, borderStyle, tex
           type="button"
           onClick={hideAll}
           disabled={visibleCount === 0}
-          className={`px-3 py-2.5 rounded-xl border text-xs font-bold transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+          className={`px-3 py-2.5 rounded-md border text-xs font-bold transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
             isLight ? "border-red-200 text-red-600 hover:bg-red-50" : "border-red-500/30 text-red-400 hover:bg-red-950/30"
           }`}
         >
@@ -167,7 +160,7 @@ export default function VisibilityManager({ isLight, cardStyle, borderStyle, tex
             }
 
             return (
-              <section key={subject} className={`rounded-2xl border ${borderStyle} ${cardStyle} overflow-hidden`}>
+              <section key={subject} className={`rounded-lg border ${borderStyle} ${cardStyle} overflow-hidden`}>
                 <button
                   type="button"
                   onClick={() =>
@@ -180,7 +173,7 @@ export default function VisibilityManager({ isLight, cardStyle, borderStyle, tex
                   }
                   className="w-full flex items-center justify-between gap-3 p-4 cursor-pointer"
                 >
-                  <span className={`text-sm font-black ${textTitle}`}>{SUBJECTS[subject].title}</span>
+                  <span className={`text-sm font-semibold ${textTitle}`}>{SUBJECTS[subject].title}</span>
                   <span className="flex items-center gap-3">
                     <span className={`text-[11px] font-bold ${visibleInSubject ? "text-emerald-400" : textMuted}`}>
                       {visibleInSubject}/{allInSubject.length} גלויים

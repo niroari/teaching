@@ -2,92 +2,177 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { 
-  ArrowRight, 
-  Search, 
-  Moon, 
-  Sun, 
-  RefreshCw, 
-  Award, 
-  Clock, 
-  BookOpen, 
-  Sparkles, 
-  CheckCircle,
-  FileText,
-  Check,
-  Settings,
-  Flame,
-  LayoutGrid,
-  TrendingUp,
-  ShieldCheck
-} from "lucide-react";
+import { Menu, Sun, Moon, BookOpen, FileText, Flame, LayoutGrid, CheckCircle, LucideIcon } from "lucide-react";
 import { useAuth } from "@/lib/context/AuthContext";
 import { dbFirestore } from "@/lib/firebase";
 import { collection, query, getDocs, updateDoc, doc, orderBy } from "firebase/firestore";
-import { UnseenDashboardView, WritingDashboardView, UnseenAssignment, WritingAssignment, StudentAnswerRecord } from "./components/UnseenWritingViews";
+import { UnseenDashboardView, WritingDashboardView, UnseenAssignment, WritingAssignment } from "./components/UnseenWritingViews";
 import MissionDashboardView from "./components/MissionDashboardView";
 import VisibilityManager from "./components/VisibilityManager";
+import ChatMastersView, { ChatAssignment } from "./components/ChatMastersView";
+import AdminSidebar, { AdminTab, ADMIN_TABS, NAV_ITEMS } from "./components/AdminSidebar";
 import { isTeacherUser } from "@/lib/auth/teacher";
 
-interface ChatAssignment {
-  id: string;
-  studentId: string;
-  studentName: string;
-  studentClass: string;
-  studentEmail: string;
-  character: string;
-  messages: Array<{ sender: "user" | "bot"; text: string; timestamp: string }>;
-  exitTicketLearned: string;
-  exitTicketPenPal: string;
-  submittedAt: any;
-  status: "submitted" | "graded";
-  score: number | null;
-  feedback: string | null;
-  customCharacterName?: string;
-}
-
-const CHARACTERS_MAP: Record<string, { name: string; avatar: string; themeColor: string }> = {
-  astronaut: { name: "Buddy", avatar: "👨‍🚀", themeColor: "text-blue-400 bg-blue-500/10 border-blue-500/20" },
-  superhero: { name: "Hero", avatar: "🦸‍♂️", themeColor: "text-red-400 bg-red-500/10 border-red-500/20" },
-  builder: { name: "Alex", avatar: "👷", themeColor: "text-amber-400 bg-amber-500/10 border-amber-500/20" },
-  cat: { name: "Luna", avatar: "🐱", themeColor: "text-pink-400 bg-pink-500/10 border-pink-500/20" },
-  sam: { name: "Sam", avatar: "🧑", themeColor: "text-purple-400 bg-purple-500/10 border-purple-500/20" }
-};
-
-const FUTURE_PROJECTS = [
+const FUTURE_PROJECTS: { id: string; title: string; desc: string; badge: string; icon: LucideIcon }[] = [
   {
     id: "vocab",
-    title: "מעקב אימון אוצר מילים (Vocab Trainer Logs)",
-    desc: "צפייה ברשימות המילים האישיות של התלמידים, מעקב אחר התקדמות תרגול כרטיסיות ואחוזי הצלחה בבחנים.",
+    title: "מעקב אימון אוצר מילים",
+    desc: "רשימות המילים האישיות של התלמידים, התקדמות בתרגול הכרטיסיות ואחוזי הצלחה בבחנים.",
     badge: "בפיתוח",
     icon: BookOpen,
-    color: "text-teal-400 border-teal-500/20 bg-teal-500/5"
   },
   {
     id: "auction",
-    title: "מכירה פומבית של משפטים (Sentence Auction)",
-    desc: "ניהול הגשות של דוחות ביצוע כיתתיים, שמירת ההון הקבוצתי שנצבר ומתן ציון לשיפור הדקדוק הקבוצתי.",
+    title: "מכירה פומבית של משפטים",
+    desc: "דוחות ביצוע כיתתיים, ההון הקבוצתי שנצבר וציון לשיפור הדקדוק הקבוצתי.",
     badge: "בתכנון",
     icon: Flame,
-    color: "text-amber-400 border-amber-500/20 bg-amber-500/5"
   },
   {
     id: "writing",
-    title: "משימות כתיבה חופשית (Writing Evaluation)",
-    desc: "ממשק לניהול חיבורים ומכתבים שהוגשו על ידי התלמידים, עם אפשרות לדריסת ציון ה-AI וכתיבת משוב מורה מורחב.",
+    title: "משימות כתיבה חופשית",
+    desc: "ניהול חיבורים ומכתבים, עם דריסת ציון ה-AI ומשוב מורה מורחב.",
     badge: "בתכנון",
     icon: FileText,
-    color: "text-purple-400 border-purple-500/20 bg-purple-500/5"
   },
   {
     id: "snakes",
-    title: "לוח מנצחים כיתתי (Snakes & Ladders Live)",
-    desc: "מעקב אחר משחקי סולמות ונחשים פעילים בכיתה וצפייה בלוח התוצאות הבית-ספרי בזמן אמת.",
+    title: "לוח מנצחים כיתתי",
+    desc: "מעקב אחר משחקי סולמות ונחשים פעילים ולוח תוצאות בזמן אמת.",
     badge: "בתכנון",
     icon: LayoutGrid,
-    color: "text-sky-400 border-sky-500/20 bg-sky-500/5"
-  }
+  },
 ];
+
+const DEMO_UNSEEN: UnseenAssignment = {
+  id: "demo-unseen-1",
+  studentId: "student-101",
+  studentName: "רועי בלש",
+  studentClass: "כיתה ח'2",
+  studentEmail: "roy.detective@school.edu",
+  unseenTitle: "Max the Small Dog",
+  difficulty: "Easy",
+  score: 85,
+  correctOnFirstTry: 7,
+  totalQuestions: 8,
+  submittedAt: { seconds: Math.floor(Date.now() / 1000) },
+  status: "submitted",
+  scoreTeacher: null,
+  feedbackTeacher: null,
+  answers: [
+    {
+      questionId: 1,
+      questionNumber: 1,
+      type: "mcq",
+      paragraph: 1,
+      prompt: "What does Max look like?",
+      studentAnswer: "He is white with long ears and a short tail",
+      correctAnswer: "He is white with long ears and a short tail",
+      firstTrySuccess: true,
+      attempts: 1,
+      explanation: "בפסקה 1 רשום בבירור שהכלב לבן, בעל אוזניים ארוכות וזנב קצר."
+    },
+    {
+      questionId: 2,
+      questionNumber: 2,
+      type: "mcq",
+      paragraph: 1,
+      prompt: "How old is Max?",
+      studentAnswer: "Three years old",
+      correctAnswer: "Three years old",
+      firstTrySuccess: true,
+      attempts: 1,
+      explanation: "הטקסט מציין 'Max is three years old'."
+    },
+    {
+      questionId: 3,
+      questionNumber: 3,
+      type: "mcq",
+      paragraph: 1,
+      prompt: "What does Max see near the big house?",
+      studentAnswer: "A yellow cat",
+      correctAnswer: "A yellow cat",
+      firstTrySuccess: true,
+      attempts: 1,
+      explanation: "נכון! בפסקה 1 רשום שמקס רואה חתול צהוב (yellow cat)."
+    },
+    {
+      questionId: 4,
+      questionNumber: 4,
+      type: "copy",
+      paragraph: 1,
+      prompt: "Copy the sentence that proves Tom gives food to Max.",
+      studentAnswer: "Tom gives Max a small cookie.",
+      correctAnswer: "Tom gives Max a small cookie.",
+      firstTrySuccess: true,
+      attempts: 1,
+      explanation: "משפט מלא ומדויק המוכיח שמתן העוגיה הוא האכלה."
+    },
+    {
+      questionId: 5,
+      questionNumber: 5,
+      type: "open",
+      paragraph: 2,
+      prompt: "Why does Max run to Tom's room every morning?",
+      studentAnswer: "Because he wants to eat his food and wakes Tom up.",
+      correctAnswer: "Because he wants to eat his food.",
+      firstTrySuccess: true,
+      attempts: 1,
+      explanation: "תשובה מצוינת! התלמיד ציין את הסיבה המדויקת מהפסקה.",
+      matchedKeywords: ["eat", "food", "wants"],
+      missingKeywords: []
+    },
+    {
+      questionId: 6,
+      questionNumber: 6,
+      type: "mcq",
+      paragraph: 2,
+      prompt: "What does Max drink?",
+      studentAnswer: "Cold water",
+      correctAnswer: "Cold water",
+      firstTrySuccess: false,
+      attempts: 2,
+      explanation: "מקס שותה מים קרים מקערה כחולה (He drinks cold water from a blue bowl)."
+    },
+    {
+      questionId: 7,
+      questionNumber: 7,
+      type: "open",
+      paragraph: 3,
+      prompt: "What does Max do with the red ball?",
+      studentAnswer: "He runs after the ball and brings it back to Tom.",
+      correctAnswer: "He runs after the red ball and brings the ball back to Tom.",
+      firstTrySuccess: true,
+      attempts: 1,
+      explanation: "תשובה מדויקת להפליא.",
+      matchedKeywords: ["runs", "ball", "brings"],
+      missingKeywords: []
+    },
+    {
+      questionId: 8,
+      questionNumber: 8,
+      type: "open",
+      paragraph: 3,
+      prompt: "What is this story mostly about?",
+      studentAnswer: "Max the small dog and what he does every day with Tom.",
+      correctAnswer: "Tom's dog Max and his daily routine.",
+      firstTrySuccess: true,
+      attempts: 1,
+      explanation: "הבנה גלובלית מלאה של הסיפור.",
+      matchedKeywords: ["Max", "dog", "Tom"],
+      missingKeywords: []
+    }
+  ],
+  passage: {
+    title: "Max the Small Dog",
+    difficulty: "Easy",
+    paragraphs: [
+      "Tom has a small dog. The dog is white. His name is Max. Max has long ears and a short tail. Tom likes Max very much. Max is three years old. Every day, Tom walks with Max. They walk near the big house. Max sees a yellow cat. He does not run after the cat. Max is a good dog. He stands next to Tom. Tom gives Max a small cookie. Max is happy.",
+      "Max sleeps in a warm bed near the door. The bed is soft and brown. Every morning, Max runs to Tom's room. Max wakes Tom up because he wants to eat his food. Tom gets up from his bed. He walks to the kitchen. Tom puts dog food in a red bowl. Max eats his food fast. He drinks cold water from a blue bowl. Then, Max waits by the door.",
+      "In the afternoon, Tom and Max play in the big garden. Max runs after a red ball. He brings the ball back to Tom. Tom smiles and pats Max's head. Sometimes, their friend Sarah comes to play. Sarah has a funny hat. Max sniffs the hat and wags his tail. At night, Max lies down in his bed. He closes his eyes and sleeps. Max is a lovely pet."
+    ]
+  }
+};
 
 export default function GeneralTeacherAdmin() {
   const { user, signInWithGoogle } = useAuth();
@@ -97,7 +182,8 @@ export default function GeneralTeacherAdmin() {
   const [mounted, setMounted] = useState(false);
   
   // Tab state
-  const [currentTab, setCurrentTab] = useState<"visibility" | "chat-masters" | "unseen-practice" | "writing-practice" | "mission-new-home" | "future-projects" | "settings">("visibility");
+  const [currentTab, setCurrentTab] = useState<AdminTab>("visibility");
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [devPreview, setDevPreview] = useState(false);
   
   // Chat Masters Submissions data states
@@ -132,8 +218,8 @@ export default function GeneralTeacherAdmin() {
       setComfortMode(savedTheme);
     }
     const tabParam = new URLSearchParams(window.location.search).get("tab");
-    if (tabParam === "visibility" || tabParam === "chat-masters" || tabParam === "unseen-practice" || tabParam === "writing-practice" || tabParam === "mission-new-home") {
-      setCurrentTab(tabParam);
+    if (tabParam && (ADMIN_TABS as string[]).includes(tabParam)) {
+      setCurrentTab(tabParam as AdminTab);
     }
   }, []);
 
@@ -360,880 +446,242 @@ export default function GeneralTeacherAdmin() {
     localStorage.setItem("teaching-site-comfort-mode", nextTheme);
   };
 
+  const selectTab = (tab: AdminTab) => {
+    setCurrentTab(tab);
+    setSearchQuery("");
+    setActiveListTab("all");
+    const url = new URL(window.location.href);
+    url.searchParams.set("tab", tab);
+    window.history.replaceState(null, "", url.toString());
+  };
+
   if (!mounted) return null;
 
   const isLight = comfortMode === "light";
   const isTeacher = isTeacherUser(user) || devPreview;
 
-  // Dynamic Theme Styling
-  const bgTheme = isLight ? "bg-[#f1f5f9]" : "bg-[#080c18]";
-  const textTitle = isLight ? "text-zinc-900" : "text-white";
-  const textBody = isLight ? "text-zinc-700" : "text-[#e8edf8]";
-  const textMuted = isLight ? "text-zinc-500" : "text-slate-400";
-  const cardStyle = isLight ? "light-card text-zinc-800" : "glass-card text-[#e8edf8]";
-  const borderStyle = isLight ? "border-zinc-200" : "border-border-custom";
-  const inputStyle = isLight 
-    ? "bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400 focus:border-purple-500" 
-    : "bg-[#0d1222]/80 border-border-custom text-white placeholder:text-zinc-700 focus:border-purple-500/50";
+  // Flat, neutral theme tokens shared by every admin view
+  const bgTheme = isLight ? "bg-zinc-50" : "bg-[#0a0b10]";
+  const textTitle = isLight ? "text-zinc-900" : "text-zinc-100";
+  const textMuted = isLight ? "text-zinc-500" : "text-zinc-400";
+  const cardStyle = isLight ? "bg-white text-zinc-800" : "bg-[#0e1016] text-zinc-200";
+  const borderStyle = isLight ? "border-zinc-200" : "border-white/[0.07]";
+  const inputStyle = isLight
+    ? "bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-500"
+    : "bg-white/[0.02] border-white/[0.1] text-zinc-100 placeholder:text-zinc-500 focus:border-zinc-500";
+  const primaryBtn = isLight
+    ? "bg-zinc-900 hover:bg-zinc-800 text-white"
+    : "bg-zinc-100 hover:bg-white text-zinc-900";
+  const secondaryBtn = isLight
+    ? "border-zinc-200 text-zinc-700 hover:bg-zinc-100"
+    : "border-white/[0.1] text-zinc-300 hover:bg-white/[0.04]";
 
-  // Filter logic for Chat Masters
-  const filteredSubmissions = submissions.filter(sub => {
-    const matchesSearch = 
-      sub.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (sub.studentClass && sub.studentClass.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      sub.studentEmail.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    if (activeListTab === "pending") return matchesSearch && sub.status === "submitted";
-    if (activeListTab === "graded") return matchesSearch && sub.status === "graded";
-    return matchesSearch;
-  });
+  const pending = <T extends { status: string }>(list: T[]) => list.filter((s) => s.status === "submitted").length;
+  const counts: Partial<Record<AdminTab, number>> = {
+    "chat-masters": pending(submissions),
+    "unseen-practice": pending(unseenSubmissions),
+    "writing-practice": pending(writingSubmissions),
+  };
+  const activeItem = NAV_ITEMS.find((i) => i.id === currentTab) ?? NAV_ITEMS[0];
 
-  const filteredUnseenSubmissions = unseenSubmissions.filter(sub => {
-    const matchesSearch = 
-      sub.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (sub.studentClass && sub.studentClass.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      sub.studentEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (sub.unseenTitle && sub.unseenTitle.toLowerCase().includes(searchQuery.toLowerCase()));
-    
-    if (activeListTab === "pending") return matchesSearch && sub.status === "submitted";
-    if (activeListTab === "graded") return matchesSearch && sub.status === "graded";
-    return matchesSearch;
-  });
+  const themeButton = (
+    <button
+      type="button"
+      onClick={toggleTheme}
+      className={`p-2 rounded-md border cursor-pointer transition-colors ${secondaryBtn}`}
+      title="Comfort Reading Mode (מצב בהיר/כהה)"
+      aria-label="החלפת מצב תצוגה"
+    >
+      {isLight ? <Moon className="w-4 h-4" strokeWidth={1.75} /> : <Sun className="w-4 h-4" strokeWidth={1.75} />}
+    </button>
+  );
 
-  const filteredWritingSubmissions = writingSubmissions.filter(sub => {
-    const matchesSearch = 
-      sub.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (sub.studentClass && sub.studentClass.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      sub.studentEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (sub.prompt && sub.prompt.toLowerCase().includes(searchQuery.toLowerCase()));
-    
-    if (activeListTab === "pending") return matchesSearch && sub.status === "submitted";
-    if (activeListTab === "graded") return matchesSearch && sub.status === "graded";
-    return matchesSearch;
-  });
+  // ---------- Signed out / not a teacher: centered card, no sidebar ----------
+  if ((!user && !devPreview) || !isTeacher) {
+    const signedOut = !user && !devPreview;
+    return (
+      <div className={`min-h-screen ${bgTheme} transition-colors flex flex-col`}>
+        <div className="flex items-center justify-between px-6 h-14">
+          <Link href="/" className={`text-sm ${textMuted} hover:underline`}>חזרה לאתר</Link>
+          {themeButton}
+        </div>
+        <div className="flex-1 flex items-center justify-center px-4 pb-16">
+          <div className={`w-full max-w-sm p-6 rounded-lg border ${borderStyle} ${cardStyle} space-y-5 text-right`}>
+            <div className="space-y-1.5">
+              <h1 className={`text-lg font-semibold ${textTitle}`}>
+                {signedOut ? "התחברות ללוח המורה" : "אין גישה"}
+              </h1>
+              <p className={`text-sm leading-relaxed ${textMuted}`}>
+                {signedOut
+                  ? "כדי לצפות בעבודות התלמידים ולהעריך אותן, יש להתחבר עם חשבון המורה."
+                  : "החשבון הזה אינו מורשה כחשבון מורה. יש להתחבר עם חשבון המורה המורשה."}
+              </p>
+            </div>
+            {signedOut ? (
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      await signInWithGoogle();
+                    } catch (err: any) {
+                      console.error(err);
+                      if (err.code === "auth/unauthorized-domain") {
+                        alert("שגיאה: הדומיין אינו מורשה ב-Firebase. אנא הוסיפו את דומיין האתר הנוכחי לרשימת הדומיינים המורשים בקונסולת Firebase (תחת Authentication -> Settings).");
+                      } else if (err.code !== "auth/popup-closed-by-user") {
+                        alert("ההתחברות נכשלה. נסו שוב.");
+                      }
+                    }
+                  }}
+                  className={`w-full py-2.5 rounded-md text-sm font-medium cursor-pointer transition-colors ${primaryBtn}`}
+                >
+                  התחברות עם Google
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDevPreview(true);
+                    selectTab("unseen-practice");
+                    setLoadingUnseen(false);
+                    setLoadingWriting(false);
+                    setLoading(false);
+                    if (unseenSubmissions.length === 0) {
+                      setUnseenSubmissions([DEMO_UNSEEN]);
+                      setSelectedUnseen(DEMO_UNSEEN);
+                    }
+                  }}
+                  className={`w-full py-2.5 rounded-md border text-sm cursor-pointer transition-colors ${secondaryBtn}`}
+                >
+                  תצוגה לדוגמה (מצב בדיקה)
+                </button>
+              </div>
+            ) : (
+              <Link href="/" className={`block w-full py-2.5 rounded-md text-sm font-medium text-center ${primaryBtn}`}>
+                חזרה לאתר
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  // Stats calculations
-  const totalCount = submissions.length;
-  const gradedCount = submissions.filter(s => s.status === "graded").length;
-  const pendingCount = submissions.filter(s => s.status === "submitted").length;
-  const avgScore = gradedCount > 0 
-    ? Math.round(submissions.filter(s => s.status === "graded" && s.score !== null).reduce((sum, s) => sum + (s.score || 0), 0) / gradedCount)
-    : 0;
+  const viewProps = { inputStyle, cardStyle, borderStyle, textTitle, textMuted, isLight };
+  const listProps = {
+    gradeInput, setGradeInput, feedbackInput, setFeedbackInput, isGrading, gradeSuccess,
+    searchQuery, setSearchQuery, activeListTab, setActiveListTab,
+  };
 
+  // ---------- Teacher console ----------
   return (
-    <div className={`min-h-screen ${bgTheme} transition-colors duration-300 flex flex-col font-sans relative overflow-x-hidden`}>
-      {/* Background Glows */}
-      {!isLight && (
-        <>
-          <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-purple-900/10 blur-[150px] pointer-events-none" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-indigo-950/10 blur-[120px] pointer-events-none" />
-        </>
-      )}
+    <div className={`min-h-screen ${bgTheme} transition-colors flex`}>
+      <AdminSidebar
+        current={currentTab}
+        onSelect={selectTab}
+        counts={counts}
+        isLight={isLight}
+        onToggleTheme={toggleTheme}
+        userEmail={user?.email ?? (devPreview ? "מצב תצוגה לדוגמה" : null)}
+        mobileOpen={mobileNavOpen}
+        setMobileOpen={setMobileNavOpen}
+      />
 
-      {/* Main Header */}
-      <header className={`w-full max-w-6xl mx-auto px-6 py-5 flex items-center justify-between border-b ${borderStyle} relative z-10`}>
-        <Link
-          href="/"
-          className={`inline-flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-lg border ${borderStyle} ${isLight ? "bg-white hover:bg-zinc-100" : "bg-surface hover:bg-[#111728]"} transition-colors duration-200`}
-        >
-          <ArrowRight className="w-4 h-4" />
-          <span>חזרה לדף הבית</span>
-        </Link>
-        
-        <div className="flex items-center gap-2">
-          <h1 className={`text-sm md:text-base font-black ${textTitle} flex items-center gap-2`}>
-            <span>לוח מורה מרכזי</span>
-            <Sparkles className="w-4.5 h-4.5 text-purple-400 animate-pulse" />
-          </h1>
+      <div className="flex-1 min-w-0 flex flex-col">
+        {/* Mobile top bar */}
+        <div className={`lg:hidden sticky top-0 z-30 h-14 px-4 flex items-center justify-between border-b ${borderStyle} ${cardStyle}`}>
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen(true)}
+            className={`p-2 rounded-md border cursor-pointer ${secondaryBtn}`}
+            aria-label="פתיחת תפריט"
+          >
+            <Menu className="w-4 h-4" />
+          </button>
+          <span className={`text-sm font-semibold ${textTitle}`}>{activeItem.label}</span>
+          {themeButton}
         </div>
 
-        {/* Toggle Theme Button */}
-        <button
-          onClick={toggleTheme}
-          className={`p-2.5 rounded-xl border ${borderStyle} ${isLight ? "bg-white hover:bg-zinc-100" : "bg-[#0f1526]/80 hover:bg-[#161d35]"} transition-colors duration-200`}
-          title="Comfort Reading Mode (שינוי ניגודיות/צבע)"
-        >
-          {isLight ? <Moon className="w-4 h-4 text-purple-600" /> : <Sun className="w-4 h-4 text-amber-400" />}
-        </button>
-      </header>
+        <main className="w-full max-w-6xl mx-auto px-4 sm:px-8 py-8 flex-1 flex flex-col">
+          {/* Page header */}
+          <header className={`mb-6 pb-5 border-b ${borderStyle} text-right`}>
+            <h1 className={`text-xl font-semibold tracking-tight ${textTitle}`}>{activeItem.label}</h1>
+            <p className={`text-sm mt-1 ${textMuted}`}>{activeItem.description}</p>
+          </header>
 
-      {/* Main Navigation Tabs */}
-      {isTeacher && (
-        <nav className={`w-full max-w-6xl mx-auto px-6 pt-6 flex flex-wrap justify-start gap-4 border-b border-zinc-800/20 relative z-10`}>
-          <button
-            onClick={() => setCurrentTab("visibility")}
-            className={`pb-3 font-bold text-xs border-b-2 cursor-pointer transition-all ${
-              currentTab === "visibility"
-                ? "border-purple-500 text-purple-400"
-                : "border-transparent text-text-muted hover:text-[#e8edf8]"
-            }`}
-          >
-            מה התלמידים רואים 👁
-          </button>
-          <button
-            onClick={() => setCurrentTab("chat-masters")}
-            className={`pb-3 font-bold text-xs border-b-2 cursor-pointer transition-all ${
-              currentTab === "chat-masters"
-                ? "border-purple-500 text-purple-400"
-                : "border-transparent text-text-muted hover:text-[#e8edf8]"
-            }`}
-          >
-            הגשות Chat Masters ({totalCount})
-          </button>
-          <button
-            onClick={() => setCurrentTab("unseen-practice")}
-            className={`pb-3 font-bold text-xs border-b-2 cursor-pointer transition-all ${
-              currentTab === "unseen-practice"
-                ? "border-purple-500 text-purple-400"
-                : "border-transparent text-text-muted hover:text-[#e8edf8]"
-            }`}
-          >
-            הגשות אנסין ({unseenSubmissions.length})
-          </button>
-          <button
-            onClick={() => setCurrentTab("writing-practice")}
-            className={`pb-3 font-bold text-xs border-b-2 cursor-pointer transition-all ${
-              currentTab === "writing-practice"
-                ? "border-purple-500 text-purple-400"
-                : "border-transparent text-text-muted hover:text-[#e8edf8]"
-            }`}
-          >
-            הגשות כתיבה ({writingSubmissions.length})
-          </button>
-          <button
-            onClick={() => setCurrentTab("mission-new-home")}
-            className={`pb-3 font-bold text-xs border-b-2 cursor-pointer transition-all ${
-              currentTab === "mission-new-home"
-                ? "border-purple-500 text-purple-400"
-                : "border-transparent text-text-muted hover:text-[#e8edf8]"
-            }`}
-          >
-            משימת בית חדש 🚀
-          </button>
-          <button
-            onClick={() => setCurrentTab("future-projects")}
-            className={`pb-3 font-bold text-xs border-b-2 cursor-pointer transition-all ${
-              currentTab === "future-projects"
-                ? "border-purple-500 text-purple-400"
-                : "border-transparent text-text-muted hover:text-[#e8edf8]"
-            }`}
-          >
-            פרויקטים נוספים (All Projects)
-          </button>
-          <button
-            onClick={() => setCurrentTab("settings")}
-            className={`pb-3 font-bold text-xs border-b-2 cursor-pointer transition-all ${
-              currentTab === "settings"
-                ? "border-purple-500 text-purple-400"
-                : "border-transparent text-text-muted hover:text-[#e8edf8]"
-            }`}
-          >
-            הגדרות כיתה
-          </button>
-        </nav>
-      )}
-
-      {/* Content Body */}
-      <main className="w-full max-w-6xl mx-auto px-6 py-8 flex-1 flex flex-col z-10">
-        
-        {/* Auth checks */}
-        {!user && !devPreview ? (
-          <div className="flex-1 flex flex-col items-center justify-center max-w-md mx-auto py-16 text-center">
-            <div className={`p-8 rounded-2xl ${cardStyle} border ${borderStyle} space-y-6 w-full shadow-2xl`}>
-              <div className="p-4 bg-purple-500/10 border border-purple-500/20 rounded-full inline-flex text-purple-400 text-3xl">
-                🔑
-              </div>
-              <h2 className={`text-xl font-bold ${textTitle}`}>נדרשת התחברות ללוח בקרה</h2>
-              <p className={`text-xs ${textMuted} leading-relaxed`}>
-                כדי לצפות בעבודות התלמידים ולהעריך אותן, עליך להתחבר עם חשבון המורה המורשה שלך.
-              </p>
-              <button
-                onClick={async () => {
-                  try {
-                    await signInWithGoogle();
-                  } catch (err: any) {
-                    console.error(err);
-                    if (err.code === "auth/unauthorized-domain") {
-                      alert("שגיאה: הדומיין אינו מורשה ב-Firebase. אנא הוסיפו את דומיין האתר הנוכחי לרשימת הדומיינים המורשים בקונסולת Firebase (תחת Authentication -> Settings).");
-                    } else if (err.code !== "auth/popup-closed-by-user") {
-                      alert("ההתחברות נכשלה. נסו שוב.");
-                    }
-                  }
-                }}
-                className="w-full py-3.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl cursor-pointer shadow-lg shadow-purple-500/25 transition-all text-sm"
-              >
-                התחברות עם Google
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setDevPreview(true);
-                  setCurrentTab("unseen-practice");
-                  if (unseenSubmissions.length === 0) {
-                    const demoSubmission: UnseenAssignment = {
-                      id: "demo-unseen-1",
-                      studentId: "student-101",
-                      studentName: "רועי בלש",
-                      studentClass: "כיתה ח'2",
-                      studentEmail: "roy.detective@school.edu",
-                      unseenTitle: "Max the Small Dog",
-                      difficulty: "Easy",
-                      score: 85,
-                      correctOnFirstTry: 7,
-                      totalQuestions: 8,
-                      submittedAt: { seconds: Math.floor(Date.now() / 1000) },
-                      status: "submitted",
-                      scoreTeacher: null,
-                      feedbackTeacher: null,
-                      answers: [
-                        {
-                          questionId: 1,
-                          questionNumber: 1,
-                          type: "mcq",
-                          paragraph: 1,
-                          prompt: "What does Max look like?",
-                          studentAnswer: "He is white with long ears and a short tail",
-                          correctAnswer: "He is white with long ears and a short tail",
-                          firstTrySuccess: true,
-                          attempts: 1,
-                          explanation: "בפסקה 1 רשום בבירור שהכלב לבן, בעל אוזניים ארוכות וזנב קצר."
-                        },
-                        {
-                          questionId: 2,
-                          questionNumber: 2,
-                          type: "mcq",
-                          paragraph: 1,
-                          prompt: "How old is Max?",
-                          studentAnswer: "Three years old",
-                          correctAnswer: "Three years old",
-                          firstTrySuccess: true,
-                          attempts: 1,
-                          explanation: "הטקסט מציין 'Max is three years old'."
-                        },
-                        {
-                          questionId: 3,
-                          questionNumber: 3,
-                          type: "mcq",
-                          paragraph: 1,
-                          prompt: "What does Max see near the big house?",
-                          studentAnswer: "A yellow cat",
-                          correctAnswer: "A yellow cat",
-                          firstTrySuccess: true,
-                          attempts: 1,
-                          explanation: "נכון! בפסקה 1 רשום שמקס רואה חתול צהוב (yellow cat)."
-                        },
-                        {
-                          questionId: 4,
-                          questionNumber: 4,
-                          type: "copy",
-                          paragraph: 1,
-                          prompt: "Copy the sentence that proves Tom gives food to Max.",
-                          studentAnswer: "Tom gives Max a small cookie.",
-                          correctAnswer: "Tom gives Max a small cookie.",
-                          firstTrySuccess: true,
-                          attempts: 1,
-                          explanation: "משפט מלא ומדויק המוכיח שמתן העוגיה הוא האכלה."
-                        },
-                        {
-                          questionId: 5,
-                          questionNumber: 5,
-                          type: "open",
-                          paragraph: 2,
-                          prompt: "Why does Max run to Tom's room every morning?",
-                          studentAnswer: "Because he wants to eat his food and wakes Tom up.",
-                          correctAnswer: "Because he wants to eat his food.",
-                          firstTrySuccess: true,
-                          attempts: 1,
-                          explanation: "תשובה מצוינת! התלמיד ציין את הסיבה המדויקת מהפסקה.",
-                          matchedKeywords: ["eat", "food", "wants"],
-                          missingKeywords: []
-                        },
-                        {
-                          questionId: 6,
-                          questionNumber: 6,
-                          type: "mcq",
-                          paragraph: 2,
-                          prompt: "What does Max drink?",
-                          studentAnswer: "Cold water",
-                          correctAnswer: "Cold water",
-                          firstTrySuccess: false,
-                          attempts: 2,
-                          explanation: "מקס שותה מים קרים מקערה כחולה (He drinks cold water from a blue bowl)."
-                        },
-                        {
-                          questionId: 7,
-                          questionNumber: 7,
-                          type: "open",
-                          paragraph: 3,
-                          prompt: "What does Max do with the red ball?",
-                          studentAnswer: "He runs after the ball and brings it back to Tom.",
-                          correctAnswer: "He runs after the red ball and brings the ball back to Tom.",
-                          firstTrySuccess: true,
-                          attempts: 1,
-                          explanation: "תשובה מדויקת להפליא.",
-                          matchedKeywords: ["runs", "ball", "brings"],
-                          missingKeywords: []
-                        },
-                        {
-                          questionId: 8,
-                          questionNumber: 8,
-                          type: "open",
-                          paragraph: 3,
-                          prompt: "What is this story mostly about?",
-                          studentAnswer: "Max the small dog and what he does every day with Tom.",
-                          correctAnswer: "Tom's dog Max and his daily routine.",
-                          firstTrySuccess: true,
-                          attempts: 1,
-                          explanation: "הבנה גלובלית מלאה של הסיפור.",
-                          matchedKeywords: ["Max", "dog", "Tom"],
-                          missingKeywords: []
-                        }
-                      ],
-                      passage: {
-                        title: "Max the Small Dog",
-                        difficulty: "Easy",
-                        paragraphs: [
-                          "Tom has a small dog. The dog is white. His name is Max. Max has long ears and a short tail. Tom likes Max very much. Max is three years old. Every day, Tom walks with Max. They walk near the big house. Max sees a yellow cat. He does not run after the cat. Max is a good dog. He stands next to Tom. Tom gives Max a small cookie. Max is happy.",
-                          "Max sleeps in a warm bed near the door. The bed is soft and brown. Every morning, Max runs to Tom's room. Max wakes Tom up because he wants to eat his food. Tom gets up from his bed. He walks to the kitchen. Tom puts dog food in a red bowl. Max eats his food fast. He drinks cold water from a blue bowl. Then, Max waits by the door.",
-                          "In the afternoon, Tom and Max play in the big garden. Max runs after a red ball. He brings the ball back to Tom. Tom smiles and pats Max's head. Sometimes, their friend Sarah comes to play. Sarah has a funny hat. Max sniffs the hat and wags his tail. At night, Max lies down in his bed. He closes his eyes and sleeps. Max is a lovely pet."
-                        ]
-                      }
-                    };
-                    setUnseenSubmissions([demoSubmission]);
-                    setSelectedUnseen(demoSubmission);
-                  }
-                }}
-                className="w-full py-2.5 bg-zinc-800/80 hover:bg-zinc-700 text-purple-300 text-xs font-bold rounded-xl text-center border border-purple-500/30 cursor-pointer transition-all flex items-center justify-center gap-2"
-              >
-                <span>⚡ צפייה כיתתית לדוגמה (מצב מורה לבדיקה)</span>
-              </button>
-            </div>
-          </div>
-        ) : !isTeacher ? (
-          <div className="flex-1 flex flex-col items-center justify-center max-w-md mx-auto py-16 text-center">
-            <div className={`p-8 rounded-2xl ${cardStyle} border ${borderStyle} space-y-6 w-full shadow-2xl`}>
-              <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-full inline-flex text-red-400 text-3xl">
-                🚫
-              </div>
-              <h2 className={`text-xl font-bold ${textTitle}`}>גישה נדחתה (Access Denied)</h2>
-              <p className={`text-xs ${textMuted} leading-relaxed`}>
-                אימייל זה אינו מורשה כחשבון מורה באתר. יש להתחבר עם חשבון המורה המורשה (<b>niroari@gmail.com</b>).
-              </p>
-              <Link
-                href="/"
-                className="w-full block py-3.5 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold rounded-xl text-center transition-all border border-zinc-700"
-              >
-                חזרה לדף הבית
-              </Link>
-            </div>
-          </div>
-        ) : currentTab === "visibility" ? (
-          <VisibilityManager
-            isLight={isLight}
-            cardStyle={cardStyle}
-            borderStyle={borderStyle}
-            textTitle={textTitle}
-            textMuted={textMuted}
-            inputStyle={inputStyle}
-          />
-        ) : currentTab === "chat-masters" ? (
-          /* TAB 1: CHAT MASTERS */
-          <div className="space-y-8 flex-1 flex flex-col">
-            
-            {/* Stats Panel */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className={`p-4 rounded-xl ${cardStyle} border ${borderStyle} flex items-center justify-between text-right`}>
-                <div>
-                  <span className={`text-[10px] ${textMuted} block font-bold`}>סה"כ הגשות</span>
-                  <span className={`text-2xl font-black ${textTitle} block mt-1`}>{totalCount}</span>
-                </div>
-                <span className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 text-lg">
-                  <FileText className="w-5 h-5" />
-                </span>
-              </div>
-
-              <div className={`p-4 rounded-xl ${cardStyle} border ${borderStyle} flex items-center justify-between text-right`}>
-                <div>
-                  <span className={`text-[10px] ${textMuted} block font-bold`}>ממתינות לבדיקה</span>
-                  <span className={`text-2xl font-black ${textTitle} block mt-1`}>{pendingCount}</span>
-                </div>
-                <span className="p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-lg">
-                  <Clock className="w-5 h-5" />
-                </span>
-              </div>
-
-              <div className={`p-4 rounded-xl ${cardStyle} border ${borderStyle} flex items-center justify-between text-right`}>
-                <div>
-                  <span className={`text-[10px] ${textMuted} block font-bold`}>נבדקו</span>
-                  <span className={`text-2xl font-black ${textTitle} block mt-1`}>{gradedCount}</span>
-                </div>
-                <span className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-lg">
-                  <CheckCircle className="w-5 h-5" />
-                </span>
-              </div>
-
-              <div className={`p-4 rounded-xl ${cardStyle} border ${borderStyle} flex items-center justify-between text-right`}>
-                <div>
-                  <span className={`text-[10px] ${textMuted} block font-bold`}>ממוצע ציונים</span>
-                  <span className={`text-2xl font-black ${textTitle} block mt-1`}>{avgScore}</span>
-                </div>
-                <span className="p-2.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-400 text-lg">
-                  <Award className="w-5 h-5" />
-                </span>
-              </div>
-            </div>
-
-            {/* Split Screen Panel */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch flex-1 min-h-[500px]">
-              
-              {/* LEFT COLUMN: Submissions List (Columns: 5) */}
-              <div className="lg:col-span-5 flex flex-col space-y-4">
-                
-                {/* Search & Filter Card */}
-                <div className={`p-4 rounded-xl ${cardStyle} border ${borderStyle} space-y-3`}>
-                  
-                  {/* Search bar */}
-                  <div className="relative">
-                    <span className="absolute inset-y-0 right-3.5 flex items-center text-text-muted">
-                      <Search className="w-4 h-4" />
-                    </span>
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="חישוב לפי שם, כיתה או אימייל..."
-                      className={`w-full pr-10 pl-4 py-2 text-xs rounded-xl border outline-none text-right transition-all font-bold ${inputStyle}`}
-                    />
-                  </div>
-
-                  {/* Tabs */}
-                  <div className="grid grid-cols-3 gap-1 bg-zinc-800/40 p-1 rounded-lg text-xs font-bold border border-zinc-700/30">
-                    <button
-                      onClick={() => setActiveListTab("all")}
-                      className={`py-1.5 rounded-md cursor-pointer text-center transition-colors ${
-                        activeListTab === "all"
-                          ? "bg-purple-600 text-white"
-                          : `${textMuted} hover:text-white`
-                      }`}
-                    >
-                      הכל ({totalCount})
-                    </button>
-                    <button
-                      onClick={() => setActiveListTab("pending")}
-                      className={`py-1.5 rounded-md cursor-pointer text-center transition-colors ${
-                        activeListTab === "pending"
-                          ? "bg-purple-600 text-white"
-                          : `${textMuted} hover:text-white`
-                      }`}
-                    >
-                      ממתין ({pendingCount})
-                    </button>
-                    <button
-                      onClick={() => setActiveListTab("graded")}
-                      className={`py-1.5 rounded-md cursor-pointer text-center transition-colors ${
-                        activeListTab === "graded"
-                          ? "bg-purple-600 text-white"
-                          : `${textMuted} hover:text-white`
-                      }`}
-                    >
-                      נבדק ({gradedCount})
-                    </button>
-                  </div>
-
-                </div>
-
-                {/* Submissions List Card */}
-                <div className={`p-4 rounded-xl ${cardStyle} border ${borderStyle} flex-1 overflow-y-auto max-h-[460px] space-y-2.5`}>
-                  {loading ? (
-                    <div className="flex flex-col items-center justify-center p-12 space-y-3">
-                      <RefreshCw className="w-6 h-6 text-purple-500 animate-spin" />
-                      <span className={`text-xs ${textMuted}`}>טוען הגשות...</span>
-                    </div>
-                  ) : filteredSubmissions.length === 0 ? (
-                    <div className="text-center py-12 text-xs text-text-muted">
-                      לא נמצאו הגשות מתאימות.
-                    </div>
-                  ) : (
-                    filteredSubmissions.map((sub) => {
-                      const isSelected = selectedSub?.id === sub.id;
-                      const isCustom = sub.character === "custom";
-                      const charDetails = isCustom 
-                        ? { name: sub.customCharacterName || "Custom Figure", avatar: "🎭", themeColor: "text-rose-400 bg-rose-500/10 border-rose-500/20" }
-                        : CHARACTERS_MAP[sub.character] || { name: sub.character, avatar: "🤖", themeColor: "" };
-                      const dateStr = sub.submittedAt 
-                        ? new Date(sub.submittedAt.seconds * 1000).toLocaleDateString("he-IL") 
-                        : "";
-                      
-                      return (
-                        <button
-                          key={sub.id}
-                          onClick={() => handleSelectSub(sub)}
-                          className={`w-full p-3.5 rounded-xl border text-right transition-all flex items-center justify-between gap-3 hover:scale-[1.01] cursor-pointer ${
-                            isSelected 
-                              ? "border-purple-500 bg-purple-500/5 ring-1 ring-purple-500/20" 
-                              : `${borderStyle} ${isLight ? "bg-white hover:bg-zinc-50" : "bg-[#0b0f19] hover:bg-[#111727]"}`
-                          }`}
-                        >
-                          {/* Score or Pending badge */}
-                          <div>
-                            {sub.status === "graded" ? (
-                              <span className="text-xs font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-lg">
-                                {sub.score}
-                              </span>
-                            ) : (
-                              <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse" />
-                                <span>ממתין</span>
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Student Details */}
-                          <div className="flex items-center gap-3">
-                            <div className="text-right">
-                              <h4 className={`text-xs font-bold ${textTitle}`}>
-                                {sub.studentName} {sub.studentClass ? `(${sub.studentClass})` : ""}
-                              </h4>
-                              <p className="text-[10px] text-text-muted mt-0.5">{sub.studentEmail}</p>
-                              <div className="flex gap-2 items-center justify-end mt-1.5 text-[9px] text-text-muted">
-                                <span>הוגש ב: {dateStr}</span>
-                                <span>•</span>
-                                <span className={`flex items-center gap-0.5 px-1 rounded bg-zinc-800 border border-zinc-700/50`}>
-                                  <span>{charDetails.avatar}</span>
-                                  <span>{charDetails.name}</span>
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </button>
-                      );
-                    })
-                  )}
-                </div>
-
-              </div>
-
-              {/* RIGHT COLUMN: Detailed View & Grading Form (Columns: 7) */}
-              <div className="lg:col-span-7 flex flex-col">
-                <div className={`rounded-2xl ${cardStyle} border ${borderStyle} flex-1 flex flex-col justify-between overflow-hidden shadow-2xl h-full min-h-[500px]`}>
-                  
-                  {!selectedSub ? (
-                    <div className="flex-1 flex flex-col items-center justify-center p-12 text-center text-xs text-text-muted space-y-4">
-                      <BookOpen className="w-12 h-12 text-zinc-700 animate-pulse" />
-                      <p className="max-w-xs leading-relaxed">
-                        יש לבחור הגשת תלמיד מרשימת ההגשות משמאל כדי לקרוא את תמלול, לראות את כרטיס היציאה ולהזין ציון ומשוב.
-                      </p>
-                    </div>
-                  ) : (
-                    /* Detailed submission review panel */
-                    <div className="flex-1 flex flex-col h-full overflow-hidden">
-                      
-                      {/* Active Sub Header */}
-                      <div className={`px-6 py-4 border-b ${borderStyle} flex items-center justify-between ${
-                        isLight ? "bg-zinc-50" : "bg-[#0b0f19]/70"
-                      }`}>
-                        <div className="text-right">
-                          <h3 className={`text-sm font-black ${textTitle}`}>
-                            {selectedSub.studentName} {selectedSub.studentClass ? `(${selectedSub.studentClass})` : ""}
-                          </h3>
-                          <p className="text-[10px] text-text-muted mt-0.5">{selectedSub.studentEmail}</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className={`text-xs px-2 py-1 rounded-xl border font-bold flex items-center gap-1 ${
-                            selectedSub.character === "custom"
-                              ? "text-rose-400 bg-rose-500/10 border-rose-500/20"
-                              : CHARACTERS_MAP[selectedSub.character]?.themeColor || ""
-                          }`}>
-                            <span>
-                              שותף שיחה: {selectedSub.character === "custom"
-                                ? `🎭 ${selectedSub.customCharacterName || "Custom"}`
-                                : `${CHARACTERS_MAP[selectedSub.character]?.avatar} ${CHARACTERS_MAP[selectedSub.character]?.name}`}
-                            </span>
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Content scroll block (Transcripts + Exit Ticket) */}
-                      <div className="flex-1 p-6 overflow-y-auto space-y-6 max-h-[340px]">
-                        
-                        {/* Conversation Transcript section */}
-                        <div className="space-y-3">
-                          <h4 className={`text-xs font-bold ${textTitle} text-right border-r-2 border-purple-500 pr-2`}>
-                            תמלול השיחה באנגלית (Chat Transcript)
-                          </h4>
-                          <div className={`p-4 rounded-xl border ${borderStyle} ${isLight ? "bg-zinc-100/50" : "bg-[#0b101d]"} space-y-4 max-h-[220px] overflow-y-auto`}>
-                            {selectedSub.messages.map((msg, idx) => {
-                              const isUser = msg.sender === "user";
-                              return (
-                                <div key={idx} className={`flex w-full ${isUser ? "justify-start" : "justify-end"}`}>
-                                  <div className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed ${
-                                    isUser
-                                      ? "bg-purple-600 text-white rounded-tl-none font-medium shadow-md shadow-purple-500/10"
-                                      : isLight
-                                        ? "bg-white border border-zinc-200 text-zinc-900 rounded-tr-none shadow-sm"
-                                        : "bg-surface border border-border-custom text-[#e8edf8] rounded-tr-none shadow-md shadow-black/10"
-                                  }`} dir="ltr">
-                                    <div className={`text-[9px] mb-1 font-bold ${isUser ? "text-purple-200" : "text-purple-400"}`}>
-                                      {isUser ? selectedSub.studentName : (selectedSub.character === "custom" ? (selectedSub.customCharacterName || "AI Partner") : (CHARACTERS_MAP[selectedSub.character]?.name || "AI Partner"))}
-                                    </div>
-                                    <p className="text-left break-words">{msg.text}</p>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-
-                        {/* Exit Ticket Responses section */}
-                        <div className="space-y-3">
-                          <h4 className={`text-xs font-bold ${textTitle} text-right border-r-2 border-purple-500 pr-2`}>
-                            כרטיס יציאה (Exit Ticket Answers)
-                          </h4>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-right">
-                            <div className={`p-3 rounded-xl border ${borderStyle} bg-purple-500/5`}>
-                              <span className="block text-[10px] font-bold text-purple-400">1. דבר אחד שלמדתי:</span>
-                              <p className={`mt-1 text-xs text-slate-200 leading-relaxed font-sans`}>
-                                {selectedSub.exitTicketLearned}
-                              </p>
-                            </div>
-                            <div className={`p-3 rounded-xl border ${borderStyle} bg-purple-500/5`}>
-                              <span className="block text-[10px] font-bold text-purple-400">2. 3 שאלות לחבר לעט:</span>
-                              <p className={`mt-1 text-xs text-slate-200 leading-relaxed font-mono whitespace-pre-wrap`} dir="ltr">
-                                {selectedSub.exitTicketPenPal}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-
-                      </div>
-
-                      {/* Grading and Review Submission Form (Fixed Footer) */}
-                      <form onSubmit={handleSaveGrade} className={`p-5 border-t ${borderStyle} ${
-                        isLight ? "bg-zinc-50" : "bg-[#0b0f19]/80"
-                      } space-y-4`}>
-                        <div className="grid grid-cols-4 gap-4 items-center flex-row-reverse text-right">
-                          
-                          {/* Feedback text area (Span: 3) */}
-                          <div className="col-span-3 space-y-1.5">
-                            <label className={`block text-[10px] font-bold ${textTitle}`}>
-                              הערות ומשוב המורה (באנגלית או בעברית):
-                            </label>
-                            <input
-                              type="text"
-                              value={feedbackInput}
-                              onChange={(e) => setFeedbackInput(e.target.value)}
-                              placeholder="כתבו משוב תומך (לדוגמה: כל הכבוד! שיחה מגוונת ומשפטים נהדרים...)"
-                              className={`w-full px-3 py-2 text-xs rounded-lg border outline-none text-right transition-all ${inputStyle}`}
-                            />
-                          </div>
-
-                          {/* Grade numeric input (Span: 1) */}
-                          <div className="col-span-1 space-y-1.5">
-                            <label className={`block text-[10px] font-bold ${textTitle}`}>
-                              ציון (0-100):
-                            </label>
-                            <input
-                              type="number"
-                              min="0"
-                              max="100"
-                              value={gradeInput}
-                              onChange={(e) => setGradeInput(e.target.value)}
-                              placeholder="90"
-                              className={`w-full px-3 py-2 text-xs rounded-lg border outline-none text-center font-bold transition-all ${inputStyle}`}
-                              required
-                            />
-                          </div>
-                        </div>
-
-                        {/* Submit Button */}
-                        <div className="flex justify-between items-center gap-3">
-                          
-                          {gradeSuccess && (
-                            <div className="text-xs text-emerald-400 font-bold flex items-center gap-1">
-                              <Check className="w-4 h-4" />
-                              <span>הציון והמשוב נשמרו בהצלחה!</span>
-                            </div>
-                          )}
-                          {!gradeSuccess && <div />}
-
-                          <button
-                            type="submit"
-                            disabled={isGrading}
-                            className="px-6 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-zinc-700 text-white font-bold text-xs rounded-lg cursor-pointer shadow-md transition-all flex items-center gap-1.5 mr-auto"
-                          >
-                            {isGrading ? (
-                              <>
-                                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                                <span>שומר...</span>
-                              </>
-                            ) : (
-                              <>
-                                <CheckCircle className="w-3.5 h-3.5" />
-                                <span>שמירת ציון ומשוב</span>
-                              </>
-                            )}
-                          </button>
-                        </div>
-
-                      </form>
-
-                    </div>
-                  )}
-
-                </div>
-              </div>
-
-            </div>
-
-          </div>
-        ) : currentTab === "unseen-practice" ? (
-          <UnseenDashboardView
-            unseenSubmissions={unseenSubmissions}
-            loadingUnseen={loadingUnseen}
-            selectedUnseen={selectedUnseen}
-            handleSelectUnseen={handleSelectUnseen}
-            handleSaveUnseenGrade={handleSaveUnseenGrade}
-            gradeInput={gradeInput}
-            setGradeInput={setGradeInput}
-            feedbackInput={feedbackInput}
-            setFeedbackInput={setFeedbackInput}
-            isGrading={isGrading}
-            gradeSuccess={gradeSuccess}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            activeListTab={activeListTab}
-            setActiveListTab={setActiveListTab}
-            inputStyle={inputStyle}
-            cardStyle={cardStyle}
-            borderStyle={borderStyle}
-            textTitle={textTitle}
-            textMuted={textMuted}
-            isLight={isLight}
-          />
-        ) : currentTab === "writing-practice" ? (
-          <WritingDashboardView
-            writingSubmissions={writingSubmissions}
-            loadingWriting={loadingWriting}
-            selectedWriting={selectedWriting}
-            handleSelectWriting={handleSelectWriting}
-            handleSaveWritingGrade={handleSaveWritingGrade}
-            gradeInput={gradeInput}
-            setGradeInput={setGradeInput}
-            feedbackInput={feedbackInput}
-            setFeedbackInput={setFeedbackInput}
-            isGrading={isGrading}
-            gradeSuccess={gradeSuccess}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            activeListTab={activeListTab}
-            setActiveListTab={setActiveListTab}
-            inputStyle={inputStyle}
-            cardStyle={cardStyle}
-            borderStyle={borderStyle}
-            textTitle={textTitle}
-            textMuted={textMuted}
-            isLight={isLight}
-          />
-        ) : currentTab === "mission-new-home" ? (
-          <MissionDashboardView
-            isTeacher={isTeacher}
-            demo={devPreview}
-            inputStyle={inputStyle}
-            cardStyle={cardStyle}
-            borderStyle={borderStyle}
-            textTitle={textTitle}
-            textMuted={textMuted}
-            isLight={isLight}
-          />
-        ) : currentTab === "future-projects" ? (
-          /* TAB 2: FUTURE PROJECTS (All Projects in one place) */
-          <div className="space-y-6">
-            <div className="text-right">
-              <h2 className={`text-xl font-bold ${textTitle} flex items-center justify-end gap-2`}>
-                <span>פרויקטים ומשימות עתידיות</span>
-                <TrendingUp className="w-5 h-5 text-purple-400" />
-              </h2>
-              <p className={`text-xs ${textMuted} mt-1`}>
-                כאן ירוכזו כל מודולי הניהול והערכת המשימות עבור הכלים האינטראקטיביים הנוספים באתר.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+          {currentTab === "visibility" ? (
+            <VisibilityManager {...viewProps} />
+          ) : currentTab === "chat-masters" ? (
+            <ChatMastersView
+              {...viewProps}
+              {...listProps}
+              submissions={submissions}
+              loading={loading}
+              selectedSub={selectedSub}
+              handleSelectSub={handleSelectSub}
+              handleSaveGrade={handleSaveGrade}
+            />
+          ) : currentTab === "unseen-practice" ? (
+            <UnseenDashboardView
+              {...viewProps}
+              {...listProps}
+              unseenSubmissions={unseenSubmissions}
+              loadingUnseen={loadingUnseen}
+              selectedUnseen={selectedUnseen}
+              handleSelectUnseen={handleSelectUnseen}
+              handleSaveUnseenGrade={handleSaveUnseenGrade}
+            />
+          ) : currentTab === "writing-practice" ? (
+            <WritingDashboardView
+              {...viewProps}
+              {...listProps}
+              writingSubmissions={writingSubmissions}
+              loadingWriting={loadingWriting}
+              selectedWriting={selectedWriting}
+              handleSelectWriting={handleSelectWriting}
+              handleSaveWritingGrade={handleSaveWritingGrade}
+            />
+          ) : currentTab === "mission-new-home" ? (
+            <MissionDashboardView {...viewProps} isTeacher={isTeacher} demo={devPreview} />
+          ) : currentTab === "future-projects" ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-right">
               {FUTURE_PROJECTS.map((proj) => {
-                const IconComp = proj.icon;
+                const Icon = proj.icon;
                 return (
-                  <div 
-                    key={proj.id} 
-                    className={`p-6 rounded-2xl border ${borderStyle} ${cardStyle} flex flex-col justify-between space-y-6 transition-all hover:scale-[1.01]`}
-                  >
-                    <div className="space-y-4">
-                      {/* Header */}
-                      <div className="flex items-center justify-between flex-row-reverse">
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-purple-500/20 bg-purple-500/10 text-purple-400">
-                          {proj.badge}
-                        </span>
-                        <div className={`p-2.5 rounded-xl border ${proj.color} shrink-0`}>
-                          <IconComp className="w-5 h-5" />
-                        </div>
+                  <div key={proj.id} className={`p-5 rounded-lg border ${borderStyle} ${cardStyle} space-y-2`}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Icon className={`w-4 h-4 ${textMuted}`} strokeWidth={1.75} />
+                        <h3 className={`text-sm font-semibold ${textTitle}`}>{proj.title}</h3>
                       </div>
-                      
-                      {/* Text */}
-                      <div className="text-right space-y-2">
-                        <h3 className={`text-sm font-black ${textTitle}`}>{proj.title}</h3>
-                        <p className={`text-xs ${textMuted} leading-relaxed`}>{proj.desc}</p>
-                      </div>
+                      <span className={`text-[11px] px-2 py-0.5 rounded border ${borderStyle} ${textMuted}`}>{proj.badge}</span>
                     </div>
-
-                    <div className="pt-2 border-t border-zinc-800/10 flex justify-end">
-                      <span className="text-[10px] text-text-muted font-bold flex items-center gap-1.5 flex-row-reverse">
-                        <Clock className="w-3.5 h-3.5" />
-                        <span>מתוכנן לפיתוח בשלבים הבאים</span>
-                      </span>
-                    </div>
+                    <p className={`text-sm leading-relaxed ${textMuted}`}>{proj.desc}</p>
                   </div>
                 );
               })}
             </div>
-          </div>
-        ) : (
-          /* TAB 3: SETTINGS */
-          <div className="max-w-xl mx-auto py-8">
-            <div className={`p-8 rounded-2xl ${cardStyle} border ${borderStyle} space-y-6 text-right`}>
-              <h2 className={`text-lg font-bold ${textTitle} flex items-center justify-end gap-2 border-b pb-4 ${borderStyle}`}>
-                <span>הגדרות וניהול כיתתי</span>
-                <ShieldCheck className="w-5 h-5 text-purple-400" />
-              </h2>
-              
-              <div className="space-y-4 text-xs leading-relaxed">
-                <div className="space-y-1">
-                  <span className={`block font-bold ${textTitle}`}>חשבון מורה מחובר:</span>
-                  <span className={`${textMuted}`}>{user?.email || "מצב תצוגה מקדימה (Demo Preview)"}</span>
-                </div>
-                <div className="space-y-1">
-                  <span className={`block font-bold ${textTitle}`}>סטטוס הרשאות:</span>
-                  <span className="text-emerald-400 font-bold flex items-center gap-1.5 justify-end">
-                    <span>מורשה לניהול מערכת (מנהל/ת)</span>
-                    <CheckCircle className="w-3.5 h-3.5" />
-                  </span>
-                </div>
-                <div className="space-y-1 pt-4 border-t border-zinc-800/20">
-                  <span className={`block font-bold ${textTitle}`}>הגדרות סינון כיתה:</span>
-                  <p className={`${textMuted}`}>
-                    במצב ברירת מחדל, תלמידים מקלידים באופן ידני את כיתתם (ז׳1, ז׳3 וכו׳). ניתן לסנן לפי כיתה בשדה החיפוש בטאב הגשות Chat Masters כדי לרכז את הבדיקה של כיתה ספציפית.
-                  </p>
-                </div>
+          ) : (
+            <div className={`max-w-xl rounded-lg border ${borderStyle} ${cardStyle} divide-y ${isLight ? "divide-zinc-200" : "divide-white/[0.07]"} text-right`}>
+              <div className="p-5 flex items-center justify-between gap-4">
+                <span className={`text-sm ${textMuted}`}>חשבון מחובר</span>
+                <span className={`text-sm ${textTitle}`} dir="ltr">{user?.email || "מצב תצוגה לדוגמה"}</span>
+              </div>
+              <div className="p-5 flex items-center justify-between gap-4">
+                <span className={`text-sm ${textMuted}`}>הרשאות</span>
+                <span className="text-sm text-emerald-500 flex items-center gap-1.5">
+                  <CheckCircle className="w-3.5 h-3.5" /> מנהל/ת מערכת
+                </span>
+              </div>
+              <div className="p-5 space-y-1">
+                <span className={`block text-sm ${textMuted}`}>סינון לפי כיתה</span>
+                <p className={`text-sm leading-relaxed ${textTitle}`}>
+                  התלמידים מקלידים את הכיתה ידנית (ז׳1, ז׳3 וכו׳). אפשר לסנן לפי כיתה בשדה החיפוש של כל רשימת הגשות.
+                </p>
               </div>
             </div>
-          </div>
-        )}
-
-      </main>
-
-      {/* Footer */}
-      <footer className="w-full text-center py-6 border-t border-border-custom text-xs text-text-muted relative z-10 bg-surface/30">
-        <span>© {new Date().getFullYear()} ניר עוז-ארי — לוח מורה מרכזי</span>
-      </footer>
+          )}
+        </main>
+      </div>
     </div>
   );
 }

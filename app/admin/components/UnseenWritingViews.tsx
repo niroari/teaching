@@ -153,16 +153,9 @@ export function UnseenDashboardView({
             placeholder="חיפוש לפי שם תלמיד, כיתה או שם האנסין..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className={`w-full pr-10 pl-4 py-2.5 rounded-xl border text-xs outline-none transition-colors text-right ${inputStyle}`}
+            className={`w-full pr-10 pl-4 py-2.5 rounded-md border text-xs outline-none transition-colors text-right ${inputStyle}`}
           />
           <Search className="w-4 h-4 text-zinc-500 absolute right-3.5 top-1/2 -translate-y-1/2" />
-        </div>
-        
-        <div className="text-right">
-          <h2 className={`text-xl font-bold ${textTitle}`}>ניהול הגשות אנסין (Unseen Practice)</h2>
-          <p className={`text-xs ${textMuted} mt-1`}>
-            צפייה במיומנות פיצוח האנסינים של התלמידים, מתן הערכה וציוני מורה משוב.
-          </p>
         </div>
       </div>
 
@@ -170,14 +163,14 @@ export function UnseenDashboardView({
         {/* LEFT COLUMN: List of Submissions */}
         <div className="lg:col-span-5 flex flex-col space-y-4 h-full">
           {/* List Header/Sub-tabs */}
-          <div className={`p-1.5 rounded-xl ${cardStyle} border ${borderStyle} flex gap-2 flex-row-reverse`}>
+          <div className={`p-1.5 rounded-md ${cardStyle} border ${borderStyle} flex gap-2 flex-row-reverse`}>
             {(["all", "pending", "graded"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveListTab(tab)}
                 className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   activeListTab === tab
-                    ? "bg-purple-600 text-white shadow-sm"
+                    ? (isLight ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-900")
                     : "text-zinc-400 hover:text-[#e8edf8]"
                 }`}
               >
@@ -187,7 +180,7 @@ export function UnseenDashboardView({
           </div>
 
           {/* Submissions List Card */}
-          <div className={`p-4 rounded-xl ${cardStyle} border ${borderStyle} flex-1 overflow-y-auto max-h-[460px] space-y-2.5`}>
+          <div className={`p-4 rounded-md ${cardStyle} border ${borderStyle} flex-1 overflow-y-auto max-h-[460px] space-y-2.5`}>
             {loadingUnseen ? (
               <div className="flex flex-col items-center justify-center p-12 space-y-3">
                 <RefreshCw className="w-6 h-6 text-purple-500 animate-spin" />
@@ -208,7 +201,7 @@ export function UnseenDashboardView({
                   <button
                     key={sub.id}
                     onClick={() => handleSelectUnseen(sub)}
-                    className={`w-full p-3.5 rounded-xl border text-right transition-all flex items-center justify-between gap-3 hover:scale-[1.01] cursor-pointer ${
+                    className={`w-full p-3.5 rounded-md border text-right transition-all flex items-center justify-between gap-3 cursor-pointer ${
                       isSelected 
                         ? "border-purple-500 bg-purple-500/5 ring-1 ring-purple-500/20" 
                         : `${borderStyle} ${isLight ? "bg-white hover:bg-zinc-50" : "bg-[#0b0f19] hover:bg-[#111727]"}`
@@ -217,12 +210,12 @@ export function UnseenDashboardView({
                     {/* Score or Pending badge */}
                     <div>
                       {sub.status === "graded" ? (
-                        <span className="text-xs font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-lg">
+                        <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-lg">
                           {sub.scoreTeacher}
                         </span>
                       ) : (
                         <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse" />
+                          <span className="w-1.5 h-1.5 bg-amber-400 rounded-full" />
                           <span>ממתין</span>
                         </span>
                       )}
@@ -254,11 +247,11 @@ export function UnseenDashboardView({
 
         {/* RIGHT COLUMN: Detailed View & Grading Form */}
         <div className="lg:col-span-7 flex flex-col">
-          <div className={`rounded-2xl ${cardStyle} border ${borderStyle} flex-1 flex flex-col justify-between overflow-hidden shadow-2xl h-full min-h-[500px]`}>
+          <div className={`rounded-lg ${cardStyle} border ${borderStyle} flex-1 flex flex-col justify-between overflow-hidden h-full min-h-[500px]`}>
             
             {!selectedUnseen ? (
               <div className="flex-1 flex flex-col items-center justify-center p-12 text-center text-xs text-zinc-500 space-y-4">
-                <BookOpen className="w-12 h-12 text-zinc-750 animate-pulse" />
+                <BookOpen className="w-12 h-12 text-zinc-750 opacity-40" />
                 <p className="max-w-xs leading-relaxed">
                   יש לבחור הגשת תלמיד מרשימת ההגשות משמאל כדי לראות את ביצועי האנסין ולהזין ציון מורה ומשוב.
                 </p>
@@ -271,7 +264,7 @@ export function UnseenDashboardView({
                   isLight ? "bg-zinc-50" : "bg-[#0b0f19]/70"
                 }`}>
                   <div className="text-right">
-                    <h3 className={`text-sm font-black ${textTitle}`}>
+                    <h3 className={`text-sm font-semibold ${textTitle}`}>
                       {selectedUnseen.studentName} {selectedUnseen.studentClass ? `(${selectedUnseen.studentClass})` : ""}
                     </h3>
                     <p className="text-[10px] text-zinc-500 mt-0.5">{selectedUnseen.studentEmail}</p>
@@ -284,23 +277,23 @@ export function UnseenDashboardView({
                 {/* Review details */}
                 <div className="p-6 flex-1 overflow-y-auto space-y-6 text-right">
                   <div className="grid grid-cols-3 gap-3">
-                    <div className={`p-4 rounded-xl border ${borderStyle} ${isLight ? "bg-zinc-50" : "bg-[#0c1222]/30"}`}>
+                    <div className={`p-4 rounded-md border ${borderStyle} ${isLight ? "bg-zinc-50" : "bg-[#0c1222]/30"}`}>
                       <span className="text-[10px] text-zinc-500 block mb-1">ציון מיומנות</span>
                       <div className="flex items-baseline gap-1 justify-end">
-                        <span className={`text-2xl font-black ${textTitle}`}>{selectedUnseen.score}</span>
+                        <span className={`text-2xl font-semibold ${textTitle}`}>{selectedUnseen.score}</span>
                         <span className="text-xs text-zinc-500">/ 100</span>
                       </div>
                     </div>
                     
-                    <div className={`p-4 rounded-xl border ${borderStyle} ${isLight ? "bg-zinc-50" : "bg-[#0c1222]/30"}`}>
+                    <div className={`p-4 rounded-md border ${borderStyle} ${isLight ? "bg-zinc-50" : "bg-[#0c1222]/30"}`}>
                       <span className="text-[10px] text-zinc-500 block mb-1">ניסיון ראשון</span>
                       <div className="flex items-baseline gap-1 justify-end">
-                        <span className={`text-2xl font-black ${textTitle}`}>{selectedUnseen.correctOnFirstTry}</span>
+                        <span className={`text-2xl font-semibold ${textTitle}`}>{selectedUnseen.correctOnFirstTry}</span>
                         <span className="text-xs text-zinc-500">/ {selectedUnseen.totalQuestions}</span>
                       </div>
                     </div>
 
-                    <div className={`p-4 rounded-xl border ${borderStyle} ${isLight ? "bg-zinc-50" : "bg-[#0c1222]/30"}`}>
+                    <div className={`p-4 rounded-md border ${borderStyle} ${isLight ? "bg-zinc-50" : "bg-[#0c1222]/30"}`}>
                       <span className="text-[10px] text-zinc-500 block mb-1">רמת קושי</span>
                       <span className="inline-block text-xs font-bold px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-teal-400 mt-1">
                         {selectedUnseen.difficulty === "Easy" ? "רמה 1 (קל)" : selectedUnseen.difficulty === "Medium" ? "רמה 2 (בינוני)" : "רמה 3 (קשה)"}
@@ -314,7 +307,7 @@ export function UnseenDashboardView({
                       <button
                         type="button"
                         onClick={() => setShowPassageText(!showPassageText)}
-                        className={`w-full p-3 rounded-xl border flex items-center justify-between text-xs font-bold transition-all cursor-pointer ${
+                        className={`w-full p-3 rounded-md border flex items-center justify-between text-xs font-bold transition-all cursor-pointer ${
                           isLight ? "bg-zinc-100 hover:bg-zinc-200 border-zinc-300 text-zinc-800" : "bg-zinc-900/80 hover:bg-zinc-850 border-zinc-700 text-zinc-200"
                         }`}
                       >
@@ -326,7 +319,7 @@ export function UnseenDashboardView({
                       </button>
 
                       {showPassageText && (
-                        <div className={`p-4 rounded-xl border text-left font-serif leading-relaxed text-sm space-y-3 max-h-60 overflow-y-auto ${
+                        <div className={`p-4 rounded-md border text-left font-serif leading-relaxed text-sm space-y-3 max-h-60 overflow-y-auto ${
                           isLight ? "bg-white border-zinc-200 text-zinc-800" : "bg-black/40 border-zinc-800 text-zinc-200"
                         }`} dir="ltr">
                           {selectedUnseen.passage.paragraphs.map((para, pIdx) => (
@@ -350,7 +343,7 @@ export function UnseenDashboardView({
                     </div>
 
                     {(!selectedUnseen.answers || selectedUnseen.answers.length === 0) ? (
-                      <div className={`p-4 rounded-xl border text-center text-xs ${borderStyle} ${textMuted}`}>
+                      <div className={`p-4 rounded-md border text-center text-xs ${borderStyle} ${textMuted}`}>
                         הגשה זו נשמרה בגרסה קודמת ללא פירוט שאלות מלא (נשמרו ציונים ומדדים כלליים).
                       </div>
                     ) : (
@@ -364,7 +357,7 @@ export function UnseenDashboardView({
                           return (
                             <div 
                               key={idx} 
-                              className={`p-4 rounded-xl border text-right space-y-2.5 transition-all ${
+                              className={`p-4 rounded-md border text-right space-y-2.5 transition-all ${
                                 isCorrect
                                   ? isLight ? "bg-emerald-50/70 border-emerald-300" : "bg-emerald-950/20 border-emerald-500/30"
                                   : isPartiallyCorrect
@@ -375,7 +368,7 @@ export function UnseenDashboardView({
                               {/* Header */}
                               <div className="flex items-center justify-between flex-row-reverse text-xs">
                                 <div className="flex items-center gap-2">
-                                  <span className={`font-black ${textTitle}`}>שאלה {ans.questionNumber || idx + 1}</span>
+                                  <span className={`font-semibold ${textTitle}`}>שאלה {ans.questionNumber || idx + 1}</span>
                                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700">
                                     {ans.type === "mcq" ? "אמריקאית" : ans.type === "open" ? "פתוחה" : ans.type === "copy" ? "העתקת משפט" : ans.type === "true_false" ? "נכון/לא נכון" : "השלמת משפט"}
                                   </span>
@@ -507,7 +500,7 @@ export function UnseenDashboardView({
                         max="100"
                         value={gradeInput}
                         onChange={(e) => setGradeInput(e.target.value)}
-                        className={`w-full px-3 py-2 text-center text-sm font-bold rounded-xl border outline-none ${inputStyle}`}
+                        className={`w-full px-3 py-2 text-center text-sm font-bold rounded-md border outline-none ${inputStyle}`}
                         placeholder="0-100"
                         required
                       />
@@ -518,7 +511,7 @@ export function UnseenDashboardView({
                       <textarea
                         value={feedbackInput}
                         onChange={(e) => setFeedbackInput(e.target.value)}
-                        className={`w-full px-3 py-2 text-xs rounded-xl border outline-none h-14 resize-none ${inputStyle}`}
+                        className={`w-full px-3 py-2 text-xs rounded-md border outline-none h-14 resize-none ${inputStyle}`}
                         placeholder="כתוב כאן משוב מפורט או בחר תבנית..."
                       />
                     </div>
@@ -539,7 +532,7 @@ export function UnseenDashboardView({
                     <button
                       type="submit"
                       disabled={isGrading}
-                      className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-md transition-all shrink-0"
+                      className="px-5 py-2.5 rounded-md bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-md transition-all shrink-0"
                     >
                       {isGrading ? (
                         <>
@@ -634,16 +627,9 @@ export function WritingDashboardView({
             placeholder="חיפוש לפי שם תלמיד, כיתה או הנחיית הכתיבה..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className={`w-full pr-10 pl-4 py-2.5 rounded-xl border text-xs outline-none transition-colors text-right ${inputStyle}`}
+            className={`w-full pr-10 pl-4 py-2.5 rounded-md border text-xs outline-none transition-colors text-right ${inputStyle}`}
           />
           <Search className="w-4 h-4 text-zinc-500 absolute right-3.5 top-1/2 -translate-y-1/2" />
-        </div>
-        
-        <div className="text-right">
-          <h2 className={`text-xl font-bold ${textTitle}`}>ניהול הגשות כתיבה (Writing Practice)</h2>
-          <p className={`text-xs ${textMuted} mt-1`}>
-            הערכת חיבורים ומכתבים של תלמידים, סקירת ניתוח ה-AI, מתן ציון מורה ומשוב מורה.
-          </p>
         </div>
       </div>
 
@@ -651,14 +637,14 @@ export function WritingDashboardView({
         {/* LEFT COLUMN: List of Submissions */}
         <div className="lg:col-span-5 flex flex-col space-y-4 h-full">
           {/* List Header/Sub-tabs */}
-          <div className={`p-1.5 rounded-xl ${cardStyle} border ${borderStyle} flex gap-2 flex-row-reverse`}>
+          <div className={`p-1.5 rounded-md ${cardStyle} border ${borderStyle} flex gap-2 flex-row-reverse`}>
             {(["all", "pending", "graded"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveListTab(tab)}
                 className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   activeListTab === tab
-                    ? "bg-purple-600 text-white shadow-sm"
+                    ? (isLight ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-900")
                     : "text-zinc-400 hover:text-[#e8edf8]"
                 }`}
               >
@@ -668,7 +654,7 @@ export function WritingDashboardView({
           </div>
 
           {/* Submissions List Card */}
-          <div className={`p-4 rounded-xl ${cardStyle} border ${borderStyle} flex-1 overflow-y-auto max-h-[460px] space-y-2.5`}>
+          <div className={`p-4 rounded-md ${cardStyle} border ${borderStyle} flex-1 overflow-y-auto max-h-[460px] space-y-2.5`}>
             {loadingWriting ? (
               <div className="flex flex-col items-center justify-center p-12 space-y-3">
                 <RefreshCw className="w-6 h-6 text-purple-500 animate-spin" />
@@ -689,7 +675,7 @@ export function WritingDashboardView({
                   <button
                     key={sub.id}
                     onClick={() => handleSelectWriting(sub)}
-                    className={`w-full p-3.5 rounded-xl border text-right transition-all flex items-center justify-between gap-3 hover:scale-[1.01] cursor-pointer ${
+                    className={`w-full p-3.5 rounded-md border text-right transition-all flex items-center justify-between gap-3 cursor-pointer ${
                       isSelected 
                         ? "border-purple-500 bg-purple-500/5 ring-1 ring-purple-500/20" 
                         : `${borderStyle} ${isLight ? "bg-white hover:bg-zinc-50" : "bg-[#0b0f19] hover:bg-[#111727]"}`
@@ -698,12 +684,12 @@ export function WritingDashboardView({
                     {/* Score or Pending badge */}
                     <div>
                       {sub.status === "graded" ? (
-                        <span className="text-xs font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-lg">
+                        <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-lg">
                           {sub.scoreTeacher}
                         </span>
                       ) : (
                         <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse" />
+                          <span className="w-1.5 h-1.5 bg-amber-400 rounded-full" />
                           <span>ממתין</span>
                         </span>
                       )}
@@ -735,11 +721,11 @@ export function WritingDashboardView({
 
         {/* RIGHT COLUMN: Detailed View & Grading Form */}
         <div className="lg:col-span-7 flex flex-col">
-          <div className={`rounded-2xl ${cardStyle} border ${borderStyle} flex-1 flex flex-col justify-between overflow-hidden shadow-2xl h-full min-h-[500px]`}>
+          <div className={`rounded-lg ${cardStyle} border ${borderStyle} flex-1 flex flex-col justify-between overflow-hidden h-full min-h-[500px]`}>
             
             {!selectedWriting ? (
               <div className="flex-1 flex flex-col items-center justify-center p-12 text-center text-xs text-zinc-500 space-y-4">
-                <BookOpen className="w-12 h-12 text-zinc-750 animate-pulse" />
+                <BookOpen className="w-12 h-12 text-zinc-750 opacity-40" />
                 <p className="max-w-xs leading-relaxed">
                   יש לבחור הגשת תלמיד מרשימת ההגשות משמאל כדי לקרוא את הטקסט שלו, לבחון את שגיאות הכתיב/דקדוק והמלצות ה-AI ולהזין ציון מורה ומשוב.
                 </p>
@@ -752,7 +738,7 @@ export function WritingDashboardView({
                   isLight ? "bg-zinc-50" : "bg-[#0b0f19]/70"
                 }`}>
                   <div className="text-right">
-                    <h3 className={`text-sm font-black ${textTitle}`}>
+                    <h3 className={`text-sm font-semibold ${textTitle}`}>
                       {selectedWriting.studentName} {selectedWriting.studentClass ? `(${selectedWriting.studentClass})` : ""}
                     </h3>
                     <p className="text-[10px] text-zinc-500 mt-0.5">{selectedWriting.studentEmail}</p>
@@ -774,16 +760,16 @@ export function WritingDashboardView({
                   {/* Student's text */}
                   <div className="space-y-2">
                     <span className={`block text-xs font-bold ${textTitle}`}>הטקסט שהתלמיד/ה כתב/ה:</span>
-                    <p className="bg-black/15 p-4 rounded-xl border border-zinc-800/10 text-sm md:text-base leading-relaxed text-zinc-100 font-medium select-text text-left whitespace-pre-line" dir="ltr" style={{ color: isLight ? '#1f2937' : '#f4f4f5' }}>
+                    <p className="bg-black/15 p-4 rounded-md border border-zinc-800/10 text-sm md:text-base leading-relaxed text-zinc-100 font-medium select-text text-left whitespace-pre-line" dir="ltr" style={{ color: isLight ? '#1f2937' : '#f4f4f5' }}>
                       {selectedWriting.studentText}
                     </p>
                   </div>
 
                   {/* AI evaluation summary */}
-                  <div className={`p-4 rounded-xl border ${borderStyle} ${isLight ? "bg-zinc-50" : "bg-[#0c1222]/30"} space-y-4`}>
+                  <div className={`p-4 rounded-md border ${borderStyle} ${isLight ? "bg-zinc-50" : "bg-[#0c1222]/30"} space-y-4`}>
                     <div className="flex justify-between items-center flex-row-reverse border-b pb-2 border-zinc-800/10">
                       <span className={`text-xs font-bold ${textTitle}`}>ניתוח ה-AI המובנה במערכת</span>
-                      <span className="text-xs font-black text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 rounded-lg">
+                      <span className="text-xs font-semibold text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 rounded-lg">
                         ציון AI: {selectedWriting.score}
                       </span>
                     </div>
@@ -808,7 +794,7 @@ export function WritingDashboardView({
                         {selectedWriting.evaluation.corrections && selectedWriting.evaluation.corrections.length > 0 && (
                           <div className="space-y-2">
                             <span className={`block font-bold ${textTitle}`}>תיקוני מילים ודקדוק ספציפיים ({selectedWriting.evaluation.corrections.length}):</span>
-                            <div className="border border-zinc-800/10 rounded-xl overflow-hidden text-[11px] leading-normal">
+                            <div className="border border-zinc-800/10 rounded-md overflow-hidden text-[11px] leading-normal">
                               <div className="grid grid-cols-3 bg-black/25 p-2 font-bold border-b border-zinc-800/10 text-center">
                                 <span>הסבר (בעברית)</span>
                                 <span>הצעה לתיקון</span>
@@ -853,7 +839,7 @@ export function WritingDashboardView({
                         max="100"
                         value={gradeInput}
                         onChange={(e) => setGradeInput(e.target.value)}
-                        className={`w-full px-3 py-2 text-center text-sm font-bold rounded-xl border outline-none ${inputStyle}`}
+                        className={`w-full px-3 py-2 text-center text-sm font-bold rounded-md border outline-none ${inputStyle}`}
                         placeholder="0-100"
                         required
                       />
@@ -864,7 +850,7 @@ export function WritingDashboardView({
                       <textarea
                         value={feedbackInput}
                         onChange={(e) => setFeedbackInput(e.target.value)}
-                        className={`w-full px-3 py-2 text-xs rounded-xl border outline-none h-14 resize-none ${inputStyle}`}
+                        className={`w-full px-3 py-2 text-xs rounded-md border outline-none h-14 resize-none ${inputStyle}`}
                         placeholder="כתוב כאן משוב מפורט..."
                       />
                     </div>
@@ -885,7 +871,7 @@ export function WritingDashboardView({
                     <button
                       type="submit"
                       disabled={isGrading}
-                      className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-md transition-all shrink-0"
+                      className="px-5 py-2.5 rounded-md bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-md transition-all shrink-0"
                     >
                       {isGrading ? (
                         <>

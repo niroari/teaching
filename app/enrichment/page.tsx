@@ -9,6 +9,8 @@ import { useVisibility } from "@/lib/context/VisibilityContext";
 const ENRICHMENT_TOPICS = [
   {
     slug: "israeli-politics",
+    image: "/images/enrichment-israeli-politics.jpg",
+    alt: "משכן הכנסת",
     title: "עושים סדר בפוליטיקה הישראלית",
     desc: "שיעור דיאלוג ומצגת אינטראקטיבית: ציר הזמן, שדה הכוחות, אידיאולוגיה מול מחנה ודיון מאוזן ומכבד לקראת הבחירות.",
     icon: "🗳️",
@@ -17,6 +19,8 @@ const ENRICHMENT_TOPICS = [
   },
   {
     slug: "israel-game",
+    image: "/images/enrichment-israel-game.jpg",
+    alt: "ישראל, סיני והנילוס מתחנת החלל",
     title: "חידון מפת ישראל",
     desc: "פעילות כיתתית אינטראקטיבית. מקמו מקומות, ערים, ואתרי מורשת רנדומליים על מפת כיתה פיזית.",
     icon: "📍",
@@ -25,6 +29,8 @@ const ENRICHMENT_TOPICS = [
   },
   {
     slug: "evolution",
+    image: "/images/enrichment-evolution.jpg",
+    alt: "מאובן ארכאופטריקס, ברלין",
     title: "אבולוציה",
     desc: "כיצד החיים על כדור הארץ השתנו לאורך מיליארדי שנים — מגוון לומדות אינטראקטיביות.",
     icon: "🧬",
@@ -33,6 +39,8 @@ const ENRICHMENT_TOPICS = [
   },
   {
     slug: "human-history",
+    image: "/images/enrichment-human-history.jpg",
+    alt: "ציורי מערת לאסקו (העתק)",
     title: "קיצור תולדות האנושות",
     desc: "שישה שיעורים אינטראקטיביים המבוססים על ספרו של יובל נוח הררי - היסטוריה של המין האנושי.",
     icon: "🌍",
@@ -41,6 +49,8 @@ const ENRICHMENT_TOPICS = [
   },
   {
     slug: "google-earth",
+    image: "/images/enrichment-google-earth.jpg",
+    alt: "העתק סן אנדראס מהאוויר",
     title: "סיורי Google Earth",
     desc: "סיורים אינטראקטיביים בתלת-ממד. הכירו את לוחות הטקטוניקה של כדור הארץ ועוד.",
     icon: "🗺️",
@@ -49,6 +59,8 @@ const ENRICHMENT_TOPICS = [
   },
   {
     slug: "snakes",
+    image: "/images/enrichment-snakes.jpg",
+    alt: "צפע ארצישראלי",
     title: "נחשים בישראל",
     desc: "מצגת אינטראקטיבית ולמידה על סוגי הנחשים השונים בארץ, התגוננות ועזרה ראשונה.",
     icon: "🐍",
@@ -73,6 +85,8 @@ export default function EnrichmentHubPage() {
           <LinkCard
             key={topic.slug}
             href={topic.link}
+            image={topic.image}
+            imageAlt={topic.alt}
             title={topic.title}
             description={topic.desc}
             meta={<Badge>{topic.badge}</Badge>}

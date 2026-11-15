@@ -1,11 +1,20 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper function to check if the user is a teacher/admin
+    // Helper function to check if the user is a teacher/admin.
+    // Keep this list in sync with TEACHER_EMAILS in lib/auth/teacher.ts.
     function isAdmin() {
       return request.auth != null && 
         (request.auth.token.email == "niroari@gmail.com" || 
          request.auth.token.email == "nirozari@gmail.com");
+    }
+
+    // Which content students can see (lib/content-registry.ts ids). Everyone reads, only the teacher writes.
+    match /settings/visibility {
+      allow read: if true;
+      allow write: if isAdmin()
+        && request.resource.data.visible is list
+        && request.resource.data.visible.size() <= 500;
     }
 
     match /users/{userId}/words/{wordId} {

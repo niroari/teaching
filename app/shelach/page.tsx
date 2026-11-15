@@ -1,6 +1,9 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import { ArrowLeft, Map } from "lucide-react";
+import { useVisibility } from "@/lib/context/VisibilityContext";
 
 const WORKSHOPS = [
   {
@@ -42,6 +45,7 @@ const WORKSHOPS = [
 ];
 
 export default function ShelachHubPage() {
+  const { canSee } = useVisibility();
   return (
     <div className="relative min-h-screen bg-[#080c18] text-[#e8edf8] flex flex-col justify-between overflow-hidden">
       {/* Background Glow */}
@@ -70,7 +74,7 @@ export default function ShelachHubPage() {
 
         {/* Workshops Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full mt-4">
-          {WORKSHOPS.map((w) => (
+          {WORKSHOPS.filter((w) => canSee(`shelach.${w.slug}`)).map((w) => (
             <Link
               key={w.slug}
               href={`/shelach/${w.slug}`}

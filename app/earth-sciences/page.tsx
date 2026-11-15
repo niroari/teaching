@@ -21,6 +21,8 @@ import {
   FolderOpen
 } from "lucide-react";
 import { EARTH_SCIENCES_UNITS, Unit, Lesson } from "@/lib/data/earth-sciences-lessons";
+import { useVisibility } from "@/lib/context/VisibilityContext";
+import { earthLessonId } from "@/lib/content-registry";
 
 export default function EarthSciencesHubPage() {
   const [comfortMode, setComfortMode] = useState<"dark" | "light">("dark");
@@ -34,6 +36,15 @@ export default function EarthSciencesHubPage() {
   const [showClassManager, setShowClassManager] = useState(false);
   const [editingClasses, setEditingClasses] = useState<string[]>(['ח׳1', 'ח׳2', 'ח׳3', 'ח׳4', 'ח׳5']);
   const [activePopoverLesson, setActivePopoverLesson] = useState<string | null>(null);
+
+  // Students only see lessons the teacher made visible; class tracking is a teacher tool.
+  const { canSee, bypass: showTeacherTools } = useVisibility();
+  const visibleUnits = EARTH_SCIENCES_UNITS.map(unit => ({
+    ...unit,
+    lessons: unit.lessons.filter(lesson => canSee(earthLessonId(unit.slug, lesson.id))),
+  })).filter(unit => unit.lessons.length > 0);
+  const showMission = canSee("earth.mission");
+  const showResources = canSee("earth.resources");
 
   // Load state from localStorage
   useEffect(() => {
@@ -157,7 +168,7 @@ export default function EarthSciencesHubPage() {
   };
 
   // Filter lessons
-  const filteredUnits = EARTH_SCIENCES_UNITS.map(unit => {
+  const filteredUnits = visibleUnits.map(unit => {
     // Filter lessons inside unit based on query
     const lessons = unit.lessons.filter(lesson => {
       const matchesSearch = 
@@ -237,6 +248,7 @@ export default function EarthSciencesHubPage() {
           {/* Controls Right */}
           <div className="flex items-center gap-3">
             {/* Resources Button */}
+            {(showMission || showResources) && (
             <button
               onClick={() => {
                 const el = document.getElementById("resources-section");
@@ -248,8 +260,10 @@ export default function EarthSciencesHubPage() {
               <FolderOpen className="w-3.5 h-3.5 text-earth" />
               <span className="hidden sm:inline">משאבים ועזרים</span>
             </button>
+            )}
 
             {/* Class Manager Button */}
+            {showTeacherTools && (
             <button
               onClick={() => {
                 setEditingClasses([...classes]);
@@ -261,6 +275,7 @@ export default function EarthSciencesHubPage() {
               <Settings className="w-3.5 h-3.5 text-earth" />
               <span className="hidden sm:inline">ניהול כיתות</span>
             </button>
+            )}
 
             {/* Theme Switcher */}
             <button
@@ -319,7 +334,8 @@ export default function EarthSciencesHubPage() {
               />
             </div>
             
-            {/* Class Filter Selector */}
+            {/* Class Filter Selector (teacher only) */}
+            {showTeacherTools && (
             <div className="flex flex-col sm:flex-row gap-3">
               <div className={`px-3 py-2 rounded-xl border ${borderTheme} bg-surface/10 flex items-center gap-2 text-xs font-bold justify-between`}>
                 <div className="flex items-center gap-2">
@@ -350,6 +366,7 @@ export default function EarthSciencesHubPage() {
                 </span>
               </div>
             </div>
+            )}
           </div>
 
           {/* Unit Filters */}
@@ -362,9 +379,9 @@ export default function EarthSciencesHubPage() {
                   : `bg-surface/30 text-text-muted hover:bg-surface-hover/50 ${borderTheme}`
               }`}
             >
-              כל היחידות ({EARTH_SCIENCES_UNITS.reduce((sum, u) => sum + u.lessons.length, 0)})
+              כל היחידות ({visibleUnits.reduce((sum, u) => sum + u.lessons.length, 0)})
             </button>
-            {EARTH_SCIENCES_UNITS.map(unit => (
+            {visibleUnits.map(unit => (
               <button
                 key={unit.id}
                 onClick={() => setActiveUnitFilter(unit.id)}
@@ -407,6 +424,7 @@ export default function EarthSciencesHubPage() {
                     const isAllDone = classes.every(c => doneClasses.includes(c));
                     const isCompletedForSelected = selectedClassFilter !== "all" && doneClasses.includes(selectedClassFilter);
                     const popoverOpen = activePopoverLesson === lesson.id;
+                    const fullIndex = EARTH_SCIENCES_UNITS.find(u => u.id === unit.id)?.lessons.findIndex(l => l.id === lesson.id) ?? index;
 
                     return (
                       <div
@@ -431,7 +449,7 @@ export default function EarthSciencesHubPage() {
                               <span className={textMuted}>
                                 {lesson.id === "intro-overview" 
                                   ? "שיעור פתיחה" 
-                                  : `שיעור ${unit.id === 1 ? index : index + 1}`}
+                                  : `שיעור ${unit.id === 1 ? fullIndex : fullIndex + 1}`}
                               </span>
                             </div>
 
@@ -453,7 +471,7 @@ export default function EarthSciencesHubPage() {
                         </Link>
 
                         {/* Middle row: Badges of completed classes (only in "all classes" view) */}
-                        {(unit.id === 1 || unit.id === 2) && selectedClassFilter === "all" && doneClasses.length > 0 && (
+                        {showTeacherTools && (unit.id === 1 || unit.id === 2) && selectedClassFilter === "all" && doneClasses.length > 0 && (
                           <div className="mt-3 flex flex-wrap gap-1.5 justify-start select-none">
                             {isAllDone ? (
                               <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[9px] font-extrabold rounded-md">
@@ -472,7 +490,9 @@ export default function EarthSciencesHubPage() {
                         {/* Footer card row */}
                         <div className={`mt-4 pt-3 border-t ${borderTheme} flex justify-between items-center relative z-10`}>
                           {/* Completion Selector / Popover */}
-                          {(unit.id === 1 || unit.id === 2) ? (
+                          {!showTeacherTools ? (
+                            <span />
+                          ) : (unit.id === 1 || unit.id === 2) ? (
                             selectedClassFilter === "all" ? (
                               <div className="relative">
                                 {/* Toggle Popover Button */}
@@ -578,7 +598,7 @@ export default function EarthSciencesHubPage() {
           /* Empty search state */
           <div className={`flex flex-col items-center justify-center p-12 border ${borderTheme} rounded-2xl ${cardTheme} text-center space-y-4`}>
             <BookOpen className={`w-12 h-12 ${textMuted}`} />
-            <h3 className={`text-lg font-bold ${titleText}`}>לא נמצאו שיעורים מתאימים</h3>
+            <h3 className={`text-lg font-bold ${titleText}`}>{visibleUnits.length === 0 ? "עדיין אין שיעורים פתוחים" : "לא נמצאו שיעורים מתאימים"}</h3>
             <p className={`${textMuted} text-xs max-w-sm`}>
               נסו לשנות את מילת החיפוש או לבחור יחידה אחרת במסננים.
             </p>
@@ -595,6 +615,7 @@ export default function EarthSciencesHubPage() {
         )}
 
         {/* Section: משאבים ועזרים */}
+        {(showMission || showResources) && (
         <div id="resources-section" className={`w-full mt-16 border-t ${borderTheme} pt-12 text-right space-y-8`}>
           <div className="text-center sm:text-right space-y-2">
             <h2 className={`text-2xl font-black tracking-tight ${titleText}`}>משאבים ועזרים 🛠️</h2>
@@ -605,6 +626,7 @@ export default function EarthSciencesHubPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
             {/* Research assignment: Mission New Home (Unit 1) */}
+            {showMission && (
             <Link
               href="/earth-sciences/mission"
               className={`lg:col-span-2 group ${cardTheme} rounded-2xl border ${borderTheme} p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-teal-400 transition-colors`}
@@ -623,7 +645,9 @@ export default function EarthSciencesHubPage() {
                 לכניסה למשימה ←
               </span>
             </Link>
+            )}
 
+            {showResources && (<>
             {/* Tool Card 1: NASA's Eye on the Solar System */}
             <div className={`group ${cardTheme} rounded-2xl border ${borderTheme} p-5 flex flex-col justify-between gap-5`}>
               <div className="space-y-2">
@@ -671,8 +695,10 @@ export default function EarthSciencesHubPage() {
                 />
               </div>
             </div>
+            </>)}
           </div>
         </div>
+        )}
       </main>
 
       {/* Class Manager Modal */}

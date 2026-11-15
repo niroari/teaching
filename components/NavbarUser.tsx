@@ -4,12 +4,11 @@ import React from "react";
 import Link from "next/link";
 import { User, LogOut, LogIn, Sparkles } from "lucide-react";
 import { useAuth } from "@/lib/context/AuthContext";
+import { isTeacherUser } from "@/lib/auth/teacher";
 
 export default function NavbarUser() {
   const { user, loading, logout } = useAuth();
-  const isTeacher = Boolean(
-    user && (user.email === "niroari@gmail.com" || user.email === "nirozari@gmail.com")
-  );
+  const isTeacher = isTeacherUser(user);
 
   if (loading) {
     return (

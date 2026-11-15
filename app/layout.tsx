@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Alef } from "next/font/google";
 import { AuthProvider } from "@/lib/context/AuthContext";
+import { VisibilityProvider } from "@/lib/context/VisibilityContext";
+import ContentGate from "@/components/ContentGate";
 import "./globals.css";
 
 const alef = Alef({
@@ -26,7 +28,11 @@ export default function RootLayout({
       className={`${alef.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <VisibilityProvider>
+            <ContentGate>{children}</ContentGate>
+          </VisibilityProvider>
+        </AuthProvider>
       </body>
     </html>
   );

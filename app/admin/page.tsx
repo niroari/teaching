@@ -26,6 +26,8 @@ import { dbFirestore } from "@/lib/firebase";
 import { collection, query, getDocs, updateDoc, doc, orderBy } from "firebase/firestore";
 import { UnseenDashboardView, WritingDashboardView, UnseenAssignment, WritingAssignment, StudentAnswerRecord } from "./components/UnseenWritingViews";
 import MissionDashboardView from "./components/MissionDashboardView";
+import VisibilityManager from "./components/VisibilityManager";
+import { isTeacherUser } from "@/lib/auth/teacher";
 
 interface ChatAssignment {
   id: string;
@@ -95,7 +97,7 @@ export default function GeneralTeacherAdmin() {
   const [mounted, setMounted] = useState(false);
   
   // Tab state
-  const [currentTab, setCurrentTab] = useState<"chat-masters" | "unseen-practice" | "writing-practice" | "mission-new-home" | "future-projects" | "settings">("chat-masters");
+  const [currentTab, setCurrentTab] = useState<"visibility" | "chat-masters" | "unseen-practice" | "writing-practice" | "mission-new-home" | "future-projects" | "settings">("visibility");
   const [devPreview, setDevPreview] = useState(false);
   
   // Chat Masters Submissions data states
@@ -128,6 +130,10 @@ export default function GeneralTeacherAdmin() {
     const savedTheme = localStorage.getItem("teaching-site-comfort-mode");
     if (savedTheme === "light" || savedTheme === "dark") {
       setComfortMode(savedTheme);
+    }
+    const tabParam = new URLSearchParams(window.location.search).get("tab");
+    if (tabParam === "visibility" || tabParam === "chat-masters" || tabParam === "unseen-practice" || tabParam === "writing-practice" || tabParam === "mission-new-home") {
+      setCurrentTab(tabParam);
     }
   }, []);
 
@@ -357,7 +363,7 @@ export default function GeneralTeacherAdmin() {
   if (!mounted) return null;
 
   const isLight = comfortMode === "light";
-  const isTeacher = (user && (user.email === "niroari@gmail.com" || user.email === "nirozari@gmail.com")) || devPreview;
+  const isTeacher = isTeacherUser(user) || devPreview;
 
   // Dynamic Theme Styling
   const bgTheme = isLight ? "bg-[#f1f5f9]" : "bg-[#080c18]";
@@ -454,6 +460,16 @@ export default function GeneralTeacherAdmin() {
       {/* Main Navigation Tabs */}
       {isTeacher && (
         <nav className={`w-full max-w-6xl mx-auto px-6 pt-6 flex flex-wrap justify-start gap-4 border-b border-zinc-800/20 relative z-10`}>
+          <button
+            onClick={() => setCurrentTab("visibility")}
+            className={`pb-3 font-bold text-xs border-b-2 cursor-pointer transition-all ${
+              currentTab === "visibility"
+                ? "border-purple-500 text-purple-400"
+                : "border-transparent text-text-muted hover:text-[#e8edf8]"
+            }`}
+          >
+            מה התלמידים רואים 👁
+          </button>
           <button
             onClick={() => setCurrentTab("chat-masters")}
             className={`pb-3 font-bold text-xs border-b-2 cursor-pointer transition-all ${
@@ -712,6 +728,15 @@ export default function GeneralTeacherAdmin() {
               </Link>
             </div>
           </div>
+        ) : currentTab === "visibility" ? (
+          <VisibilityManager
+            isLight={isLight}
+            cardStyle={cardStyle}
+            borderStyle={borderStyle}
+            textTitle={textTitle}
+            textMuted={textMuted}
+            inputStyle={inputStyle}
+          />
         ) : currentTab === "chat-masters" ? (
           /* TAB 1: CHAT MASTERS */
           <div className="space-y-8 flex-1 flex flex-col">

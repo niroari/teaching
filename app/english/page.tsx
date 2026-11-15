@@ -3,8 +3,8 @@
 import React from "react";
 import Link from "next/link";
 import { ArrowLeft, BookOpen, Presentation, Gamepad2, GraduationCap, Sparkles } from "lucide-react";
-import { useAuth } from "@/lib/context/AuthContext";
 import NavbarUser from "@/components/NavbarUser";
+import { useVisibility } from "@/lib/context/VisibilityContext";
 
 const ENGLISH_SECTIONS = [
   {
@@ -91,8 +91,7 @@ const ENGLISH_SECTIONS = [
 ];
 
 export default function EnglishHubPage() {
-  const { user } = useAuth();
-  const isTeacher = user && (user.email === "niroari@gmail.com" || user.email === "nirozari@gmail.com");
+  const { canSee } = useVisibility();
 
   const CATEGORIES = [
     {
@@ -101,7 +100,7 @@ export default function EnglishHubPage() {
       subtitle: "שינון אוצר מילים, כתיבה ושיפור מיומנויות",
       icon: GraduationCap,
       colorClass: "text-teal-400 bg-teal-500/10 border-teal-500/20",
-      items: ENGLISH_SECTIONS.filter(sec => sec.category === "למידה ותרגול")
+      items: ENGLISH_SECTIONS.filter(sec => canSee(`english.${sec.slug}`) && sec.category === "למידה ותרגול")
     },
     {
       id: "presentations",
@@ -109,7 +108,7 @@ export default function EnglishHubPage() {
       subtitle: "מצגות למידה והסברי דקדוק אינטראקטיביים",
       icon: Presentation,
       colorClass: "text-sky-400 bg-sky-500/10 border-sky-500/20",
-      items: ENGLISH_SECTIONS.filter(sec => sec.category === "מצגות")
+      items: ENGLISH_SECTIONS.filter(sec => canSee(`english.${sec.slug}`) && sec.category === "מצגות")
     },
     {
       id: "games",
@@ -117,7 +116,7 @@ export default function EnglishHubPage() {
       subtitle: "משחקים כיתתיים ואינטראקטיביים לתרגול חווייתי",
       icon: Gamepad2,
       colorClass: "text-amber-400 bg-amber-500/10 border-amber-500/20",
-      items: ENGLISH_SECTIONS.filter(sec => sec.category === "משחקים")
+      items: ENGLISH_SECTIONS.filter(sec => canSee(`english.${sec.slug}`) && sec.category === "משחקים")
     },
     {
       id: "projects",
@@ -125,7 +124,7 @@ export default function EnglishHubPage() {
       subtitle: "פרויקטים מעשיים ושימוש בבינה מלאכותית לתרגול שפה",
       icon: Sparkles,
       colorClass: "text-purple-400 bg-purple-500/10 border-purple-500/20",
-      items: ENGLISH_SECTIONS.filter(sec => sec.category === "פרויקטים")
+      items: ENGLISH_SECTIONS.filter(sec => canSee(`english.${sec.slug}`) && sec.category === "פרויקטים")
     }
   ];
 

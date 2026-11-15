@@ -2,10 +2,19 @@
 
 import React from "react";
 import Link from "next/link";
-import { ArrowLeft, GraduationCap } from "lucide-react";
+import { ArrowLeft, GraduationCap, Lock, Loader2 } from "lucide-react";
 import NavbarUser from "@/components/NavbarUser";
+import { useVisibility } from "@/lib/context/VisibilityContext";
 
 export default function PortalHomePage() {
+  const { loading, canSeeSubject } = useVisibility();
+  const show = {
+    shelach: canSeeSubject("shelach"),
+    english: canSeeSubject("english"),
+    enrichment: canSeeSubject("enrichment"),
+    earth: canSeeSubject("earth"),
+  };
+  const shownCount = Object.values(show).filter(Boolean).length;
 
   return (
     <div className="relative min-h-screen bg-[#080c18] text-[#e8edf8] flex flex-col justify-between overflow-hidden">
@@ -43,9 +52,27 @@ export default function PortalHomePage() {
         </div>
 
         {/* Subjects Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+        {loading ? (
+          <div className="py-16 text-text-muted">
+            <Loader2 className="w-6 h-6 animate-spin" />
+          </div>
+        ) : shownCount === 0 ? (
+          <div className="glass-card rounded-2xl border border-border-custom p-8 max-w-md text-center space-y-3">
+            <Lock className="w-6 h-6 mx-auto text-purple-300" />
+            <h2 className="text-lg font-bold text-white">המורה עוד לא פתח תכנים</h2>
+            <p className="text-text-muted text-sm leading-relaxed">
+              כשהמורה יפרסם שיעור, מצגת או משימה, הם יופיעו כאן. אם קיבלתם קישור ישיר מהמורה, אפשר להיכנס דרכו.
+            </p>
+          </div>
+        ) : (
+        <div
+          className={`grid grid-cols-1 sm:grid-cols-2 gap-6 w-full ${
+            shownCount >= 4 ? "lg:grid-cols-4" : shownCount === 3 ? "lg:grid-cols-3" : "max-w-3xl mx-auto"
+          } ${shownCount === 1 ? "sm:grid-cols-1 max-w-sm" : ""}`}
+        >
           
           {/* Card: של"ח */}
+          {show.shelach && (
           <Link
             href="/shelach"
             className="group glass-card rounded-2xl border border-border-custom hover:border-shelach/40 hover:shadow-[0_12px_40px_rgba(249,115,22,0.12)] transition-all duration-300 flex flex-col overflow-hidden"
@@ -74,8 +101,10 @@ export default function PortalHomePage() {
               </div>
             </div>
           </Link>
+          )}
 
           {/* Card: אנגלית */}
+          {show.english && (
           <Link
             href="/english"
             className="group glass-card rounded-2xl border border-border-custom hover:border-english/40 hover:shadow-[0_12px_40px_rgba(0,200,255,0.12)] transition-all duration-300 flex flex-col overflow-hidden"
@@ -104,8 +133,10 @@ export default function PortalHomePage() {
               </div>
             </div>
           </Link>
+          )}
 
           {/* Card: העשרה */}
+          {show.enrichment && (
           <Link
             href="/enrichment"
             className="group glass-card rounded-2xl border border-border-custom hover:border-enrichment/40 hover:shadow-[0_12px_40px_rgba(34,197,94,0.12)] transition-all duration-300 flex flex-col overflow-hidden"
@@ -134,8 +165,10 @@ export default function PortalHomePage() {
               </div>
             </div>
           </Link>
+          )}
 
           {/* Card: מדעי כדור הארץ */}
+          {show.earth && (
           <Link
             href="/earth-sciences"
             className="group glass-card rounded-2xl border border-border-custom hover:border-earth/40 hover:shadow-[0_12px_40px_rgba(13,148,136,0.12)] transition-all duration-300 flex flex-col overflow-hidden"
@@ -164,8 +197,10 @@ export default function PortalHomePage() {
               </div>
             </div>
           </Link>
+          )}
 
         </div>
+        )}
       </div>
 
       {/* Footer */}

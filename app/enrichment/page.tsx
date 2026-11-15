@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Microscope, Moon, Sun } from "lucide-react";
+import { useVisibility } from "@/lib/context/VisibilityContext";
 
 const ENRICHMENT_TOPICS = [
   {
@@ -56,6 +57,7 @@ const ENRICHMENT_TOPICS = [
 ];
 
 export default function EnrichmentHubPage() {
+  const { canSee } = useVisibility();
   const [comfortMode, setComfortMode] = useState<"dark" | "light">("dark");
 
   useEffect(() => {
@@ -144,7 +146,7 @@ export default function EnrichmentHubPage() {
 
         {/* Topics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mt-2">
-          {ENRICHMENT_TOPICS.map((topic) => (
+          {ENRICHMENT_TOPICS.filter((topic) => canSee(`enrichment.${topic.slug}`)).map((topic) => (
             <Link
               key={topic.slug}
               href={topic.link}

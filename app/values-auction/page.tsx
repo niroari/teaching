@@ -554,12 +554,12 @@ export default function ValuesAuctionPage() {
   if (role === 'student' && sessionId) {
     if (sessionNotFound) {
       return (
-        <div className="min-h-screen bg-[#080c18] text-[#e8edf8] flex items-center justify-center p-6">
-          <div className="glass-card max-w-md w-full rounded-2xl p-8 border border-red-500/30 text-center">
+        <div className="min-h-screen bg-canvas text-fg flex items-center justify-center p-6">
+          <div className="bg-card border-line max-w-md w-full rounded-xl p-8 border border-red-500/30 text-center">
             <X className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-red-400 mb-2">המפגש לא נמצא</h3>
-            <p className="text-text-muted text-sm mb-6">בדוק את קישור ההתחברות או קוד המפגש שקיבלת מהמורה.</p>
-            <a href="/values-auction" className="inline-block px-5 py-2.5 bg-surface hover:bg-surface-hover border border-border-custom hover:border-gold rounded-xl transition-all font-semibold">
+            <h3 className="text-xl font-bold text-red-700 dark:text-red-400 mb-2">המפגש לא נמצא</h3>
+            <p className="text-fg-muted text-sm mb-6">בדוק את קישור ההתחברות או קוד המפגש שקיבלת מהמורה.</p>
+            <a href="/values-auction" className="inline-block px-5 py-2.5 bg-subtle hover:bg-subtle-hover border border-line hover:border-gold rounded-xl transition-all font-semibold">
               חזרה לדף הבית
             </a>
           </div>
@@ -569,17 +569,17 @@ export default function ValuesAuctionPage() {
 
     if (myStudentIdx === null) {
       return (
-        <div className="min-h-screen bg-[#080c18] text-[#e8edf8] flex items-center justify-center p-6">
-          <div className="glass-card max-w-md w-full rounded-2xl p-8 shadow-2xl">
+        <div className="min-h-screen bg-canvas text-fg flex items-center justify-center p-6">
+          <div className="bg-card border-line max-w-md w-full rounded-xl p-8 shadow-sm">
             <div className="text-center mb-6">
               <span className="text-4xl inline-block mb-3">🏛️</span>
               <h2 className="text-2xl font-bold">מכירה פומבית של ערכים</h2>
-              <p className="text-text-muted text-sm mt-1">בחר את שמך כדי להצטרף למכירה</p>
+              <p className="text-fg-muted text-sm mt-1">בחר את שמך כדי להצטרף למכירה</p>
             </div>
 
             <div className="space-y-4">
               <select
-                className="w-full bg-surface border border-border-custom hover:border-border-custom-hover rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan"
+                className="w-full bg-subtle border border-line hover:border-line rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan"
                 onChange={(e) => {
                   if (e.target.value !== "") {
                     handleJoinAsStudent(parseInt(e.target.value));
@@ -593,7 +593,7 @@ export default function ValuesAuctionPage() {
                 ))}
               </select>
 
-              <p className="text-xs text-text-muted text-center leading-relaxed">
+              <p className="text-xs text-fg-muted text-center leading-relaxed">
                 * כל משתתף מתחיל עם תקציב וירטואלי של 1,000 ₪
               </p>
             </div>
@@ -611,18 +611,18 @@ export default function ValuesAuctionPage() {
     const currentBidderName = liveAuction && liveAuction.currentBidderId !== null ? students[liveAuction.currentBidderId].name : "—";
 
     return (
-      <div className="min-h-screen bg-[#080c18] text-[#e8edf8] flex flex-col">
+      <div className="min-h-screen bg-canvas text-fg flex flex-col">
         {/* Student Header */}
-        <header className="bg-surface/80 backdrop-blur-md border-b border-border-custom px-6 py-4 flex items-center justify-between sticky top-0 z-30">
+        <header className="bg-subtle border-b border-line px-6 py-4 flex items-center justify-between sticky top-0 z-30">
           <div>
             <h2 className="text-lg font-bold">{me.name}</h2>
-            <div className="text-xs text-text-muted">קוד מפגש: {sessionId}</div>
+            <div className="text-xs text-fg-muted">קוד מפגש: {sessionId}</div>
           </div>
           <div className="text-left">
-            <div className={`text-xl font-black ${me.budget < 200 ? 'text-red-400 animate-pulse' : 'text-emerald-400'}`}>
+            <div className={`text-xl font-bold ${me.budget < 200 ? 'text-red-700 dark:text-red-400 animate-pulse' : 'text-emerald-700 dark:text-emerald-400'}`}>
               {fmt(me.budget)}
             </div>
-            <div className="text-[10px] text-text-muted uppercase tracking-wider">יתרה זמינה</div>
+            <div className="text-[10px] text-fg-muted uppercase tracking-wider">יתרה זמינה</div>
           </div>
         </header>
 
@@ -630,40 +630,40 @@ export default function ValuesAuctionPage() {
         <main className="flex-1 max-w-md w-full mx-auto px-4 py-6 space-y-6">
           {/* Waiting or Active screen */}
           {!liveAuction ? (
-            <div className="glass-card rounded-2xl p-8 border border-border-custom text-center space-y-4 shadow-xl">
+            <div className="bg-card border-line rounded-xl p-8 border text-center space-y-4 shadow-sm">
               <div className="text-4xl animate-bounce">⏳</div>
               <h3 className="text-lg font-bold">ממתין לפתיחת המכירה הבאה...</h3>
-              <p className="text-text-muted text-sm">המורה יפתח את הערך הבא למכירה בקרוב</p>
+              <p className="text-fg-muted text-sm">המורה יפתח את הערך הבא למכירה בקרוב</p>
             </div>
           ) : (
-            <div className="glass-card rounded-2xl p-6 border border-border-custom space-y-6 shadow-xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 left-0 h-1 bg-gradient-to-r from-amber-500 to-amber-300" />
+            <div className="bg-card border-line rounded-xl p-6 border space-y-6 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 left-0 h-1 bg-amber-500" />
               <div className="flex justify-between items-center">
-                <span className="text-xs font-bold px-2.5 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full">
+                <span className="text-xs font-bold px-2.5 py-1 bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 rounded-full">
                   מכירה פעילה
                 </span>
                 {amLeading && (
-                  <span className="text-xs font-bold px-2.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full">
+                  <span className="text-xs font-bold px-2.5 py-1 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 rounded-full">
                     🏆 אתה מוביל!
                   </span>
                 )}
               </div>
 
               <div>
-                <h3 className="text-2xl font-black text-amber-400 leading-tight">{activeValue?.name}</h3>
-                <p className="text-text-muted text-sm mt-2 leading-relaxed">{activeValue?.desc}</p>
+                <h3 className="text-2xl font-bold text-amber-700 dark:text-amber-400 leading-tight">{activeValue?.name}</h3>
+                <p className="text-fg-muted text-sm mt-2 leading-relaxed">{activeValue?.desc}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-surface/60 rounded-xl p-3 border border-border-custom text-center">
-                  <div className="text-[10px] text-text-muted font-bold tracking-wider">הצעה מובילה</div>
-                  <div className="text-xl font-black text-amber-400 mt-1">
+                <div className="bg-subtle rounded-xl p-3 border border-line text-center">
+                  <div className="text-[10px] text-fg-muted font-bold tracking-wider">הצעה מובילה</div>
+                  <div className="text-xl font-bold text-amber-700 dark:text-amber-400 mt-1">
                     {liveAuction.currentBid > 0 ? fmt(liveAuction.currentBid) : "פתיחה"}
                   </div>
                 </div>
-                <div className="bg-surface/60 rounded-xl p-3 border border-border-custom text-center">
-                  <div className="text-[10px] text-text-muted font-bold tracking-wider">מציע</div>
-                  <div className="text-sm font-semibold text-[#e8edf8] mt-2 truncate">
+                <div className="bg-subtle rounded-xl p-3 border border-line text-center">
+                  <div className="text-[10px] text-fg-muted font-bold tracking-wider">מציע</div>
+                  <div className="text-sm font-semibold text-fg mt-2 truncate">
                     {currentBidderName}
                   </div>
                 </div>
@@ -678,18 +678,18 @@ export default function ValuesAuctionPage() {
                     onChange={(e) => setStudentBidInput(e.target.value)}
                     disabled={amLeading}
                     placeholder="הזן סכום ₪"
-                    className="flex-1 bg-surface border border-border-custom rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-400 text-left font-mono font-bold"
+                    className="flex-1 bg-subtle border border-line rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-400 text-left font-mono font-bold"
                   />
                   <button
                     onClick={submitStudentBid}
                     disabled={amLeading}
-                    className="px-6 py-3 bg-amber-500 hover:bg-amber-400 disabled:bg-surface disabled:border disabled:border-border-custom disabled:text-text-muted text-zinc-950 font-bold rounded-xl transition-all cursor-pointer"
+                    className="px-6 py-3 bg-amber-500 hover:bg-amber-400 disabled:bg-subtle disabled:border disabled:border-line disabled:text-fg-muted text-zinc-950 font-bold rounded-xl transition-all cursor-pointer"
                   >
                     {amLeading ? "✓ מוביל" : "הצע"}
                   </button>
                 </div>
                 {studentError && (
-                  <p className="text-xs text-red-400 font-medium min-h-[1.5em]">{studentError}</p>
+                  <p className="text-xs text-red-700 dark:text-red-400 font-medium min-h-[1.5em]">{studentError}</p>
                 )}
               </div>
             </div>
@@ -697,13 +697,13 @@ export default function ValuesAuctionPage() {
 
           {/* Bought Items list */}
           {me.bought && me.bought.length > 0 && (
-            <div className="glass-card rounded-2xl p-5 border border-border-custom space-y-3">
-              <div className="text-xs font-bold text-text-muted tracking-wider">הערכים שרכשת</div>
+            <div className="bg-card border-line rounded-xl p-5 border space-y-3">
+              <div className="text-xs font-bold text-fg-muted tracking-wider">הערכים שרכשת</div>
               <div className="divide-y divide-border-custom">
                 {me.bought.map((item, index) => (
                   <div key={index} className="py-2.5 flex justify-between items-center text-sm">
                     <span className="font-medium">{item.name}</span>
-                    <span className="font-bold text-emerald-400">{fmt(item.price)}</span>
+                    <span className="font-bold text-emerald-700 dark:text-emerald-400">{fmt(item.price)}</span>
                   </div>
                 ))}
               </div>
@@ -719,34 +719,34 @@ export default function ValuesAuctionPage() {
   const activeValue = liveAuction ? values[liveAuction.valueId] : null;
 
   return (
-    <div className="min-h-screen bg-[#080c18] text-[#e8edf8] flex flex-col">
+    <div className="min-h-screen bg-canvas text-fg flex flex-col">
       {/* Top Navbar */}
-      <header className="bg-surface/80 backdrop-blur-md border-b border-border-custom px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4 sticky top-0 z-30">
+      <header className="bg-subtle border-b border-line px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4 sticky top-0 z-30">
         <div className="flex items-center gap-3">
-          <a href="/" className="p-2 bg-surface hover:bg-surface-hover border border-border-custom rounded-xl text-text-muted hover:text-[#e8edf8] transition-all" title="חזרה לפורטל">
+          <a href="/" className="p-2 bg-subtle hover:bg-subtle-hover border border-line rounded-xl text-fg-muted hover:text-fg transition-all" title="חזרה לפורטל">
             <ArrowLeft className="w-5 h-5" />
           </a>
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500 font-bold text-xl shadow-[0_0_15px_rgba(240,165,0,0.15)]">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500 font-bold text-xl">
             $
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight bg-gradient-to-r from-amber-400 to-yellow-300 bg-clip-text text-transparent">
+            <h1 className="text-xl font-bold tracking-tight">
               מכירה פומבית של ערכים
             </h1>
-            <p className="text-[10px] text-text-muted tracking-wider uppercase">כל תלמיד מתחיל עם 1,000 ₪</p>
+            <p className="text-[10px] text-fg-muted tracking-wider uppercase">כל תלמיד מתחיל עם 1,000 ₪</p>
           </div>
         </div>
 
         <div className="flex gap-2 flex-wrap">
           <button
             onClick={openEditStudents}
-            className="hbtn px-4 py-2 bg-surface hover:bg-surface-hover border border-border-custom hover:border-amber-500/50 rounded-xl text-xs font-bold transition-all cursor-pointer"
+            className="hbtn px-4 py-2 bg-subtle hover:bg-subtle-hover border border-line hover:border-amber-500/50 rounded-xl text-xs font-bold transition-all cursor-pointer"
           >
             👥 עריכת משתתפים
           </button>
           <button
             onClick={openEditValues}
-            className="hbtn px-4 py-2 bg-surface hover:bg-surface-hover border border-border-custom hover:border-amber-500/50 rounded-xl text-xs font-bold transition-all cursor-pointer"
+            className="hbtn px-4 py-2 bg-subtle hover:bg-subtle-hover border border-line hover:border-amber-500/50 rounded-xl text-xs font-bold transition-all cursor-pointer"
           >
             📋 עריכת ערכים
           </button>
@@ -759,7 +759,7 @@ export default function ValuesAuctionPage() {
                 setShowRemoteModal(true);
               }
             }}
-            className={`hbtn px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${sessionId ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-surface hover:bg-surface-hover border border-border-custom'}`}
+            className={`hbtn px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${sessionId ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30' : 'bg-subtle hover:bg-subtle-hover border border-line'}`}
           >
             <Share2 className="w-3.5 h-3.5" />
             <span>{sessionId ? "🟢 מפגש פעיל" : "🌐 מפגש מרחוק"}</span>
@@ -778,11 +778,11 @@ export default function ValuesAuctionPage() {
         
         {/* Students Sidebar (3 cols) */}
         <section className="lg:col-span-3 flex flex-col min-h-[300px]">
-          <div className="glass-card rounded-2xl p-5 border border-border-custom flex-1 flex flex-col shadow-lg">
-            <h2 className="text-md font-bold mb-4 text-text-muted flex items-center gap-2 border-b border-border-custom pb-2">
+          <div className="bg-card border-line rounded-xl p-5 border flex-1 flex flex-col shadow-sm">
+            <h2 className="text-md font-bold mb-4 text-fg-muted flex items-center gap-2 border-b border-line pb-2">
               <Users className="w-4 h-4 text-amber-500" />
               <span>תלמידים</span>
-              <span className="text-xs font-normal text-text-muted mr-auto">
+              <span className="text-xs font-normal text-fg-muted mr-auto">
                 {students.length} משתתפים
               </span>
             </h2>
@@ -794,10 +794,10 @@ export default function ValuesAuctionPage() {
                 return (
                   <div
                     key={i}
-                    className={`p-3 rounded-xl border transition-all flex justify-between items-center ${isLeading ? 'bg-amber-500/10 border-amber-500/40 text-amber-400' : 'bg-surface/40 border-border-custom'}`}
+                    className={`p-3 rounded-xl border transition-all flex justify-between items-center ${isLeading ? 'bg-amber-500/10 border-amber-500/40 text-amber-700 dark:text-amber-400' : 'bg-subtle border-line'}`}
                   >
                     <span className="font-semibold text-sm">{s.name}</span>
-                    <span className={`text-xs font-bold font-mono ${isLow ? 'text-red-400' : 'text-emerald-400'}`}>
+                    <span className={`text-xs font-bold font-mono ${isLow ? 'text-red-700 dark:text-red-400' : 'text-emerald-700 dark:text-emerald-400'}`}>
                       {fmt(s.budget)}
                     </span>
                   </div>
@@ -810,48 +810,48 @@ export default function ValuesAuctionPage() {
         {/* Center: Live Card + Logs (6 cols) */}
         <section className="lg:col-span-6 flex flex-col gap-6">
           {/* Auction Card */}
-          <div className={`glass-card rounded-2xl p-6 border transition-all shadow-xl relative overflow-hidden ${liveAuction ? 'border-amber-500/40' : 'border-border-custom'}`}>
-            <div className="absolute top-0 right-0 left-0 h-1 bg-gradient-to-r from-amber-500 to-amber-300 opacity-50" />
+          <div className={`bg-card border-line rounded-xl p-6 border transition-all shadow-sm relative overflow-hidden ${liveAuction ? 'border-amber-500/40' : 'border-line'}`}>
+            <div className="absolute top-0 right-0 left-0 h-1 opacity-50 bg-amber-500" />
             <div className="flex justify-between items-center mb-4">
-              <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${liveAuction ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-surface border border-border-custom text-text-muted'}`}>
+              <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${liveAuction ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20' : 'bg-subtle border border-line text-fg-muted'}`}>
                 {liveAuction ? "מכירה פעילה" : "ממתין למכירה"}
               </span>
             </div>
 
             <div className="min-h-[110px] mb-6">
-              <h3 className="text-2xl font-black text-amber-400 leading-tight">
+              <h3 className="text-2xl font-bold text-amber-700 dark:text-amber-400 leading-tight">
                 {liveAuction ? activeValue?.name : "בחר ערך לפתיחת מכירה"}
               </h3>
-              <p className="text-text-muted text-sm mt-2 leading-relaxed">
+              <p className="text-fg-muted text-sm mt-2 leading-relaxed">
                 {liveAuction ? activeValue?.desc : "לחץ על 'פתח מכירה' ליד אחד הערכים ברשימה משמאל כדי להתחיל."}
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="bg-surface/50 border border-border-custom rounded-xl p-4 text-center">
-                <div className="text-[10px] text-text-muted font-bold tracking-wider">הצעה גבוהה</div>
-                <div className="text-2xl font-black text-amber-500 mt-1">
+              <div className="bg-subtle border border-line rounded-xl p-4 text-center">
+                <div className="text-[10px] text-fg-muted font-bold tracking-wider">הצעה גבוהה</div>
+                <div className="text-2xl font-bold text-amber-500 mt-1">
                   {liveAuction && liveAuction.currentBid > 0 ? fmt(liveAuction.currentBid) : "—"}
                 </div>
               </div>
-              <div className="bg-surface/50 border border-border-custom rounded-xl p-4 text-center">
-                <div className="text-[10px] text-text-muted font-bold tracking-wider">מציע</div>
-                <div className="text-lg font-bold text-[#e8edf8] mt-2 truncate">
+              <div className="bg-subtle border border-line rounded-xl p-4 text-center">
+                <div className="text-[10px] text-fg-muted font-bold tracking-wider">מציע</div>
+                <div className="text-lg font-bold text-fg mt-2 truncate">
                   {liveAuction && liveAuction.currentBidderId !== null ? students[liveAuction.currentBidderId].name : "—"}
                 </div>
               </div>
             </div>
 
             {/* Bidding inputs (Teacher control panel) */}
-            <div className="border-t border-border-custom pt-5 space-y-4">
+            <div className="border-t border-line pt-5 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="flex flex-col">
-                  <label className="text-[10px] text-text-muted font-bold mb-1.5">תלמיד מציע</label>
+                  <label className="text-[10px] text-fg-muted font-bold mb-1.5">תלמיד מציע</label>
                   <select
                     disabled={!liveAuction}
                     value={teacherBidderId}
                     onChange={(e) => setTeacherBidderId(e.target.value)}
-                    className="bg-surface border border-border-custom rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-amber-400"
+                    className="bg-subtle border border-line rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-amber-400"
                   >
                     <option value="">— בחר תלמיד —</option>
                     {students.map((s, i) => (
@@ -862,21 +862,21 @@ export default function ValuesAuctionPage() {
                   </select>
                 </div>
                 <div className="flex flex-col">
-                  <label className="text-[10px] text-text-muted font-bold mb-1.5">סכום ₪</label>
+                  <label className="text-[10px] text-fg-muted font-bold mb-1.5">סכום ₪</label>
                   <input
                     type="number"
                     disabled={!liveAuction}
                     value={teacherBidAmount}
                     onChange={(e) => setTeacherBidAmount(e.target.value)}
                     placeholder="0"
-                    className="bg-surface border border-border-custom rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-amber-400 text-left font-mono font-bold"
+                    className="bg-subtle border border-line rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-amber-400 text-left font-mono font-bold"
                   />
                 </div>
                 <div className="flex flex-col justify-end">
                   <button
                     disabled={!liveAuction}
                     onClick={handleTeacherPlaceBid}
-                    className="py-2.5 bg-amber-500 hover:bg-amber-400 disabled:bg-surface disabled:border disabled:border-border-custom disabled:text-text-muted text-zinc-950 font-bold rounded-xl text-xs transition-all cursor-pointer"
+                    className="py-2.5 bg-amber-500 hover:bg-amber-400 disabled:bg-subtle disabled:border disabled:border-line disabled:text-fg-muted text-zinc-950 font-bold rounded-xl text-xs transition-all cursor-pointer"
                   >
                     📤 הגש הצעה
                   </button>
@@ -884,21 +884,21 @@ export default function ValuesAuctionPage() {
               </div>
 
               {teacherBidError && (
-                <p className="text-xs text-red-400 font-medium min-h-[1.5em]">{teacherBidError}</p>
+                <p className="text-xs text-red-700 dark:text-red-400 font-medium min-h-[1.5em]">{teacherBidError}</p>
               )}
 
               <div className="flex gap-3 pt-2">
                 <button
                   disabled={!liveAuction || liveAuction.currentBid === 0}
                   onClick={closeAuction}
-                  className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-400 disabled:bg-surface disabled:border disabled:border-border-custom disabled:text-text-muted text-zinc-950 font-bold rounded-xl text-sm transition-all cursor-pointer"
+                  className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-400 disabled:bg-subtle disabled:border disabled:border-line disabled:text-fg-muted text-zinc-950 font-bold rounded-xl text-sm transition-all cursor-pointer"
                 >
                   🔨 מכור לגבוה ביותר!
                 </button>
                 <button
                   disabled={!liveAuction}
                   onClick={cancelAuction}
-                  className="px-4 py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 disabled:bg-transparent disabled:border-transparent disabled:text-transparent text-red-400 font-bold rounded-xl text-xs transition-all cursor-pointer"
+                  className="px-4 py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 disabled:bg-transparent disabled:border-transparent disabled:text-transparent text-red-700 dark:text-red-400 font-bold rounded-xl text-xs transition-all cursor-pointer"
                 >
                   ✕ בטל מכירה
                 </button>
@@ -907,20 +907,20 @@ export default function ValuesAuctionPage() {
           </div>
 
           {/* Activity Logs */}
-          <div className="glass-card rounded-2xl p-5 border border-border-custom flex-1 flex flex-col max-h-[300px] overflow-hidden shadow-lg">
-            <h2 className="text-xs font-bold text-text-muted tracking-wider border-b border-border-custom pb-2 mb-3">
+          <div className="bg-card border-line rounded-xl p-5 border flex-1 flex flex-col max-h-[300px] overflow-hidden shadow-sm">
+            <h2 className="text-xs font-bold text-fg-muted tracking-wider border-b border-line pb-2 mb-3">
               יומן פעילות
             </h2>
             <div className="flex-1 overflow-y-auto space-y-2 pr-1">
               {logs.length === 0 ? (
-                <div className="text-center py-6 text-xs text-text-muted">אין פעילות כרגע</div>
+                <div className="text-center py-6 text-xs text-fg-muted">אין פעילות כרגע</div>
               ) : (
                 logs.map((log, i) => (
                   <div key={i} className="text-xs flex gap-2 items-start py-1 leading-relaxed">
-                    <span className="font-mono text-text-muted shrink-0">{log.time}</span>
+                    <span className="font-mono text-fg-muted shrink-0">{log.time}</span>
                     <span
                       dangerouslySetInnerHTML={{ __html: log.text }}
-                      className={log.type === 'sold' ? 'text-emerald-400 font-bold' : log.type === 'bid' ? 'text-amber-400' : 'text-text-muted'}
+                      className={log.type === 'sold' ? 'text-emerald-700 dark:text-emerald-400 font-bold' : log.type === 'bid' ? 'text-amber-700 dark:text-amber-400' : 'text-fg-muted'}
                     />
                   </div>
                 ))
@@ -931,8 +931,8 @@ export default function ValuesAuctionPage() {
 
         {/* Right Sidebar: Values (3 cols) */}
         <section className="lg:col-span-3 flex flex-col min-h-[300px]">
-          <div className="glass-card rounded-2xl p-5 border border-border-custom flex-1 flex flex-col shadow-lg">
-            <h2 className="text-md font-bold mb-4 text-text-muted flex items-center gap-2 border-b border-border-custom pb-2">
+          <div className="bg-card border-line rounded-xl p-5 border flex-1 flex flex-col shadow-sm">
+            <h2 className="text-md font-bold mb-4 text-fg-muted flex items-center gap-2 border-b border-line pb-2">
               <ClipboardList className="w-4 h-4 text-amber-500" />
               <span>רשימת ערכים</span>
             </h2>
@@ -944,16 +944,16 @@ export default function ValuesAuctionPage() {
                 return (
                   <div
                     key={i}
-                    className={`p-3 rounded-xl border transition-all flex flex-col gap-2 ${isActive ? 'bg-amber-500/10 border-amber-500/40' : isSold ? 'opacity-60 border-border-custom bg-surface/10' : 'bg-surface/40 border-border-custom hover:border-border-custom-hover'}`}
+                    className={`p-3 rounded-xl border transition-all flex flex-col gap-2 ${isActive ? 'bg-amber-500/10 border-amber-500/40' : isSold ? 'opacity-60 border-line bg-subtle' : 'bg-subtle border-line hover:border-line'}`}
                   >
                     <div className="flex justify-between items-center">
                       <span className="font-bold text-xs">{v.name}</span>
                       {isSold ? (
-                        <span className="text-[10px] font-bold text-emerald-400">
+                        <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
                           {v.winner} ({fmt(v.finalPrice ?? 0)})
                         </span>
                       ) : isActive ? (
-                        <span className="text-[10px] font-bold text-amber-400 animate-pulse">פעיל...</span>
+                        <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 animate-pulse">פעיל...</span>
                       ) : (
                         <button
                           onClick={() => startAuction(v.id)}
@@ -974,13 +974,13 @@ export default function ValuesAuctionPage() {
 
       {/* ══ Remote Session Modal ══ */}
       {showRemoteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm">
-          <div className="glass-card max-w-sm w-full rounded-2xl p-6 border border-border-custom shadow-2xl relative">
-            <button onClick={() => setShowRemoteModal(false)} className="absolute top-4 left-4 p-1 rounded-lg hover:bg-surface text-text-muted hover:text-[#e8edf8] transition-all">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-subtle">
+          <div className="bg-card border-line max-w-sm w-full rounded-xl p-6 border shadow-sm relative">
+            <button onClick={() => setShowRemoteModal(false)} className="absolute top-4 left-4 p-1 rounded-lg hover:bg-subtle text-fg-muted hover:text-fg transition-all">
               <X className="w-4 h-4" />
             </button>
 
-            <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-amber-400 border-b border-border-custom pb-2">
+            <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-amber-700 dark:text-amber-400 border-b border-line pb-2">
               <Share2 className="w-5 h-5" />
               <span>מפגש מרחוק</span>
             </h2>
@@ -988,18 +988,18 @@ export default function ValuesAuctionPage() {
             {/* Active session state */}
             {sessionId ? (
               <div className="space-y-5 text-center">
-                <div className="bg-surface/50 border border-border-custom rounded-xl p-3">
-                  <span className="text-2xl font-black text-emerald-400">{joinedStudents}</span>
-                  <p className="text-[10px] text-text-muted font-bold tracking-wider mt-0.5">תלמידים מחוברים</p>
+                <div className="bg-subtle border border-line rounded-xl p-3">
+                  <span className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">{joinedStudents}</span>
+                  <p className="text-[10px] text-fg-muted font-bold tracking-wider mt-0.5">תלמידים מחוברים</p>
                 </div>
 
                 <div className="space-y-1">
-                  <div className="text-[10px] text-text-muted font-bold uppercase tracking-wider">קוד המפגש</div>
-                  <div className="text-3xl font-black text-[#e8edf8] font-mono select-all">{sessionId}</div>
+                  <div className="text-[10px] text-fg-muted font-bold uppercase tracking-wider">קוד המפגש</div>
+                  <div className="text-3xl font-bold text-fg font-mono select-all">{sessionId}</div>
                 </div>
 
                 {/* QR Code */}
-                <div className="w-36 h-36 bg-white p-2.5 mx-auto rounded-xl shadow-lg border border-border-custom">
+                <div className="w-36 h-36 bg-card p-2.5 mx-auto rounded-xl shadow-sm border border-line">
                   {/* Generate QR code via public QR code server API */}
                   <img
                     src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(getStudentLink())}`}
@@ -1009,8 +1009,8 @@ export default function ValuesAuctionPage() {
                 </div>
 
                 {/* Copy Link */}
-                <div className="flex items-center gap-2 bg-surface border border-border-custom rounded-xl p-2.5 text-xs text-right">
-                  <span className="flex-1 truncate font-mono text-text-muted">{getStudentLink()}</span>
+                <div className="flex items-center gap-2 bg-subtle border border-line rounded-xl p-2.5 text-xs text-right">
+                  <span className="flex-1 truncate font-mono text-fg-muted">{getStudentLink()}</span>
                   <button
                     onClick={copyStudentLink}
                     className="p-1.5 bg-amber-500 hover:bg-amber-400 text-zinc-950 rounded-lg font-bold transition-all cursor-pointer shrink-0"
@@ -1019,11 +1019,11 @@ export default function ValuesAuctionPage() {
                   </button>
                 </div>
 
-                <div className="flex gap-2 pt-2 border-t border-border-custom">
-                  <button onClick={() => setShowRemoteModal(false)} className="flex-1 py-2.5 bg-surface border border-border-custom hover:border-border-custom-hover rounded-xl text-xs font-bold transition-all cursor-pointer">
+                <div className="flex gap-2 pt-2 border-t border-line">
+                  <button onClick={() => setShowRemoteModal(false)} className="flex-1 py-2.5 bg-subtle border border-line hover:border-line rounded-xl text-xs font-bold transition-all cursor-pointer">
                     סגור
                   </button>
-                  <button onClick={endRemoteSession} className="flex-1 py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 rounded-xl text-xs font-bold transition-all cursor-pointer">
+                  <button onClick={endRemoteSession} className="flex-1 py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-700 dark:text-red-400 rounded-xl text-xs font-bold transition-all cursor-pointer">
                     סיים מפגש
                   </button>
                 </div>
@@ -1031,11 +1031,11 @@ export default function ValuesAuctionPage() {
             ) : (
               // Pre-start
               <div className="space-y-4">
-                <p className="text-xs text-text-muted leading-relaxed">
+                <p className="text-xs text-fg-muted leading-relaxed">
                   תלמידים יקבלו קישור או יסרקו קוד QR, יבחרו את שמם ויוכלו להציע הצעות מהטלפון שלהם.
                 </p>
                 <div className="flex gap-2 pt-2">
-                  <button onClick={() => setShowRemoteModal(false)} className="flex-1 py-2.5 bg-surface border border-border-custom hover:border-border-custom-hover rounded-xl text-xs font-bold transition-all cursor-pointer">
+                  <button onClick={() => setShowRemoteModal(false)} className="flex-1 py-2.5 bg-subtle border border-line hover:border-line rounded-xl text-xs font-bold transition-all cursor-pointer">
                     ביטול
                   </button>
                   <button onClick={startRemoteSession} className="flex-1 py-2.5 bg-amber-500 hover:bg-amber-400 text-zinc-950 rounded-xl text-xs font-bold transition-all cursor-pointer">
@@ -1050,29 +1050,29 @@ export default function ValuesAuctionPage() {
 
       {/* ══ Edit Students Modal ══ */}
       {showEditStudentsModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm">
-          <div className="glass-card max-w-sm w-full rounded-2xl p-6 border border-border-custom shadow-2xl relative">
-            <button onClick={() => setShowEditStudentsModal(false)} className="absolute top-4 left-4 p-1 rounded-lg hover:bg-surface text-text-muted hover:text-[#e8edf8] transition-all">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-subtle">
+          <div className="bg-card border-line max-w-sm w-full rounded-xl p-6 border shadow-sm relative">
+            <button onClick={() => setShowEditStudentsModal(false)} className="absolute top-4 left-4 p-1 rounded-lg hover:bg-subtle text-fg-muted hover:text-fg transition-all">
               <X className="w-4 h-4" />
             </button>
 
-            <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-amber-400 border-b border-border-custom pb-2">
+            <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-amber-700 dark:text-amber-400 border-b border-line pb-2">
               <Users className="w-5 h-5" />
               <span>עריכת משתתפים</span>
             </h2>
 
             <div className="space-y-4">
-              <p className="text-[10px] text-text-muted leading-relaxed">
+              <p className="text-[10px] text-fg-muted leading-relaxed">
                 הזן שם אחד בכל שורה. שים לב שעדכון הרשימה יאפס את כל הרכישות והתקציבים הקיימים!
               </p>
               <textarea
                 value={tempStudentsText}
                 onChange={(e) => setTempStudentsText(e.target.value)}
                 placeholder="שם תלמיד&#10;שם תלמיד&#10;..."
-                className="w-full h-48 bg-surface border border-border-custom rounded-xl p-3 text-xs focus:outline-none focus:border-amber-400"
+                className="w-full h-48 bg-subtle border border-line rounded-xl p-3 text-xs focus:outline-none focus:border-amber-400"
               />
               <div className="flex gap-2">
-                <button onClick={() => setShowEditStudentsModal(false)} className="flex-1 py-2.5 bg-surface border border-border-custom hover:border-border-custom-hover rounded-xl text-xs font-bold transition-all cursor-pointer">
+                <button onClick={() => setShowEditStudentsModal(false)} className="flex-1 py-2.5 bg-subtle border border-line hover:border-line rounded-xl text-xs font-bold transition-all cursor-pointer">
                   ביטול
                 </button>
                 <button onClick={applyStudents} className="flex-1 py-2.5 bg-amber-500 hover:bg-amber-400 text-zinc-950 rounded-xl text-xs font-bold transition-all cursor-pointer">
@@ -1086,19 +1086,19 @@ export default function ValuesAuctionPage() {
 
       {/* ══ Edit Values Modal ══ */}
       {showEditValuesModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm">
-          <div className="glass-card max-w-md w-full rounded-2xl p-6 border border-border-custom shadow-2xl relative">
-            <button onClick={() => setShowEditValuesModal(false)} className="absolute top-4 left-4 p-1 rounded-lg hover:bg-surface text-text-muted hover:text-[#e8edf8] transition-all">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-subtle">
+          <div className="bg-card border-line max-w-md w-full rounded-xl p-6 border shadow-sm relative">
+            <button onClick={() => setShowEditValuesModal(false)} className="absolute top-4 left-4 p-1 rounded-lg hover:bg-subtle text-fg-muted hover:text-fg transition-all">
               <X className="w-4 h-4" />
             </button>
 
-            <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-amber-400 border-b border-border-custom pb-2">
+            <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-amber-700 dark:text-amber-400 border-b border-line pb-2">
               <ClipboardList className="w-5 h-5" />
               <span>עריכת רשימת הערכים</span>
             </h2>
 
             <div className="space-y-4">
-              <p className="text-[10px] text-text-muted leading-relaxed">
+              <p className="text-[10px] text-fg-muted leading-relaxed">
                 ניתן לערוך שמות ותיאורים, להוסיף ערכים ולמחוק אותם. שם הוא שדה חובה. ערכים שנמכרו לא ניתנים לעריכה.
               </p>
 
@@ -1106,7 +1106,7 @@ export default function ValuesAuctionPage() {
                 {tempValuesList.map((tv, idx) => {
                   const isLocked = tv.status === 'sold' || tv.status === 'active';
                   return (
-                    <div key={idx} className="p-3 border border-border-custom rounded-xl bg-surface/30 flex gap-2 items-start relative">
+                    <div key={idx} className="p-3 border border-line rounded-xl bg-subtle flex gap-2 items-start relative">
                       <div className="flex-1 space-y-2">
                         <input
                           type="text"
@@ -1118,7 +1118,7 @@ export default function ValuesAuctionPage() {
                             setTempValuesList(updated);
                           }}
                           placeholder="שם הערך *"
-                          className="w-full bg-surface border border-border-custom rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-amber-400 disabled:opacity-60"
+                          className="w-full bg-subtle border border-line rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-amber-400 disabled:opacity-60"
                         />
                         <textarea
                           disabled={isLocked}
@@ -1129,19 +1129,19 @@ export default function ValuesAuctionPage() {
                             setTempValuesList(updated);
                           }}
                           placeholder="תיאור הערך..."
-                          className="w-full bg-surface border border-border-custom rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-amber-400 disabled:opacity-60 h-16"
+                          className="w-full bg-subtle border border-line rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-amber-400 disabled:opacity-60 h-16"
                         />
                       </div>
                       {!isLocked ? (
                         <button
                           onClick={() => removeValueRow(idx)}
-                          className="p-1 text-red-400 hover:bg-surface rounded-lg transition-all"
+                          className="p-1 text-red-700 dark:text-red-400 hover:bg-subtle rounded-lg transition-all"
                           title="מחק ערך"
                         >
                           <X className="w-4 h-4" />
                         </button>
                       ) : (
-                        <span className="text-[9px] font-bold text-amber-400 mt-1 uppercase rotate-12">{tv.status === 'sold' ? "נמכר" : "פעיל"}</span>
+                        <span className="text-[9px] font-bold text-amber-700 dark:text-amber-400 mt-1 uppercase rotate-12">{tv.status === 'sold' ? "נמכר" : "פעיל"}</span>
                       )}
                     </div>
                   );
@@ -1150,13 +1150,13 @@ export default function ValuesAuctionPage() {
 
               <button
                 onClick={addValueRow}
-                className="w-full py-2 bg-surface hover:bg-surface-hover border border-border-custom hover:border-amber-500/50 text-xs font-bold rounded-xl transition-all cursor-pointer"
+                className="w-full py-2 bg-subtle hover:bg-subtle-hover border border-line hover:border-amber-500/50 text-xs font-bold rounded-xl transition-all cursor-pointer"
               >
                 + הוסף ערך חדש
               </button>
 
               <div className="flex gap-2">
-                <button onClick={() => setShowEditValuesModal(false)} className="flex-1 py-2.5 bg-surface border border-border-custom hover:border-border-custom-hover rounded-xl text-xs font-bold transition-all cursor-pointer">
+                <button onClick={() => setShowEditValuesModal(false)} className="flex-1 py-2.5 bg-subtle border border-line hover:border-line rounded-xl text-xs font-bold transition-all cursor-pointer">
                   ביטול
                 </button>
                 <button onClick={applyValues} className="flex-1 py-2.5 bg-amber-500 hover:bg-amber-400 text-zinc-950 rounded-xl text-xs font-bold transition-all cursor-pointer">
@@ -1170,13 +1170,13 @@ export default function ValuesAuctionPage() {
 
       {/* ══ Summary Modal ══ */}
       {showSummaryModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm">
-          <div className="glass-card max-w-2xl w-full rounded-2xl p-6 border border-border-custom shadow-2xl relative flex flex-col max-h-[85vh]">
-            <button onClick={() => setShowSummaryModal(false)} className="absolute top-4 left-4 p-1 rounded-lg hover:bg-surface text-text-muted hover:text-[#e8edf8] transition-all">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-subtle">
+          <div className="bg-card border-line max-w-2xl w-full rounded-xl p-6 border shadow-sm relative flex flex-col max-h-[85vh]">
+            <button onClick={() => setShowSummaryModal(false)} className="absolute top-4 left-4 p-1 rounded-lg hover:bg-subtle text-fg-muted hover:text-fg transition-all">
               <X className="w-4 h-4" />
             </button>
 
-            <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-amber-400 border-b border-border-custom pb-2 shrink-0">
+            <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-amber-700 dark:text-amber-400 border-b border-line pb-2 shrink-0">
               <Award className="w-5 h-5" />
               <span>סיכום המכירה הפומבית</span>
             </h2>
@@ -1184,10 +1184,10 @@ export default function ValuesAuctionPage() {
             <div className="flex-1 overflow-y-auto space-y-6 pr-1 pl-1">
               {/* Values summary table */}
               <div className="space-y-2">
-                <h3 className="text-xs font-bold text-text-muted tracking-wider uppercase">סיכום לפי ערכים</h3>
-                <div className="overflow-x-auto border border-border-custom rounded-xl">
+                <h3 className="text-xs font-bold text-fg-muted tracking-wider uppercase">סיכום לפי ערכים</h3>
+                <div className="overflow-x-auto border border-line rounded-xl">
                   <table className="w-full text-right text-xs">
-                    <thead className="bg-surface/50 border-b border-border-custom">
+                    <thead className="bg-subtle border-b border-line">
                       <tr>
                         <th className="p-3">ערך</th>
                         <th className="p-3 text-center">הצעות</th>
@@ -1197,13 +1197,13 @@ export default function ValuesAuctionPage() {
                     </thead>
                     <tbody className="divide-y divide-border-custom">
                       {values.map((v, i) => (
-                        <tr key={i} className="hover:bg-surface/20">
+                        <tr key={i} className="hover:bg-subtle">
                           <td className="p-3 font-semibold">{v.name}</td>
-                          <td className="p-3 text-center"><span className="px-2 py-0.5 bg-surface border border-border-custom rounded-full font-bold">{v.bidCount}</span></td>
-                          <td className="p-3 font-mono font-bold text-amber-400">
+                          <td className="p-3 text-center"><span className="px-2 py-0.5 bg-subtle border border-line rounded-full font-bold">{v.bidCount}</span></td>
+                          <td className="p-3 font-mono font-bold text-amber-700 dark:text-amber-400">
                             {v.status === 'sold' ? fmt(v.finalPrice ?? 0) : v.status === 'active' ? 'בתהליך...' : '—'}
                           </td>
-                          <td className="p-3 font-medium text-emerald-400">
+                          <td className="p-3 font-medium text-emerald-700 dark:text-emerald-400">
                             {v.status === 'sold' ? `🏆 ${v.winner}` : v.status === 'active' ? 'בתהליך...' : 'לא נמכר'}
                           </td>
                         </tr>
@@ -1215,20 +1215,20 @@ export default function ValuesAuctionPage() {
 
               {/* Students summary grid */}
               <div className="space-y-3">
-                <h3 className="text-xs font-bold text-text-muted tracking-wider uppercase">סיכום לפי תלמידים</h3>
+                <h3 className="text-xs font-bold text-fg-muted tracking-wider uppercase">סיכום לפי תלמידים</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {students.map((s, idx) => (
-                    <div key={idx} className="p-4 border border-border-custom bg-surface/30 rounded-xl space-y-3">
-                      <div className="flex justify-between items-center border-b border-border-custom pb-2">
+                    <div key={idx} className="p-4 border border-line bg-subtle rounded-xl space-y-3">
+                      <div className="flex justify-between items-center border-b border-line pb-2">
                         <span className="font-bold text-sm">{s.name}</span>
-                        <span className="text-xs font-bold text-emerald-400 font-mono">{fmt(s.budget)} נותר</span>
+                        <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 font-mono">{fmt(s.budget)} נותר</span>
                       </div>
                       <div className="space-y-1.5">
                         {s.bought.length === 0 ? (
-                          <div className="text-[10px] text-text-muted italic">לא רכש ערכים</div>
+                          <div className="text-[10px] text-fg-muted italic">לא רכש ערכים</div>
                         ) : (
                           s.bought.map((item, index) => (
-                            <div key={index} className="text-xs flex justify-between text-text-muted">
+                            <div key={index} className="text-xs flex justify-between text-fg-muted">
                               <span>✔ {item.name}</span>
                               <span className="font-mono">{fmt(item.price)}</span>
                             </div>
@@ -1241,7 +1241,7 @@ export default function ValuesAuctionPage() {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-border-custom mt-4 shrink-0">
+            <div className="pt-4 border-t border-line mt-4 shrink-0">
               <button
                 onClick={() => setShowSummaryModal(false)}
                 className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold rounded-xl text-sm transition-all cursor-pointer"

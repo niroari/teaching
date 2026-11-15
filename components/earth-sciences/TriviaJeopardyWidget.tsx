@@ -205,8 +205,8 @@ export default function TriviaJeopardyWidget() {
   };
 
   const mainContainerClasses = isFullScreen
-    ? "fixed inset-0 z-[100] bg-slate-950 p-6 flex flex-col justify-between overflow-hidden text-right h-screen w-screen"
-    : "w-full bg-slate-950/20 border border-zinc-800/80 rounded-2xl p-6 text-right relative min-h-[600px] flex flex-col justify-between";
+    ? "fixed inset-0 z-[100] bg-card p-6 flex flex-col justify-between overflow-hidden text-right h-screen w-screen"
+    : "w-full bg-subtle border border-line rounded-xl p-6 text-right relative min-h-[600px] flex flex-col justify-between";
 
   return (
     <div className={mainContainerClasses}>
@@ -217,37 +217,37 @@ export default function TriviaJeopardyWidget() {
           {/* Setup screen fullscreen toggle button */}
           <button 
             onClick={toggleFullScreen}
-            className="absolute top-0 left-0 p-2.5 rounded-xl border border-zinc-800 bg-surface/30 hover:bg-surface-hover/30 text-text-muted hover:text-white transition-all cursor-pointer flex items-center gap-1.5 text-xs md:text-sm font-bold"
+            className="absolute top-0 left-0 p-2.5 rounded-xl border border-line bg-subtle hover:bg-subtle-hover text-fg-muted hover:text-fg transition-all cursor-pointer flex items-center gap-1.5 text-xs md:text-sm font-bold"
             title="מסך מלא"
           >
             {isFullScreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
             <span>{isFullScreen ? "חלון רגיל" : "מסך מלא"}</span>
           </button>
 
-          <div className="w-16 h-16 bg-earth/10 border border-earth/20 rounded-full flex items-center justify-center text-earth animate-bounce">
+          <div className="w-16 h-16 bg-accent-soft border border-accent/20 rounded-full flex items-center justify-center text-accent animate-bounce">
             <Award className="w-8 h-8" />
           </div>
           
           <div className="space-y-2">
-            <h3 className="text-2xl font-black text-white">הגדרת טריוויה כיתתית (Jeopardy)</h3>
-            <p className="text-sm text-text-muted max-w-sm">
+            <h3 className="text-2xl font-bold text-fg">הגדרת טריוויה כיתתית (Jeopardy)</h3>
+            <p className="text-sm text-fg-muted max-w-sm">
               חלקו את התלמידים בכיתה לקבוצות, בחרו את מספר הקבוצות והגדירו את שמותיהן כדי להתחיל בתחרות!
             </p>
           </div>
 
           <div className="w-full space-y-4 text-right">
             <div>
-              <label className="block text-sm font-bold text-text-muted mb-2">מספר קבוצות משתתפות:</label>
+              <label className="block text-sm font-bold text-fg-muted mb-2">מספר קבוצות משתתפות:</label>
               <div className="grid grid-cols-3 gap-2">
                 {[2, 3, 4].map(n => (
                   <button
                     key={n}
                     type="button"
                     onClick={() => setNumTeams(n)}
-                    className={`py-3 rounded-xl text-sm font-extrabold transition-all cursor-pointer border ${
+                    className={`py-3 rounded-xl text-sm font-bold transition-all cursor-pointer border ${
                       numTeams === n 
-                        ? "bg-earth border-earth text-white shadow-lg shadow-teal-500/10" 
-                        : "bg-surface border-zinc-800 text-text-muted hover:border-zinc-700"
+                        ? "bg-accent border-accent text-fg shadow-sm" 
+                        : "bg-subtle border-line text-fg-muted hover:border-line"
                     }`}
                   >
                     {n} קבוצות
@@ -258,11 +258,11 @@ export default function TriviaJeopardyWidget() {
 
             {/* Dynamic Group Name Input fields */}
             <div className="space-y-2.5 pt-2">
-              <label className="block text-sm font-bold text-text-muted">שמות הקבוצות:</label>
+              <label className="block text-sm font-bold text-fg-muted">שמות הקבוצות:</label>
               <div className="grid grid-cols-1 gap-2">
                 {Array.from({ length: numTeams }).map((_, i) => (
-                  <div key={i} className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 focus-within:border-earth transition-colors">
-                    <span className="text-sm font-bold text-earth shrink-0">קבוצה {i + 1}:</span>
+                  <div key={i} className="flex items-center gap-2 bg-card border border-line rounded-xl px-4 py-2.5 focus-within:border-accent transition-colors">
+                    <span className="text-sm font-bold text-accent shrink-0">קבוצה {i + 1}:</span>
                     <input
                       type="text"
                       value={customNames[i] || ""}
@@ -271,7 +271,7 @@ export default function TriviaJeopardyWidget() {
                         updated[i] = e.target.value;
                         setCustomNames(updated);
                       }}
-                      className="bg-transparent border-none text-sm font-bold text-white focus:outline-none w-full text-right"
+                      className="bg-transparent border-none text-sm font-bold text-fg focus:outline-none w-full text-right"
                       placeholder={`הזן שם לקבוצה ${i + 1}`}
                     />
                   </div>
@@ -282,7 +282,7 @@ export default function TriviaJeopardyWidget() {
 
           <button
             onClick={handleStartGame}
-            className="w-full py-4 bg-earth hover:bg-teal-600 text-white font-bold text-base rounded-xl cursor-pointer shadow-md hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+            className="w-full py-4 bg-accent hover:bg-teal-600 text-white font-bold text-base rounded-xl cursor-pointer shadow-md hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
           >
             <Play className="w-4 h-4 fill-white" />
             <span>התחל בחידון 🚀</span>
@@ -295,14 +295,14 @@ export default function TriviaJeopardyWidget() {
         <div className="flex-1 flex flex-col justify-between space-y-4 select-none overflow-hidden h-full">
           
           {/* Active Turn banner */}
-          <div className={`flex flex-row justify-between items-center bg-zinc-900/60 border border-zinc-800/80 rounded-2xl gap-3 text-right flex-shrink-0 ${
+          <div className={`flex flex-row justify-between items-center bg-subtle border border-line rounded-xl gap-3 text-right flex-shrink-0 ${
             isFullScreen ? "p-3" : "p-4"
           }`}>
             <div className="flex items-center gap-2.5">
-              <Users className="w-5.5 h-5.5 text-earth shrink-0" />
+              <Users className="w-5.5 h-5.5 text-accent shrink-0" />
               <div>
-                <span className="text-xs text-text-muted font-bold block">תור הקבוצה לבחור משבצת:</span>
-                <span className="text-base md:text-lg font-extrabold text-white">
+                <span className="text-xs text-fg-muted font-bold block">תור הקבוצה לבחור משבצת:</span>
+                <span className="text-base md:text-lg font-bold text-fg">
                   👉 {teams[activeTeamIdx]?.name}
                 </span>
               </div>
@@ -312,7 +312,7 @@ export default function TriviaJeopardyWidget() {
               {/* Full Screen Toggle Button */}
               <button
                 onClick={toggleFullScreen}
-                className="px-4 py-2 border border-earth/40 bg-earth/10 hover:bg-earth/20 text-xs md:text-sm font-bold text-earth rounded-xl flex items-center gap-1.5 cursor-pointer transition-colors"
+                className="px-4 py-2 border border-accent/40 bg-accent-soft hover:bg-accent-soft text-xs md:text-sm font-bold text-accent rounded-xl flex items-center gap-1.5 cursor-pointer transition-colors"
               >
                 {isFullScreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
                 <span>{isFullScreen ? "חלון רגיל" : "מסך מלא"}</span>
@@ -324,14 +324,14 @@ export default function TriviaJeopardyWidget() {
                     setGameStarted(false);
                   }
                 }}
-                className="px-4 py-2 border border-zinc-800 hover:bg-zinc-800 text-xs md:text-sm font-bold text-text-muted rounded-xl flex items-center gap-1.5 cursor-pointer transition-colors"
+                className="px-4 py-2 border border-line hover:bg-subtle text-xs md:text-sm font-bold text-fg-muted rounded-xl flex items-center gap-1.5 cursor-pointer transition-colors"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">אתחול משחק</span>
               </button>
               <button 
                 onClick={() => setGameOver(true)}
-                className="px-4 py-2 border border-red-500/20 bg-red-950/15 hover:bg-red-950/30 text-xs md:text-sm font-bold text-red-400 rounded-xl flex items-center gap-1.5 cursor-pointer transition-colors"
+                className="px-4 py-2 border border-red-500/20 bg-red-50 dark:bg-red-950/15 hover:bg-red-50 dark:hover:bg-red-950/30 text-xs md:text-sm font-bold text-red-700 dark:text-red-400 rounded-xl flex items-center gap-1.5 cursor-pointer transition-colors"
               >
                 <X className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">סיום משחק</span>
@@ -347,12 +347,12 @@ export default function TriviaJeopardyWidget() {
               {CATEGORIES.map((cat, idx) => (
                 <div 
                   key={idx} 
-                  className={`bg-teal-950/30 border border-teal-500/40 rounded-xl p-2.5 text-center flex flex-col items-center justify-center shadow-md ${
+                  className={`bg-teal-50 dark:bg-teal-950/30 border border-teal-500/40 rounded-xl p-2.5 text-center flex flex-col items-center justify-center shadow-md ${
                     isFullScreen ? "h-[8vh] min-h-[50px] max-h-[70px]" : "min-h-[80px]"
                   }`}
                 >
-                  <span className="text-xs md:text-sm font-black text-earth block mb-0.5">קטגוריה {idx + 1}</span>
-                  <span className="text-xs sm:text-sm md:text-base lg:text-lg font-black text-white leading-tight">{cat}</span>
+                  <span className="text-xs md:text-sm font-bold text-accent block mb-0.5">קטגוריה {idx + 1}</span>
+                  <span className="text-xs sm:text-sm md:text-base lg:text-lg font-bold text-fg leading-tight">{cat}</span>
                 </div>
               ))}
 
@@ -368,16 +368,16 @@ export default function TriviaJeopardyWidget() {
                         key={cellKey}
                         disabled={played}
                         onClick={() => handleCellClick(col, rowIdx, val)}
-                        className={`rounded-xl border text-center font-black transition-all flex flex-col items-center justify-center cursor-pointer select-none ${
+                        className={`rounded-xl border text-center font-bold transition-all flex flex-col items-center justify-center cursor-pointer select-none ${
                           isFullScreen ? "h-[7vh] min-h-[38px] max-h-[55px]" : "h-24"
                         } ${
                           played
-                            ? "bg-zinc-900/40 border-zinc-900 text-zinc-700 line-through opacity-30 cursor-default"
-                            : "bg-zinc-900 border-zinc-800 text-amber-500 hover:scale-[1.03] hover:border-amber-500/50 hover:bg-zinc-800/80 shadow-md text-lg md:text-xl"
+                            ? "bg-subtle border-line text-fg line-through opacity-30 cursor-default"
+                            : "bg-card border-line text-amber-500 hover:scale-[1.03] hover:border-amber-500/50 hover:bg-subtle shadow-md text-lg md:text-xl"
                         }`}
                       >
                         {played ? (
-                          <Check className="w-5 h-5 text-zinc-600" />
+                          <Check className="w-5 h-5 text-fg-muted" />
                         ) : (
                           <span>{val}</span>
                         )}
@@ -391,23 +391,23 @@ export default function TriviaJeopardyWidget() {
 
           {/* Scoreboard block */}
           <div className="space-y-2.5 flex-shrink-0">
-            <h4 className="text-xs font-black text-text-muted">לוח ניקוד כיתתי 📊</h4>
+            <h4 className="text-xs font-bold text-fg-muted">לוח ניקוד כיתתי 📊</h4>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {teams.map((t, idx) => {
                 const isActive = idx === activeTeamIdx;
                 const colors = [
-                  "border-sky-500/30 bg-sky-950/20 text-sky-400",
-                  "border-purple-500/30 bg-purple-950/20 text-purple-400",
-                  "border-emerald-500/30 bg-emerald-950/20 text-emerald-400",
-                  "border-amber-500/30 bg-amber-950/20 text-amber-400"
+                  "border-sky-500/30 bg-sky-50 dark:bg-sky-950/20 text-sky-700 dark:text-sky-400",
+                  "border-purple-500/30 bg-purple-50 dark:bg-purple-950/20 text-purple-700 dark:text-purple-400",
+                  "border-emerald-500/30 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400",
+                  "border-amber-500/30 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400"
                 ];
                 
                 return (
                   <div
                     key={idx}
-                    className={`rounded-2xl border flex flex-col justify-between items-center transition-all ${
+                    className={`rounded-xl border flex flex-col justify-between items-center transition-all ${
                       colors[idx % colors.length]
-                    } ${isActive ? "ring-2 ring-white/30 scale-[1.02] border-white/20" : "opacity-85"} ${
+                    } ${isActive ? "ring-2 ring-line scale-[1.02] border-line" : "opacity-85"} ${
                       isFullScreen ? "p-2" : "p-4"
                     }`}
                   >
@@ -421,26 +421,26 @@ export default function TriviaJeopardyWidget() {
                           updated[idx].name = e.target.value;
                           setTeams(updated);
                         }}
-                        className="bg-transparent border-none text-center font-extrabold text-sm focus:outline-none focus:ring-1 focus:ring-white/30 rounded px-1 text-white w-24"
+                        className="bg-transparent border-none text-center font-bold text-sm focus:outline-none focus:ring-1 focus:ring-line rounded px-1 text-fg w-24"
                       />
-                      <Edit2Icon className="w-3.5 h-3.5 text-white/50" />
+                      <Edit2Icon className="w-3.5 h-3.5 text-fg-muted" />
                     </div>
 
                     {/* Team Score */}
-                    <span className={`font-black text-white ${isFullScreen ? "text-xl py-0.5" : "text-2xl py-2"}`}>{t.score}</span>
+                    <span className={`font-bold text-fg ${isFullScreen ? "text-xl py-0.5" : "text-2xl py-2"}`}>{t.score}</span>
 
                     {/* Manual Score adjustments */}
                     <div className="flex gap-2 w-full justify-center">
                       <button
                         onClick={() => handleScoreChange(idx, -50)}
-                        className="p-2 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-white cursor-pointer"
+                        className="p-2 rounded-lg bg-subtle hover:bg-subtle text-fg cursor-pointer"
                         title="הפחת 50 נקודות"
                       >
                         <Minus className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleScoreChange(idx, 50)}
-                        className="p-2 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-white cursor-pointer"
+                        className="p-2 rounded-lg bg-subtle hover:bg-subtle text-fg cursor-pointer"
                         title="הוסף 50 נקודות"
                       >
                         <Plus className="w-4 h-4" />
@@ -460,7 +460,7 @@ export default function TriviaJeopardyWidget() {
           {/* Fullscreen toggle button on game over */}
           <button 
             onClick={toggleFullScreen}
-            className="absolute top-0 left-0 p-2.5 rounded-xl border border-zinc-800 bg-surface/30 hover:bg-surface-hover/30 text-text-muted hover:text-white transition-all cursor-pointer flex items-center gap-1.5 text-xs md:text-sm font-bold"
+            className="absolute top-0 left-0 p-2.5 rounded-xl border border-line bg-subtle hover:bg-subtle-hover text-fg-muted hover:text-fg transition-all cursor-pointer flex items-center gap-1.5 text-xs md:text-sm font-bold"
           >
             {isFullScreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
             <span>{isFullScreen ? "חלון רגיל" : "מסך מלא"}</span>
@@ -468,38 +468,38 @@ export default function TriviaJeopardyWidget() {
 
           <div className="relative">
             <Award className="w-20 h-20 text-amber-500 animate-bounce" />
-            <Sparkles className="w-6 h-6 text-amber-400 absolute -top-1 -right-1 animate-pulse" />
+            <Sparkles className="w-6 h-6 text-amber-700 dark:text-amber-400 absolute -top-1 -right-1 animate-pulse" />
           </div>
 
           <div className="space-y-1">
-            <h3 className="text-3xl font-black text-white">סיום המשחק! 🏁</h3>
-            <p className="text-sm text-text-muted">
+            <h3 className="text-3xl font-bold text-fg">סיום המשחק! 🏁</h3>
+            <p className="text-sm text-fg-muted">
               כל הכבוד לכל הקבוצות על מאמץ מדהים ושיתוף פעולה מושלם!
             </p>
           </div>
 
           {/* Podium ranking board */}
-          <div className="w-full bg-zinc-900/60 border border-zinc-800/80 rounded-2xl p-5 space-y-3.5 text-right">
-            <h4 className="text-sm font-black text-text-muted border-b border-zinc-800 pb-2">דירוג קבוצות סופי:</h4>
+          <div className="w-full bg-subtle border border-line rounded-xl p-5 space-y-3.5 text-right">
+            <h4 className="text-sm font-bold text-fg-muted border-b border-line pb-2">דירוג קבוצות סופי:</h4>
             <div className="space-y-2">
               {getSortedTeams().map((t, idx) => (
                 <div 
                   key={idx} 
                   className={`flex items-center justify-between p-3.5 rounded-xl border text-sm md:text-base font-bold ${
                     idx === 0 
-                      ? "border-amber-500/30 bg-amber-950/20 text-amber-300 font-extrabold" 
-                      : "border-zinc-800 bg-zinc-900/40 text-zinc-300 font-medium"
+                      ? "border-amber-500/30 bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-300 font-bold" 
+                      : "border-line bg-subtle text-fg font-medium"
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs md:text-sm font-black ${
-                      idx === 0 ? "bg-amber-500 text-slate-950" : "bg-zinc-800 text-zinc-400"
+                    <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs md:text-sm font-bold ${
+                      idx === 0 ? "bg-amber-500 text-slate-950" : "bg-subtle text-fg-muted"
                     }`}>
                       {idx + 1}
                     </span>
                     <span>{t.name}</span>
                   </div>
-                  <span className="font-black text-lg text-white">{t.score} נקודות</span>
+                  <span className="font-bold text-lg text-fg">{t.score} נקודות</span>
                 </div>
               ))}
             </div>
@@ -507,7 +507,7 @@ export default function TriviaJeopardyWidget() {
 
           <button
             onClick={() => setGameStarted(false)}
-            className="w-full py-4 bg-earth hover:bg-teal-600 text-white font-bold text-base rounded-xl cursor-pointer shadow-md hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+            className="w-full py-4 bg-accent hover:bg-teal-600 text-white font-bold text-base rounded-xl cursor-pointer shadow-md hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
           >
             <RotateCcw className="w-4 h-4" />
             <span>שחק שוב 🔄</span>
@@ -517,41 +517,41 @@ export default function TriviaJeopardyWidget() {
 
       {/* 4. ACTIVE QUESTION MODAL WINDOW */}
       {activeQuestion && (
-        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-[110] flex items-center justify-center p-4">
-          <div className="w-full max-w-xl bg-slate-900 border border-zinc-800 rounded-3xl p-6 md:p-8 text-right shadow-2xl relative space-y-6 animate-scale-up">
+        <div className="fixed inset-0 bg-black/85 z-[110] flex items-center justify-center p-4">
+          <div className="w-full max-w-xl bg-card border border-line rounded-xl p-6 md:p-8 text-right shadow-sm relative space-y-6 animate-scale-up">
             
             {/* Header info */}
-            <div className="flex justify-between items-center border-b border-zinc-800 pb-4">
-              <span className="text-sm text-text-muted font-bold">
-                הקבוצה המשיבה: <strong className="text-white text-base">{teams[activeTeamIdx]?.name}</strong>
+            <div className="flex justify-between items-center border-b border-line pb-4">
+              <span className="text-sm text-fg-muted font-bold">
+                הקבוצה המשיבה: <strong className="text-fg text-base">{teams[activeTeamIdx]?.name}</strong>
               </span>
-              <span className="px-4 py-1.5 bg-amber-500/10 border border-amber-500/20 text-amber-500 font-black text-base rounded-xl">
+              <span className="px-4 py-1.5 bg-amber-500/10 border border-amber-500/20 text-amber-500 font-bold text-base rounded-xl">
                 {activeQuestion.points} נקודות
               </span>
             </div>
 
             {/* Question Text */}
             <div className="space-y-2 py-2">
-              <span className="text-xs text-earth font-black block">השאלה:</span>
-              <p className="text-lg md:text-xl lg:text-2xl font-bold text-white leading-relaxed">
+              <span className="text-xs text-accent font-bold block">השאלה:</span>
+              <p className="text-lg md:text-xl lg:text-2xl font-bold text-fg leading-relaxed">
                 {activeQuestion.q}
               </p>
             </div>
 
             {/* Hidden Answer block */}
             {answerRevealed ? (
-              <div className="bg-earth/5 border border-earth/20 rounded-2xl p-4 md:p-5 space-y-2 animate-fade-in">
-                <span className="text-xs text-earth font-black block">התשובה הנכונה:</span>
-                <p className="text-base md:text-lg font-bold text-emerald-400 leading-relaxed">
+              <div className="bg-accent-soft border border-accent/20 rounded-xl p-4 md:p-5 space-y-2 animate-fade-in">
+                <span className="text-xs text-accent font-bold block">התשובה הנכונה:</span>
+                <p className="text-base md:text-lg font-bold text-emerald-700 dark:text-emerald-400 leading-relaxed">
                   ✅ {activeQuestion.a}
                 </p>
               </div>
             ) : (
               <button
                 onClick={() => setAnswerRevealed(true)}
-                className="w-full py-5 border-2 border-dashed border-zinc-800 hover:border-zinc-700 bg-zinc-900/50 hover:bg-zinc-800/40 text-base font-black text-text-muted hover:text-white rounded-2xl transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5"
+                className="w-full py-5 border-2 border-dashed border-line hover:border-line bg-subtle hover:bg-subtle text-base font-bold text-fg-muted hover:text-fg rounded-xl transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5"
               >
-                <Volume2 className="w-5 h-5 text-earth animate-pulse" />
+                <Volume2 className="w-5 h-5 text-accent animate-pulse" />
                 <span>חשוף תשובה נכונה</span>
               </button>
             )}
@@ -576,7 +576,7 @@ export default function TriviaJeopardyWidget() {
               
               <button
                 onClick={handleSkipQuestion}
-                className="py-4 px-5 border border-zinc-800 hover:bg-zinc-800 text-sm font-bold text-text-muted rounded-xl cursor-pointer transition-colors"
+                className="py-4 px-5 border border-line hover:bg-subtle text-sm font-bold text-fg-muted rounded-xl cursor-pointer transition-colors"
               >
                 דלג ללא שינוי ניקוד
               </button>

@@ -156,8 +156,8 @@ export default function TeamGate({ user, theme: t, onOpen }: Props) {
   return (
     <div className="space-y-6">
       {myTeams && myTeams.length > 0 && (
-        <section className={`rounded-2xl border p-5 space-y-3 ${t.card} ${t.border}`}>
-          <h3 className={`text-lg font-black ${t.title}`}>העבודות שלי</h3>
+        <section className={`rounded-xl border p-5 space-y-3 ${t.card} ${t.border}`}>
+          <h3 className={`text-lg font-bold ${t.title}`}>העבודות שלי</h3>
           <div className="grid sm:grid-cols-2 gap-3">
             {myTeams.map((team) => {
               const d = getDestination(team.destinationId);
@@ -183,8 +183,8 @@ export default function TeamGate({ user, theme: t, onOpen }: Props) {
         </section>
       )}
 
-      <section className={`rounded-2xl border p-5 space-y-3 ${t.card} ${t.border}`}>
-        <h3 className={`text-lg font-black ${t.title}`}>מי אתם?</h3>
+      <section className={`rounded-xl border p-5 space-y-3 ${t.card} ${t.border}`}>
+        <h3 className={`text-lg font-bold ${t.title}`}>מי אתם?</h3>
         <div className="grid sm:grid-cols-2 gap-3">
           <input className={field} placeholder="שם מלא" value={name} onChange={(e) => setName(e.target.value)} />
           <input className={field} placeholder="כיתה (לדוגמה: ח׳2)" value={studentClass} onChange={(e) => setStudentClass(e.target.value)} />
@@ -192,8 +192,8 @@ export default function TeamGate({ user, theme: t, onOpen }: Props) {
       </section>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        <section className={`rounded-2xl border p-5 space-y-3 ${t.card} ${t.border}`}>
-          <h3 className={`text-lg font-black flex items-center gap-2 ${t.title}`}>
+        <section className={`rounded-xl border p-5 space-y-3 ${t.card} ${t.border}`}>
+          <h3 className={`text-lg font-bold flex items-center gap-2 ${t.title}`}>
             <Plus className="w-5 h-5" /> פתיחת צוות חדש
           </h3>
           <p className={`text-sm ${t.muted}`}>בחרו יעד. תקבלו קוד צוות שתמסרו לשותף.</p>
@@ -223,8 +223,8 @@ export default function TeamGate({ user, theme: t, onOpen }: Props) {
           </button>
         </section>
 
-        <section className={`rounded-2xl border p-5 space-y-3 ${t.card} ${t.border}`}>
-          <h3 className={`text-lg font-black flex items-center gap-2 ${t.title}`}>
+        <section className={`rounded-xl border p-5 space-y-3 ${t.card} ${t.border}`}>
+          <h3 className={`text-lg font-bold flex items-center gap-2 ${t.title}`}>
             <Users className="w-5 h-5" /> הצטרפות לצוות
           </h3>
           <p className={`text-sm ${t.muted}`}>השותף כבר פתח צוות? הקלידו את הקוד שקיבל.</p>

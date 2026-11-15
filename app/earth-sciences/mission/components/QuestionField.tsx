@@ -161,10 +161,10 @@ export default function QuestionField({ q, number, api }: { q: Question; number:
   };
 
   return (
-    <div className={`rounded-2xl border p-4 sm:p-5 space-y-3 ${t.card} ${t.border}`}>
+    <div className={`rounded-xl border p-4 sm:p-5 space-y-3 ${t.card} ${t.border}`}>
       <div className="flex gap-3">
         <span
-          className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-black ${
+          className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
             q.challenge ? "bg-amber-400 text-zinc-900" : "bg-teal-500/15 " + t.accentText
           }`}
         >
@@ -186,7 +186,7 @@ export default function QuestionField({ q, number, api }: { q: Question; number:
             <ol className="space-y-1.5 pt-1">
               {q.steps(api.destination).map((s, i) => (
                 <li key={s} className="flex items-start gap-2 text-sm">
-                  <span className="shrink-0 w-5 h-5 mt-0.5 rounded-full bg-teal-500 text-white text-[11px] font-black flex items-center justify-center">
+                  <span className="shrink-0 w-5 h-5 mt-0.5 rounded-full bg-teal-500 text-white text-[11px] font-bold flex items-center justify-center">
                     {i + 1}
                   </span>
                   <span>{s}</span>
@@ -281,8 +281,8 @@ export default function QuestionField({ q, number, api }: { q: Question; number:
               ))}
               {q.kind === "score" && (
                 <tr>
-                  <td className={`text-xs font-black p-1 ${t.title}`}>סך הכול</td>
-                  <td className={`text-sm font-black p-1 text-center ${t.accentText}`}>
+                  <td className={`text-xs font-bold p-1 ${t.title}`}>סך הכול</td>
+                  <td className={`text-sm font-bold p-1 text-center ${t.accentText}`}>
                     {q.rows.reduce((sum, _, r) => sum + (Number(api.answers[cellKey(q.id, r, 0)]) || 0), 0)} / {q.rows.length * 5}
                   </td>
                   <td />

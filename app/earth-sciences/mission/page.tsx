@@ -97,7 +97,7 @@ export default function MissionNewHomePage() {
 
   return (
     <div className={`relative min-h-screen transition-colors duration-200 ${t.bg}`} dir="rtl">
-      <header className={`sticky top-0 z-20 border-b backdrop-blur ${t.border} ${t.isLight ? "bg-white/80" : "bg-[#080c18]/80"}`}>
+      <header className={`sticky top-0 z-20 border-b ${t.border} bg-card`}>
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
           <Link href="/earth-sciences" className={`text-xs font-semibold flex items-center gap-1.5 hover:text-teal-500 ${t.muted}`}>
             <ArrowRight className="w-4 h-4" /> מדעי כדור הארץ
@@ -120,7 +120,7 @@ export default function MissionNewHomePage() {
       <main className="max-w-5xl mx-auto px-4 py-8 space-y-6">
         <div className="space-y-1">
           <p className={`text-xs font-bold tracking-wide ${t.accentText}`}>יחידה 1 · אסטרונומיה · עבודת חקר בזוגות</p>
-          <h1 className={`text-3xl sm:text-4xl font-black flex items-center gap-3 ${t.title}`}>
+          <h1 className={`text-3xl sm:text-4xl font-bold flex items-center gap-3 ${t.title}`}>
             <Rocket className="w-8 h-8 text-teal-500" /> משימת בית חדש
           </h1>
         </div>
@@ -130,7 +130,7 @@ export default function MissionNewHomePage() {
             <Loader2 className="w-8 h-8 animate-spin text-teal-500" />
           </div>
         ) : !user ? (
-          <section className={`rounded-2xl border p-8 text-center space-y-4 ${t.card} ${t.border}`}>
+          <section className={`rounded-xl border p-8 text-center space-y-4 ${t.card} ${t.border}`}>
             <p className="text-[15px] leading-relaxed">
               כדי לעבוד על המשימה ולשמור את ההתקדמות, התחברו או צרו משתמש חדש.
             </p>

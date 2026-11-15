@@ -28,6 +28,9 @@ export default function ContentGate({ children }: { children: React.ReactNode })
     }
   }, [pathname, alwaysOpen]);
 
+  const pathSubject = hubSubjectForPath(pathname) ?? findItemForPath(pathname)?.subject;
+  const subject = pathSubject && pathSubject !== "other" ? pathSubject : undefined;
+
   let content: React.ReactNode;
   if (alwaysOpen) content = children;
   else if (loading) content = <GateLoading />;
@@ -37,10 +40,32 @@ export default function ContentGate({ children }: { children: React.ReactNode })
   return (
     <>
       <ThemeSync />
-      {content}
+      {/* Gives every page its subject accent color (see [data-subject] in globals.css). */}
+      <div data-subject={subject} className="contents">
+        {content}
+      </div>
+      {needsFloatingToggle(pathname) && (
+        <ThemeToggle className="fixed bottom-4 right-4 z-[90] bg-card shadow-sm print:hidden" />
+      )}
       {isTeacher && !pathname.startsWith("/admin") && <TeacherVisibilityPill pathname={pathname} />}
     </>
   );
+}
+
+/** Pages with no header of their own to hold the Comfort Mode toggle get a floating one. */
+const FLOATING_TOGGLE_PREFIXES = [
+  "/english-auction",
+  "/values-auction",
+  "/english/adjectives",
+  "/english/past-simple",
+  "/english/simone-biles",
+  "/enrichment/human-history/",
+  "/shelach/",
+];
+
+function needsFloatingToggle(pathname: string) {
+  if (pathname.startsWith("/shelach/gicha")) return false;
+  return FLOATING_TOGGLE_PREFIXES.some((p) => pathname.startsWith(p));
 }
 
 function GateLoading() {

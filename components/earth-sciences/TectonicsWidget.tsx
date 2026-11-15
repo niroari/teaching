@@ -94,39 +94,39 @@ export default function TectonicsWidget() {
   };
 
   return (
-    <div className="w-full bg-surface border border-border-custom rounded-2xl overflow-hidden shadow-xl flex flex-col">
+    <div className="w-full bg-subtle border border-line rounded-xl overflow-hidden shadow-sm flex flex-col">
       {/* Selector Tabs */}
-      <div className="flex border-b border-border-custom bg-surface-hover/30">
+      <div className="flex border-b border-line bg-subtle-hover">
         {BOUNDARY_TYPES.map(b => (
           <button
             key={b.id}
             onClick={() => handleSelectBoundary(b.id)}
             className={`flex-1 py-4 text-sm md:text-base font-bold transition-all text-center cursor-pointer ${
               activeBoundary === b.id
-                ? "text-earth border-b-2 border-earth bg-earth/5"
-                : "text-text-muted hover:text-foreground"
+                ? "text-accent border-b-2 border-accent bg-accent-soft"
+                : "text-fg-muted hover:text-fg"
             }`}
           >
             {b.name.split(" ")[0]} {b.name.split(" ")[1]}
-            <span className="block text-xs text-text-muted mt-1">{b.subName}</span>
+            <span className="block text-xs text-fg-muted mt-1">{b.subName}</span>
           </button>
         ))}
       </div>
 
       <div className="p-6 space-y-6">
-        <div className="bg-earth/5 border border-earth/20 rounded-xl p-4 flex gap-3 text-sm text-text-muted leading-relaxed">
-          <HelpCircle className="w-5 h-5 text-earth shrink-0 mt-0.5" />
+        <div className="bg-accent-soft border border-accent/20 rounded-xl p-4 flex gap-3 text-sm text-fg-muted leading-relaxed">
+          <HelpCircle className="w-5 h-5 text-accent shrink-0 mt-0.5" />
           <div>
-            <span className="font-bold text-white block mb-1 text-base">דינמיקה פנימית - טקטוניקת הלוחות:</span>
+            <span className="font-bold text-fg block mb-1 text-base">דינמיקה פנימית - טקטוניקת הלוחות:</span>
             בחרו את סוג גבול הלוח כדי לחקור את הכוחות הפועלים בתוך קרום כדור הארץ. 
             לחצו על כפתור <strong>הפעל כוחות גאולוגיים</strong> כדי לראות את האנימציה המדגימה היווצרות נופים ורעידות אדמה.
           </div>
         </div>
 
         {/* Dynamic Graphic Container */}
-        <div className="bg-zinc-950/50 border border-border-custom rounded-2xl p-6 flex flex-col items-center overflow-hidden min-h-[260px] relative justify-center">
+        <div className="bg-subtle border border-line rounded-xl p-6 flex flex-col items-center overflow-hidden min-h-[260px] relative justify-center">
           {/* Earth's Core/Mantle Background Glow */}
-          <div className="absolute bottom-0 inset-x-0 h-10 bg-gradient-to-t from-red-600/20 to-transparent blur-md pointer-events-none" />
+          <div className="absolute bottom-0 inset-x-0 h-10 blur-md pointer-events-none bg-red-600/20" />
 
           <div 
             className={`w-full max-w-md h-40 relative flex items-center justify-center transition-all ${
@@ -138,7 +138,7 @@ export default function TectonicsWidget() {
               <div className="w-full h-full flex items-center justify-between relative px-8">
                 {/* Left Plate */}
                 <div 
-                  className={`w-2/5 h-20 bg-zinc-700 border-t-4 border-emerald-500 rounded-lg flex items-center justify-center text-xs md:text-sm font-bold text-zinc-200 relative transition-transform duration-1000 ${
+                  className={`w-2/5 h-20 bg-subtle border-t-4 border-emerald-500 rounded-lg flex items-center justify-center text-xs md:text-sm font-bold text-fg relative transition-transform duration-1000 ${
                     animState === "animating" || animState === "finished" ? "-translate-x-6" : ""
                   }`}
                 >
@@ -157,16 +157,16 @@ export default function TectonicsWidget() {
                   />
                   {/* New crust forming */}
                   {animState === "finished" && (
-                    <div className="absolute bottom-10 w-16 h-8 bg-red-950/70 border-t-2 border-red-500 text-[10px] md:text-xs text-red-300 font-bold flex items-center justify-center rounded text-center">
+                    <div className="absolute bottom-10 w-16 h-8 bg-red-50 dark:bg-red-950/70 border-t-2 border-red-500 text-[10px] md:text-xs text-red-700 dark:text-red-300 font-bold flex items-center justify-center rounded text-center">
                       קרום בזלתי צעיר
                     </div>
                   )}
-                  <span className="text-xs font-black text-red-400 mt-1">עליית מאגמה לוהטת</span>
+                  <span className="text-xs font-bold text-red-700 dark:text-red-400 mt-1">עליית מאגמה לוהטת</span>
                 </div>
 
                 {/* Right Plate */}
                 <div 
-                  className={`w-2/5 h-20 bg-zinc-700 border-t-4 border-emerald-500 rounded-lg flex items-center justify-center text-xs md:text-sm font-bold text-zinc-200 relative transition-transform duration-1000 ${
+                  className={`w-2/5 h-20 bg-subtle border-t-4 border-emerald-500 rounded-lg flex items-center justify-center text-xs md:text-sm font-bold text-fg relative transition-transform duration-1000 ${
                     animState === "animating" || animState === "finished" ? "translate-x-6" : ""
                   }`}
                 >
@@ -182,7 +182,7 @@ export default function TectonicsWidget() {
               <div className="w-full h-full flex items-center justify-center relative px-4">
                 {/* Left Oceanic Plate (subducting) */}
                 <div 
-                  className={`w-5/12 h-14 bg-zinc-800 border-t-4 border-blue-500 rounded-lg flex items-center justify-center text-xs md:text-sm font-bold text-zinc-300 relative transition-all duration-1000 ${
+                  className={`w-5/12 h-14 bg-subtle border-t-4 border-blue-500 rounded-lg flex items-center justify-center text-xs md:text-sm font-bold text-fg relative transition-all duration-1000 ${
                     animState === "animating" || animState === "finished" 
                       ? "translate-x-8 translate-y-6 rotate-12 scale-95" 
                       : ""
@@ -195,13 +195,13 @@ export default function TectonicsWidget() {
                 {/* Collision/Friction sparks */}
                 {animState === "animating" && (
                   <div className="w-8 h-8 rounded-full bg-yellow-400/30 flex items-center justify-center absolute z-20 animate-ping">
-                    <Zap className="w-4 h-4 text-yellow-400" />
+                    <Zap className="w-4 h-4 text-yellow-700 dark:text-yellow-400" />
                   </div>
                 )}
 
                 {/* Right Continental Plate (buckling/folding) */}
                 <div 
-                  className={`w-5/12 h-20 bg-zinc-700 border-t-4 border-amber-600 rounded-lg flex flex-col items-center justify-center text-xs md:text-sm font-bold text-zinc-200 relative transition-all duration-1000 ${
+                  className={`w-5/12 h-20 bg-subtle border-t-4 border-amber-600 rounded-lg flex flex-col items-center justify-center text-xs md:text-sm font-bold text-fg relative transition-all duration-1000 ${
                     animState === "animating" || animState === "finished" 
                       ? "-translate-x-2 border-t-8 border-red-500" 
                       : ""
@@ -209,7 +209,7 @@ export default function TectonicsWidget() {
                 >
                   <span>לוח יבשתי</span>
                   {animState === "finished" && (
-                    <span className="text-[10px] md:text-xs text-yellow-400 font-bold bg-zinc-950/80 px-2 py-0.5 rounded mt-1.5">רכס הרים מקומט</span>
+                    <span className="text-[10px] md:text-xs text-yellow-700 dark:text-yellow-400 font-bold bg-subtle px-2 py-0.5 rounded mt-1.5">רכס הרים מקומט</span>
                   )}
                   <span className="absolute -top-6 left-2 text-red-500 text-lg">←</span>
                 </div>
@@ -221,7 +221,7 @@ export default function TectonicsWidget() {
               <div className="w-full h-32 flex flex-col justify-between relative py-2">
                 {/* Top Plate moving Left */}
                 <div 
-                  className={`w-full h-12 bg-zinc-700 border-b-2 border-dashed border-red-500/30 rounded-lg flex items-center justify-center text-xs md:text-sm font-bold text-zinc-200 relative transition-transform duration-[1200ms] ${
+                  className={`w-full h-12 bg-subtle border-b-2 border-dashed border-red-500/30 rounded-lg flex items-center justify-center text-xs md:text-sm font-bold text-fg relative transition-transform duration-[1200ms] ${
                     animState === "animating" || animState === "finished" ? "-translate-x-12" : ""
                   }`}
                 >
@@ -232,13 +232,13 @@ export default function TectonicsWidget() {
                 {/* Friction Zone / Earthquake indicator */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
                   {animState === "animating" && (
-                    <div className="px-4 py-2 bg-red-600 border border-red-400 text-white font-black text-xs md:text-sm rounded-full animate-bounce flex items-center gap-1.5">
-                      <Zap className="w-4 h-4 text-yellow-300" />
+                    <div className="px-4 py-2 bg-red-600 border border-red-400 text-white font-bold text-xs md:text-sm rounded-full animate-bounce flex items-center gap-1.5">
+                      <Zap className="w-4 h-4 text-yellow-700 dark:text-yellow-300" />
                       <span>רעידת אדמה!</span>
                     </div>
                   )}
                   {animState === "finished" && (
-                    <div className="px-4 py-2 bg-zinc-900/90 border border-zinc-700 text-text-muted text-xs md:text-sm font-bold rounded-lg">
+                    <div className="px-4 py-2 bg-subtle border border-line text-fg-muted text-xs md:text-sm font-bold rounded-lg">
                       שחרור מתח העתק
                     </div>
                   )}
@@ -246,7 +246,7 @@ export default function TectonicsWidget() {
 
                 {/* Bottom Plate moving Right */}
                 <div 
-                  className={`w-full h-12 bg-zinc-800 border-t-2 border-dashed border-red-500/30 rounded-lg flex items-center justify-center text-xs md:text-sm font-bold text-zinc-300 relative transition-transform duration-[1200ms] ${
+                  className={`w-full h-12 bg-subtle border-t-2 border-dashed border-red-500/30 rounded-lg flex items-center justify-center text-xs md:text-sm font-bold text-fg relative transition-transform duration-[1200ms] ${
                     animState === "animating" || animState === "finished" ? "translate-x-12" : ""
                   }`}
                 >
@@ -261,7 +261,7 @@ export default function TectonicsWidget() {
           <div className="flex gap-4 mt-4 z-10">
             <button
               onClick={resetAnimation}
-              className="px-4 py-2.5 border border-border-custom bg-surface hover:bg-surface-hover text-xs md:text-sm font-bold rounded-xl flex items-center gap-1.5 cursor-pointer transition-all"
+              className="px-4 py-2.5 border border-line bg-subtle hover:bg-subtle-hover text-xs md:text-sm font-bold rounded-xl flex items-center gap-1.5 cursor-pointer transition-all"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>איפוס כוחות</span>
@@ -269,7 +269,7 @@ export default function TectonicsWidget() {
             <button
               onClick={runAnimation}
               disabled={animState === "animating"}
-              className="px-5 py-2.5 bg-earth hover:bg-teal-600 text-white text-xs md:text-sm font-bold rounded-xl flex items-center gap-1.5 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-5 py-2.5 bg-accent hover:bg-teal-600 text-white text-xs md:text-sm font-bold rounded-xl flex items-center gap-1.5 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Layers className="w-4 h-4" />
               <span>הפעל כוחות גאולוגיים</span>
@@ -278,29 +278,29 @@ export default function TectonicsWidget() {
         </div>
 
         {/* Text descriptions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-border-custom">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-line">
           <div className="md:col-span-2 space-y-3 text-right">
-            <h4 className="font-bold text-white text-lg">
+            <h4 className="font-bold text-fg text-lg">
               {selected.name} — {selected.subName}
             </h4>
-            <p className="text-sm text-text-muted leading-relaxed">
+            <p className="text-sm text-fg-muted leading-relaxed">
               {selected.desc}
             </p>
-            <div className="bg-surface/50 border border-border-custom rounded-xl p-4 text-sm">
-              <strong className="text-earth block mb-1.5 text-base">דוגמה מקומית בארץ/אזור:</strong>
-              <span className="text-text-muted">{selected.israelExample}</span>
+            <div className="bg-subtle border border-line rounded-xl p-4 text-sm">
+              <strong className="text-accent block mb-1.5 text-base">דוגמה מקומית בארץ/אזור:</strong>
+              <span className="text-fg-muted">{selected.israelExample}</span>
             </div>
           </div>
 
-          <div className="space-y-3 text-right bg-surface-hover/20 p-4 border border-border-custom rounded-xl">
-            <h5 className="text-sm font-bold text-white flex items-center gap-1.5 justify-start">
-              <Layers className="w-4 h-4 text-earth shrink-0" />
+          <div className="space-y-3 text-right bg-subtle-hover p-4 border border-line rounded-xl">
+            <h5 className="text-sm font-bold text-fg flex items-center gap-1.5 justify-start">
+              <Layers className="w-4 h-4 text-accent shrink-0" />
               <span>צורות נוף ותופעות עיקריות</span>
             </h5>
-            <ul className="text-xs md:text-sm text-text-muted space-y-2.5 list-none pr-0">
+            <ul className="text-xs md:text-sm text-fg-muted space-y-2.5 list-none pr-0">
               {selected.features.map((f, index) => (
                 <li key={index} className="flex gap-2 justify-start items-start">
-                  <span className="w-2 h-2 rounded-full bg-earth mt-2 shrink-0" />
+                  <span className="w-2 h-2 rounded-full bg-accent mt-2 shrink-0" />
                   <span className="leading-normal">{f}</span>
                 </li>
               ))}

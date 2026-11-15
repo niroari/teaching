@@ -28,7 +28,7 @@ export default function InfoSheet({ sheet, theme: t }: { sheet: Sheet | undefine
         <div className="px-3.5 pb-4 space-y-4">
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
             {sheet.cards.map((c) => (
-              <div key={c.term} className={`rounded-lg border p-2.5 flex items-start gap-2 ${t.border} ${t.isLight ? "bg-white" : "bg-white/[0.03]"}`}>
+              <div key={c.term} className={`rounded-lg border p-2.5 flex items-start gap-2 ${t.border} bg-card dark:bg-white/[0.03]`}>
                 <span className="text-xl leading-none">{c.icon}</span>
                 <div className="min-w-0">
                   <p className={`text-sm font-bold leading-tight ${t.title}`}>{c.term}</p>

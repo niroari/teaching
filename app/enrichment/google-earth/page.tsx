@@ -100,21 +100,15 @@ export default function GoogleEarthTours() {
   };
 
   const isLight = comfortMode === "light";
-  const bgTheme = isLight ? "bg-[#f4f6fa] text-zinc-800" : "bg-[#080c18] text-[#e8edf8]";
-  const borderTheme = isLight ? "border-zinc-200" : "border-border-custom";
-  const textTitle = isLight ? "text-zinc-950 font-black" : "text-white";
-  const textMuted = isLight ? "text-zinc-700 font-medium" : "text-text-muted";
-  const cardStyle = isLight 
-    ? "bg-white border-zinc-300 shadow-sm" 
-    : "glass-card";
+  const bgTheme = "bg-canvas text-fg";
+  const borderTheme = "border-line";
+  const textTitle = "text-fg font-bold";
+  const textMuted = "text-fg font-medium";
+  const cardStyle = "bg-card border-line shadow-sm";
 
   return (
     <div className={`relative min-h-screen flex flex-col justify-between overflow-hidden transition-colors duration-200 ${bgTheme}`} dir="rtl">
       {/* Background Glow */}
-      {!isLight && (
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-emerald-500/5 via-transparent to-transparent blur-3xl pointer-events-none rounded-full" />
-      )}
-
       {/* Main Container */}
       <div className="relative w-full max-w-4xl mx-auto px-6 py-12 flex-1 flex flex-col z-10">
         
@@ -123,7 +117,7 @@ export default function GoogleEarthTours() {
           {/* Back Link */}
           <Link
             href="/enrichment"
-            className={`inline-flex items-center gap-1.5 text-xs font-semibold hover:text-enrichment transition-colors ${textMuted}`}
+            className={`inline-flex items-center gap-1.5 text-xs font-semibold hover:text-accent transition-colors ${textMuted}`}
           >
             <ArrowRight className="w-3.5 h-3.5" />
             <span>חזרה ללומדות העשרה</span>
@@ -134,24 +128,16 @@ export default function GoogleEarthTours() {
             {/* Teacher Toggle */}
             <button
               onClick={() => setShowTeacherGuide(!showTeacherGuide)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 border rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                isLight 
-                  ? "bg-white hover:bg-zinc-50 border-zinc-200 text-zinc-700" 
-                  : "bg-surface hover:bg-surface-hover border-border-custom text-zinc-300"
-              }`}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 border rounded-xl text-xs font-semibold transition-all cursor-pointer bg-card hover:bg-subtle border-line text-fg`}
             >
-              <Info className="w-3.5 h-3.5 text-enrichment" />
+              <Info className="w-3.5 h-3.5 text-accent" />
               <span>הנחיות למורה</span>
             </button>
 
             {/* Theme Toggle */}
             <button
               onClick={toggleComfortMode}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 border rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                isLight 
-                  ? "bg-white hover:bg-zinc-50 border-zinc-200 text-zinc-700" 
-                  : "bg-surface hover:bg-surface-hover border-border-custom text-zinc-300"
-              }`}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 border rounded-xl text-xs font-semibold transition-all cursor-pointer bg-card hover:bg-subtle border-line text-fg`}
             >
               {isLight ? (
                 <>
@@ -160,7 +146,7 @@ export default function GoogleEarthTours() {
                 </>
               ) : (
                 <>
-                  <Sun className="w-3.5 h-3.5 text-amber-400" />
+                  <Sun className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
                   <span>מצב קריאה בהיר</span>
                 </>
               )}
@@ -170,13 +156,11 @@ export default function GoogleEarthTours() {
 
         {/* Header */}
         <div className="text-center mb-12 space-y-4">
-          <div className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 border rounded-full text-xs font-bold ${
-            isLight ? "bg-white border-zinc-200 text-emerald-600" : "bg-surface border-border-custom text-enrichment"
-          }`}>
+          <div className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 border rounded-full text-xs font-bold bg-card border-line text-emerald-600 dark:text-accent`}>
             <Globe className="w-3.5 h-3.5" />
             <span>סיורים גאוגרפיים ב-Google Earth</span>
           </div>
-          <h1 className={`text-3xl sm:text-4xl font-black ${textTitle}`}>סיורים תלת-ממדיים בקובצי KML</h1>
+          <h1 className={`text-3xl sm:text-4xl font-bold ${textTitle}`}>סיורים תלת-ממדיים בקובצי KML</h1>
           <p className={`text-sm max-w-2xl mx-auto leading-relaxed ${textMuted}`}>
             הכירו את כדור הארץ דרך גאוגרפיה וגאולוגיה אינטראקטיבית. הורידו את קובצי המידע (KML) והעלו אותם ל-Google Earth לקבלת מפות שכבות אינטראקטיביות, מודלים תלת-ממדיים וסיורי שטח דינמיים.
           </p>
@@ -184,32 +168,30 @@ export default function GoogleEarthTours() {
 
         {/* Teacher Admin Guidelines Panel */}
         {showTeacherGuide && (
-          <div className={`mb-8 p-6 rounded-2xl border transition-all ${
-            isLight ? "bg-emerald-50/50 border-emerald-100" : "bg-emerald-950/10 border-emerald-800/30"
-          }`}>
-            <h3 className={`text-md font-bold text-enrichment mb-2 flex items-center gap-2`}>
+          <div className={`mb-8 p-6 rounded-xl border transition-all bg-emerald-50/50 border-emerald-100 dark:bg-emerald-950/10 dark:border-emerald-800/30`}>
+            <h3 className={`text-md font-bold text-accent mb-2 flex items-center gap-2`}>
               <Info className="w-4 h-4" />
               <span>הנחיות להגדרת הסיור והמטמיע בכיתה (למורים)</span>
             </h3>
-            <div className={`text-xs space-y-3 leading-relaxed ${isLight ? "text-zinc-600" : "text-emerald-100/80"}`}>
+            <div className={`text-xs space-y-3 leading-relaxed text-fg-muted dark:text-emerald-100/80`}>
               <div>
-                <h4 className="font-bold mb-1 text-enrichment">1. קישור שיתוף ל-Google Earth 3D (תלת-ממד):</h4>
+                <h4 className="font-bold mb-1 text-accent">1. קישור שיתוף ל-Google Earth 3D (תלת-ממד):</h4>
                 <ol className="list-decimal list-inside space-y-1 pr-1">
                   <li>הורידו את קובץ ה-KML מכפתור ההורדה למטה.</li>
-                  <li>פתחו את <a href="https://earth.google.com/web/" target="_blank" rel="noreferrer" className="underline text-enrichment font-semibold">Google Earth Web</a>, כנסו ללשונית <strong>פרויקטים</strong> (סמל הסיכה והמפה) ולחצו על <strong>ייבוא קובץ KML מהמחשב</strong>.</li>
+                  <li>פתחו את <a href="https://earth.google.com/web/" target="_blank" rel="noreferrer" className="underline text-accent font-semibold">Google Earth Web</a>, כנסו ללשונית <strong>פרויקטים</strong> (סמל הסיכה והמפה) ולחצו על <strong>ייבוא קובץ KML מהמחשב</strong>.</li>
                   <li>לאחר הטעינה, לחצו על כפתור <strong>שיתוף פרויקט</strong> בראש תפריט הפרויקט (מעביר את הפרויקט לאחסון ב-Google Drive שלכם).</li>
                   <li>שנו את הגדרות השיתוף ל-<strong>"כל מי שקיבל את הקישור יכול לצפות"</strong> והעתיקו את קישור השיתוף שמתקבל.</li>
-                  <li>בתוך קוד הקובץ במפתח <code className="px-1.5 py-0.5 bg-black/10 rounded font-mono text-[10px]">TECTONICS_PROJECT.defaultEarthUrl</code>, הדביקו את הקישור שהעתקתם.</li>
+                  <li>בתוך קוד הקובץ במפתח <code className="px-1.5 py-0.5 bg-subtle rounded font-mono text-[10px]">TECTONICS_PROJECT.defaultEarthUrl</code>, הדביקו את הקישור שהעתקתם.</li>
                 </ol>
               </div>
-              <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800">
-                <h4 className="font-bold mb-1 text-enrichment">2. הטמעת מפת תצוגה מקדימה ישירה (2D) בדף:</h4>
+              <div className="pt-2 border-t border-line dark:border-zinc-800">
+                <h4 className="font-bold mb-1 text-accent">2. הטמעת מפת תצוגה מקדימה ישירה (2D) בדף:</h4>
                 <ol className="list-decimal list-inside space-y-1 pr-1">
-                  <li>היכנסו ל- <a href="https://www.google.com/maps/d/" target="_blank" rel="noreferrer" className="underline text-enrichment font-semibold">Google My Maps</a> ולחצו על <strong>צור מפה חדשה</strong>.</li>
+                  <li>היכנסו ל- <a href="https://www.google.com/maps/d/" target="_blank" rel="noreferrer" className="underline text-accent font-semibold">Google My Maps</a> ולחצו על <strong>צור מפה חדשה</strong>.</li>
                   <li>לחצו על <strong>ייבוא</strong> והעלו את קובץ ה-KML שהורדתם.</li>
                   <li>לחצו על <strong>שיתוף</strong> והפעילו את האפשרות <strong>"כל אחד עם הקישור הזה יכול לצפות במפה"</strong>.</li>
-                  <li>העתיקו מכתובת ה-URL של הדפדפן את מזהה המפה (הערך שמופיע אחרי <code className="px-1 py-0.5 bg-black/10 rounded font-mono text-[10px]">mid=</code>).</li>
-                  <li>בתוך קוד הקובץ במפתח <code className="px-1.5 py-0.5 bg-black/10 rounded font-mono text-[10px]">TECTONICS_PROJECT.myMapsId</code>, הדביקו את המזהה שקיבלתם. המפה תופיע מיד ישירות בדף זה עבור כל התלמידים!</li>
+                  <li>העתיקו מכתובת ה-URL של הדפדפן את מזהה המפה (הערך שמופיע אחרי <code className="px-1 py-0.5 bg-subtle rounded font-mono text-[10px]">mid=</code>).</li>
+                  <li>בתוך קוד הקובץ במפתח <code className="px-1.5 py-0.5 bg-subtle rounded font-mono text-[10px]">TECTONICS_PROJECT.myMapsId</code>, הדביקו את המזהה שקיבלתם. המפה תופיע מיד ישירות בדף זה עבור כל התלמידים!</li>
                 </ol>
               </div>
             </div>
@@ -217,14 +199,14 @@ export default function GoogleEarthTours() {
         )}
 
         {/* Project Showcase Section */}
-        <div className={`border rounded-3xl p-6 sm:p-8 space-y-8 ${cardStyle}`}>
-          <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 border-b pb-6 border-zinc-200 dark:border-zinc-800">
+        <div className={`border rounded-xl p-6 sm:p-8 space-y-8 ${cardStyle}`}>
+          <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 border-b pb-6 border-line dark:border-zinc-800">
             {/* Details */}
             <div className="space-y-3 flex-1">
-              <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 bg-enrichment/10 rounded-full text-enrichment">
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 bg-accent-soft rounded-full text-accent">
                 פעיל כעת
               </span>
-              <h2 className={`text-2xl font-black ${textTitle}`}>{TECTONICS_PROJECT.title}</h2>
+              <h2 className={`text-2xl font-bold ${textTitle}`}>{TECTONICS_PROJECT.title}</h2>
               <p className={`text-sm leading-relaxed ${textMuted}`}>{TECTONICS_PROJECT.description}</p>
             </div>
 
@@ -234,7 +216,7 @@ export default function GoogleEarthTours() {
                 href={TECTONICS_PROJECT.defaultEarthUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-enrichment hover:bg-emerald-600 text-zinc-950 font-bold text-sm shadow-lg hover:shadow-emerald-500/10 hover:translate-y-[-2px] transition-all cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-accent hover:bg-emerald-600 text-zinc-950 font-bold text-sm shadow-sm hover:translate-y-[-2px] transition-all cursor-pointer"
               >
                 <Compass className="w-4 h-4" />
                 <span>פתיחה ב-Google Earth</span>
@@ -244,13 +226,9 @@ export default function GoogleEarthTours() {
               <a
                 href={TECTONICS_PROJECT.downloadUrl}
                 download
-                className={`inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl border font-bold text-sm hover:translate-y-[-2px] transition-all cursor-pointer ${
-                  isLight 
-                    ? "bg-white hover:bg-zinc-50 border-zinc-200 text-zinc-700" 
-                    : "bg-surface hover:bg-surface-hover border-border-custom text-zinc-200 hover:border-enrichment/30"
-                }`}
+                className={`inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl border font-bold text-sm hover:translate-y-[-2px] transition-all cursor-pointer bg-card hover:bg-subtle border-line text-fg dark:hover:border-accent/30`}
               >
-                <Download className="w-4 h-4 text-enrichment" />
+                <Download className="w-4 h-4 text-accent" />
                 <span>הורדת קובץ KML</span>
                 <span className="text-[10px] opacity-60">({TECTONICS_PROJECT.fileSize})</span>
               </a>
@@ -259,15 +237,15 @@ export default function GoogleEarthTours() {
 
           {/* Live Map Preview */}
           {TECTONICS_PROJECT.myMapsId ? (
-            <div className="space-y-4 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+            <div className="space-y-4 pt-4 border-t border-line dark:border-zinc-800">
               <h3 className={`text-lg font-bold flex items-center gap-2 ${textTitle}`}>
-                <Globe className="w-4 h-4 text-enrichment" />
+                <Globe className="w-4 h-4 text-accent" />
                 <span>תצוגה מקדימה אינטראקטיבית (2D)</span>
               </h3>
               <p className={`text-xs ${textMuted}`}>
                 ניתן לגרור את המפה, להגדיל/להקטין וללחוץ על הלוחות או החצים כדי לראות מידע נוסף.
               </p>
-              <div className="w-full h-[450px] rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 relative">
+              <div className="w-full h-[450px] rounded-xl overflow-hidden border border-line dark:border-zinc-800 relative">
                 <iframe
                   src={`https://www.google.com/maps/d/embed?mid=${TECTONICS_PROJECT.myMapsId}`}
                   className="w-full h-full border-0 absolute top-0 left-0"
@@ -277,11 +255,9 @@ export default function GoogleEarthTours() {
               </div>
             </div>
           ) : (
-            <div className={`p-5 rounded-2xl border ${
-              isLight ? "bg-zinc-50 border-zinc-100" : "bg-surface/20 border-border-custom"
-            } space-y-2 border-dashed`}>
+            <div className={`p-5 rounded-xl border bg-subtle border-line space-y-2 border-dashed`}>
               <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-enrichment shrink-0" />
+                <Globe className="w-4 h-4 text-accent shrink-0" />
                 <h4 className={`text-sm font-bold ${textTitle}`}>רוצים להציג את המפה ישירות בדף זה?</h4>
               </div>
               <p className={`text-xs leading-relaxed ${textMuted}`}>
@@ -289,7 +265,7 @@ export default function GoogleEarthTours() {
               </p>
               <button
                 onClick={() => setShowTeacherGuide(true)}
-                className="text-xs text-enrichment hover:underline font-bold cursor-pointer"
+                className="text-xs text-accent hover:underline font-bold cursor-pointer"
               >
                 לחצו כאן למעבר להנחיות המורה ←
               </button>
@@ -299,7 +275,7 @@ export default function GoogleEarthTours() {
           {/* Graphic Legend (מקרא המפה) */}
           <div className="space-y-4">
             <h3 className={`text-lg font-bold flex items-center gap-2 ${textTitle}`}>
-              <Layers className="w-4 h-4 text-enrichment" />
+              <Layers className="w-4 h-4 text-accent" />
               <span>מקרא המפה (Legend)</span>
             </h3>
             <p className={`text-xs ${textMuted}`}>
@@ -310,9 +286,7 @@ export default function GoogleEarthTours() {
               {TECTONICS_PROJECT.legend.map((item, index) => (
                 <div 
                   key={index}
-                  className={`flex items-start gap-4 p-4 border rounded-2xl transition-all hover:bg-black/5 dark:hover:bg-white/5 ${
-                    isLight ? "bg-white border-zinc-100" : "bg-surface/40 border-border-custom"
-                  }`}
+                  className={`flex items-start gap-4 p-4 border rounded-xl transition-all hover:bg-subtle dark:hover:bg-white/5 bg-card border-line`}
                 >
                   <span className={`w-3.5 h-3.5 rounded-full border-2 shrink-0 mt-1 ${item.color} ${item.borderColor}`} />
                   <div className="space-y-1">
@@ -325,16 +299,16 @@ export default function GoogleEarthTours() {
           </div>
 
           {/* Student Instructions */}
-          <div className="space-y-4 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+          <div className="space-y-4 pt-4 border-t border-line dark:border-zinc-800">
             <h3 className={`text-lg font-bold flex items-center gap-2 ${textTitle}`}>
-              <HelpCircle className="w-4 h-4 text-enrichment" />
+              <HelpCircle className="w-4 h-4 text-accent" />
               <span>כיצד להשתמש בקובץ? (מדריך לתלמידים)</span>
             </h3>
             
             <div className="space-y-3">
               {TECTONICS_PROJECT.instructions.map((step, index) => (
                 <div key={index} className="flex gap-3">
-                  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-enrichment/10 text-enrichment text-xs font-bold shrink-0 mt-0.5">
+                  <span className="flex items-center justify-center w-5 h-5 rounded-full bg-accent-soft text-accent text-xs font-bold shrink-0 mt-0.5">
                     {index + 1}
                   </span>
                   <p className="text-xs sm:text-sm leading-relaxed">{step}</p>
@@ -347,8 +321,8 @@ export default function GoogleEarthTours() {
       </div>
 
       {/* Footer */}
-      <footer className={`w-full text-center py-6 border-t text-xs relative z-10 bg-surface/10 ${borderTheme} ${textMuted}`}>
-        <span>© {new Date().getFullYear()} ניר עוז-ארי — סיורי Google Earth והעשרה מדעית</span>
+      <footer className={`w-full text-center py-6 border-t text-xs relative z-10 bg-subtle ${borderTheme} ${textMuted}`}>
+        <span>© {new Date().getFullYear()} נקודת ציון — סיורי Google Earth והעשרה מדעית</span>
       </footer>
     </div>
   );

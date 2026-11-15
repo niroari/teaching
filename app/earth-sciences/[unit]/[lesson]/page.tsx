@@ -157,11 +157,11 @@ export default function LessonPresenterConsolePage() {
 
   if (!unitData || !lessonData) {
     return (
-      <div className="min-h-screen bg-[#080c18] text-[#e8edf8] flex items-center justify-center p-6 text-right font-sans">
-        <div className="glass-card max-w-md w-full rounded-2xl p-8 border border-red-500/30 text-center space-y-4">
-          <h3 className="text-xl font-bold text-red-400">השיעור המבוקש לא נמצא</h3>
-          <p className="text-text-muted text-sm">הקישור שהזנת אינו תקין או שהשיעור עודנו בבנייה.</p>
-          <Link href="/earth-sciences" className="inline-block px-5 py-2.5 bg-surface hover:bg-surface-hover border border-border-custom rounded-xl font-semibold transition-all">
+      <div className="min-h-screen bg-canvas text-fg flex items-center justify-center p-6 text-right font-sans">
+        <div className="bg-card border-line max-w-md w-full rounded-xl p-8 border border-red-500/30 text-center space-y-4">
+          <h3 className="text-xl font-bold text-red-700 dark:text-red-400">השיעור המבוקש לא נמצא</h3>
+          <p className="text-fg-muted text-sm">הקישור שהזנת אינו תקין או שהשיעור עודנו בבנייה.</p>
+          <Link href="/earth-sciences" className="inline-block px-5 py-2.5 bg-subtle hover:bg-subtle-hover border border-line rounded-xl font-semibold transition-all">
             חזרה לתוכנית הלימודים
           </Link>
         </div>
@@ -172,21 +172,20 @@ export default function LessonPresenterConsolePage() {
   // Intercept and render a beautiful "Under Construction" placeholder page for Units 3, 4
   if (unitData.id !== 1 && unitData.id !== 2) {
     return (
-      <div className="min-h-screen bg-[#080c18] text-[#e8edf8] flex items-center justify-center p-6 text-right font-sans">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-amber-500/5 via-transparent to-transparent blur-3xl pointer-events-none rounded-full" />
-        <div className="glass-card max-w-lg w-full rounded-3xl p-8 md:p-10 border border-amber-500/20 text-center space-y-6 relative overflow-hidden backdrop-blur-xl">
-          <div className="w-16 h-16 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(245,158,11,0.1)]">
+      <div className="min-h-screen bg-canvas text-fg flex items-center justify-center p-6 text-right font-sans">
+        <div className="bg-card border-line max-w-lg w-full rounded-xl p-8 md:p-10 border border-amber-500/20 text-center space-y-6 relative overflow-hidden">
+          <div className="w-16 h-16 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center justify-center mx-auto">
             <Edit3 className="w-8 h-8 text-amber-500 animate-pulse" />
           </div>
           
           <div className="space-y-3">
-            <span className="text-[10px] text-amber-400 font-black tracking-widest uppercase">
+            <span className="text-[10px] text-amber-700 dark:text-amber-400 font-bold tracking-widest uppercase">
               יחידה {unitData.id}: {unitData.title}
             </span>
-            <h3 className="text-2xl font-black text-white">
+            <h3 className="text-2xl font-bold text-fg">
               השיעור נמצא בתהליך פיתוח 💻
             </h3>
-            <p className="text-text-muted text-sm leading-relaxed max-w-sm mx-auto">
+            <p className="text-fg-muted text-sm leading-relaxed max-w-sm mx-auto">
               התוכן, המצגות והיישומונים האינטראקטיביים עבור שיעור זה יעלו בקרוב, לאחר הזנת התוכן המקצועי על ידי המורה.
             </p>
           </div>
@@ -194,7 +193,7 @@ export default function LessonPresenterConsolePage() {
           <div className="pt-2">
             <Link 
               href="/earth-sciences" 
-              className="inline-flex items-center gap-2 px-6 py-3 bg-earth hover:bg-teal-600 text-white font-extrabold text-xs rounded-xl shadow-lg transition-all cursor-pointer hover:scale-[1.02]"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-accent hover:bg-teal-600 text-white font-bold text-xs rounded-xl shadow-sm transition-all cursor-pointer hover:scale-[1.02]"
             >
               <ArrowRight className="w-4 h-4" />
               <span>חזרה ללוח השיעורים</span>
@@ -245,27 +244,23 @@ export default function LessonPresenterConsolePage() {
   };
 
   const isLight = comfortMode === "light";
-  const bgTheme = isLight ? "bg-[#f4f6fa] text-zinc-800" : "bg-[#080c18] text-[#e8edf8]";
-  const borderTheme = isLight ? "border-zinc-200" : "border-border-custom";
-  const cardTheme = isLight ? "bg-white border-zinc-200 shadow-sm" : "glass-card";
-  const textMuted = isLight ? "text-zinc-500" : "text-text-muted";
-  const titleText = isLight ? "text-zinc-900" : "text-white";
+  const bgTheme = "bg-canvas text-fg";
+  const borderTheme = "border-line";
+  const cardTheme = "bg-card border-line shadow-sm";
+  const textMuted = "text-fg-muted";
+  const titleText = "text-fg";
 
   return (
     <div className={`relative min-h-screen ${bgTheme} flex flex-col justify-between overflow-hidden transition-colors duration-300`}>
       {/* Background Glow */}
-      {!isLight && !cinemaMode && (
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-teal-500/5 via-transparent to-transparent blur-3xl pointer-events-none rounded-full" />
-      )}
-
       {/* HEADER: Hide in cinema mode to maximize projector space */}
       {!cinemaMode && (
-        <header className={`w-full border-b ${borderTheme} py-4 relative z-20 bg-surface/10 backdrop-blur-md shrink-0`}>
+        <header className={`w-full border-b ${borderTheme} py-4 relative z-20 bg-subtle shrink-0`}>
           <div className="max-w-6xl mx-auto px-6 flex justify-between items-center">
             {/* Back to Earth Hub */}
             <Link
               href="/earth-sciences"
-              className={`inline-flex items-center gap-1.5 text-xs font-bold ${textMuted} hover:text-earth transition-colors cursor-pointer`}
+              className={`inline-flex items-center gap-1.5 text-xs font-bold ${textMuted} hover:text-accent transition-colors cursor-pointer`}
             >
               <ArrowRight className="w-3.5 h-3.5" />
               <span>חזרה לתוכנית הלימודים</span>
@@ -273,10 +268,10 @@ export default function LessonPresenterConsolePage() {
 
             {/* Title display */}
             <div className="hidden md:block text-right">
-              <span className={`text-[10px] font-bold text-earth`}>
+              <span className={`text-[10px] font-bold text-accent`}>
                 יחידה {unitData.id}: {unitData.title.split(" - ")[0]}
               </span>
-              <h2 className={`text-sm font-black ${titleText}`}>
+              <h2 className={`text-sm font-bold ${titleText}`}>
                 {lessonData.title}
               </h2>
             </div>
@@ -284,17 +279,17 @@ export default function LessonPresenterConsolePage() {
             {/* Theme Toggle */}
             <button
               onClick={toggleComfortMode}
-              className={`p-2 rounded-xl border ${borderTheme} bg-surface/30 hover:bg-surface-hover/30 transition-all cursor-pointer flex items-center gap-2 text-xs font-bold`}
+              className={`p-2 rounded-xl border ${borderTheme} bg-subtle hover:bg-subtle-hover transition-all cursor-pointer flex items-center gap-2 text-xs font-bold`}
             >
               {isLight ? (
                 <>
                   <Moon className="w-4 h-4 text-purple-600" />
-                  <span className="text-zinc-700">מצב כיתה חשוך</span>
+                  <span className="text-fg">מצב כיתה חשוך</span>
                 </>
               ) : (
                 <>
-                  <Sun className="w-4 h-4 text-amber-400" />
-                  <span className="text-zinc-300">מצב קריאה בהיר</span>
+                  <Sun className="w-4 h-4 text-amber-700 dark:text-amber-400" />
+                  <span className="text-fg">מצב קריאה בהיר</span>
                 </>
               )}
             </button>
@@ -304,30 +299,30 @@ export default function LessonPresenterConsolePage() {
 
       {/* Main Container */}
       <div className={`relative w-full max-w-6xl mx-auto px-6 py-6 flex-1 flex flex-col z-10 ${
-        cinemaMode ? "fixed inset-0 max-w-none px-4 py-4 bg-zinc-950 z-50 justify-center" : ""
+        cinemaMode ? "fixed inset-0 max-w-none px-4 py-4 bg-card z-50 justify-center" : ""
       }`}>
         
         {/* CINEMA MODE TOP HEADER OVERLAY */}
         {cinemaMode && (
-          <div className="absolute top-4 inset-x-6 flex justify-between items-center z-50 text-white select-none">
+          <div className="absolute top-4 inset-x-6 flex justify-between items-center z-50 text-fg select-none">
             <div className="text-right">
-              <span className="text-[10px] text-earth font-black tracking-wider uppercase">שיעור מוקרן</span>
+              <span className="text-[10px] text-accent font-bold tracking-wider uppercase">שיעור מוקרן</span>
               <h3 className="text-sm font-bold">{lessonData.title}</h3>
             </div>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setShowNotebookOverlay(true)}
-                className="px-3.5 py-1.5 rounded-lg border border-amber-500/20 bg-amber-950/30 hover:bg-amber-950/50 text-xs font-bold text-amber-400 flex items-center gap-1.5 cursor-pointer transition-all"
+                className="px-3.5 py-1.5 rounded-lg border border-amber-500/20 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-50 dark:hover:bg-amber-950/50 text-xs font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1.5 cursor-pointer transition-all"
                 title="הצג מושגים לכתיבה במחברת"
               >
-                <BookCopy className="w-4 h-4 text-amber-400" />
+                <BookCopy className="w-4 h-4 text-amber-700 dark:text-amber-400" />
                 <span>מושגי מחברת 📝</span>
               </button>
               <button
                 onClick={() => setCinemaMode(false)}
-                className="px-3.5 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-xs font-bold text-zinc-300 flex items-center gap-1.5 cursor-pointer transition-all"
+                className="px-3.5 py-1.5 rounded-lg border border-line bg-card hover:bg-subtle text-xs font-bold text-fg flex items-center gap-1.5 cursor-pointer transition-all"
               >
-                <Minimize2 className="w-4 h-4 text-earth" />
+                <Minimize2 className="w-4 h-4 text-accent" />
                 <span>יציאה ממצב הקרנה (Esc)</span>
               </button>
             </div>
@@ -336,11 +331,11 @@ export default function LessonPresenterConsolePage() {
 
         {/* Tab Selection Row: Hide in Cinema Mode */}
         {!cinemaMode && (
-          <div className="flex border-b border-zinc-800/80 mb-6 pb-0.5 justify-start gap-4">
+          <div className="flex border-b border-line mb-6 pb-0.5 justify-start gap-4">
             <button
               onClick={() => setActiveTab("slides")}
               className={`pb-2.5 text-xs md:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 relative ${
-                activeTab === "slides" ? "text-earth font-black border-b-2 border-earth" : "text-text-muted hover:text-foreground"
+                activeTab === "slides" ? "text-accent font-bold border-b-2 border-accent" : "text-fg-muted hover:text-fg"
               }`}
             >
               <Presentation className="w-4 h-4" />
@@ -349,7 +344,7 @@ export default function LessonPresenterConsolePage() {
             <button
               onClick={() => setActiveTab("activity")}
               className={`pb-2.5 text-xs md:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 relative ${
-                activeTab === "activity" ? "text-earth font-black border-b-2 border-earth" : "text-text-muted hover:text-foreground"
+                activeTab === "activity" ? "text-accent font-bold border-b-2 border-accent" : "text-fg-muted hover:text-fg"
               }`}
             >
               <Play className="w-4 h-4" />
@@ -358,7 +353,7 @@ export default function LessonPresenterConsolePage() {
             <button
               onClick={() => setActiveTab("teacherGuide")}
               className={`pb-2.5 text-xs md:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 relative ${
-                activeTab === "teacherGuide" ? "text-earth font-black border-b-2 border-earth" : "text-text-muted hover:text-foreground"
+                activeTab === "teacherGuide" ? "text-accent font-bold border-b-2 border-accent" : "text-fg-muted hover:text-fg"
               }`}
             >
               <BookOpen className="w-4 h-4" />
@@ -373,11 +368,8 @@ export default function LessonPresenterConsolePage() {
             {/* Presentation Frame */}
             <div className={`flex-1 w-full rounded-3xl overflow-hidden shadow-2xl relative min-h-[520px] md:min-h-[580px] border flex flex-col justify-between transition-all duration-300 ${
               cinemaMode 
-                ? "border-none bg-zinc-950/80 pt-16 pb-4 px-6 md:px-10" 
-                : `${isLight 
-                    ? "bg-gradient-to-br from-white to-zinc-50/50 border-zinc-200 shadow-sm" 
-                    : "bg-gradient-to-br from-[#0c1226] to-[#080c18] border-teal-500/10 shadow-[0_20px_50px_rgba(20,184,166,0.06)] hover:shadow-[0_20px_50px_rgba(20,184,166,0.12)]"
-                  }`
+                ? "border-none bg-subtle pt-16 pb-4 px-6 md:px-10" 
+                : `bg-gradient-to-br from-white to-zinc-50/50 border-line shadow-sm dark:from-[#0c1226] dark:to-[#080c18] dark:border-teal-500/10`
             }`}>
               
               {/* Top Bar Actions inside Frame (Normal Mode) */}
@@ -385,22 +377,18 @@ export default function LessonPresenterConsolePage() {
                 <div className="absolute left-4 top-4 flex gap-2 z-30 select-none">
                   <button
                     onClick={() => setShowNotebookOverlay(true)}
-                    className={`px-3 py-1.5 rounded-lg border text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all shadow-sm ${
-                      isLight 
-                        ? "border-amber-200 bg-amber-50/90 hover:bg-amber-100 text-amber-800" 
-                        : "border-amber-500/20 bg-amber-950/40 hover:bg-amber-950/65 text-amber-400"
-                    }`}
+                    className={`px-3 py-1.5 rounded-lg border text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all shadow-sm border-amber-200 bg-amber-50/90 hover:bg-amber-100 text-amber-800 dark:border-amber-500/20 dark:bg-amber-950/40 dark:hover:bg-amber-950/65 dark:text-amber-400`}
                     title="הצג מושגים לכתיבה במחברת"
                   >
-                    <BookCopy className="w-3.5 h-3.5 text-amber-400" />
+                    <BookCopy className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
                     <span>מושגי מחברת 📝</span>
                   </button>
                   <button
                     onClick={() => setCinemaMode(true)}
-                    className="px-3 py-1.5 rounded-lg border border-border-custom bg-surface-hover/85 hover:bg-surface-hover text-xs font-bold text-text-muted flex items-center gap-1.5 cursor-pointer transition-all shadow-sm"
+                    className="px-3 py-1.5 rounded-lg border border-line bg-subtle-hover hover:bg-subtle-hover text-xs font-bold text-fg-muted flex items-center gap-1.5 cursor-pointer transition-all shadow-sm"
                     title="מסך מלא להקרנה בכיתה"
                   >
-                    <Maximize2 className="w-3.5 h-3.5 text-earth" />
+                    <Maximize2 className="w-3.5 h-3.5 text-accent" />
                     <span className="hidden sm:inline">מצב הקרנה בכיתה</span>
                   </button>
                 </div>
@@ -410,20 +398,20 @@ export default function LessonPresenterConsolePage() {
               <div className="flex-1 flex items-center justify-center p-6 md:p-10">
                 {showInlineWidget && lessonData.widgetId ? (
                   /* INLINE INTERACTIVE WIDGET DISPLAY */
-                  <div className="w-full h-full max-w-4xl relative z-10 flex flex-col justify-between animate-fade-in bg-zinc-950/90 p-3 rounded-2xl border border-zinc-800/80">
+                  <div className="w-full h-full max-w-4xl relative z-10 flex flex-col justify-between animate-fade-in bg-subtle p-3 rounded-xl border border-line">
                     <div className="flex justify-between items-center mb-3 px-2">
-                      <span className="text-xs text-earth font-bold flex items-center gap-1.5">
-                        <Play className="w-4 h-4 text-earth shrink-0" />
+                      <span className="text-xs text-accent font-bold flex items-center gap-1.5">
+                        <Play className="w-4 h-4 text-accent shrink-0" />
                         <span>יישומון פעיל - להקרנה/תרגול כיתתי</span>
                       </span>
                       <button
                         onClick={() => setShowInlineWidget(false)}
-                        className="px-3 py-1.5 border border-zinc-800 hover:bg-zinc-900 rounded-lg text-xs font-bold text-zinc-400 cursor-pointer animate-pulse"
+                        className="px-3 py-1.5 border border-line hover:bg-card rounded-lg text-xs font-bold text-fg-muted cursor-pointer animate-pulse"
                       >
                         סגור יישומון ויציאה לשקף
                       </button>
                     </div>
-                    <div className="flex-1 overflow-y-auto max-h-[420px] border border-zinc-900 rounded-xl">
+                    <div className="flex-1 overflow-y-auto max-h-[420px] border border-line rounded-xl">
                       {renderWidget()}
                     </div>
                   </div>
@@ -434,18 +422,18 @@ export default function LessonPresenterConsolePage() {
                   }`}>
                     {/* Slide content header */}
                     <div className={`text-right shrink-0 ${
-                      cinemaMode ? "border-b-2 border-teal-500/25 pb-4 mb-8" : "border-b border-border-custom/40 pb-4 mb-8"
+                      cinemaMode ? "border-b-2 border-teal-500/25 pb-4 mb-8" : "border-b border-line pb-4 mb-8"
                     }`}>
                       <span className={`${
                         cinemaMode 
-                          ? "text-xs tracking-widest text-teal-400 font-black block mb-1" 
-                          : "text-[10px] text-earth font-black uppercase tracking-widest block mb-0.5"
+                          ? "text-xs tracking-widest text-teal-700 dark:text-teal-400 font-bold block mb-1" 
+                          : "text-[10px] text-accent font-bold uppercase tracking-widest block mb-0.5"
                       }`}>
                         שקף {currentSlideIndex + 1} מתוך {slides.length}
                       </span>
                       <h3 className={`font-black mt-2 tracking-tight ${
                         cinemaMode 
-                          ? "text-3xl md:text-4xl lg:text-5xl text-white" 
+                          ? "text-3xl md:text-4xl lg:text-5xl text-fg" 
                           : `text-2xl md:text-3xl ${titleText}`
                       }`}>
                         {slides[currentSlideIndex].title}
@@ -466,8 +454,8 @@ export default function LessonPresenterConsolePage() {
                           <div className="flex-1 text-right space-y-4">
                             <p className={`whitespace-pre-line leading-relaxed ${
                               cinemaMode 
-                                ? "text-xl md:text-2xl lg:text-3xl font-semibold text-zinc-100" 
-                                : `text-base md:text-lg lg:text-xl font-extrabold ${isLight ? "text-zinc-800" : "text-zinc-200"}`
+                                ? "text-xl md:text-2xl lg:text-3xl font-semibold text-fg" 
+                                : `text-base md:text-lg lg:text-xl font-extrabold text-fg`
                             }`}>
                               {slides[currentSlideIndex].content}
                             </p>
@@ -475,10 +463,10 @@ export default function LessonPresenterConsolePage() {
                           
                           {/* Media on Left */}
                           {lessonData.hookVideoId ? (
-                            <div className={`aspect-video bg-zinc-900 rounded-2xl overflow-hidden border shrink-0 relative flex items-center justify-center ${
+                            <div className={`aspect-video bg-card rounded-xl overflow-hidden border shrink-0 relative flex items-center justify-center ${
                               cinemaMode 
-                                ? "w-full md:w-6/12 lg:w-7/12 shadow-[0_15px_50px_rgba(20,184,166,0.25)] border-teal-500/20" 
-                                : "w-full md:w-5/12 shadow-lg border-zinc-800/40"
+                                ? "w-full md:w-6/12 lg:w-7/12 border-teal-500/20" 
+                                : "w-full md:w-5/12 shadow-sm border-line"
                             }`}>
                               <iframe
                                 src={`https://www.youtube.com/embed/${lessonData.hookVideoId}?rel=0&modestbranding=1`}
@@ -489,16 +477,16 @@ export default function LessonPresenterConsolePage() {
                               />
                             </div>
                           ) : lessonData.hookImageUrl === "rotating-earth-css" ? (
-                            <div className={`aspect-video bg-[#020617] bg-[radial-gradient(circle_at_center,rgba(15,23,42,0.4)_0%,rgba(3,7,18,1)_100%)] rounded-2xl overflow-hidden border shrink-0 relative flex items-center justify-center ${
+                            <div className={`aspect-video bg-card bg-[radial-gradient(circle_at_center,rgba(15,23,42,0.4)_0%,rgba(3,7,18,1)_100%)] rounded-xl overflow-hidden border shrink-0 relative flex items-center justify-center ${
                               cinemaMode 
-                                ? "w-full md:w-6/12 lg:w-7/12 shadow-[0_15px_50px_rgba(20,184,166,0.25)] border-teal-500/20" 
-                                : "w-full md:w-5/12 shadow-lg border-zinc-800/40"
+                                ? "w-full md:w-6/12 lg:w-7/12 border-teal-500/20" 
+                                : "w-full md:w-5/12 shadow-sm border-line"
                             }`}>
                               {/* Earth GIF (Zoomed out: w-32 h-32 md:w-36 md:h-36) */}
                               <img
                                 src="/blue-marble-rotating.gif"
                                 alt="כדור הארץ מסתובב"
-                                className="w-32 h-32 md:w-36 md:h-36 object-contain z-10 rounded-full shadow-[0_0_40px_rgba(14,165,233,0.2)] border border-sky-500/10"
+                                className="w-32 h-32 md:w-36 md:h-36 object-contain z-10 rounded-full border border-sky-500/10"
                               />
                             </div>
                           ) : (
@@ -510,10 +498,10 @@ export default function LessonPresenterConsolePage() {
                               <img
                                 src={lessonData.hookImageUrl}
                                 alt="גירוי חזותי"
-                                className={`max-w-full max-h-[410px] md:max-h-[470px] object-contain rounded-2xl border cursor-zoom-in hover:scale-[1.01] transition-transform duration-300 ${
+                                className={`max-w-full max-h-[410px] md:max-h-[470px] object-contain rounded-xl border cursor-zoom-in hover:scale-[1.01] transition-transform duration-300 ${
                                   cinemaMode 
-                                    ? "shadow-[0_15px_50px_rgba(20,184,166,0.25)] border-teal-500/20" 
-                                    : "shadow-lg border-zinc-800/40"
+                                    ? "border-teal-500/20" 
+                                    : "shadow-sm border-line"
                                 }`}
                                 onClick={() => setLightboxImageUrl(lessonData.hookImageUrl || null)}
                               />
@@ -522,7 +510,7 @@ export default function LessonPresenterConsolePage() {
                         </>
                       ) : slides[currentSlideIndex].visualType === "notebook" ? (
                         /* NOTEBOOK DESIGN SLIDE */
-                        <div className={`w-full bg-amber-50/15 border rounded-3xl shadow-inner text-right relative overflow-hidden ${
+                        <div className={`w-full bg-amber-50/15 border rounded-xl shadow-inner text-right relative overflow-hidden ${
                           cinemaMode 
                             ? "max-w-4xl p-8 md:p-10 border-amber-900/20" 
                             : "max-w-3xl p-6 md:p-8 border-amber-900/15"
@@ -541,11 +529,11 @@ export default function LessonPresenterConsolePage() {
                           }`}>
                             <div className="flex items-center gap-1.5 justify-start">
                               <Edit3 className={`text-amber-500 shrink-0 ${cinemaMode ? "w-6 h-6" : "w-5 h-5"}`} />
-                              <span className={`font-black text-amber-500/90 ${cinemaMode ? "text-base md:text-lg" : "text-sm"}`}>הנחיית כתיבה לתלמידים 📝</span>
+                              <span className={`font-bold text-amber-500/90 ${cinemaMode ? "text-base md:text-lg" : "text-sm"}`}>הנחיית כתיבה לתלמידים 📝</span>
                             </div>
                             <h4 className={`font-black tracking-tight ${
                               cinemaMode 
-                                ? "text-xl md:text-2xl lg:text-3xl text-zinc-100" 
+                                ? "text-xl md:text-2xl lg:text-3xl text-fg" 
                                 : `text-lg md:text-xl ${titleText}`
                             }`}>
                               {slides[currentSlideIndex].content}
@@ -553,15 +541,15 @@ export default function LessonPresenterConsolePage() {
                             <div className={`space-y-6`}>
                               {lessonData.notebookSummary.map((concept, cIdx) => (
                                 <div key={cIdx} className="space-y-1.5 pr-2">
-                                  <strong className={`text-earth font-black block border-b border-dashed border-earth/20 pb-0.5 ${
+                                  <strong className={`text-accent font-bold block border-b border-dashed border-accent/20 pb-0.5 ${
                                     cinemaMode ? "text-lg md:text-xl lg:text-2xl" : "text-base md:text-lg"
                                   }`}>
                                     • {concept.term}
                                   </strong>
                                   <p className={`leading-relaxed ${
                                     cinemaMode 
-                                      ? "text-sm md:text-base lg:text-lg text-zinc-300 font-medium" 
-                                      : `text-sm md:text-base ${isLight ? "text-zinc-700" : "text-zinc-300"} font-bold`
+                                      ? "text-sm md:text-base lg:text-lg text-fg font-medium" 
+                                      : `text-sm md:text-base text-fg font-bold`
                                   }`}>
                                     {concept.definition}
                                   </p>
@@ -575,22 +563,22 @@ export default function LessonPresenterConsolePage() {
                         <div className={`w-full text-right ${cinemaMode ? "max-w-4xl space-y-8" : "max-w-3xl space-y-6"}`}>
                           <p className={`leading-relaxed border-b border-dashed border-earth/30 pb-4 ${
                             cinemaMode 
-                              ? "text-xl md:text-2xl lg:text-3xl font-black text-teal-300" 
-                              : `text-lg md:text-xl font-extrabold ${isLight ? "text-zinc-900" : "text-zinc-100"}`
+                              ? "text-xl md:text-2xl lg:text-3xl font-bold text-teal-700 dark:text-teal-300" 
+                              : `text-lg md:text-xl font-extrabold text-fg`
                           }`}>
                             {slides[currentSlideIndex].content}
                           </p>
                           <div className="space-y-4">
-                            <h5 className={`font-black text-earth flex items-center gap-1.5 justify-start ${
+                            <h5 className={`font-bold text-accent flex items-center gap-1.5 justify-start ${
                               cinemaMode ? "text-lg md:text-xl lg:text-2xl" : "text-base md:text-lg"
                             }`}>
-                              <CheckCircle className={`text-earth shrink-0 ${cinemaMode ? "w-6 h-6" : "w-5 h-5"}`} />
+                              <CheckCircle className={`text-accent shrink-0 ${cinemaMode ? "w-6 h-6" : "w-5 h-5"}`} />
                               <span>הנחיות לביצוע המשימה בכיתה:</span>
                             </h5>
                             <ul className={`list-none pr-0 ${cinemaMode ? "space-y-4 lg:space-y-5" : "space-y-3.5"}`}>
                               {lessonData.task.instructions.map((inst, index) => (
                                 <li key={index} className="flex gap-3 justify-start items-start">
-                                  <span className={`rounded-full bg-earth/10 border border-earth/20 text-earth font-bold flex items-center justify-center shrink-0 mt-0.5 ${
+                                  <span className={`rounded-full bg-accent-soft border border-accent/20 text-accent font-bold flex items-center justify-center shrink-0 mt-0.5 ${
                                     cinemaMode 
                                       ? "w-8 h-8 text-sm mt-1" 
                                       : "w-6 h-6 text-xs mt-0.5"
@@ -599,8 +587,8 @@ export default function LessonPresenterConsolePage() {
                                   </span>
                                   <span className={`leading-relaxed ${
                                     cinemaMode 
-                                      ? "text-lg md:text-xl text-zinc-200 font-medium" 
-                                      : `text-sm md:text-base ${isLight ? "text-zinc-800" : "text-zinc-200"} font-bold`
+                                      ? "text-lg md:text-xl text-fg font-medium" 
+                                      : `text-sm md:text-base text-fg font-bold`
                                   }`}>{inst}</span>
                                 </li>
                               ))}
@@ -612,7 +600,7 @@ export default function LessonPresenterConsolePage() {
                         <div className={`w-full text-right ${cinemaMode ? "max-w-4xl space-y-6" : "max-w-3xl space-y-5"}`}>
                           <p className={`font-black border-b border-zinc-800/80 pb-4 ${
                             cinemaMode 
-                              ? "text-xl md:text-2xl lg:text-3xl text-teal-400" 
+                              ? "text-xl md:text-2xl lg:text-3xl text-teal-700 dark:text-teal-400" 
                               : `text-lg md:text-xl lg:text-2xl text-teal-400`
                           }`}>
                             {slides[currentSlideIndex].content}
@@ -622,12 +610,12 @@ export default function LessonPresenterConsolePage() {
                               <li key={sIdx} className="flex gap-3 justify-start items-start">
                                 <span className={`rounded-full bg-teal-400 shrink-0 ${
                                   cinemaMode 
-                                    ? "w-3 h-3 mt-2.5 shadow-[0_0_10px_rgba(20,184,166,0.8)]" 
-                                    : "w-2.5 h-2.5 mt-2 shadow-[0_0_8px_rgba(20,184,166,0.6)]"
+                                    ? "w-3 h-3 mt-2.5" 
+                                    : "w-2.5 h-2.5 mt-2"
                                 }`} />
                                 <span className={`${
                                   cinemaMode 
-                                    ? "text-lg md:text-xl lg:text-2xl text-zinc-100 font-medium" 
+                                    ? "text-lg md:text-xl lg:text-2xl text-fg font-medium" 
                                     : `text-base md:text-lg ${titleText} font-bold`
                                 }`}>{sumItem}</span>
                               </li>
@@ -645,14 +633,14 @@ export default function LessonPresenterConsolePage() {
                                 <img
                                   src={slides[currentSlideIndex].imageUrl}
                                   alt={slides[currentSlideIndex].title}
-                                  className="w-auto h-52 sm:h-68 md:h-[330px] lg:h-[350px] xl:h-[390px] max-h-[52vh] object-contain rounded-2xl border border-zinc-800/40 shadow-xl group-hover:scale-[1.01] transition-transform duration-500"
+                                  className="w-auto h-52 sm:h-68 md:h-[330px] lg:h-[350px] xl:h-[390px] max-h-[52vh] object-contain rounded-xl border border-line shadow-sm group-hover:scale-[1.01] transition-transform duration-500"
                                   onClick={() => setLightboxImageUrl(slides[currentSlideIndex].imageUrl || null)}
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent pointer-events-none rounded-2xl" />
+                                <div className="absolute inset-0 pointer-events-none rounded-xl bg-black/80" />
                                 
                                 {/* Overlay Subtitle Content */}
                                 <div className="absolute bottom-4 right-4 left-4 text-right z-10 pointer-events-none">
-                                  <p className="text-white font-black text-xs sm:text-sm md:text-base lg:text-lg drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+                                  <p className="text-fg font-bold text-xs sm:text-sm md:text-base lg:text-lg">
                                     {slides[currentSlideIndex].content}
                                   </p>
                                 </div>
@@ -665,9 +653,7 @@ export default function LessonPresenterConsolePage() {
                                 {slides[currentSlideIndex].bullets!.map((bullet: string, bIdx: number) => (
                                   <span 
                                     key={bIdx} 
-                                    className={`px-4 py-2 rounded-xl border ${borderTheme} ${
-                                      isLight ? "bg-zinc-100 text-zinc-700" : "bg-teal-500/5 text-teal-400"
-                                    } text-xs md:text-sm font-bold shadow-sm shrink-0`}
+                                    className={`px-4 py-2 rounded-xl border ${borderTheme} bg-subtle text-fg dark:bg-teal-500/5 dark:text-teal-400 text-xs md:text-sm font-bold shadow-sm shrink-0`}
                                   >
                                     💬 {bullet}
                                   </span>
@@ -684,7 +670,7 @@ export default function LessonPresenterConsolePage() {
                                 <div className="space-y-6">
                                   <p className={`font-black border-b border-zinc-800/80 pb-4 ${
                                     cinemaMode 
-                                      ? "text-xl md:text-2xl lg:text-3xl text-teal-400 leading-relaxed" 
+                                      ? "text-xl md:text-2xl lg:text-3xl text-teal-700 dark:text-teal-400 leading-relaxed" 
                                       : `text-lg md:text-xl lg:text-2xl text-teal-400 leading-relaxed`
                                   }`}>
                                     {slides[currentSlideIndex].content}
@@ -694,12 +680,12 @@ export default function LessonPresenterConsolePage() {
                                       <li key={bIdx} className="flex gap-3 justify-start items-start">
                                         <span className={`rounded-full bg-teal-400 shrink-0 ${
                                           cinemaMode 
-                                            ? "w-3 h-3 mt-2.5 shadow-[0_0_10px_rgba(20,184,166,0.8)]" 
-                                            : "w-2.5 h-2.5 mt-2 shadow-[0_0_8px_rgba(20,184,166,0.6)]"
+                                            ? "w-3 h-3 mt-2.5" 
+                                            : "w-2.5 h-2.5 mt-2"
                                         }`} />
                                         <span className={`${
                                           cinemaMode 
-                                            ? "text-lg md:text-xl lg:text-2xl text-zinc-100 font-medium leading-relaxed" 
+                                            ? "text-lg md:text-xl lg:text-2xl text-fg font-medium leading-relaxed" 
                                             : `text-base md:text-lg ${titleText} font-bold leading-relaxed`
                                         }`}>{bullet}</span>
                                       </li>
@@ -710,8 +696,8 @@ export default function LessonPresenterConsolePage() {
                                 /* FALLBACK SIMPLE TOPIC SLIDE */
                                 <p className={`whitespace-pre-line font-bold leading-relaxed ${
                                   cinemaMode 
-                                    ? "text-xl md:text-2xl lg:text-3xl text-zinc-200" 
-                                    : `text-xl ${isLight ? "text-zinc-800" : "text-zinc-200"}`
+                                    ? "text-xl md:text-2xl lg:text-3xl text-fg" 
+                                    : `text-xl text-fg`
                                 }`}>
                                   {slides[currentSlideIndex].content}
                                 </p>
@@ -720,10 +706,10 @@ export default function LessonPresenterConsolePage() {
 
                             {/* Optional Image or Video on Left */}
                             {slides[currentSlideIndex].videoDetailId ? (
-                              <div className={`aspect-video bg-zinc-900 rounded-2xl overflow-hidden border shrink-0 relative flex items-center justify-center ${
+                              <div className={`aspect-video bg-card rounded-xl overflow-hidden border shrink-0 relative flex items-center justify-center ${
                                 cinemaMode 
-                                  ? "w-full md:w-6/12 lg:w-7/12 shadow-[0_15px_50px_rgba(20,184,166,0.25)] border-teal-500/20" 
-                                  : "w-full md:w-5/12 shadow-lg border-zinc-800/40"
+                                  ? "w-full md:w-6/12 lg:w-7/12 border-teal-500/20" 
+                                  : "w-full md:w-5/12 shadow-sm border-line"
                               }`}>
                                 <iframe
                                   src={`https://www.youtube.com/embed/${slides[currentSlideIndex].videoDetailId}?rel=0&modestbranding=1`}
@@ -742,10 +728,10 @@ export default function LessonPresenterConsolePage() {
                                 <img
                                   src={slides[currentSlideIndex].imageUrl}
                                   alt={slides[currentSlideIndex].title}
-                                  className={`max-w-full max-h-[416px] md:max-h-[468px] object-contain rounded-2xl border cursor-zoom-in hover:scale-[1.01] transition-transform duration-300 ${
+                                  className={`max-w-full max-h-[416px] md:max-h-[468px] object-contain rounded-xl border cursor-zoom-in hover:scale-[1.01] transition-transform duration-300 ${
                                     cinemaMode 
-                                      ? "shadow-[0_15px_50px_rgba(20,184,166,0.25)] border-teal-500/20" 
-                                      : "shadow-lg border-zinc-800/40"
+                                      ? "border-teal-500/20" 
+                                      : "shadow-sm border-line"
                                   }`}
                                   onClick={() => setLightboxImageUrl(slides[currentSlideIndex].imageUrl || null)}
                                 />
@@ -758,13 +744,13 @@ export default function LessonPresenterConsolePage() {
 
                     {/* Inline Widget activator reminder */}
                     {slides[currentSlideIndex].visualType === "task" && lessonData.widgetId && (
-                      <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-3 bg-earth/10 border border-earth/20 rounded-xl p-3 text-xs shrink-0 select-none">
-                        <span className="text-earth font-bold text-right">
+                      <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-3 bg-accent-soft border border-accent/20 rounded-xl p-3 text-xs shrink-0 select-none">
+                        <span className="text-accent font-bold text-right">
                           💡 תלמידים יקרים, כעת נפנה לתרגול וחקירה בעזרת היישומון הדיגיטלי הבא:
                         </span>
                         <button
                           onClick={() => setShowInlineWidget(true)}
-                          className="px-4 py-1.5 bg-earth hover:bg-teal-600 text-white rounded-lg font-bold cursor-pointer transition-all flex items-center gap-1.5 shrink-0"
+                          className="px-4 py-1.5 bg-accent hover:bg-teal-600 text-white rounded-lg font-bold cursor-pointer transition-all flex items-center gap-1.5 shrink-0"
                         >
                           <Play className="w-3.5 h-3.5 animate-pulse" />
                           <span>הפעל יישומון להדגמה</span>
@@ -777,19 +763,19 @@ export default function LessonPresenterConsolePage() {
 
               {/* Slider Bottom Navigation Controls */}
               <div className={`w-full border-t p-4 flex justify-between items-center shrink-0 ${
-                cinemaMode ? "border-zinc-800 bg-zinc-900/40" : `${borderTheme} bg-surface-hover/20`
+                cinemaMode ? "border-line bg-subtle" : `${borderTheme} bg-surface-hover/20`
               }`}>
                 {/* Previous button on the Right under RTL */}
                 <button
                   onClick={handlePrevSlide}
                   disabled={currentSlideIndex === 0}
-                  className="px-4 py-2 border border-border-custom bg-surface hover:bg-surface-hover disabled:opacity-40 disabled:cursor-not-allowed text-text-muted text-xs font-bold rounded-xl cursor-pointer transition-all flex items-center gap-1.5 select-none"
+                  className="px-4 py-2 border border-line bg-subtle hover:bg-subtle-hover disabled:opacity-40 disabled:cursor-not-allowed text-fg-muted text-xs font-bold rounded-xl cursor-pointer transition-all flex items-center gap-1.5 select-none"
                 >
                   <ChevronRight className="w-4 h-4 shrink-0" />
                   <span>שקף קודם</span>
                 </button>
 
-                <div className={`text-[10px] font-black hidden sm:block ${cinemaMode ? "text-zinc-500" : textMuted}`}>
+                <div className={`text-[10px] font-bold hidden sm:block ${cinemaMode ? "text-fg-muted" : textMuted}`}>
                   מקשי חצים במקלדת (ימין/שמאל) מנווטים בשקפים
                 </div>
 
@@ -797,7 +783,7 @@ export default function LessonPresenterConsolePage() {
                 <button
                   onClick={handleNextSlide}
                   disabled={currentSlideIndex === slides.length - 1}
-                  className="px-4 py-2 bg-earth hover:bg-teal-600 disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed text-white text-xs font-bold rounded-xl cursor-pointer transition-all flex items-center gap-1.5 select-none animate-pulse-hover"
+                  className="px-4 py-2 bg-accent hover:bg-teal-600 disabled:bg-subtle disabled:text-fg-muted disabled:cursor-not-allowed text-white text-xs font-bold rounded-xl cursor-pointer transition-all flex items-center gap-1.5 select-none animate-pulse-hover"
                 >
                   <span>שקף הבא</span>
                   <ChevronLeft className="w-4 h-4 shrink-0" />
@@ -816,8 +802,8 @@ export default function LessonPresenterConsolePage() {
                 {renderWidget()}
               </div>
             ) : (
-              <div className={`p-8 border ${borderTheme} rounded-2xl ${cardTheme} text-center space-y-4`}>
-                <HelpCircle className="w-12 h-12 text-text-muted mx-auto" />
+              <div className={`p-8 border ${borderTheme} rounded-xl ${cardTheme} text-center space-y-4`}>
+                <HelpCircle className="w-12 h-12 text-fg-muted mx-auto" />
                 <h4 className={`text-base font-bold ${titleText}`}>אין יישומון דיגיטלי מובנה לשיעור זה</h4>
                 <p className={`${textMuted} text-xs max-w-sm mx-auto`}>
                   השיעור מתמקד בדיון כיתתי ושיח טיעוני. עקבו אחר ההנחיות למשימה בשקפי המצגת או במערך השיעור.
@@ -826,9 +812,9 @@ export default function LessonPresenterConsolePage() {
             )}
 
             {/* Task guidelines card */}
-            <div className={`p-5 rounded-2xl border ${borderTheme} ${cardTheme} text-right space-y-3`}>
+            <div className={`p-5 rounded-xl border ${borderTheme} ${cardTheme} text-right space-y-3`}>
               <h4 className={`text-base font-bold ${titleText} flex items-center gap-1.5 justify-start`}>
-                <CheckCircle className="w-4 h-4 text-earth shrink-0" />
+                <CheckCircle className="w-4 h-4 text-accent shrink-0" />
                 <span>הנחיות למשימה המעשית בכיתה</span>
               </h4>
               <p className={`text-xs ${textMuted} font-bold leading-normal`}>
@@ -837,7 +823,7 @@ export default function LessonPresenterConsolePage() {
               <ol className={`text-xs ${textMuted} space-y-2 list-none pr-0`}>
                 {lessonData.task.instructions.map((inst, index) => (
                   <li key={index} className="flex gap-2 justify-start items-start">
-                    <span className="w-5 h-5 rounded-full bg-earth/10 border border-earth/20 text-earth text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                    <span className="w-5 h-5 rounded-full bg-accent-soft border border-accent/20 text-accent text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                       {index + 1}
                     </span>
                     <span className="leading-relaxed">{inst}</span>
@@ -853,10 +839,10 @@ export default function LessonPresenterConsolePage() {
           <div className="flex-1 flex flex-col justify-start space-y-6 text-right">
             
             {/* Pedagogical 3-Step Lesson Plan */}
-            <div className={`p-5 rounded-2xl border ${borderTheme} ${cardTheme} space-y-4`}>
-              <div className="flex justify-between items-center border-b border-border-custom pb-2">
+            <div className={`p-5 rounded-xl border ${borderTheme} ${cardTheme} space-y-4`}>
+              <div className="flex justify-between items-center border-b border-line pb-2">
                 <span className={`text-[10px] ${textMuted} font-semibold flex items-center gap-1`}>
-                  <Clock className="w-3.5 h-3.5 text-earth" />
+                  <Clock className="w-3.5 h-3.5 text-accent" />
                   <span>שיעור תלת-שלבי מומלץ (50 דקות)</span>
                 </span>
                 <h4 className={`text-base font-bold ${titleText}`}>מערך השיעור</h4>
@@ -864,9 +850,9 @@ export default function LessonPresenterConsolePage() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Step 1 */}
-                <div className="space-y-2 bg-surface/20 p-4 border border-border-custom/50 rounded-xl flex flex-col justify-between">
+                <div className="space-y-2 bg-subtle p-4 border border-line rounded-xl flex flex-col justify-between">
                   <div>
-                    <span className="text-[10px] font-black text-earth block">שלב א׳ (15 דקות)</span>
+                    <span className="text-[10px] font-bold text-accent block">שלב א׳ (15 דקות)</span>
                     <h5 className={`font-bold text-xs ${titleText} mt-1`}>הצגת הנושא וגירוי חזותי</h5>
                     <p className={`text-[11px] ${textMuted} leading-relaxed mt-2`}>
                       {lessonData.hook}
@@ -876,9 +862,9 @@ export default function LessonPresenterConsolePage() {
                 </div>
 
                 {/* Step 2 */}
-                <div className="space-y-2 bg-surface/20 p-4 border border-border-custom/50 rounded-xl flex flex-col justify-between">
+                <div className="space-y-2 bg-subtle p-4 border border-line rounded-xl flex flex-col justify-between">
                   <div>
-                    <span className="text-[10px] font-black text-earth block">שלב ב׳ (25 דקות)</span>
+                    <span className="text-[10px] font-bold text-accent block">שלב ב׳ (25 דקות)</span>
                     <h5 className={`font-bold text-xs ${titleText} mt-1`}>עבודה עצמית וחקר פעיל</h5>
                     <p className={`text-[11px] ${textMuted} leading-relaxed mt-2`}>
                       {lessonData.task.description} המשימה כוללת עבודה קבוצתית או מילוי שאלונים ביישומון.
@@ -888,9 +874,9 @@ export default function LessonPresenterConsolePage() {
                 </div>
 
                 {/* Step 3 */}
-                <div className="space-y-2 bg-surface/20 p-4 border border-border-custom/50 rounded-xl flex flex-col justify-between">
+                <div className="space-y-2 bg-subtle p-4 border border-line rounded-xl flex flex-col justify-between">
                   <div>
-                    <span className="text-[10px] font-black text-earth block">שלב ג׳ (10 דקות)</span>
+                    <span className="text-[10px] font-bold text-accent block">שלב ג׳ (10 דקות)</span>
                     <h5 className={`font-bold text-xs ${titleText} mt-1`}>סיכום כיתתי במליאה</h5>
                     <p className={`text-[11px] ${textMuted} leading-relaxed mt-2`}>
                       הצגת הממצאים במליאה, דיון טיעוני כיתתי וחיזוק המושגים המדעיים: 
@@ -904,15 +890,15 @@ export default function LessonPresenterConsolePage() {
 
             {/* Notebook Copied Concepts Guide for Teacher */}
             {lessonData.notebookSummary && lessonData.notebookSummary.length > 0 && (
-              <div className={`p-5 rounded-2xl border ${borderTheme} ${cardTheme} space-y-3`}>
+              <div className={`p-5 rounded-xl border ${borderTheme} ${cardTheme} space-y-3`}>
                 <h4 className={`text-sm font-bold ${titleText} flex items-center gap-1.5 justify-start`}>
-                  <Edit3 className="w-4 h-4 text-earth shrink-0" />
+                  <Edit3 className="w-4 h-4 text-accent shrink-0" />
                   <span>סיכום מושגי יסוד להעתקה למחברת התלמידים:</span>
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {lessonData.notebookSummary.map((concept, cIdx) => (
-                    <div key={cIdx} className="bg-surface/10 p-3 rounded-xl border border-border-custom text-right">
-                      <strong className="text-white text-xs block border-b border-border-custom pb-1 mb-1.5">{concept.term}</strong>
+                    <div key={cIdx} className="bg-subtle p-3 rounded-xl border border-line text-right">
+                      <strong className="text-fg text-xs block border-b border-line pb-1 mb-1.5">{concept.term}</strong>
                       <p className={`text-[11px] ${textMuted} leading-relaxed`}>{concept.definition}</p>
                     </div>
                   ))}
@@ -924,15 +910,15 @@ export default function LessonPresenterConsolePage() {
 
             {/* Misconception Busters */}
             {lessonData.misconceptions && lessonData.misconceptions.length > 0 && (
-              <div className="p-5 rounded-2xl border border-amber-500/20 bg-amber-950/10 space-y-3 text-right">
-                <h4 className="text-sm font-bold text-amber-400 flex items-center gap-1.5 justify-start">
-                  <Lightbulb className="w-4 h-4 text-amber-400 shrink-0" />
+              <div className="p-5 rounded-xl border border-amber-500/20 bg-amber-50 dark:bg-amber-950/10 space-y-3 text-right">
+                <h4 className="text-sm font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1.5 justify-start">
+                  <Lightbulb className="w-4 h-4 text-amber-700 dark:text-amber-400 shrink-0" />
                   <span>התמודדות עם תפיסות שגויות וקשיים קוגניטיביים של תלמידים:</span>
                 </h4>
-                <ul className="text-xs text-text-muted space-y-2 list-none pr-0">
+                <ul className="text-xs text-fg-muted space-y-2 list-none pr-0">
                   {lessonData.misconceptions.map((mis, mIdx) => (
                     <li key={mIdx} className="flex gap-2 justify-start items-start text-right">
-                      <span className="leading-relaxed text-zinc-300">
+                      <span className="leading-relaxed text-fg">
                         ⚠️ <strong>תפיסה מוטעית נפוצה:</strong> {mis}
                       </span>
                     </li>
@@ -947,28 +933,22 @@ export default function LessonPresenterConsolePage() {
 
       {/* FOOTER: Hide in cinema mode */}
       {!cinemaMode && (
-        <footer className={`w-full text-center py-6 border-t ${borderTheme} text-[10px] text-text-muted relative z-10 bg-surface/30 shrink-0`}>
-          <span>© {new Date().getFullYear()} ניר עוז-ארי — מדעי כדור הארץ והיקום לכיתה ח׳</span>
+        <footer className={`w-full text-center py-6 border-t ${borderTheme} text-[10px] text-fg-muted relative z-10 bg-subtle shrink-0`}>
+          <span>© {new Date().getFullYear()} נקודת ציון — מדעי כדור הארץ והיקום לכיתה ח׳</span>
         </footer>
       )}
 
       {/* NOTEBOOK OVERLAY PANEL */}
       {showNotebookOverlay && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] flex items-center justify-center p-4 select-none animate-fade-in" onClick={() => setShowNotebookOverlay(false)}>
+        <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4 select-none animate-fade-in" onClick={() => setShowNotebookOverlay(false)}>
           <div 
-            className={`w-full max-w-lg rounded-3xl border shadow-2xl p-6 md:p-8 text-right relative space-y-6 transform scale-100 transition-all duration-300 ${
-              isLight 
-                ? "bg-amber-50/95 border-amber-200 text-zinc-800" 
-                : "bg-zinc-900/95 border-amber-500/20 text-zinc-100"
-            }`}
+            className={`w-full max-w-lg rounded-xl border shadow-sm p-6 md:p-8 text-right relative space-y-6 transform scale-100 transition-all duration-300 bg-amber-50/95 border-amber-200 text-fg dark:bg-subtle dark:border-amber-500/20`}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
             <button 
               onClick={() => setShowNotebookOverlay(false)}
-              className={`absolute top-4 left-4 p-2 rounded-xl transition-all cursor-pointer ${
-                isLight ? "hover:bg-amber-100 text-zinc-600" : "hover:bg-zinc-800 text-zinc-400"
-              }`}
+              className={`absolute top-4 left-4 p-2 rounded-xl transition-all cursor-pointer hover:bg-amber-100 text-fg-muted dark:hover:bg-subtle`}
             >
               <X className="w-5 h-5" />
             </button>
@@ -976,10 +956,10 @@ export default function LessonPresenterConsolePage() {
             <div className="flex items-center gap-3 justify-start pb-4 border-b border-amber-500/10">
               <BookCopy className="w-7 h-7 text-amber-500 shrink-0" />
               <div>
-                <h3 className="text-lg md:text-xl font-black text-amber-500">
+                <h3 className="text-lg md:text-xl font-bold text-amber-500">
                   מושגי יסוד למחברת 📝
                 </h3>
-                <p className={`text-xs mt-0.5 ${isLight ? "text-zinc-500" : "text-zinc-400"}`}>
+                <p className={`text-xs mt-0.5 text-fg-muted`}>
                   העתקת מושגי מפתח בצורה מסודרת במהלך השיעור
                 </p>
               </div>
@@ -989,10 +969,10 @@ export default function LessonPresenterConsolePage() {
               <ul className="space-y-4 pr-0 list-none max-h-[300px] overflow-y-auto pl-2 scrollbar-custom text-right">
                 {lessonData.notebookSummary.map((concept: NotebookConcept, cIdx: number) => (
                   <li key={cIdx} className="flex gap-3 justify-start items-start">
-                    <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0 mt-2 shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
+                    <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0 mt-2" />
                     <div className="flex-1">
-                      <strong className="text-amber-500 block text-sm font-black">{concept.term}</strong>
-                      <p className={`text-xs md:text-sm font-medium mt-0.5 leading-relaxed ${isLight ? "text-zinc-600" : "text-zinc-300"}`}>
+                      <strong className="text-amber-500 block text-sm font-bold">{concept.term}</strong>
+                      <p className={`text-xs md:text-sm font-medium mt-0.5 leading-relaxed text-fg-muted`}>
                         {concept.definition}
                       </p>
                     </div>
@@ -1000,7 +980,7 @@ export default function LessonPresenterConsolePage() {
                 ))}
               </ul>
             ) : (
-              <div className="text-center py-6 text-text-muted">
+              <div className="text-center py-6 text-fg-muted">
                 <p className="text-sm font-bold">אין מושגי מחברת מוגדרים לשיעור זה.</p>
               </div>
             )}
@@ -1008,7 +988,7 @@ export default function LessonPresenterConsolePage() {
             <div className="pt-2 text-center">
               <button
                 onClick={() => setShowNotebookOverlay(false)}
-                className="px-6 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm rounded-xl cursor-pointer transition-all shadow-[0_4px_12px_rgba(245,158,11,0.25)]"
+                className="px-6 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm rounded-xl cursor-pointer transition-all"
               >
                 הבנתי, סגור
               </button>
@@ -1020,13 +1000,13 @@ export default function LessonPresenterConsolePage() {
       {/* IMAGE LIGHTBOX OVERLAY */}
       {lightboxImageUrl && (
         <div 
-          className="fixed inset-0 bg-black/95 backdrop-blur-md z-[100] flex flex-col items-center justify-center p-4 cursor-zoom-out select-none animate-fade-in"
+          className="fixed inset-0 bg-black/95 z-[100] flex flex-col items-center justify-center p-4 cursor-zoom-out select-none animate-fade-in"
           onClick={() => setLightboxImageUrl(null)}
         >
           {/* Close Button */}
           <button 
             onClick={() => setLightboxImageUrl(null)}
-            className="fixed top-6 left-6 p-2 rounded-xl bg-zinc-900/80 border border-zinc-800 hover:bg-zinc-800 text-white cursor-pointer z-[110]"
+            className="fixed top-6 left-6 p-2 rounded-xl bg-subtle border border-line hover:bg-subtle text-fg cursor-pointer z-[110]"
           >
             <X className="w-6 h-6" />
           </button>
@@ -1035,12 +1015,12 @@ export default function LessonPresenterConsolePage() {
             <img 
               src={lightboxImageUrl} 
               alt="תמונה מוגדלת" 
-              className="max-w-full max-h-full object-contain rounded-xl shadow-2xl border border-zinc-800"
+              className="max-w-full max-h-full object-contain rounded-xl shadow-sm border border-line"
               onClick={(e) => e.stopPropagation()} 
             />
           </div>
           
-          <span className="text-zinc-400 text-xs font-bold mt-4 tracking-wider">
+          <span className="text-fg-muted text-xs font-bold mt-4 tracking-wider">
             לחץ בכל מקום או על ה-X ליציאה
           </span>
         </div>

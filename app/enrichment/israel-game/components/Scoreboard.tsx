@@ -21,14 +21,14 @@ export interface Team {
 }
 
 export const TEAM_COLOR_PALETTES = [
-  "bg-blue-500/15 text-blue-400 border-blue-500/30",
-  "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
-  "bg-amber-500/15 text-amber-400 border-amber-500/30",
-  "bg-rose-500/15 text-rose-400 border-rose-500/30",
-  "bg-purple-500/15 text-purple-400 border-purple-500/30",
-  "bg-cyan-500/15 text-cyan-400 border-cyan-500/30",
-  "bg-orange-500/15 text-orange-400 border-orange-500/30",
-  "bg-pink-500/15 text-pink-400 border-pink-500/30",
+  "bg-blue-500/15 text-blue-700 dark:text-blue-400 border-blue-500/30",
+  "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30",
+  "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30",
+  "bg-rose-500/15 text-rose-700 dark:text-rose-400 border-rose-500/30",
+  "bg-purple-500/15 text-purple-700 dark:text-purple-400 border-purple-500/30",
+  "bg-cyan-500/15 text-cyan-700 dark:text-cyan-400 border-cyan-500/30",
+  "bg-orange-500/15 text-orange-700 dark:text-orange-400 border-orange-500/30",
+  "bg-pink-500/15 text-pink-700 dark:text-pink-400 border-pink-500/30",
 ];
 
 interface ScoreboardProps {
@@ -63,53 +63,43 @@ export function Scoreboard({
     <div
       className={`w-full transition-all duration-300 ${
         isProjector
-          ? "bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-5 shadow-2xl"
-          : isLight
-          ? "bg-white rounded-3xl border border-zinc-200 p-6 shadow-sm"
-          : "bg-surface/60 backdrop-blur-md rounded-3xl border border-border-custom p-6 shadow-xl"
+          ? "bg-subtle rounded-xl border border-line p-5 shadow-sm"
+          : "bg-card rounded-xl border border-line p-6 shadow-sm"
       }`}
     >
       {/* Header controls */}
       <div
         className={`flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b ${
           isProjector
-            ? "border-white/10"
-            : isLight
-            ? "border-zinc-200"
-            : "border-border-custom"
+            ? "border-line"
+            : "border-line"
         }`}
       >
         <div className="flex items-center gap-3">
           <div
             className={`p-2 rounded-xl ${
               isProjector
-                ? "bg-white/10 text-enrichment"
-                : isLight
-                ? "bg-blue-50 text-blue-600"
-                : "bg-enrichment/10 text-enrichment"
+                ? "bg-subtle text-accent"
+                : "bg-blue-50 text-blue-600 dark:bg-accent-soft dark:text-accent"
             }`}
           >
             <Users className="w-5 h-5" />
           </div>
           <div>
             <h2
-              className={`text-lg md:text-xl font-black font-sans tracking-tight ${
+              className={`text-lg md:text-xl font-bold font-sans tracking-tight ${
                 isProjector
-                  ? "text-white"
-                  : isLight
-                  ? "text-zinc-900"
-                  : "text-white"
+                  ? "text-fg"
+                  : "text-fg"
               }`}
             >
               לוח ניקוד כיתתי
             </h2>
             <div
-              className={`text-xs ${
-                isLight ? "text-zinc-500" : "text-text-muted"
-              }`}
+              className={`text-xs text-fg-muted`}
             >
               {teams.length} קבוצות פעילות • שווי המקום הנוכחי:{" "}
-              <b className="text-enrichment font-bold">+{currentPlacePoints} נק׳</b>
+              <b className="text-accent font-bold">+{currentPlacePoints} נק׳</b>
             </div>
           </div>
         </div>
@@ -122,13 +112,11 @@ export function Scoreboard({
             onClick={onAddTeam}
             className={`text-xs flex items-center gap-1.5 h-9 px-3 font-semibold transition-all ${
               isProjector
-                ? "bg-white/10 text-white border-white/20 hover:bg-white/20"
-                : isLight
-                ? "bg-zinc-100 border-zinc-300 hover:bg-zinc-200 text-zinc-800"
-                : "border-border-custom hover:bg-surface-hover text-text-muted hover:text-white"
+                ? "bg-subtle text-fg border-line hover:bg-subtle"
+                : "bg-subtle border-line hover:bg-subtle-hover text-fg hover:text-fg"
             }`}
           >
-            <UserPlus className="w-4 h-4 text-enrichment" />
+            <UserPlus className="w-4 h-4 text-accent" />
             <span>הוסף קבוצה</span>
           </Button>
 
@@ -138,10 +126,8 @@ export function Scoreboard({
             onClick={onResetScores}
             className={`text-xs flex items-center gap-1.5 h-9 px-3 transition-colors ${
               isProjector
-                ? "bg-transparent text-white/70 border-white/20 hover:bg-white/10 hover:text-white"
-                : isLight
-                ? "border-zinc-300 hover:bg-zinc-100 text-zinc-600"
-                : "border-border-custom hover:bg-surface-hover text-text-muted hover:text-white"
+                ? "bg-transparent text-fg-muted border-line hover:bg-subtle hover:text-fg"
+                : "border-line hover:bg-subtle text-fg-muted hover:text-fg"
             }`}
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -167,27 +153,23 @@ export function Scoreboard({
           return (
             <div
               key={team.id}
-              className={`relative flex flex-col justify-between p-4 rounded-2xl border transition-all duration-300 ${
+              className={`relative flex flex-col justify-between p-4 rounded-xl border transition-all duration-300 ${
                 isLeader
                   ? isProjector
-                    ? "border-amber-400 bg-amber-500/10 ring-2 ring-amber-400/40 shadow-[0_0_20px_rgba(245,158,11,0.25)]"
-                    : isLight
-                    ? "border-amber-400 bg-amber-50/70 ring-2 ring-amber-400/30 shadow-md"
-                    : "border-amber-500/70 bg-amber-500/5 ring-2 ring-amber-500/30 shadow-[0_0_20px_rgba(245,158,11,0.2)]"
+                    ? "border-amber-400 bg-amber-500/10 ring-2 ring-amber-400/40"
+                    : "border-amber-400 bg-amber-50/70 ring-2 ring-amber-400/30 shadow-md dark:border-amber-500/70 dark:bg-amber-500/5 dark:ring-amber-500/30"
                   : isProjector
-                  ? "border-white/10 bg-white/5 hover:border-white/20"
-                  : isLight
-                  ? "border-zinc-200 bg-zinc-50 hover:border-zinc-300"
-                  : "border-border-custom bg-surface/40 hover:border-border-custom-hover"
+                  ? "border-line bg-subtle hover:border-line"
+                  : "border-line bg-subtle hover:border-line"
               }`}
             >
               {/* Leader Trophy */}
               {isLeader && (
                 <div
-                  className="absolute -top-3.5 right-3 bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-extrabold rounded-full px-2 py-0.5 text-[10px] shadow-lg flex items-center gap-1 animate-bounce"
+                  className="absolute -top-3.5 right-3 text-black font-bold rounded-full px-2 py-0.5 text-[10px] shadow-sm flex items-center gap-1 animate-bounce bg-amber-500"
                   title="מובילים בטבלה!"
                 >
-                  <Trophy className="w-3 h-3 text-black" />
+                  <Trophy className="w-3 h-3 text-fg" />
                   <span>מובילים!</span>
                 </div>
               )}
@@ -198,11 +180,7 @@ export function Scoreboard({
                   type="button"
                   onClick={() => onRemoveTeam(team.id)}
                   title="הסר קבוצה זו"
-                  className={`absolute -top-2 left-2 p-1 rounded-full border opacity-40 hover:opacity-100 transition-opacity ${
-                    isLight
-                      ? "bg-zinc-200 hover:bg-rose-100 hover:text-rose-600 border-zinc-300"
-                      : "bg-surface hover:bg-rose-500/20 hover:text-rose-400 border-border-custom"
-                  }`}
+                  className={`absolute -top-2 left-2 p-1 rounded-full border opacity-40 hover:opacity-100 transition-opacity bg-subtle-hover hover:bg-rose-100 hover:text-rose-600 border-line dark:hover:bg-rose-500/20 dark:hover:text-rose-400`}
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -214,15 +192,13 @@ export function Scoreboard({
                   type="text"
                   value={team.name}
                   onChange={(e) => onRenameTeam(team.id, e.target.value)}
-                  className={`w-full text-center text-sm font-bold bg-transparent border-b border-transparent hover:border-inherit focus:border-enrichment focus:outline-none px-1 pb-0.5 rounded transition-colors ${
-                    isLight ? "text-zinc-900" : "text-white"
-                  }`}
+                  className={`w-full text-center text-sm font-bold bg-transparent border-b border-transparent hover:border-inherit focus:border-accent focus:outline-none px-1 pb-0.5 rounded transition-colors text-fg`}
                 />
               </div>
 
               {/* Score Number Display */}
               <div
-                className={`text-3xl md:text-4xl font-black my-2 py-2 px-3 rounded-xl font-mono text-center transition-all ${team.color} ${
+                className={`text-3xl md:text-4xl font-bold my-2 py-2 px-3 rounded-xl font-mono text-center transition-all ${team.color} ${
                   isLeader ? "scale-105" : ""
                 }`}
               >
@@ -235,7 +211,7 @@ export function Scoreboard({
                   variant="default"
                   size="sm"
                   onClick={() => onAwardPoints(team.id, currentPlacePoints)}
-                  className="w-full h-8 text-xs font-bold bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-sm flex items-center justify-center gap-1.5 transition-transform active:scale-95"
+                  className="w-full h-8 text-xs font-bold text-white shadow-sm flex items-center justify-center gap-1.5 transition-transform active:scale-95 bg-emerald-600"
                   title={`הוסף +${currentPlacePoints} נק׳ לקבוצה זו`}
                 >
                   <Sparkles className="w-3.5 h-3.5" />
@@ -251,10 +227,8 @@ export function Scoreboard({
                   onClick={() => onUpdateScore(team.id, -1)}
                   className={`h-7 flex-1 border transition-colors ${
                     isProjector
-                      ? "border-white/10 hover:bg-rose-500/20 hover:text-rose-400 text-white/60"
-                      : isLight
-                      ? "border-zinc-300 hover:bg-rose-50 hover:text-rose-600 text-zinc-600"
-                      : "border-border-custom hover:bg-rose-500/10 hover:text-rose-400 text-text-muted"
+                      ? "border-line hover:bg-rose-500/20 hover:text-rose-700 dark:hover:text-rose-400 text-fg-muted"
+                      : "border-line hover:bg-rose-50 hover:text-rose-600 text-fg-muted dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
                   }`}
                   title="הורד 1 נקודה"
                 >
@@ -267,10 +241,8 @@ export function Scoreboard({
                   onClick={() => onUpdateScore(team.id, 1)}
                   className={`h-7 flex-1 border transition-colors ${
                     isProjector
-                      ? "border-white/10 hover:bg-emerald-500/20 hover:text-emerald-400 text-white/60"
-                      : isLight
-                      ? "border-zinc-300 hover:bg-emerald-50 hover:text-emerald-600 text-zinc-600"
-                      : "border-border-custom hover:bg-emerald-500/10 hover:text-emerald-400 text-text-muted"
+                      ? "border-line hover:bg-emerald-500/20 hover:text-emerald-700 dark:hover:text-emerald-400 text-fg-muted"
+                      : "border-line hover:bg-emerald-50 hover:text-emerald-600 text-fg-muted dark:hover:bg-emerald-500/10 dark:hover:text-emerald-400"
                   }`}
                   title="הוסף 1 נקודה"
                 >

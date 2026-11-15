@@ -146,7 +146,7 @@ export default function CrosswordClashPlayPage() {
 
   if (!gameState) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-white">
+      <div className="min-h-screen flex items-center justify-center bg-card text-fg">
         <p>Loading game arena...</p>
       </div>
     );
@@ -555,25 +555,17 @@ export default function CrosswordClashPlayPage() {
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-300 flex flex-col justify-between ${
-        isLight ? "bg-slate-100 text-slate-900" : "bg-zinc-950 text-zinc-100"
-      }`}
+      className={`min-h-screen transition-colors duration-300 flex flex-col justify-between bg-subtle text-fg`}
     >
       {/* Top Navbar */}
       <header
-        className={`border-b sticky top-0 z-30 backdrop-blur-md px-6 py-3 transition-colors ${
-          isLight ? "bg-white/90 border-slate-200" : "bg-zinc-900/90 border-zinc-800"
-        }`}
+        className={`border-b sticky top-0 z-30 px-6 py-3 transition-colors bg-card border-line`}
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link
               href="/english/crossword-clash"
-              className={`p-2 rounded-xl border transition-all ${
-                isLight
-                  ? "bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700"
-                  : "bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300"
-              }`}
+              className={`p-2 rounded-xl border transition-all bg-subtle hover:bg-subtle-hover border-line text-fg`}
               title="חזרה להגדרות"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -581,13 +573,13 @@ export default function CrosswordClashPlayPage() {
 
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-black text-sm tracking-wide bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+                <span className="font-bold text-sm tracking-wide">
                   CROSSWORD CLASH
                 </span>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 font-semibold">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-700 dark:text-indigo-400 font-semibold">
                   סיבוב {gameState.roundNumber}
                 </span>
-                <span className="text-xs text-zinc-500">• {gameState.topic}</span>
+                <span className="text-xs text-fg-muted">• {gameState.topic}</span>
               </div>
             </div>
           </div>
@@ -597,14 +589,10 @@ export default function CrosswordClashPlayPage() {
             {/* Teacher Reveal Hint */}
             <button
               onClick={handleTeacherRevealHint}
-              className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                isLight
-                  ? "bg-amber-50 hover:bg-amber-100 border-amber-200 text-amber-800"
-                  : "bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/30 text-amber-300"
-              }`}
+              className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer bg-amber-50 hover:bg-amber-100 border-amber-200 text-amber-800 dark:bg-amber-500/10 dark:hover:bg-amber-500/20 dark:border-amber-500/30 dark:text-amber-300`}
               title="גלה אות רמז למשבצת הנבחרת"
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <Sparkles className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
               <span>רמז מורה</span>
             </button>
 
@@ -612,11 +600,7 @@ export default function CrosswordClashPlayPage() {
             <Link
               href="/english/crossword-clash/printable"
               target="_blank"
-              className={`p-2 rounded-xl border transition-all text-xs font-bold flex items-center gap-1.5 ${
-                isLight
-                  ? "bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700"
-                  : "bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300"
-              }`}
+              className={`p-2 rounded-xl border transition-all text-xs font-bold flex items-center gap-1.5 bg-subtle hover:bg-subtle-hover border-line text-fg`}
               title="הדפס דף עבודה לתלמידים"
             >
               <Printer className="w-4 h-4" />
@@ -626,31 +610,23 @@ export default function CrosswordClashPlayPage() {
             {/* Audio Toggle */}
             <button
               onClick={toggleSound}
-              className={`p-2 rounded-xl border transition-all cursor-pointer ${
-                isLight
-                  ? "bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700"
-                  : "bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300"
-              }`}
+              className={`p-2 rounded-xl border transition-all cursor-pointer bg-subtle hover:bg-subtle-hover border-line text-fg`}
               title={soundEnabled ? "השתק" : "הפעל צליל"}
             >
               {soundEnabled ? (
-                <Volume2 className="w-4 h-4 text-cyan-400" />
+                <Volume2 className="w-4 h-4 text-cyan-700 dark:text-cyan-400" />
               ) : (
-                <VolumeX className="w-4 h-4 text-zinc-500" />
+                <VolumeX className="w-4 h-4 text-fg-muted" />
               )}
             </button>
 
             {/* Comfort Mode */}
             <button
               onClick={toggleComfortMode}
-              className={`p-2 rounded-xl border transition-all cursor-pointer ${
-                isLight
-                  ? "bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700"
-                  : "bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300"
-              }`}
+              className={`p-2 rounded-xl border transition-all cursor-pointer bg-subtle hover:bg-subtle-hover border-line text-fg`}
               title="Comfort Reading Mode"
             >
-              {isLight ? <Moon className="w-4 h-4 text-indigo-500" /> : <Sun className="w-4 h-4 text-amber-400" />}
+              {isLight ? <Moon className="w-4 h-4 text-indigo-500" /> : <Sun className="w-4 h-4 text-amber-700 dark:text-amber-400" />}
             </button>
           </div>
         </div>
@@ -675,31 +651,29 @@ export default function CrosswordClashPlayPage() {
                 className={`p-2.5 rounded-2xl border-2 transition-all cursor-pointer relative overflow-hidden ${
                   isTurn
                     ? `${theme.border} ${theme.bg} shadow-lg scale-[1.02]`
-                    : isLight
-                    ? "bg-white border-slate-200 opacity-80"
-                    : "bg-zinc-900/60 border-zinc-800 opacity-80"
+                    : "bg-card border-line opacity-80"
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div
-                      className={`w-6 h-6 rounded-lg ${theme.solidBg} flex items-center justify-center text-white text-xs font-bold`}
+                      className={`w-6 h-6 rounded-lg ${theme.solidBg} flex items-center justify-center text-fg text-xs font-bold`}
                     >
                       {idx + 1}
                     </div>
                     <span className="font-bold text-xs truncate max-w-[85px]">{team.name}</span>
                   </div>
-                  <span className="font-black text-sm text-cyan-400">{team.score}</span>
+                  <span className="font-bold text-sm text-cyan-700 dark:text-cyan-400">{team.score}</span>
                 </div>
 
-                <div className="flex items-center justify-between text-[10px] text-zinc-500 mt-1">
+                <div className="flex items-center justify-between text-[10px] text-fg-muted mt-1">
                   <span>מילים: {team.wordsCompleted}</span>
                   <button
                     onClick={e => {
                       e.stopPropagation();
                       setScoreAdjustTeam(team);
                     }}
-                    className="hover:text-zinc-300 px-1 py-0.5 rounded"
+                    className="hover:text-fg px-1 py-0.5 rounded"
                     title="עדכן ניקוד ידנית"
                   >
                     ⚖️
@@ -713,25 +687,25 @@ export default function CrosswordClashPlayPage() {
         {/* Feedback Alert Toast */}
         {turnFeedback && (
           <div
-            className={`px-4 py-2.5 rounded-2xl border flex items-center justify-between text-xs font-bold transition-all shadow-md animate-in fade-in slide-in-from-top-2 ${
+            className={`px-4 py-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition-all shadow-md animate-in fade-in slide-in-from-top-2 ${
               turnFeedback.type === "word"
-                ? "bg-amber-500/15 border-amber-500/40 text-amber-300"
+                ? "bg-amber-500/15 border-amber-500/40 text-amber-700 dark:text-amber-300"
                 : turnFeedback.type === "penalty"
-                ? "bg-rose-500/15 border-rose-500/40 text-rose-300"
-                : "bg-emerald-500/15 border-emerald-500/40 text-emerald-300"
+                ? "bg-rose-500/15 border-rose-500/40 text-rose-700 dark:text-rose-300"
+                : "bg-emerald-500/15 border-emerald-500/40 text-emerald-700 dark:text-emerald-300"
             }`}
           >
             <div className="flex items-center gap-2">
               {turnFeedback.type === "word" ? (
-                <Award className="w-4 h-4 text-amber-400" />
+                <Award className="w-4 h-4 text-amber-700 dark:text-amber-400" />
               ) : turnFeedback.type === "penalty" ? (
-                <XCircle className="w-4 h-4 text-rose-400" />
+                <XCircle className="w-4 h-4 text-rose-700 dark:text-rose-400" />
               ) : (
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
               )}
               <span>{turnFeedback.message}</span>
             </div>
-            <span className="text-sm font-black">
+            <span className="text-sm font-bold">
               {turnFeedback.points > 0 ? `+${turnFeedback.points}` : turnFeedback.points} נק׳
             </span>
           </div>
@@ -742,34 +716,30 @@ export default function CrosswordClashPlayPage() {
           {/* Left/Center: 8x10 Crossword Grid (8 cols on lg) */}
           <div
             dir="ltr"
-            className={`lg:col-span-7 p-4 md:p-6 rounded-3xl border flex flex-col items-center justify-center transition-all ${
-              isLight ? "bg-white border-slate-200 shadow-sm" : "bg-zinc-900/60 border-zinc-800"
-            }`}
+            className={`lg:col-span-7 p-4 md:p-6 rounded-xl border flex flex-col items-center justify-center transition-all bg-card border-line shadow-sm`}
           >
             {/* Active Selected Clue Highlight Header */}
             {activeWord ? (
               <div
                 dir="ltr"
-                className={`w-full mb-4 px-4 py-2.5 rounded-2xl border flex items-center justify-between text-xs text-left ${
-                  isLight ? "bg-indigo-50 border-indigo-200" : "bg-indigo-950/30 border-indigo-500/30"
-                }`}
+                className={`w-full mb-4 px-4 py-2.5 rounded-xl border flex items-center justify-between text-xs text-left bg-indigo-50 border-indigo-200 dark:bg-indigo-950/30 dark:border-indigo-500/30`}
               >
                 <div className="flex items-center gap-2 text-left">
-                  <span className="font-bold text-indigo-400 shrink-0">
+                  <span className="font-bold text-indigo-700 dark:text-indigo-400 shrink-0">
                     {activeWord.number} {activeWord.direction === "across" ? "Across" : "Down"}:
                   </span>
                   <span className="font-semibold">{activeWord.clue}</span>
                 </div>
                 <button
                   onClick={() => speakWord(activeWord.word)}
-                  className="p-1 rounded-lg hover:bg-indigo-500/20 text-indigo-400 transition-colors shrink-0"
+                  className="p-1 rounded-lg hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 transition-colors shrink-0"
                   title="הקרא הגדרה באנגלית"
                 >
                   <Volume1 className="w-4 h-4" />
                 </button>
               </div>
             ) : (
-              <div className="w-full mb-4 text-center text-xs text-zinc-500">
+              <div className="w-full mb-4 text-center text-xs text-fg-muted">
                 לחצו על משבצת או הגדרה כדי לראות את המילה המתאימה בלוח
               </div>
             )}
@@ -777,7 +747,7 @@ export default function CrosswordClashPlayPage() {
             {/* The Grid Matrix */}
             <div
               dir="ltr"
-              className="inline-grid gap-1.5 p-3 rounded-2xl bg-zinc-950/20 border border-zinc-500/10 select-none"
+              className="inline-grid gap-1.5 p-3 rounded-xl bg-subtle border border-line select-none"
               style={{
                 gridTemplateColumns: `repeat(${gameState.grid.cols}, minmax(0, 1fr))`
               }}
@@ -793,9 +763,7 @@ export default function CrosswordClashPlayPage() {
                     return (
                       <div
                         key={cellKey}
-                        className={`w-8 h-8 sm:w-11 sm:h-11 md:w-13 md:h-13 rounded-xl transition-all ${
-                          isLight ? "bg-slate-200/60" : "bg-zinc-900/40"
-                        }`}
+                        className={`w-8 h-8 sm:w-11 sm:h-11 md:w-13 md:h-13 rounded-xl transition-all bg-subtle-hover`}
                       />
                     );
                   }
@@ -828,14 +796,12 @@ export default function CrosswordClashPlayPage() {
                             } animate-pulse`
                           : isHighlighted
                           ? "border-indigo-400/80 bg-indigo-500/15"
-                          : isLight
-                          ? "border-slate-300 bg-white hover:border-slate-400"
-                          : "border-zinc-700 bg-zinc-900/80 hover:border-zinc-500"
+                          : "border-line bg-card hover:border-line"
                       }`}
                     >
                       {/* Cell Clue Number */}
                       {cell.number && (
-                        <span className="absolute top-0.5 left-1 text-[9px] sm:text-[10px] font-bold text-zinc-500 leading-none">
+                        <span className="absolute top-0.5 left-1 text-[9px] sm:text-[10px] font-bold text-fg-muted leading-none">
                           {cell.number}
                         </span>
                       )}
@@ -844,7 +810,7 @@ export default function CrosswordClashPlayPage() {
                       {placedTile && placingTeam && (
                         <span
                           className={`absolute top-0.5 right-1 text-[8px] font-bold ${
-                            placingTheme ? placingTheme.badge : "bg-amber-500/20 text-amber-300"
+                            placingTheme ? placingTheme.badge : "bg-amber-500/20 text-amber-700 dark:text-amber-300"
                           } px-1 rounded`}
                         >
                           ק{gameState.teams.indexOf(placingTeam) + 1}
@@ -854,16 +820,16 @@ export default function CrosswordClashPlayPage() {
                       {/* Display Letter */}
                       {cell.isRevealed ? (
                         <span
-                          className={`text-base sm:text-xl md:text-2xl font-black ${
-                            revealingTheme ? revealingTheme.text : "text-emerald-400"
+                          className={`text-base sm:text-xl md:text-2xl font-bold ${
+                            revealingTheme ? revealingTheme.text : "text-emerald-700 dark:text-emerald-400"
                           }`}
                         >
                           {cell.letter}
                         </span>
                       ) : placedTile ? (
                         <span
-                          className={`text-base sm:text-xl md:text-2xl font-black ${
-                            placingTheme ? placingTheme.text : "text-amber-300"
+                          className={`text-base sm:text-xl md:text-2xl font-bold ${
+                            placingTheme ? placingTheme.text : "text-amber-700 dark:text-amber-300"
                           }`}
                         >
                           {placedTile.letter}
@@ -881,16 +847,14 @@ export default function CrosswordClashPlayPage() {
             {/* Clues Accordion Box */}
             <div
               dir="ltr"
-              className={`p-4 rounded-3xl border flex-1 flex flex-col transition-all overflow-hidden text-left ${
-                isLight ? "bg-white border-slate-200 shadow-sm" : "bg-zinc-900/60 border-zinc-800"
-              }`}
+              className={`p-4 rounded-xl border flex-1 flex flex-col transition-all overflow-hidden text-left bg-card border-line shadow-sm`}
             >
               <div className="flex items-center justify-between pb-3 border-b mb-3">
                 <div className="flex items-center gap-2">
-                  <HelpCircle className="w-4 h-4 text-indigo-400" />
+                  <HelpCircle className="w-4 h-4 text-indigo-700 dark:text-indigo-400" />
                   <span className="font-bold text-sm">Clues (הגדרות התשבץ)</span>
                 </div>
-                <span className="text-xs text-zinc-500">
+                <span className="text-xs text-fg-muted">
                   {gameState.grid.words.filter(w => w.solved).length} / {gameState.grid.words.length} solved
                 </span>
               </div>
@@ -898,7 +862,7 @@ export default function CrosswordClashPlayPage() {
               <div className="space-y-4 overflow-y-auto max-h-[360px] pr-1" dir="ltr">
                 {/* Across Clues */}
                 <div>
-                  <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2 text-left">
+                  <h4 className="text-xs font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider mb-2 text-left">
                     Across (מאוזן)
                   </h4>
                   <div className="space-y-2">
@@ -920,16 +884,14 @@ export default function CrosswordClashPlayPage() {
                                 ? "border-indigo-500 bg-indigo-500/15 font-semibold"
                                 : w.solved
                                 ? "border-emerald-500/20 bg-emerald-500/5 line-through opacity-70"
-                                : isLight
-                                ? "border-slate-200 hover:border-slate-300 bg-slate-50"
-                                : "border-zinc-800 hover:border-zinc-700 bg-zinc-900/40"
+                                : "border-line hover:border-line bg-subtle"
                             }`}
                           >
-                            <span className="font-bold text-indigo-400 shrink-0">{w.number}.</span>
+                            <span className="font-bold text-indigo-700 dark:text-indigo-400 shrink-0">{w.number}.</span>
                             <div className="flex-1 text-left">
-                              <p className={w.solved ? "line-through text-zinc-500" : ""}>{w.clue}</p>
+                              <p className={w.solved ? "line-through text-fg-muted" : ""}>{w.clue}</p>
                             </div>
-                            <span className="text-[10px] text-zinc-500 shrink-0">
+                            <span className="text-[10px] text-fg-muted shrink-0">
                               ({w.word.length} letters)
                             </span>
                           </div>
@@ -940,7 +902,7 @@ export default function CrosswordClashPlayPage() {
 
                 {/* Down Clues */}
                 <div>
-                  <h4 className="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-2 text-left">
+                  <h4 className="text-xs font-bold text-cyan-700 dark:text-cyan-400 uppercase tracking-wider mb-2 text-left">
                     Down (מאונך)
                   </h4>
                   <div className="space-y-2">
@@ -962,16 +924,14 @@ export default function CrosswordClashPlayPage() {
                                 ? "border-cyan-500 bg-cyan-500/15 font-semibold"
                                 : w.solved
                                 ? "border-emerald-500/20 bg-emerald-500/5 line-through opacity-70"
-                                : isLight
-                                ? "border-slate-200 hover:border-slate-300 bg-slate-50"
-                                : "border-zinc-800 hover:border-zinc-700 bg-zinc-900/40"
+                                : "border-line hover:border-line bg-subtle"
                             }`}
                           >
-                            <span className="font-bold text-cyan-400 shrink-0">{w.number}.</span>
+                            <span className="font-bold text-cyan-700 dark:text-cyan-400 shrink-0">{w.number}.</span>
                             <div className="flex-1 text-left">
-                              <p className={w.solved ? "line-through text-zinc-500" : ""}>{w.clue}</p>
+                              <p className={w.solved ? "line-through text-fg-muted" : ""}>{w.clue}</p>
                             </div>
-                            <span className="text-[10px] text-zinc-500 shrink-0">
+                            <span className="text-[10px] text-fg-muted shrink-0">
                               ({w.word.length} letters)
                             </span>
                           </div>
@@ -985,23 +945,21 @@ export default function CrosswordClashPlayPage() {
             {/* Timer & Turn Controller */}
             {gameState.settings.roundTimerSeconds > 0 && (
               <div
-                className={`p-4 rounded-3xl border flex items-center justify-between transition-all ${
-                  isLight ? "bg-white border-slate-200" : "bg-zinc-900/60 border-zinc-800"
-                }`}
+                className={`p-4 rounded-xl border flex items-center justify-between transition-all bg-card border-line`}
               >
                 <div className="flex items-center gap-3">
                   <div
-                    className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black text-lg ${
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg ${
                       gameState.timeLeft <= 10
-                        ? "bg-rose-500/20 text-rose-400 animate-pulse border border-rose-500/40"
-                        : "bg-cyan-500/10 text-cyan-400 border border-cyan-500/30"
+                        ? "bg-rose-500/20 text-rose-700 dark:text-rose-400 animate-pulse border border-rose-500/40"
+                        : "bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border border-cyan-500/30"
                     }`}
                   >
                     <Clock className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="text-xl font-black">{gameState.timeLeft} שנ׳</span>
-                    <p className="text-[10px] text-zinc-500">טיימר סיבוב</p>
+                    <span className="text-xl font-bold">{gameState.timeLeft} שנ׳</span>
+                    <p className="text-[10px] text-fg-muted">טיימר סיבוב</p>
                   </div>
                 </div>
 
@@ -1010,8 +968,8 @@ export default function CrosswordClashPlayPage() {
                     onClick={toggleTimer}
                     className={`p-2 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
                       gameState.isTimerRunning
-                        ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
-                        : "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                        ? "bg-amber-500/10 border-amber-500/30 text-amber-700 dark:text-amber-400"
+                        : "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-400"
                     }`}
                   >
                     {gameState.isTimerRunning ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
@@ -1019,7 +977,7 @@ export default function CrosswordClashPlayPage() {
 
                   <button
                     onClick={resetTimer}
-                    className="p-2 rounded-xl border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition-all cursor-pointer"
+                    className="p-2 rounded-xl border border-line bg-subtle hover:bg-subtle text-fg transition-all cursor-pointer"
                     title="אפס טיימר"
                   >
                     <RotateCcw className="w-4 h-4" />
@@ -1034,21 +992,19 @@ export default function CrosswordClashPlayPage() {
         {gameState.mode === "simultaneous" ? (
           /* Simultaneous Mode: ALL TEAMS RACKS DISPLAYED SIMULTANEOUSLY */
           <div
-            className={`p-4 md:p-5 rounded-3xl border-2 transition-all shadow-xl ${
-              isLight ? "bg-white border-slate-200" : "bg-zinc-900/90 border-zinc-800"
-            }`}
+            className={`p-4 md:p-5 rounded-xl border-2 transition-all shadow-sm bg-card border-line`}
           >
             {/* Action Bar Above All Racks */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pb-3 mb-3 border-b border-zinc-800/60">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pb-3 mb-3 border-b border-line">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-bold">
+                <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-700 dark:text-cyan-400 font-bold">
                   ⚡
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-sm md:text-base leading-tight">
+                  <h3 className="font-bold text-sm md:text-base leading-tight">
                     אותיות כל הקבוצות לסיבוב {gameState.roundNumber} (All Teams&apos; Letters)
                   </h3>
-                  <p className={`text-[11px] ${isLight ? "text-slate-500" : "text-zinc-400"}`}>
+                  <p className={`text-[11px] text-fg-muted`}>
                     כל הקבוצות רואות את האותיות שלהן יחד. לחצו על אות של קבוצה כדי לשבץ אותה בלוח
                   </p>
                 </div>
@@ -1057,7 +1013,7 @@ export default function CrosswordClashPlayPage() {
               <div className="flex items-center gap-2 w-full sm:w-auto">
                 <button
                   onClick={handleSwapAllRacks}
-                  className="px-3.5 py-2.5 rounded-2xl border border-zinc-700 hover:border-zinc-600 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+                  className="px-3.5 py-2.5 rounded-xl border border-line hover:border-line bg-subtle hover:bg-subtle text-fg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
                   title="החלף 5 אותיות עבור כל הקבוצות"
                 >
                   <Shuffle className="w-3.5 h-3.5" />
@@ -1066,7 +1022,7 @@ export default function CrosswordClashPlayPage() {
 
                 <button
                   onClick={handleSubmitTurn}
-                  className="flex-1 sm:flex-none px-6 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:opacity-95 text-white font-extrabold text-xs md:text-sm shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 transition-all transform hover:scale-[1.02] cursor-pointer"
+                  className="flex-1 sm:flex-none px-6 py-2.5 rounded-xl hover:opacity-95 text-white font-bold text-xs md:text-sm shadow-sm flex items-center justify-center gap-2 transition-all transform hover:scale-[1.02] cursor-pointer bg-emerald-500"
                 >
                   <Check className="w-4 h-4" />
                   <span>בדוק והזן סיבוב ({Object.keys(turnPlacements).length} שובצו)</span>
@@ -1098,20 +1054,18 @@ export default function CrosswordClashPlayPage() {
                     className={`p-3 rounded-2xl border-2 transition-all cursor-pointer relative overflow-hidden ${
                       isSelectedTeam
                         ? `${tTheme.border} ${tTheme.bg} shadow-md`
-                        : isLight
-                        ? "bg-slate-50 border-slate-200 hover:border-slate-300"
-                        : "bg-zinc-900/60 border-zinc-800 hover:border-zinc-700"
+                        : "bg-subtle border-line hover:border-line"
                     }`}
                   >
                     {/* Header */}
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <div
-                          className={`w-6 h-6 rounded-lg ${tTheme.solidBg} flex items-center justify-center text-white text-xs font-black shadow-sm`}
+                          className={`w-6 h-6 rounded-lg ${tTheme.solidBg} flex items-center justify-center text-fg text-xs font-bold shadow-sm`}
                         >
                           {tIdx + 1}
                         </div>
-                        <span className="font-extrabold text-xs md:text-sm truncate max-w-[110px]">
+                        <span className="font-bold text-xs md:text-sm truncate max-w-[110px]">
                           {team.name}
                         </span>
                       </div>
@@ -1121,7 +1075,7 @@ export default function CrosswordClashPlayPage() {
                             {placedByThisTeamCount} בלוח
                           </span>
                         )}
-                        <span className="font-black text-xs text-cyan-400">{team.score} נק׳</span>
+                        <span className="font-bold text-xs text-cyan-700 dark:text-cyan-400">{team.score} נק׳</span>
                       </div>
                     </div>
 
@@ -1142,14 +1096,12 @@ export default function CrosswordClashPlayPage() {
                               setActiveTeamId(team.id);
                               handleRackTileClick(lIdx);
                             }}
-                            className={`h-11 sm:h-12 rounded-xl border-2 flex items-center justify-center font-black text-lg md:text-xl transition-all cursor-pointer select-none ${
+                            className={`h-11 sm:h-12 rounded-xl border-2 flex items-center justify-center font-bold text-lg md:text-xl transition-all cursor-pointer select-none ${
                               isPlaced
-                                ? "opacity-25 border-dashed border-zinc-600 scale-90"
+                                ? "opacity-25 border-dashed border-line scale-90"
                                 : isSelected
-                                ? "border-cyan-400 bg-cyan-400 text-black shadow-lg shadow-cyan-400/30 scale-110 -translate-y-1"
-                                : isLight
-                                ? "border-slate-300 bg-white hover:border-slate-400 text-slate-900 hover:scale-105"
-                                : "border-zinc-700 bg-zinc-800 hover:border-zinc-500 text-zinc-100 hover:scale-105"
+                                ? "border-cyan-400 bg-cyan-400 text-black shadow-sm scale-110 -translate-y-1"
+                                : "border-line bg-card hover:border-line text-fg hover:scale-105"
                             }`}
                           >
                             {letter}
@@ -1165,26 +1117,26 @@ export default function CrosswordClashPlayPage() {
         ) : (
           /* Turn-by-Turn Mode: Active Team 5-Letter Rack */
           <div
-            className={`p-4 md:p-5 rounded-3xl border-2 transition-all shadow-xl ${
+            className={`p-4 md:p-5 rounded-xl border-2 transition-all shadow-sm ${
               currentTeamTheme.border
-            } ${isLight ? "bg-white" : "bg-zinc-900/90"}`}
+            } bg-card`}
           >
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               {/* Active Team Indicator */}
               <div className="flex items-center gap-3">
                 <div
-                  className={`w-10 h-10 rounded-2xl ${currentTeamTheme.solidBg} flex items-center justify-center text-white font-black text-lg shadow-md`}
+                  className={`w-10 h-10 rounded-xl ${currentTeamTheme.solidBg} flex items-center justify-center text-fg font-bold text-lg shadow-md`}
                 >
                   ★
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-extrabold text-base md:text-lg">{currentTeam.name}</span>
+                    <span className="font-bold text-base md:text-lg">{currentTeam.name}</span>
                     <span className={`text-xs px-2 py-0.5 rounded-full ${currentTeamTheme.badge} font-bold`}>
                       תור פעיל
                     </span>
                   </div>
-                  <p className={`text-xs ${isLight ? "text-slate-500" : "text-zinc-400"}`}>
+                  <p className={`text-xs text-fg-muted`}>
                     בחרו אות מהמגש והניחו במשבצת המתאימה בלוח
                   </p>
                 </div>
@@ -1203,14 +1155,12 @@ export default function CrosswordClashPlayPage() {
                       key={`${currentTeam.id}-${idx}`}
                       disabled={isPlaced}
                       onClick={() => handleRackTileClick(idx)}
-                      className={`w-11 h-11 sm:w-13 sm:h-13 rounded-2xl border-2 flex items-center justify-center font-black text-xl md:text-2xl transition-all transform cursor-pointer ${
+                      className={`w-11 h-11 sm:w-13 sm:h-13 rounded-xl border-2 flex items-center justify-center font-bold text-xl md:text-2xl transition-all transform cursor-pointer ${
                         isPlaced
-                          ? "opacity-30 border-dashed border-zinc-600 cursor-not-allowed scale-90"
+                          ? "opacity-30 border-dashed border-line cursor-not-allowed scale-90"
                           : isSelected
-                          ? "border-cyan-400 bg-cyan-400 text-black shadow-lg shadow-cyan-400/30 scale-110 -translate-y-1"
-                          : isLight
-                          ? "border-slate-300 bg-slate-50 text-slate-800 hover:border-slate-400 hover:scale-105"
-                          : "border-zinc-700 bg-zinc-800 text-zinc-100 hover:border-zinc-500 hover:scale-105"
+                          ? "border-cyan-400 bg-cyan-400 text-black shadow-sm scale-110 -translate-y-1"
+                          : "border-line bg-subtle text-fg hover:border-line hover:scale-105"
                       }`}
                     >
                       {letter}
@@ -1223,7 +1173,7 @@ export default function CrosswordClashPlayPage() {
               <div className="flex items-center gap-2 w-full md:w-auto">
                 <button
                   onClick={handleSwapRack}
-                  className="px-3.5 py-3 rounded-2xl border border-zinc-700 hover:border-zinc-600 bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+                  className="px-3.5 py-3 rounded-xl border border-line hover:border-line bg-subtle hover:bg-subtle text-fg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
                   title="החלף את כל 5 האותיות והעבר תור"
                 >
                   <Shuffle className="w-4 h-4" />
@@ -1232,7 +1182,7 @@ export default function CrosswordClashPlayPage() {
 
                 <button
                   onClick={handleSubmitTurn}
-                  className="flex-1 md:flex-none px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:opacity-95 text-white font-extrabold text-sm md:text-base shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 transition-all transform hover:scale-[1.02] cursor-pointer"
+                  className="flex-1 md:flex-none px-6 py-3 rounded-xl hover:opacity-95 text-white font-bold text-sm md:text-base shadow-sm flex items-center justify-center gap-2 transition-all transform hover:scale-[1.02] cursor-pointer bg-emerald-500"
                 >
                   <Check className="w-5 h-5" />
                   <span>בדוק והזן מהלך ({Object.keys(turnPlacements).length})</span>
@@ -1245,48 +1195,46 @@ export default function CrosswordClashPlayPage() {
 
       {/* Manual Score Adjustment Modal */}
       {scoreAdjustTeam && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div
-            className={`w-full max-w-sm p-6 rounded-3xl border space-y-4 shadow-2xl ${
-              isLight ? "bg-white border-slate-200" : "bg-zinc-900 border-zinc-800"
-            }`}
+            className={`w-full max-w-sm p-6 rounded-xl border space-y-4 shadow-sm bg-card border-line`}
           >
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-base">עדכון ניקוד ידני: {scoreAdjustTeam.name}</h3>
               <button
                 onClick={() => setScoreAdjustTeam(null)}
-                className="text-zinc-500 hover:text-zinc-300 font-bold"
+                className="text-fg-muted hover:text-fg font-bold"
               >
                 ✕
               </button>
             </div>
 
-            <p className="text-xs text-zinc-500">
-              ניקוד נוכחי: <strong className="text-cyan-400">{scoreAdjustTeam.score}</strong>
+            <p className="text-xs text-fg-muted">
+              ניקוד נוכחי: <strong className="text-cyan-700 dark:text-cyan-400">{scoreAdjustTeam.score}</strong>
             </p>
 
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => handleAdjustScore(scoreAdjustTeam.id, 10)}
-                className="py-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold text-xs"
+                className="py-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 font-bold text-xs"
               >
                 +10 נקודות
               </button>
               <button
                 onClick={() => handleAdjustScore(scoreAdjustTeam.id, -5)}
-                className="py-2.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-400 font-bold text-xs"
+                className="py-2.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-700 dark:text-rose-400 font-bold text-xs"
               >
                 -5 נקודות
               </button>
               <button
                 onClick={() => handleAdjustScore(scoreAdjustTeam.id, 25)}
-                className="py-2.5 rounded-xl bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 font-bold text-xs"
+                className="py-2.5 rounded-xl bg-indigo-500/15 border border-indigo-500/30 text-indigo-700 dark:text-indigo-400 font-bold text-xs"
               >
                 +25 (בונוס כיתה)
               </button>
               <button
                 onClick={() => handleAdjustScore(scoreAdjustTeam.id, -10)}
-                className="py-2.5 rounded-xl bg-zinc-800 border border-zinc-700 text-zinc-300 font-bold text-xs"
+                className="py-2.5 rounded-xl bg-subtle border border-line text-fg font-bold text-xs"
               >
                 -10 נקודות
               </button>
@@ -1294,7 +1242,7 @@ export default function CrosswordClashPlayPage() {
 
             <button
               onClick={() => setScoreAdjustTeam(null)}
-              className="w-full py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs"
+              className="w-full py-2.5 rounded-xl bg-subtle hover:bg-subtle text-fg font-bold text-xs"
             >
               סיום
             </button>
@@ -1304,19 +1252,17 @@ export default function CrosswordClashPlayPage() {
 
       {/* Game Over Victory Modal */}
       {gameState.isGameOver && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 animate-in fade-in">
           <div
-            className={`w-full max-w-lg p-8 rounded-3xl border text-center space-y-6 shadow-2xl ${
-              isLight ? "bg-white border-slate-200" : "bg-zinc-900 border-zinc-800"
-            }`}
+            className={`w-full max-w-lg p-8 rounded-xl border text-center space-y-6 shadow-sm bg-card border-line`}
           >
             <div className="w-16 h-16 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center mx-auto text-3xl">
               🏆
             </div>
 
             <div className="space-y-1">
-              <h2 className="text-2xl md:text-3xl font-black">התשבץ הושלם בהצלחה!</h2>
-              <p className="text-xs text-zinc-500">כל המילים פוענחו. להלן טבלת הניקוד הסופית:</p>
+              <h2 className="text-2xl md:text-3xl font-bold">התשבץ הושלם בהצלחה!</h2>
+              <p className="text-xs text-fg-muted">כל המילים פוענחו. להלן טבלת הניקוד הסופית:</p>
             </div>
 
             {/* Podium Leaderboard */}
@@ -1326,12 +1272,12 @@ export default function CrosswordClashPlayPage() {
                 .map((t, idx) => (
                   <div
                     key={t.id}
-                    className={`p-3 rounded-2xl border flex items-center justify-between text-xs font-bold ${
+                    className={`p-3 rounded-xl border flex items-center justify-between text-xs font-bold ${
                       idx === 0
-                        ? "bg-amber-500/15 border-amber-500/40 text-amber-300"
+                        ? "bg-amber-500/15 border-amber-500/40 text-amber-700 dark:text-amber-300"
                         : idx === 1
-                        ? "bg-slate-300/10 border-slate-300/30 text-slate-300"
-                        : "bg-zinc-800/40 border-zinc-800 text-zinc-400"
+                        ? "bg-subtle-hover border-line text-fg"
+                        : "bg-subtle border-line text-fg-muted"
                     }`}
                   >
                     <div className="flex items-center gap-2">
@@ -1340,7 +1286,7 @@ export default function CrosswordClashPlayPage() {
                       </span>
                       <span>{t.name}</span>
                     </div>
-                    <span className="text-sm font-black">{t.score} נקודות</span>
+                    <span className="text-sm font-bold">{t.score} נקודות</span>
                   </div>
                 ))}
             </div>
@@ -1348,7 +1294,7 @@ export default function CrosswordClashPlayPage() {
             <div className="flex items-center justify-center gap-3 pt-2">
               <Link
                 href="/english/crossword-clash"
-                className="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition-colors"
+                className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition-colors"
               >
                 משחק חדש
               </Link>

@@ -221,9 +221,9 @@ export default function Workspace({ team, theme: t, onLeave }: Props) {
   return (
     <div className="space-y-5">
       {/* Team header */}
-      <section className={`rounded-2xl border p-4 flex flex-wrap items-center justify-between gap-3 ${t.card} ${t.border}`}>
+      <section className={`rounded-xl border p-4 flex flex-wrap items-center justify-between gap-3 ${t.card} ${t.border}`}>
         <div>
-          <div className={`text-lg font-black ${t.title}`}>
+          <div className={`text-lg font-bold ${t.title}`}>
             {destination.emoji} צוות {destination.name}
           </div>
           <div className={`text-xs ${t.muted}`}>
@@ -278,16 +278,14 @@ export default function Workspace({ team, theme: t, onLeave }: Props) {
       {/* Status banners */}
       {team.status === "submitted" && (
         <div
-          className={`rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-4 text-sm font-semibold ${
-            t.isLight ? "text-emerald-700" : "text-emerald-300"
-          }`}
+          className={`rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-4 text-sm font-semibold text-emerald-700 dark:text-emerald-300`}
         >
           הדו&quot;ח הוגש לסוכנות! המורה יבדוק אותו, והציון יופיע כאן.
         </div>
       )}
       {team.status === "graded" && (
-        <section className="rounded-2xl border border-amber-400/50 bg-amber-400/10 p-5 space-y-3">
-          <div className={`flex items-center gap-2 text-lg font-black ${t.title}`}>
+        <section className="rounded-xl border border-amber-400/50 bg-amber-400/10 p-5 space-y-3">
+          <div className={`flex items-center gap-2 text-lg font-bold ${t.title}`}>
             <Trophy className="w-5 h-5 text-amber-500" /> הציון שלכם: {team.scoreTeacher ?? totalScore}
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 text-sm">
@@ -327,7 +325,7 @@ export default function Workspace({ team, theme: t, onLeave }: Props) {
           );
         })}
       </nav>
-      <div className={`h-1.5 rounded-full overflow-hidden ${t.isLight ? "bg-zinc-200" : "bg-white/10"}`}>
+      <div className={`h-1.5 rounded-full overflow-hidden bg-subtle-hover`}>
         <div className="h-full bg-teal-500 transition-all" style={{ width: `${overall}%` }} />
       </div>
 
@@ -336,8 +334,8 @@ export default function Workspace({ team, theme: t, onLeave }: Props) {
 
       {stage && (
         <div className="space-y-4">
-          <section className={`rounded-2xl border p-5 space-y-2 ${t.card} ${t.border}`}>
-            <h2 className={`text-2xl font-black ${t.title}`}>
+          <section className={`rounded-xl border p-5 space-y-2 ${t.card} ${t.border}`}>
+            <h2 className={`text-2xl font-bold ${t.title}`}>
               {stage.short}: {stage.title}
             </h2>
             <p className="text-[15px] leading-relaxed">{stage.intro}</p>
@@ -362,7 +360,7 @@ export default function Workspace({ team, theme: t, onLeave }: Props) {
           </section>
           {stage.sections.map((sec, si) => (
             <div key={si} className="space-y-3">
-              {sec.title && <h3 className={`text-lg font-black pt-2 ${t.title}`}>{sec.title}</h3>}
+              {sec.title && <h3 className={`text-lg font-bold pt-2 ${t.title}`}>{sec.title}</h3>}
               {sec.questions.map((q) => (
                 <QuestionField key={q.id} q={q} number={numbers.get(q.id) ?? 0} api={api} />
               ))}

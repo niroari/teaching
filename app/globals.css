@@ -1,23 +1,128 @@
 @import "tailwindcss";
 
+/* `dark:` follows the Comfort Mode toggle (class on <html>), not the OS setting. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ─────────────────────────────────────────────────────────────
+   Design tokens. Light is the base; dark overrides below.
+   Use the semantic utilities (bg-canvas, text-fg, border-line…)
+   instead of hex colors or isLight ternaries.
+   ───────────────────────────────────────────────────────────── */
 :root {
+  --canvas: #fafafa;
+  --card: #ffffff;
+  --subtle: #f4f4f5;
+  --subtle-hover: #ececee;
+  --fg: #18181b;
+  --fg-muted: #52525b;
+  --fg-subtle: #71717a;
+  --line: #e4e4e7;
+  --line-strong: #d4d4d8;
+  --primary: #18181b;
+  --primary-hover: #27272a;
+  --primary-foreground: #ffffff;
+  --focus: #18181b;
+
+  --success: #15803d;
+  --success-soft: #f0fdf4;
+  --warning: #a16207;
+  --warning-soft: #fefce8;
+  --danger: #b91c1c;
+  --danger-soft: #fef2f2;
+
+  /* Subject accents: ink-like in light mode */
+  --accent-earth-c: oklch(0.47 0.085 195);
+  --accent-english-c: oklch(0.44 0.12 258);
+  --accent-shelach-c: oklch(0.5 0.13 42);
+  --accent-enrichment-c: oklch(0.47 0.09 135);
+  --accent: var(--fg);
+  --accent-soft: var(--subtle);
+
+  --radius: 0.5rem;
+
+  /* Legacy dark palette: used only by pages not yet migrated to the tokens above. */
   --background: #080c18;
   --foreground: #e8edf8;
-  
   --surface: #0f1526;
   --surface-hover: #161d35;
   --border: rgba(255, 255, 255, 0.07);
   --border-hover: rgba(255, 255, 255, 0.15);
   --text-muted: #7a8baa;
-  
-  /* Subject Accents HSL */
-  --accent-shelach: 24 95% 53%;    /* #f97316 */
-  --accent-english: 195 100% 50%;  /* #00c8ff */
-  --accent-enrichment: 142 70% 45%; /* #22c55e */
-  --accent-earth: 174 85% 45%;      /* Teal for Earth Sciences */
+  --accent-shelach: 24 95% 53%;
+  --accent-english: 195 100% 50%;
+  --accent-enrichment: 142 70% 45%;
+  --accent-earth: 174 85% 45%;
 }
 
+[data-theme="dark"] {
+  --canvas: #0a0b10;
+  --card: #0e1016;
+  --subtle: #15171f;
+  --subtle-hover: #1b1e28;
+  --fg: #f4f4f5;
+  --fg-muted: #a1a1aa;
+  --fg-subtle: #8b8b94;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --primary: #f4f4f5;
+  --primary-hover: #ffffff;
+  --primary-foreground: #18181b;
+  --focus: #f4f4f5;
+
+  --success: #4ade80;
+  --success-soft: rgba(74, 222, 128, 0.1);
+  --warning: #facc15;
+  --warning-soft: rgba(250, 204, 21, 0.1);
+  --danger: #f87171;
+  --danger-soft: rgba(248, 113, 113, 0.1);
+
+  --accent-earth-c: oklch(0.78 0.09 190);
+  --accent-english-c: oklch(0.76 0.1 255);
+  --accent-shelach-c: oklch(0.76 0.11 50);
+  --accent-enrichment-c: oklch(0.78 0.1 135);
+}
+
+[data-subject="earth"] { --accent: var(--accent-earth-c); }
+[data-subject="english"] { --accent: var(--accent-english-c); }
+[data-subject="shelach"] { --accent: var(--accent-shelach-c); }
+[data-subject="enrichment"] { --accent: var(--accent-enrichment-c); }
+[data-subject] { --accent-soft: color-mix(in oklab, var(--accent) 9%, transparent); }
+
 @theme inline {
+  --color-canvas: var(--canvas);
+  --color-card: var(--card);
+  --color-subtle: var(--subtle);
+  --color-subtle-hover: var(--subtle-hover);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-focus: var(--focus);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+
+  /* Tokens the components/ui primitives expect */
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--subtle);
+  --color-secondary-foreground: var(--fg);
+  --color-muted: var(--subtle);
+  --color-muted-foreground: var(--fg-muted);
+  --color-destructive: var(--danger);
+  --color-input: var(--line-strong);
+  --color-ring: var(--focus);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+
+  /* Legacy (unmigrated pages) */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-surface: var(--surface);
@@ -25,20 +130,46 @@
   --color-border-custom: var(--border);
   --color-border-custom-hover: var(--border-hover);
   --color-text-muted: var(--text-muted);
-  
   --color-shelach: hsl(var(--accent-shelach));
   --color-english: hsl(var(--accent-english));
   --color-enrichment: hsl(var(--accent-enrichment));
   --color-earth: hsl(var(--accent-earth));
-  
-  --font-sans: var(--font-alef), ui-sans-serif, system-ui, sans-serif;
+
+  --font-sans: var(--font-plex), ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  background: var(--canvas);
+  color-scheme: light;
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
+  background: var(--canvas);
+  /* Unmigrated pages paint their own dark background and inherit this light text. */
   color: var(--foreground);
   min-height: 100vh;
   overflow-x: hidden;
+}
+
+/* Keyboard focus is always visible on migrated pages. */
+.site :focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Glassmorphism card utility */
@@ -53,14 +184,14 @@ body {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--background);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--surface-hover);
+  background: var(--line-strong);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+  background: var(--fg-subtle);
 }
 
 /* 3D Flip card utilities */

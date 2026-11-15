@@ -160,7 +160,7 @@ export default function DrawingCanvas({ value, disabled, onSave, theme }: Props)
         onPointerUp={end}
         onPointerCancel={end}
         onPointerLeave={end}
-        className={`w-full max-w-[600px] aspect-[3/2] rounded-xl border ${theme.border} bg-white ${
+        className={`w-full max-w-[600px] aspect-[3/2] rounded-xl border ${theme.border} bg-card ${
           disabled ? "cursor-default" : "cursor-crosshair"
         }`}
         style={{ touchAction: "none" }}

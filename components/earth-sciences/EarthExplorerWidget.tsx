@@ -137,7 +137,7 @@ export default function EarthExplorerWidget() {
       ],
       correctAnswer: 1,
       explanation: "למרות שיערות הגשם מכונים 'הריאות של כדור הארץ', רוב החמצן באטמוספרה (בין 50% ל-80%) מיוצר על ידי אצות וצמחים מיקרוסקופיים באוקיינוסים בתהליך פוטוסינתזה!",
-      icon: <HelpCircle className="w-8 h-8 text-teal-400" />
+      icon: <HelpCircle className="w-8 h-8 text-teal-700 dark:text-teal-400" />
     }
   ];
 
@@ -175,34 +175,34 @@ export default function EarthExplorerWidget() {
   const getOptionStyle = (optIdx: number) => {
     if (!isChecked) {
       return selectedOption === optIdx
-        ? "border-earth bg-earth/10 text-white font-extrabold"
-        : "border-border-custom bg-surface hover:bg-surface-hover/80 text-text-muted";
+        ? "border-accent bg-accent-soft text-fg font-bold"
+        : "border-line bg-subtle hover:bg-subtle-hover text-fg-muted";
     }
 
     const isCorrect = optIdx === QUESTIONS[currentIdx].correctAnswer;
     const isSelected = optIdx === selectedOption;
 
     if (isCorrect) {
-      return "border-emerald-500 bg-emerald-950/20 text-emerald-300 font-extrabold";
+      return "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-300 font-bold";
     }
     if (isSelected) {
-      return "border-red-500 bg-red-950/20 text-red-300 font-extrabold";
+      return "border-red-500 bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-300 font-bold";
     }
-    return "border-border-custom bg-surface opacity-45 text-text-muted";
+    return "border-line bg-subtle opacity-45 text-fg-muted";
   };
 
   return (
-    <div className="w-full bg-[#090d16] border border-zinc-800/80 rounded-2xl p-6 min-h-[460px] flex flex-col justify-between select-none relative overflow-hidden shadow-2xl">
+    <div className="w-full bg-card border border-line rounded-xl p-6 min-h-[460px] flex flex-col justify-between select-none relative overflow-hidden shadow-sm">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(20,184,166,0.1),transparent_70%)] pointer-events-none" />
 
       {gameState === "welcome" && (
         <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6 py-6 z-10">
-          <div className="w-20 h-20 rounded-full bg-earth/10 border-2 border-earth flex items-center justify-center shadow-lg shadow-teal-500/10 animate-bounce">
-            <Compass className="w-10 h-10 text-earth" />
+          <div className="w-20 h-20 rounded-full bg-accent-soft border-2 border-accent flex items-center justify-center shadow-sm animate-bounce">
+            <Compass className="w-10 h-10 text-accent" />
           </div>
           <div className="space-y-3 max-w-lg">
-            <h3 className="text-2xl md:text-3xl font-black text-white">חידון כדור הארץ הגדול! 🧠</h3>
-            <p className="text-base text-text-muted leading-relaxed">
+            <h3 className="text-2xl md:text-3xl font-bold text-fg">חידון כדור הארץ הגדול! 🧠</h3>
+            <p className="text-base text-fg-muted leading-relaxed">
               התכוננו לשנת הלימודים הבאה עלינו לטובה!
               לפניכם 5 שאלות טריוויה מפתיעות ומסקרנות על כוכב הלכת הייחודי שלנו.
               נסו לגלות כמה אתם כבר יודעים!
@@ -210,7 +210,7 @@ export default function EarthExplorerWidget() {
           </div>
           <button
             onClick={handleStart}
-            className="px-10 py-4 bg-earth hover:bg-teal-600 text-white font-extrabold rounded-xl transition-all shadow-md shadow-teal-500/20 cursor-pointer animate-pulse-hover text-lg"
+            className="px-10 py-4 bg-accent hover:bg-teal-600 text-white font-bold rounded-xl transition-all shadow-md cursor-pointer animate-pulse-hover text-lg"
           >
             בואו נתחיל לשחק
           </button>
@@ -219,23 +219,23 @@ export default function EarthExplorerWidget() {
 
       {gameState === "quiz" && (
         <div className="flex-1 flex flex-col justify-between z-10 space-y-4">
-          <div className="flex justify-between items-center border-b border-zinc-800 pb-3">
-            <span className="text-sm text-text-muted font-bold">
+          <div className="flex justify-between items-center border-b border-line pb-3">
+            <span className="text-sm text-fg-muted font-bold">
               שאלה {currentIdx + 1} מתוך {QUESTIONS.length}
             </span>
-            <div className="flex items-center gap-2 text-sm text-amber-400 font-extrabold bg-amber-500/10 border border-amber-500/20 px-3.5 py-1.5 rounded-lg">
+            <div className="flex items-center gap-2 text-sm text-amber-700 dark:text-amber-400 font-bold bg-amber-500/10 border border-amber-500/20 px-3.5 py-1.5 rounded-lg">
               <Award className="w-4.5 h-4.5 shrink-0" />
               <span>ניקוד: {score} נקודות</span>
             </div>
           </div>
 
           <div className="flex items-start gap-4 text-right py-2">
-            <div className="shrink-0 p-3 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-center">
+            <div className="shrink-0 p-3 bg-card border border-line rounded-xl flex items-center justify-center">
               {QUESTIONS[currentIdx].icon}
             </div>
             <div className="space-y-1.5">
-              <span className="text-xs text-earth font-black tracking-widest uppercase">אתגר פתיחה</span>
-              <h4 className="text-lg md:text-xl lg:text-2xl font-black text-white leading-snug">
+              <span className="text-xs text-accent font-bold tracking-widest uppercase">אתגר פתיחה</span>
+              <h4 className="text-lg md:text-xl lg:text-2xl font-bold text-fg leading-snug">
                 {QUESTIONS[currentIdx].text}
               </h4>
             </div>
@@ -253,8 +253,8 @@ export default function EarthExplorerWidget() {
               >
                 <span className={`w-7 h-7 rounded-full border flex items-center justify-center text-xs md:text-sm shrink-0 ${
                   selectedOption === oIdx 
-                    ? "bg-earth/20 border-earth text-earth font-black"
-                    : "border-zinc-800 text-zinc-500 bg-zinc-950"
+                    ? "bg-accent-soft border-accent text-accent font-bold"
+                    : "border-line text-fg-muted bg-card"
                 }`}>
                   {String.fromCharCode(65 + oIdx)}
                 </span>
@@ -268,7 +268,7 @@ export default function EarthExplorerWidget() {
               <button
                 onClick={handleCheck}
                 disabled={selectedOption === null}
-                className="w-full py-3.5 bg-earth hover:bg-teal-600 disabled:bg-zinc-900 disabled:text-zinc-600 disabled:border-zinc-800 disabled:cursor-not-allowed text-white font-extrabold rounded-xl transition-all border border-transparent cursor-pointer text-sm md:text-base flex items-center justify-center gap-1.5"
+                className="w-full py-3.5 bg-accent hover:bg-teal-600 disabled:bg-card disabled:text-fg-muted disabled:border-line disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all border border-transparent cursor-pointer text-sm md:text-base flex items-center justify-center gap-1.5"
               >
                 <span>בדוק תשובה</span>
               </button>
@@ -276,21 +276,21 @@ export default function EarthExplorerWidget() {
               <div className="space-y-3.5 animate-fade-in text-right">
                 <div className={`p-4 border rounded-xl flex gap-3.5 ${
                   selectedOption === QUESTIONS[currentIdx].correctAnswer
-                    ? "bg-emerald-950/20 border-emerald-500/25 text-emerald-300"
-                    : "bg-red-950/20 border-red-500/25 text-red-300"
+                    ? "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-500/25 text-emerald-700 dark:text-emerald-300"
+                    : "bg-red-50 dark:bg-red-950/20 border-red-500/25 text-red-700 dark:text-red-300"
                 }`}>
                   <div className="shrink-0 mt-0.5">
                     {selectedOption === QUESTIONS[currentIdx].correctAnswer ? (
-                      <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                      <CheckCircle2 className="w-5 h-5 text-emerald-700 dark:text-emerald-400" />
                     ) : (
-                      <XCircle className="w-5 h-5 text-red-400" />
+                      <XCircle className="w-5 h-5 text-red-700 dark:text-red-400" />
                     )}
                   </div>
                   <div className="space-y-1.5">
-                    <span className="text-sm font-black block">
+                    <span className="text-sm font-bold block">
                       {selectedOption === QUESTIONS[currentIdx].correctAnswer ? "תשובה נכונה! כל הכבוד 🌟" : "תשובה לא נכונה. לא נורא!"}
                     </span>
-                    <p className="text-xs md:text-sm leading-relaxed text-zinc-300 font-medium">
+                    <p className="text-xs md:text-sm leading-relaxed text-fg font-medium">
                       {QUESTIONS[currentIdx].explanation}
                     </p>
                   </div>
@@ -298,7 +298,7 @@ export default function EarthExplorerWidget() {
 
                 <button
                   onClick={handleNext}
-                  className="w-full py-3.5 bg-zinc-800 hover:bg-zinc-700 text-white font-extrabold rounded-xl transition-all cursor-pointer text-sm md:text-base flex items-center justify-center gap-1.5"
+                  className="w-full py-3.5 bg-subtle hover:bg-subtle text-fg font-bold rounded-xl transition-all cursor-pointer text-sm md:text-base flex items-center justify-center gap-1.5"
                 >
                   <span>{currentIdx === QUESTIONS.length - 1 ? "סיום החידון וצפייה בתוצאה" : "שאלה הבאה"}</span>
                   <ArrowLeft className="w-4 h-4" />
@@ -312,14 +312,14 @@ export default function EarthExplorerWidget() {
       {/* FINAL SCORE REPORT VIEW */}
       {gameState === "score" && (
         <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6 py-6 z-10">
-          <div className="w-20 h-20 rounded-full bg-amber-500/10 border-2 border-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/10 animate-pulse">
+          <div className="w-20 h-20 rounded-full bg-amber-500/10 border-2 border-amber-500 flex items-center justify-center shadow-sm animate-pulse">
             <Award className="w-10 h-10 text-amber-500" />
           </div>
           <div className="space-y-2 max-w-md">
-            <span className="text-[10px] text-earth font-black uppercase tracking-widest">תוצאה סופית</span>
-            <h3 className="text-2xl font-black text-white">השלמתם את חידון הפתיחה!</h3>
-            <p className="text-3xl font-black text-earth mt-2">{score} מתוך {QUESTIONS.length}</p>
-            <p className="text-sm text-text-muted leading-relaxed mt-2.5">
+            <span className="text-[10px] text-accent font-bold uppercase tracking-widest">תוצאה סופית</span>
+            <h3 className="text-2xl font-bold text-fg">השלמתם את חידון הפתיחה!</h3>
+            <p className="text-3xl font-bold text-accent mt-2">{score} מתוך {QUESTIONS.length}</p>
+            <p className="text-sm text-fg-muted leading-relaxed mt-2.5">
               {score === QUESTIONS.length
                 ? "מושלם! אתם אלופי כדור הארץ האמיתיים 🌍 מחכה לנו שנה מרתקת ביחד!"
                 : score >= 3
@@ -329,9 +329,9 @@ export default function EarthExplorerWidget() {
           </div>
           <button
             onClick={handleStart}
-            className="px-6 py-2.5 bg-surface hover:bg-surface-hover border border-border-custom text-white font-extrabold rounded-xl transition-all cursor-pointer text-sm flex items-center gap-2"
+            className="px-6 py-2.5 bg-subtle hover:bg-subtle-hover border border-line text-fg font-bold rounded-xl transition-all cursor-pointer text-sm flex items-center gap-2"
           >
-            <RotateCcw className="w-4 h-4 text-earth" />
+            <RotateCcw className="w-4 h-4 text-accent" />
             <span>נסו שוב</span>
           </button>
         </div>

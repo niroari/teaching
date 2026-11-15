@@ -61,9 +61,6 @@ export const CONTENT_ITEMS: ContentItem[] = [
   // ── English ──
   { id: "english.crossword-clash", title: "Crossword Clash", subject: "english", kind: "game", path: "/english/crossword-clash" },
   { id: "english.sentence-auction", title: "The Sentence Auction", subject: "english", kind: "game", path: "/english-auction" },
-  { id: "english.vocab-trainer", title: "Vocab Trainer", subject: "english", kind: "tool", path: "/english/vocab-trainer" },
-  { id: "english.unseen-practice", title: "בלשי האנסין (Unseen Practice)", subject: "english", kind: "assignment", path: "/english/unseen-practice" },
-  { id: "english.writing-practice", title: "תרגול כתיבה (Writing Practice)", subject: "english", kind: "assignment", path: "/english/writing-practice" },
   { id: "english.chat-masters", title: "Chat Masters", subject: "english", kind: "assignment", path: "/english/chat-masters" },
   { id: "english.adjectives", title: "שמות תואר (Adjectives)", subject: "english", kind: "presentation", path: "/english/adjectives" },
   { id: "english.simone-biles", title: "Simone Biles: Present Tenses", subject: "english", kind: "presentation", path: "/english/simone-biles" },
@@ -87,13 +84,12 @@ export const CONTENT_ITEMS: ContentItem[] = [
 
   // ── Pages with no card on the home page ──
   { id: "other.values-auction", title: "מכירה פומבית של ערכים", subject: "other", kind: "game", path: "/values-auction" },
-  { id: "other.opening-year", title: "מצגת פתיחת שנה", subject: "other", kind: "presentation", path: "/opening-year" },
 ];
 
 export const CONTENT_BY_ID = new Map(CONTENT_ITEMS.map((i) => [i.id, i]));
 
 /** Pages anyone can open, whatever is visible. /admin has its own teacher check. */
-const ALWAYS_OPEN_PREFIXES = ["/login", "/admin"];
+const ALWAYS_OPEN_PREFIXES = ["/login", "/admin", "/credits"];
 
 export function isAlwaysOpenPath(pathname: string) {
   return pathname === "/" || ALWAYS_OPEN_PREFIXES.some((p) => matchesPrefix(pathname, p));

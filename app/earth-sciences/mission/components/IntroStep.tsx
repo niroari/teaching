@@ -8,7 +8,7 @@ const BLANK = "?? חפשו";
 
 function Cell({ value, mine }: { value: string | null; mine: boolean }) {
   if (value === null) {
-    return <span className="inline-block px-1.5 py-0.5 rounded bg-amber-400/90 text-zinc-900 text-[11px] font-black">{mine ? BLANK : "?"}</span>;
+    return <span className="inline-block px-1.5 py-0.5 rounded bg-amber-400/90 text-zinc-900 text-[11px] font-bold">{mine ? BLANK : "?"}</span>;
   }
   return <>{value}</>;
 }
@@ -41,7 +41,7 @@ export default function IntroStep({ api }: { api: FieldApi }) {
       <div className={`overflow-x-auto rounded-xl border ${t.border}`}>
         <table className="w-full text-xs min-w-[720px]">
           <thead>
-            <tr className={t.isLight ? "bg-zinc-100" : "bg-white/5"}>
+            <tr className={"bg-subtle"}>
               <th className={`text-right p-2 font-bold ${t.title}`}>יעד</th>
               {cols.map((c) => (
                 <th key={c.label} className={`text-right p-2 font-bold ${t.title}`}>
@@ -56,7 +56,7 @@ export default function IntroStep({ api }: { api: FieldApi }) {
               return (
                 <tr
                   key={d.id}
-                  className={`border-t ${t.border} ${isMine ? (t.isLight ? "bg-teal-50" : "bg-teal-500/10") : ""}`}
+                  className={`border-t ${t.border} ${isMine ? ("bg-teal-50 dark:bg-teal-500/10") : ""}`}
                 >
                   <td className={`p-2 font-bold whitespace-nowrap ${isMine ? t.accentText : t.title}`}>
                     {d.emoji} {d.name}
@@ -77,8 +77,8 @@ export default function IntroStep({ api }: { api: FieldApi }) {
 
   return (
     <div className="space-y-6">
-      <section className={`rounded-2xl border p-5 space-y-3 ${t.card} ${t.border}`}>
-        <h3 className={`text-xl font-black ${t.title}`}>המשימה: בית חדש לאנושות</h3>
+      <section className={`rounded-xl border p-5 space-y-3 ${t.card} ${t.border}`}>
+        <h3 className={`text-xl font-bold ${t.title}`}>המשימה: בית חדש לאנושות</h3>
         {STORY.map((p) => (
           <p key={p} className="text-[15px] leading-relaxed">
             {p}
@@ -86,8 +86,8 @@ export default function IntroStep({ api }: { api: FieldApi }) {
         ))}
       </section>
 
-      <section className={`rounded-2xl border p-5 space-y-3 ${t.card} ${t.border}`}>
-        <h3 className={`text-lg font-black ${t.title}`}>הנחיות לצוות</h3>
+      <section className={`rounded-xl border p-5 space-y-3 ${t.card} ${t.border}`}>
+        <h3 className={`text-lg font-bold ${t.title}`}>הנחיות לצוות</h3>
         <ul className="list-disc pr-5 space-y-1.5 text-sm leading-relaxed">
           {GUIDELINES.map((g) => (
             <li key={g}>{g}</li>
@@ -95,9 +95,9 @@ export default function IntroStep({ api }: { api: FieldApi }) {
         </ul>
       </section>
 
-      <section className={`rounded-2xl border p-5 space-y-4 ${t.card} ${t.border}`}>
+      <section className={`rounded-xl border p-5 space-y-4 ${t.card} ${t.border}`}>
         <div>
-          <h3 className={`text-lg font-black ${t.title}`}>כרטיסי נתונים</h3>
+          <h3 className={`text-lg font-bold ${t.title}`}>כרטיסי נתונים</h3>
           <p className={`text-sm ${t.muted}`}>
             היעד שלכם מודגש. המספרים מעוגלים. שימו לב לשני הפרטים שמסומנים &quot;{BLANK}&quot;.
           </p>
@@ -110,8 +110,8 @@ export default function IntroStep({ api }: { api: FieldApi }) {
         </p>
       </section>
 
-      <section className={`rounded-2xl border p-5 space-y-3 ${t.card} ${t.border}`}>
-        <h3 className={`text-lg font-black ${t.title}`}>
+      <section className={`rounded-xl border p-5 space-y-3 ${t.card} ${t.border}`}>
+        <h3 className={`text-lg font-bold ${t.title}`}>
           השלימו את הנתונים החסרים על {mine.emoji} {mine.name}
         </h3>
         {mine.blanks.map((b) => (

@@ -11,6 +11,8 @@ import {
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useAuth } from "@/lib/context/AuthContext";
+import ThemeToggle from "@/components/site/ThemeToggle";
+import SiteFooter from "@/components/site/SiteFooter";
 import { LogIn, UserPlus, Mail, Lock, User, ArrowRight, Sparkles } from "lucide-react";
 
 function LoginContent() {
@@ -112,53 +114,54 @@ function LoginContent() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#080c18] text-[#e8edf8] flex items-center justify-center">
-        <div className="text-sm text-text-muted animate-pulse">בטוען פרטי משתמש...</div>
+      <div className="min-h-screen bg-canvas text-fg flex items-center justify-center">
+        <div className="text-sm text-fg-muted animate-pulse">בטוען פרטי משתמש...</div>
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen bg-[#080c18] text-[#e8edf8] flex flex-col justify-between overflow-hidden">
-      {/* Decorative Gradients */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg h-96 bg-cyan-500/10 blur-3xl rounded-full pointer-events-none" />
-      
+    <div className="site relative flex min-h-screen flex-col bg-canvas text-fg">
+      <div className="flex h-14 items-center justify-end px-4 sm:px-6">
+        <ThemeToggle />
+      </div>
+
       {/* Main Form container */}
-      <div className="relative w-full max-w-md mx-auto px-6 py-20 flex-1 flex flex-col justify-center z-10">
+      <div className="relative w-full max-w-md mx-auto px-6 py-10 flex-1 flex flex-col justify-center z-10">
         
         {/* Logo / Header */}
         <div className="text-center mb-8 space-y-2">
-          <Link href="/" className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-cyan-400 transition-colors mb-4">
+          <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-fg-muted hover:text-fg transition-colors mb-4">
             <ArrowRight className="w-3.5 h-3.5" />
             <span>חזרה לדף הבית</span>
           </Link>
 
-          <h1 className="text-3xl font-black text-white">
+          <h1 className="text-3xl font-semibold text-fg">
             כניסת תלמידים
           </h1>
-          <p className="text-text-muted text-xs">התחברו כדי לשמור את המילים וההתקדמות האישית שלכם</p>
+          <p className="text-fg-muted text-sm">התחברו כדי לשמור את ההתקדמות שלכם ולהגיש משימות</p>
         </div>
 
         {/* Auth Box */}
-        <div className="glass-card rounded-2xl border border-border-custom p-6 md:p-8 space-y-6 shadow-2xl">
+        <div className="rounded-lg border border-line bg-card p-6 md:p-8 space-y-6">
           {/* Mode Tabs */}
-          <div className="grid grid-cols-2 bg-[#080c18]/80 border border-border-custom rounded-xl p-1">
+          <div className="grid grid-cols-2 gap-1 rounded-lg border border-line bg-subtle p-1">
             <button
               onClick={() => { setMode("signin"); setError(""); }}
-              className={`py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`py-2 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
                 mode === "signin"
-                  ? "bg-cyan-500/10 text-cyan-300 border border-cyan-500/20"
-                  : "text-text-muted hover:text-white"
+                  ? "bg-card text-fg shadow-sm"
+                  : "text-fg-muted hover:text-fg"
               }`}
             >
               התחברות
             </button>
             <button
               onClick={() => { setMode("signup"); setError(""); }}
-              className={`py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`py-2 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
                 mode === "signup"
-                  ? "bg-cyan-500/10 text-cyan-300 border border-cyan-500/20"
-                  : "text-text-muted hover:text-white"
+                  ? "bg-card text-fg shadow-sm"
+                  : "text-fg-muted hover:text-fg"
               }`}
             >
               הרשמה
@@ -169,9 +172,9 @@ function LoginContent() {
           <form onSubmit={handleEmailSubmit} className="space-y-4 text-right">
             {mode === "signup" && (
               <div className="space-y-1.5">
-                <label className="text-xs text-text-muted font-bold block">שם מלא</label>
+                <label className="text-sm text-fg-muted font-semibold block">שם מלא</label>
                 <div className="relative flex items-center">
-                  <span className="absolute right-3 text-text-muted">
+                  <span className="absolute right-3 text-fg-muted">
                     <User className="w-4 h-4" />
                   </span>
                   <input
@@ -182,16 +185,16 @@ function LoginContent() {
                     placeholder="הזינו את שמכם..."
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
-                    className="w-full h-10 bg-[#0d1222]/80 border border-border-custom rounded-xl pr-10 pl-3 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-cyan-500/50"
+                    className="w-full h-11 bg-card border border-line-strong rounded-md pr-10 pl-3 text-sm text-fg placeholder:text-fg-subtle focus:outline-none focus:border-fg"
                   />
                 </div>
               </div>
             )}
 
             <div className="space-y-1.5">
-              <label className="text-xs text-text-muted font-bold block">כתובת אימייל</label>
+              <label className="text-sm text-fg-muted font-semibold block">כתובת אימייל</label>
               <div className="relative flex items-center">
-                <span className="absolute right-3 text-text-muted">
+                <span className="absolute right-3 text-fg-muted">
                   <Mail className="w-4 h-4" />
                 </span>
                 <input
@@ -203,15 +206,15 @@ function LoginContent() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   dir="ltr"
-                  className="w-full h-10 bg-[#0d1222]/80 border border-border-custom rounded-xl pr-10 pl-3 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-cyan-500/50 text-right"
+                  className="w-full h-11 bg-card border border-line-strong rounded-md pr-10 pl-3 text-sm text-fg placeholder:text-fg-subtle focus:outline-none focus:border-fg text-right"
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs text-text-muted font-bold block">סיסמה</label>
+              <label className="text-sm text-fg-muted font-semibold block">סיסמה</label>
               <div className="relative flex items-center">
-                <span className="absolute right-3 text-text-muted">
+                <span className="absolute right-3 text-fg-muted">
                   <Lock className="w-4 h-4" />
                 </span>
                 <input
@@ -223,13 +226,13 @@ function LoginContent() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   dir="ltr"
-                  className="w-full h-10 bg-[#0d1222]/80 border border-border-custom rounded-xl pr-10 pl-3 text-sm text-white placeholder:text-zinc-700 focus:outline-none focus:border-cyan-500/50 text-right"
+                  className="w-full h-11 bg-card border border-line-strong rounded-md pr-10 pl-3 text-sm text-fg placeholder:text-fg-subtle focus:outline-none focus:border-fg text-right"
                 />
               </div>
             </div>
 
             {error && (
-              <div className="text-xs text-rose-400 font-semibold bg-rose-500/10 border border-rose-500/20 p-2.5 rounded-xl">
+              <div className="text-sm text-danger font-medium bg-danger-soft border border-transparent p-2.5 rounded-md">
                 {error}
               </div>
             )}
@@ -237,10 +240,10 @@ function LoginContent() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-10 rounded-xl bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all border border-cyan-400/20"
+              className="w-full h-11 rounded-md bg-primary hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer transition-colors border border-cyan-400/20"
             >
               {loading ? (
-                <span>בטוען...</span>
+                <span>טוען…</span>
               ) : mode === "signin" ? (
                 <>
                   <LogIn className="w-4 h-4" />
@@ -257,16 +260,16 @@ function LoginContent() {
 
           {/* Divider */}
           <div className="relative flex py-2 items-center">
-            <div className="flex-grow border-t border-border-custom"></div>
-            <span className="flex-shrink mx-4 text-[10px] text-text-muted uppercase font-bold">או באמצעות</span>
-            <div className="flex-grow border-t border-border-custom"></div>
+            <div className="flex-grow border-t border-line"></div>
+            <span className="flex-shrink mx-4 text-xs text-fg-muted uppercase font-semibold">או באמצעות</span>
+            <div className="flex-grow border-t border-line"></div>
           </div>
 
           {/* Google Button */}
           <button
             onClick={handleGoogleSubmit}
             disabled={loading}
-            className="w-full h-10 rounded-xl bg-surface hover:bg-surface-hover border border-border-custom text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+            className="w-full h-11 rounded-md bg-card hover:bg-subtle border border-line-strong text-fg font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer transition-colors disabled:opacity-50"
           >
             {/* Google Icon SVG */}
             <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
@@ -293,10 +296,7 @@ function LoginContent() {
 
       </div>
 
-      {/* Footer */}
-      <footer className="w-full text-center py-6 border-t border-border-custom text-xs text-text-muted relative z-10 bg-surface/30">
-        <span>© {new Date().getFullYear()} ניר עוז-ארי — אבטחת מידע וכניסה</span>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
@@ -304,8 +304,8 @@ function LoginContent() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#080c18] text-[#e8edf8] flex items-center justify-center">
-        <div className="text-sm text-text-muted animate-pulse">בטוען...</div>
+      <div className="min-h-screen bg-canvas text-fg flex items-center justify-center">
+        <div className="text-sm text-fg-muted animate-pulse">טוען…</div>
       </div>
     }>
       <LoginContent />

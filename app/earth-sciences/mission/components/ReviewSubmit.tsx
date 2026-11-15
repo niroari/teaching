@@ -36,8 +36,8 @@ export default function ReviewSubmit({
 
   return (
     <div className="space-y-6">
-      <section className={`rounded-2xl border p-5 space-y-3 ${t.card} ${t.border}`}>
-        <h3 className={`text-lg font-black ${t.title}`}>מה עוד חסר?</h3>
+      <section className={`rounded-xl border p-5 space-y-3 ${t.card} ${t.border}`}>
+        <h3 className={`text-lg font-bold ${t.title}`}>מה עוד חסר?</h3>
         {totalMissing === 0 ? (
           <p className="flex items-center gap-2 text-sm font-semibold text-emerald-500">
             <CheckCircle2 className="w-4 h-4" /> ענית על כל שאלות החובה.
@@ -59,9 +59,9 @@ export default function ReviewSubmit({
         {missingDrawings > 0 && <p className={`text-sm ${t.muted}`}>שימו לב: {missingDrawings} שרטוטים עוד ריקים.</p>}
       </section>
 
-      <section className={`rounded-2xl border p-5 space-y-4 ${t.card} ${t.border}`}>
+      <section className={`rounded-xl border p-5 space-y-4 ${t.card} ${t.border}`}>
         <div>
-          <h3 className={`text-lg font-black ${t.title}`}>רשימת המונחים</h3>
+          <h3 className={`text-lg font-bold ${t.title}`}>רשימת המונחים</h3>
           <p className={`text-sm ${t.muted}`}>סמנו כל מונח שהשתמשתם בו נכון לפחות פעם אחת בעבודה.</p>
         </div>
         <div className="grid md:grid-cols-2 gap-4">
@@ -85,8 +85,8 @@ export default function ReviewSubmit({
         </div>
       </section>
 
-      <section className={`rounded-2xl border p-5 space-y-3 ${t.card} ${t.border}`}>
-        <h3 className={`text-lg font-black ${t.title}`}>מי הוביל כל שלב?</h3>
+      <section className={`rounded-xl border p-5 space-y-3 ${t.card} ${t.border}`}>
+        <h3 className={`text-lg font-bold ${t.title}`}>מי הוביל כל שלב?</h3>
         <div className="grid sm:grid-cols-2 gap-3">
           {STAGES.map((s) => (
             <label key={s.id} className="space-y-1">
@@ -112,18 +112,18 @@ export default function ReviewSubmit({
         </div>
       </section>
 
-      <section className={`rounded-2xl border p-5 space-y-3 ${t.card} ${t.border}`}>
-        <h3 className={`text-lg font-black ${t.title}`}>מקורות</h3>
+      <section className={`rounded-xl border p-5 space-y-3 ${t.card} ${t.border}`}>
+        <h3 className={`text-lg font-bold ${t.title}`}>מקורות</h3>
         <p className={`text-sm ${t.muted}`}>לפחות 2 מקורות: שם האתר וכתובת הקישור, כל מקור בשורה נפרדת.</p>
         <AnswerText api={api} k={SOURCES_KEY} rows={4} placeholder={"נאס״א – https://...\nהידען – https://..."} />
       </section>
 
-      <section className={`rounded-2xl border p-5 space-y-3 ${t.card} ${t.border}`}>
-        <h3 className={`text-lg font-black ${t.title}`}>מחוון ההערכה (100 נקודות)</h3>
+      <section className={`rounded-xl border p-5 space-y-3 ${t.card} ${t.border}`}>
+        <h3 className={`text-lg font-bold ${t.title}`}>מחוון ההערכה (100 נקודות)</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-xs min-w-[640px]">
             <thead>
-              <tr className={t.isLight ? "bg-zinc-100" : "bg-white/5"}>
+              <tr className={"bg-subtle"}>
                 {["קריטריון", "נקודות", "מצוין", "טוב", "דורש שיפור"].map((h) => (
                   <th key={h} className={`text-right p-2 font-bold ${t.title}`}>
                     {h}
@@ -153,7 +153,7 @@ export default function ReviewSubmit({
             type="button"
             onClick={onSubmit}
             disabled={submitting}
-            className={`inline-flex items-center gap-2 rounded-2xl px-8 py-3.5 text-base cursor-pointer ${t.accentButton}`}
+            className={`inline-flex items-center gap-2 rounded-xl px-8 py-3.5 text-base cursor-pointer ${t.accentButton}`}
           >
             {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
             הגשת הדו&quot;ח לסוכנות

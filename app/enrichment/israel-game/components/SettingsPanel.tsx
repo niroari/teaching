@@ -77,17 +77,17 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
         render={
           <Button
             variant="outline"
-            className="gap-2 border-border-custom text-text-muted hover:text-white hover:bg-surface-hover"
+            className="gap-2 border-line text-fg-muted hover:text-fg hover:bg-subtle-hover"
           >
             <SlidersHorizontal className="w-4 h-4" />
             הגדרות משחק
           </Button>
         }
       />
-      <DialogContent className="max-w-lg bg-surface text-foreground border-border-custom p-6 rounded-2xl shadow-2xl" dir="rtl">
+      <DialogContent className="max-w-lg bg-subtle text-fg border-line p-6 rounded-xl shadow-sm" dir="rtl">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold flex items-center gap-2 mb-4 text-white">
-            <SlidersHorizontal className="w-5 h-5 text-enrichment" />
+          <DialogTitle className="text-xl font-bold flex items-center gap-2 mb-4 text-fg">
+            <SlidersHorizontal className="w-5 h-5 text-accent" />
             הגדרות המשחק
           </DialogTitle>
         </DialogHeader>
@@ -95,7 +95,7 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
         <div className="space-y-6">
           {/* Difficulty Selection */}
           <div>
-            <h3 className="text-sm font-semibold text-text-muted mb-2">רמת קושי</h3>
+            <h3 className="text-sm font-semibold text-fg-muted mb-2">רמת קושי</h3>
             <div className="grid grid-cols-3 gap-2">
               {(Object.keys(settings.difficulties) as Array<keyof GameSettings["difficulties"]>).map((diff) => {
                 const labels = { easy: "קל", medium: "בינוני", hard: "קשה" };
@@ -106,8 +106,8 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
                     variant={isSelected ? "default" : "outline"}
                     className={`h-10 text-sm font-medium transition-all ${
                       isSelected
-                        ? "bg-enrichment hover:bg-enrichment/90 text-white shadow"
-                        : "border-border-custom text-foreground hover:bg-surface-hover"
+                        ? "bg-accent hover:bg-accent-soft text-fg shadow"
+                        : "border-line text-fg hover:bg-subtle-hover"
                     }`}
                     onClick={() => toggleDifficulty(diff)}
                   >
@@ -121,7 +121,7 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
 
           {/* Category Selection */}
           <div>
-            <h3 className="text-sm font-semibold text-text-muted mb-2">קטגוריות מקומות</h3>
+            <h3 className="text-sm font-semibold text-fg-muted mb-2">קטגוריות מקומות</h3>
             <div className="grid grid-cols-2 gap-2">
               {(Object.keys(settings.categories) as Array<keyof GameSettings["categories"]>).map((cat) => {
                 const labels = {
@@ -137,8 +137,8 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
                     variant={isSelected ? "default" : "outline"}
                     className={`h-10 text-sm font-medium justify-start px-3 transition-all ${
                       isSelected
-                        ? "bg-enrichment hover:bg-enrichment/90 text-white shadow"
-                        : "border-border-custom text-foreground hover:bg-surface-hover"
+                        ? "bg-accent hover:bg-accent-soft text-fg shadow"
+                        : "border-line text-fg hover:bg-subtle-hover"
                     }`}
                     onClick={() => toggleCategory(cat)}
                   >
@@ -152,7 +152,7 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
 
           {/* Region Selection */}
           <div>
-            <h3 className="text-sm font-semibold text-text-muted mb-2">אזורים בארץ</h3>
+            <h3 className="text-sm font-semibold text-fg-muted mb-2">אזורים בארץ</h3>
             <div className="grid grid-cols-5 gap-1.5">
               {(Object.keys(settings.regions) as Array<keyof GameSettings["regions"]>).map((reg) => {
                 const labels = {
@@ -169,8 +169,8 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
                     variant={isSelected ? "default" : "outline"}
                     className={`h-9 px-1 text-xs font-medium transition-all ${
                       isSelected
-                        ? "bg-enrichment hover:bg-enrichment/90 text-white shadow"
-                        : "border-border-custom text-foreground hover:bg-surface-hover"
+                        ? "bg-accent hover:bg-accent-soft text-fg shadow"
+                        : "border-line text-fg hover:bg-subtle-hover"
                     }`}
                     onClick={() => toggleRegion(reg)}
                   >
@@ -181,17 +181,17 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
             </div>
           </div>
 
-          <hr className="border-border-custom" />
+          <hr className="border-line" />
 
           {/* Other settings */}
           <div className="space-y-4">
             {/* Timer Settings */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Timer className="w-5 h-5 text-text-muted" />
+                <Timer className="w-5 h-5 text-fg-muted" />
                 <div>
-                  <div className="text-sm font-semibold text-white">טיימר שאלות</div>
-                  <div className="text-xs text-text-muted">הגבלת זמן למציאת המקום במפה</div>
+                  <div className="text-sm font-semibold text-fg">טיימר שאלות</div>
+                  <div className="text-xs text-fg-muted">הגבלת זמן למציאת המקום במפה</div>
                 </div>
               </div>
               <div className="flex items-center gap-1.5">
@@ -202,8 +202,8 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
                     variant={settings.timerDuration === sec ? "default" : "outline"}
                     className={`h-7 px-2.5 text-xs ${
                       settings.timerDuration === sec
-                        ? "bg-enrichment hover:bg-enrichment/90 text-white"
-                        : "border-border-custom text-foreground hover:bg-surface-hover"
+                        ? "bg-accent hover:bg-accent-soft text-fg"
+                        : "border-line text-fg hover:bg-subtle-hover"
                     }`}
                     onClick={() => onChange({ ...settings, timerDuration: sec })}
                   >
@@ -216,10 +216,10 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
             {/* English translation settings */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Globe className="w-5 h-5 text-text-muted" />
+                <Globe className="w-5 h-5 text-fg-muted" />
                 <div>
-                  <div className="text-sm font-semibold text-white">תרגום לאנגלית</div>
-                  <div className="text-xs text-text-muted">הצגת שם המקום גם באנגלית</div>
+                  <div className="text-sm font-semibold text-fg">תרגום לאנגלית</div>
+                  <div className="text-xs text-fg-muted">הצגת שם המקום גם באנגלית</div>
                 </div>
               </div>
               <Switch

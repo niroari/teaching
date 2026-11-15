@@ -27,7 +27,7 @@ export function IsraelMapHint({
         return {
           title: "צפון הארץ",
           description: "הגליל, הגולן, עמק יזרעאל ורצועת החוף הצפונית",
-          badgeBg: "bg-sky-500/15 text-sky-400 border-sky-500/30",
+          badgeBg: "bg-sky-500/15 text-sky-700 dark:text-sky-400 border-sky-500/30",
           y: 0,
           height: 32,
           x: 0,
@@ -37,7 +37,7 @@ export function IsraelMapHint({
         return {
           title: "מרכז הארץ",
           description: "מישור החוף, גוש דן, השרון והשפלה",
-          badgeBg: "bg-amber-500/15 text-amber-400 border-amber-500/30",
+          badgeBg: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30",
           y: 32,
           height: 23,
           x: 0,
@@ -47,7 +47,7 @@ export function IsraelMapHint({
         return {
           title: "אזור ירושלים",
           description: "הרי ירושלים, יהודה ופרוזדור ירושלים",
-          badgeBg: "bg-purple-500/15 text-purple-400 border-purple-500/30",
+          badgeBg: "bg-purple-500/15 text-purple-700 dark:text-purple-400 border-purple-500/30",
           y: 40,
           height: 15,
           x: 30,
@@ -57,7 +57,7 @@ export function IsraelMapHint({
         return {
           title: "מזרח ובקעת הירדן",
           description: "בקעת הירדן, עמק המעיינות וצפון ים המלח",
-          badgeBg: "bg-teal-500/15 text-teal-400 border-teal-500/30",
+          badgeBg: "bg-teal-500/15 text-teal-700 dark:text-teal-400 border-teal-500/30",
           y: 28,
           height: 30,
           x: 42,
@@ -67,7 +67,7 @@ export function IsraelMapHint({
         return {
           title: "דרום הארץ",
           description: "הנגב, צפון הנגב, הערבה ואילת",
-          badgeBg: "bg-orange-500/15 text-orange-400 border-orange-500/30",
+          badgeBg: "bg-orange-500/15 text-orange-700 dark:text-orange-400 border-orange-500/30",
           y: 55,
           height: 45,
           x: 0,
@@ -77,7 +77,7 @@ export function IsraelMapHint({
         return {
           title: "ישראל",
           description: "",
-          badgeBg: "bg-blue-500/15 text-blue-400 border-blue-500/30",
+          badgeBg: "bg-blue-500/15 text-blue-700 dark:text-blue-400 border-blue-500/30",
           y: 0,
           height: 100,
           x: 0,
@@ -93,10 +93,8 @@ export function IsraelMapHint({
     <div
       className={`flex flex-col items-center justify-between transition-all duration-300 ${
         isProjector
-          ? "w-full max-w-xs bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-2xl"
-          : isLight
-          ? "w-full bg-white border border-zinc-200 p-5 rounded-3xl shadow-sm"
-          : "w-full bg-surface/60 backdrop-blur-md border border-border-custom p-6 rounded-3xl shadow-xl"
+          ? "w-full max-w-xs bg-subtle border border-line p-5 rounded-xl"
+          : "w-full bg-card border border-line p-5 rounded-xl shadow-sm dark:p-6"
       }`}
     >
       {/* Title */}
@@ -104,13 +102,11 @@ export function IsraelMapHint({
         <h3
           className={`text-sm font-bold flex items-center gap-2 ${
             isProjector
-              ? "text-white"
-              : isLight
-              ? "text-zinc-900"
-              : "text-white"
+              ? "text-fg"
+              : "text-fg"
           }`}
         >
-          <MapPin className="w-4 h-4 text-enrichment" />
+          <MapPin className="w-4 h-4 text-accent" />
           <span>רמז מפה (הארת אזור בארץ)</span>
         </h3>
         {showHint && regionInfo && (
@@ -125,12 +121,10 @@ export function IsraelMapHint({
       {/* Map SVG container */}
       <div className="relative w-full flex-1 flex items-center justify-center py-2">
         <div
-          className={`relative w-[180px] h-[340px] rounded-2xl flex items-center justify-center overflow-hidden transition-colors ${
+          className={`relative w-[180px] h-[340px] rounded-xl flex items-center justify-center overflow-hidden transition-colors ${
             isProjector
-              ? "bg-black/30 border border-white/10"
-              : isLight
-              ? "bg-zinc-50 border border-zinc-200"
-              : "bg-surface/40 border border-border-custom/30"
+              ? "bg-subtle border border-line"
+              : "bg-subtle border border-line"
           }`}
         >
           <svg
@@ -162,9 +156,7 @@ export function IsraelMapHint({
               className={`transition-colors duration-300 ${
                 isProjector
                   ? "fill-white/5 stroke-white/20 stroke-[1.2]"
-                  : isLight
-                  ? "fill-zinc-200/80 stroke-zinc-400 stroke-[1.2]"
-                  : "fill-surface/60 stroke-text-muted/30 stroke-[1.2]"
+                  : "fill-zinc-200/80 stroke-zinc-400 stroke-[1.2] dark:fill-surface/60 dark:stroke-text-muted/30"
               }`}
             />
 
@@ -178,7 +170,7 @@ export function IsraelMapHint({
                 y2="32"
                 strokeDasharray="2 2"
                 strokeWidth="0.8"
-                className={isLight ? "stroke-zinc-400/50" : "stroke-white/20"}
+                className={"stroke-zinc-400/50 dark:stroke-white/20"}
               />
               {/* Divider between Center and South (Y ~ 55) */}
               <line
@@ -188,7 +180,7 @@ export function IsraelMapHint({
                 y2="55"
                 strokeDasharray="2 2"
                 strokeWidth="0.8"
-                className={isLight ? "stroke-zinc-400/50" : "stroke-white/20"}
+                className={"stroke-zinc-400/50 dark:stroke-white/20"}
               />
             </g>
 
@@ -236,9 +228,7 @@ export function IsraelMapHint({
               className={
                 isProjector
                   ? "stroke-white/30 stroke-[1.5]"
-                  : isLight
-                  ? "stroke-zinc-500 stroke-[1.5]"
-                  : "stroke-border-custom-hover stroke-[1.5]"
+                  : "stroke-zinc-500 stroke-[1.5] dark:stroke-border-custom-hover"
               }
             />
 
@@ -248,7 +238,7 @@ export function IsraelMapHint({
               y="20"
               fontSize="4"
               textAnchor="start"
-              className={isLight ? "fill-zinc-600 font-semibold" : "fill-white/40 font-medium"}
+              className={"fill-zinc-600 font-semibold dark:fill-white/40 dark:font-medium"}
             >
               צפון
             </text>
@@ -257,7 +247,7 @@ export function IsraelMapHint({
               y="44"
               fontSize="4"
               textAnchor="start"
-              className={isLight ? "fill-zinc-600 font-semibold" : "fill-white/40 font-medium"}
+              className={"fill-zinc-600 font-semibold dark:fill-white/40 dark:font-medium"}
             >
               מרכז
             </text>
@@ -266,7 +256,7 @@ export function IsraelMapHint({
               y="74"
               fontSize="4"
               textAnchor="start"
-              className={isLight ? "fill-zinc-600 font-semibold" : "fill-white/40 font-medium"}
+              className={"fill-zinc-600 font-semibold dark:fill-white/40 dark:font-medium"}
             >
               דרום
             </text>
@@ -276,9 +266,7 @@ export function IsraelMapHint({
           {!showHint && (
             <div className="absolute inset-0 flex items-center justify-center text-center p-4 select-none pointer-events-none">
               <span
-                className={`text-xs leading-relaxed ${
-                  isLight ? "text-zinc-500 font-medium" : "text-text-muted/60"
-                }`}
+                className={`text-xs leading-relaxed text-fg-muted font-medium dark:text-text-muted/60`}
               >
                 לחצו על <b>הצג רמז</b> כדי להאיר את האזור של המקום על גבי המפה
               </span>
@@ -292,22 +280,18 @@ export function IsraelMapHint({
         <div
           className={`w-full mt-3 py-2 px-3 rounded-xl border text-center text-xs animate-[fadeIn_0.2s_ease-out] ${
             isProjector
-              ? "bg-white/10 border-white/20 text-white"
-              : isLight
-              ? "bg-zinc-100 border-zinc-200 text-zinc-800"
-              : "bg-surface/90 border-border-custom text-white"
+              ? "bg-subtle border-line text-fg"
+              : "bg-subtle border-line text-fg"
           }`}
         >
-          <div className="font-bold text-sm text-enrichment mb-0.5">
+          <div className="font-bold text-sm text-accent mb-0.5">
             {regionInfo.title}
           </div>
           <div className="text-[11px] opacity-80">{regionInfo.description}</div>
         </div>
       ) : (
         <div
-          className={`w-full mt-3 py-1.5 px-3 rounded-xl border text-center text-xs opacity-50 ${
-            isLight ? "border-zinc-200 text-zinc-500" : "border-border-custom text-text-muted"
-          }`}
+          className={`w-full mt-3 py-1.5 px-3 rounded-xl border text-center text-xs opacity-50 border-line text-fg-muted`}
         >
           שלושת חבלי הארץ: צפון • מרכז • דרום
         </div>

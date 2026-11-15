@@ -1,19 +1,22 @@
 import type { Metadata } from "next";
-import { Alef } from "next/font/google";
+import { IBM_Plex_Sans_Hebrew } from "next/font/google";
 import { AuthProvider } from "@/lib/context/AuthContext";
 import { VisibilityProvider } from "@/lib/context/VisibilityContext";
 import ContentGate from "@/components/ContentGate";
+import { DEFAULT_THEME, THEME_INIT_SCRIPT } from "@/lib/theme/config";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE } from "@/lib/site";
 import "./globals.css";
 
-const alef = Alef({
+const plex = IBM_Plex_Sans_Hebrew({
   subsets: ["hebrew", "latin"],
-  weight: ["400", "700"],
-  variable: "--font-alef",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-plex",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "ניר עוז-ארי — חומרי לימוד",
-  description: "פורטל חומרי לימוד אינטראקטיביים — של״ח, אנגלית והעשרה",
+  title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+  description: SITE_DESCRIPTION,
 };
 
 export default function RootLayout({
@@ -25,8 +28,13 @@ export default function RootLayout({
     <html
       lang="he"
       dir="rtl"
-      className={`${alef.variable} h-full antialiased`}
+      data-theme={DEFAULT_THEME}
+      className={`${plex.variable} h-full antialiased${DEFAULT_THEME === "dark" ? " dark" : ""}`}
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="min-h-full flex flex-col font-sans">
         <AuthProvider>
           <VisibilityProvider>

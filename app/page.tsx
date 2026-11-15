@@ -1,212 +1,113 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
-import { ArrowLeft, GraduationCap, Lock, Loader2 } from "lucide-react";
-import NavbarUser from "@/components/NavbarUser";
+import { Lock } from "lucide-react";
+import PageShell from "@/components/site/PageShell";
+import { EmptyState, LinkCard, Spinner } from "@/components/site/ui";
 import { useVisibility } from "@/lib/context/VisibilityContext";
+import { CONTENT_ITEMS, Subject } from "@/lib/content-registry";
+import { SITE_NAME, SITE_TAGLINE } from "@/lib/site";
+
+const SUBJECT_CARDS: { subject: Subject; href: string; title: string; subtitle: string; desc: string; cta: string; image: string; alt: string }[] = [
+  {
+    subject: "shelach",
+    href: "/shelach",
+    title: "של״ח",
+    subtitle: "שדה, לאום, חברה",
+    desc: "סדנאות על ההיסטוריה, הגאוגרפיה, הטבע והתרבויות של ארץ ישראל, והכנה לגיחות.",
+    cta: "לסדנאות",
+    image: "/images/shelach.jpg",
+    alt: "נוף מדבר יהודה",
+  },
+  {
+    subject: "english",
+    href: "/english",
+    title: "אנגלית",
+    subtitle: "דקדוק, אוצר מילים ושיחה",
+    desc: "מצגות דקדוק, משחקי כיתה ותרגול שיחה באנגלית.",
+    cta: "לפעילויות",
+    image: "/images/english.jpg",
+    alt: "אולם ספרייה ישנה עם מדפי ספרים גבוהים",
+  },
+  {
+    subject: "enrichment",
+    href: "/enrichment",
+    title: "העשרה",
+    subtitle: "מעבר לתוכנית הלימודים",
+    desc: "אבולוציה, תולדות האדם, אקטואליה וגאוגרפיה: לומדות ומשחקים להרחבת אופקים.",
+    cta: "ללומדות",
+    image: "/images/enrichment.jpg",
+    alt: "ערפילית בצילום טלסקופ החלל ג׳יימס ווב",
+  },
+  {
+    subject: "earth",
+    href: "/earth-sciences",
+    title: "מדעי כדור הארץ",
+    subtitle: "תוכנית שנתית",
+    desc: "שיעורים, סימולציות ומשימות חקר באסטרונומיה, באטמוספרה, בגאוספרה ובמשאבי כדור הארץ.",
+    cta: "לתוכנית הלימודים",
+    image: "/images/earth.jpg",
+    alt: "כדור הארץ בצילום מהחלל",
+  },
+];
 
 export default function PortalHomePage() {
-  const { loading, canSeeSubject } = useVisibility();
-  const show = {
-    shelach: canSeeSubject("shelach"),
-    english: canSeeSubject("english"),
-    enrichment: canSeeSubject("enrichment"),
-    earth: canSeeSubject("earth"),
-  };
-  const shownCount = Object.values(show).filter(Boolean).length;
+  const { loading, canSeeSubject, canSee } = useVisibility();
+  const cards = SUBJECT_CARDS.filter((c) => canSeeSubject(c.subject));
+  const shownCount = cards.length;
+  const openCount = (subject: Subject) => CONTENT_ITEMS.filter((i) => i.subject === subject && canSee(i.id)).length;
 
   return (
-    <div className="relative min-h-screen bg-[#080c18] text-[#e8edf8] flex flex-col justify-between overflow-hidden">
-      {/* Top Header Bar */}
-      <header className="w-full max-w-6xl mx-auto px-6 pt-8 flex justify-between items-center relative z-20">
-        <div className="flex items-center gap-2">
-          {/* Subtle decoration or leave empty */}
-        </div>
-        <NavbarUser />
-      </header>
-
-      {/* Dynamic Background Gradients */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-amber-500/5 via-transparent to-transparent blur-3xl pointer-events-none rounded-full" />
-      <div className="absolute -top-40 -left-40 w-96 h-96 bg-emerald-500/5 blur-3xl rounded-full pointer-events-none" />
-      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-sky-500/5 blur-3xl rounded-full pointer-events-none" />
-
-      {/* Main Container */}
-      <div className="relative w-full max-w-6xl mx-auto px-6 py-12 flex-1 flex flex-col justify-center items-center z-10">
-        
-        {/* Header Section */}
-        <div className="text-center mb-20 space-y-4">
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 bg-surface border border-border-custom rounded-full text-sm font-bold text-text-muted">
-            <GraduationCap className="w-4 h-4 text-amber-400" />
-            <span>פורטל פדגוגי דיגיטלי</span>
-          </div>
-          <h1 className="text-6xl font-black tracking-tight text-white mt-6">
-            ניר עוז-ארי
-            <span className="block mt-3 text-3xl font-bold bg-gradient-to-r from-amber-400 via-sky-400 to-emerald-400 bg-clip-text text-transparent">
-              חומרי לימוד ולומדות אינטראקטיביות
-            </span>
-          </h1>
-          <p className="text-text-muted max-w-xl mx-auto text-base md:text-lg leading-relaxed pt-2">
-            בחרו נושא לימוד כדי להתחיל בשיעור, לומדה או משחק כיתתי אינטראקטיבי.
-          </p>
-        </div>
-
-        {/* Subjects Grid */}
-        {loading ? (
-          <div className="py-16 text-text-muted">
-            <Loader2 className="w-6 h-6 animate-spin" />
-          </div>
-        ) : shownCount === 0 ? (
-          <div className="glass-card rounded-2xl border border-border-custom p-8 max-w-md text-center space-y-3">
-            <Lock className="w-6 h-6 mx-auto text-purple-300" />
-            <h2 className="text-lg font-bold text-white">המורה עוד לא פתח תכנים</h2>
-            <p className="text-text-muted text-sm leading-relaxed">
-              כשהמורה יפרסם שיעור, מצגת או משימה, הם יופיעו כאן. אם קיבלתם קישור ישיר מהמורה, אפשר להיכנס דרכו.
-            </p>
-          </div>
-        ) : (
-        <div
-          className={`grid grid-cols-1 sm:grid-cols-2 gap-6 w-full ${
-            shownCount >= 4 ? "lg:grid-cols-4" : shownCount === 3 ? "lg:grid-cols-3" : "max-w-3xl mx-auto"
-          } ${shownCount === 1 ? "sm:grid-cols-1 max-w-sm" : ""}`}
-        >
-          
-          {/* Card: של"ח */}
-          {show.shelach && (
-          <Link
-            href="/shelach"
-            className="group glass-card rounded-2xl border border-border-custom hover:border-shelach/40 hover:shadow-[0_12px_40px_rgba(249,115,22,0.12)] transition-all duration-300 flex flex-col overflow-hidden"
-          >
-            {/* Header Image with Gradient overlay */}
-            <div
-              className="h-48 bg-cover bg-center relative"
-              style={{
-                backgroundImage: `url('/shelach_cover.png')`
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-t from-[#080c18] via-transparent to-transparent opacity-80" />
-            </div>
-            {/* Body */}
-            <div className="p-6 flex-1 flex flex-col justify-between">
-              <div>
-                <h3 className="text-xl font-bold text-white group-hover:text-shelach transition-colors">של״ח</h3>
-                <p className="text-xs font-semibold text-shelach/80 mt-1">לימודי ארץ ישראל</p>
-                <p className="text-text-muted text-xs leading-relaxed mt-3">
-                  סדנאות למידה אינטראקטיביות העוסקות בהיסטוריה, גיאוגרפיה, טבע ורב-תרבותיות בארץ ישראל.
-                </p>
-              </div>
-              <div className="mt-6 flex items-center gap-2 text-xs font-bold text-shelach group-hover:translate-x-[-6px] transition-transform">
-                <span>כניסה לסדנאות</span>
-                <ArrowLeft className="w-4 h-4" />
-              </div>
-            </div>
-          </Link>
-          )}
-
-          {/* Card: אנגלית */}
-          {show.english && (
-          <Link
-            href="/english"
-            className="group glass-card rounded-2xl border border-border-custom hover:border-english/40 hover:shadow-[0_12px_40px_rgba(0,200,255,0.12)] transition-all duration-300 flex flex-col overflow-hidden"
-          >
-            {/* Header Image */}
-            <div
-              className="h-48 bg-cover bg-center relative"
-              style={{
-                backgroundImage: `url('/english_cover.png')`
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-t from-[#080c18] via-transparent to-transparent opacity-80" />
-            </div>
-            {/* Body */}
-            <div className="p-6 flex-1 flex flex-col justify-between">
-              <div>
-                <h3 className="text-xl font-bold text-white group-hover:text-english transition-colors">אנגלית</h3>
-                <p className="text-xs font-semibold text-english/80 mt-1">תרגול דקדוק ואוצר מילים</p>
-                <p className="text-text-muted text-xs leading-relaxed mt-3">
-                  משחק מכירה פומבית כיתתי לתרגול חוקי דקדוק, וכלי אינטראקטיבי לשינון ותרגול מותאם אישית של אוצר מילים.
-                </p>
-              </div>
-              <div className="mt-6 flex items-center gap-2 text-xs font-bold text-english group-hover:translate-x-[-6px] transition-transform">
-                <span>כניסה לתרגול</span>
-                <ArrowLeft className="w-4 h-4" />
-              </div>
-            </div>
-          </Link>
-          )}
-
-          {/* Card: העשרה */}
-          {show.enrichment && (
-          <Link
-            href="/enrichment"
-            className="group glass-card rounded-2xl border border-border-custom hover:border-enrichment/40 hover:shadow-[0_12px_40px_rgba(34,197,94,0.12)] transition-all duration-300 flex flex-col overflow-hidden"
-          >
-            {/* Header Image */}
-            <div
-              className="h-48 bg-cover bg-center relative"
-              style={{
-                backgroundImage: `url('https://www.spacecentre.co.uk/media/5hhl423f/jwst-carina-nebula.jpg?anchor=center&rmode=crop&width=1000&height=600&format=webp&quality=80')`
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-t from-[#080c18] via-transparent to-transparent opacity-80" />
-            </div>
-            {/* Body */}
-            <div className="p-6 flex-1 flex flex-col justify-between">
-              <div>
-                <h3 className="text-xl font-bold text-white group-hover:text-enrichment transition-colors">העשרה</h3>
-                <p className="text-xs font-semibold text-enrichment/80 mt-1">מחוץ לתוכנית הלימודים</p>
-                <p className="text-text-muted text-xs leading-relaxed mt-3">
-                  לומדות בנושאים מרתקים ומדעיים, כולל מודולים אינטראקטיביים מעמיקים בנושא אבולוציה.
-                </p>
-              </div>
-              <div className="mt-6 flex items-center gap-2 text-xs font-bold text-enrichment group-hover:translate-x-[-6px] transition-transform">
-                <span>כניסה ללומדות</span>
-                <ArrowLeft className="w-4 h-4" />
-              </div>
-            </div>
-          </Link>
-          )}
-
-          {/* Card: מדעי כדור הארץ */}
-          {show.earth && (
-          <Link
-            href="/earth-sciences"
-            className="group glass-card rounded-2xl border border-border-custom hover:border-earth/40 hover:shadow-[0_12px_40px_rgba(13,148,136,0.12)] transition-all duration-300 flex flex-col overflow-hidden"
-          >
-            {/* Header Image */}
-            <div
-              className="h-48 bg-cover bg-center relative"
-              style={{
-                backgroundImage: `url('https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?auto=format&fit=crop&w=600&q=80')`
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-t from-[#080c18] via-transparent to-transparent opacity-80" />
-            </div>
-            {/* Body */}
-            <div className="p-6 flex-1 flex flex-col justify-between">
-              <div>
-                <h3 className="text-xl font-bold text-white group-hover:text-earth transition-colors">מדעי כדור הארץ</h3>
-                <p className="text-xs font-semibold text-earth/80 mt-1">תוכנית לימודים שנתית</p>
-                <p className="text-text-muted text-xs leading-relaxed mt-3">
-                  מצגות, מערכי שיעור אינטראקטיביים ויישומונים מדעיים באסטרונומיה, אטמוספרה, גאוספרה ומשאבים.
-                </p>
-              </div>
-              <div className="mt-6 flex items-center gap-2 text-xs font-bold text-earth group-hover:translate-x-[-6px] transition-transform">
-                <span>כניסה לתוכנית</span>
-                <ArrowLeft className="w-4 h-4" />
-              </div>
-            </div>
-          </Link>
-          )}
-
-        </div>
-        )}
+    <PageShell>
+      {/* Header Section */}
+      <div className="mb-12 max-w-2xl sm:mb-16">
+        <h1 className="text-4xl font-semibold tracking-tight text-fg sm:text-5xl">
+          {SITE_NAME}
+          <span className="mt-2 block text-xl font-normal tracking-normal text-fg-muted sm:text-2xl">{SITE_TAGLINE}</span>
+        </h1>
+        <p className="mt-5 text-base leading-relaxed text-fg-muted">
+          שיעורים, מצגות, משימות ומשחקי כיתה במקום אחד. בחרו תחום כדי להתחיל.
+        </p>
       </div>
 
-      {/* Footer */}
-      <footer className="w-full text-center py-6 border-t border-border-custom text-xs text-text-muted relative z-10 bg-surface/30">
-        <span>© {new Date().getFullYear()} ניר עוז-ארי — כל הזכויות שמורות</span>
-      </footer>
-    </div>
+      {/* Subjects Grid */}
+      {loading ? (
+        <div className="flex justify-center py-16">
+          <Spinner />
+        </div>
+      ) : shownCount === 0 ? (
+        <EmptyState icon={<Lock className="h-5 w-5" strokeWidth={1.75} />} title="עדיין אין תכנים פתוחים">
+          תכנים חדשים יופיעו כאן ברגע שהמורה יפרסם אותם. קיבלתם קישור ישיר מהמורה? אפשר להיכנס דרכו.
+        </EmptyState>
+      ) : (
+        <div
+          className={`grid grid-cols-1 gap-5 ${
+            shownCount >= 4
+              ? "sm:grid-cols-2 lg:grid-cols-4"
+              : shownCount === 3
+              ? "sm:grid-cols-2 lg:grid-cols-3"
+              : shownCount === 2
+              ? "max-w-3xl sm:grid-cols-2"
+              : "max-w-sm"
+          }`}
+        >
+          {cards.map((c, i) => (
+            <LinkCard
+              key={c.subject}
+              subject={c.subject}
+              href={c.href}
+              image={c.image}
+              imageAlt={c.alt}
+              priority={i < 2}
+              title={c.title}
+              subtitle={c.subtitle}
+              description={c.desc}
+              cta={c.cta}
+              meta={<span className="text-xs text-fg-subtle tabular-nums">{openCount(c.subject)} תכנים</span>}
+            />
+          ))}
+        </div>
+      )}
+    </PageShell>
   );
 }

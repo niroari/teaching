@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { User, LogOut, LogIn, Sparkles } from "lucide-react";
+import { User, LogOut, LogIn, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/lib/context/AuthContext";
 import { isTeacherUser } from "@/lib/auth/teacher";
 
@@ -11,55 +11,54 @@ export default function NavbarUser() {
   const isTeacher = isTeacherUser(user);
 
   if (loading) {
-    return (
-      <div className="h-8 w-24 rounded-xl bg-white/5 animate-pulse border border-white/10" />
-    );
+    return <div className="h-9 w-24 animate-pulse rounded-md bg-subtle" />;
   }
 
   if (!user) {
     return (
       <Link
         href="/login"
-        className="px-3.5 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-950 text-xs font-bold transition-all flex items-center gap-1.5 shadow-lg shadow-cyan-500/10 border border-cyan-400/20 hover:scale-[1.02] cursor-pointer"
+        className="inline-flex h-9 items-center gap-1.5 rounded-md bg-primary px-3.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-hover"
       >
-        <LogIn className="w-3.5 h-3.5" />
+        <LogIn className="h-4 w-4" strokeWidth={1.75} />
         <span>התחברות</span>
       </Link>
     );
   }
 
   return (
-    <div className="flex items-center gap-2 sm:gap-3">
+    <div className="flex items-center gap-1.5 text-fg">
       {isTeacher && (
         <Link
           href="/admin"
-          className="px-3 py-1.5 rounded-xl border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm hover:scale-[1.02] cursor-pointer"
+          className="inline-flex h-9 items-center gap-1.5 rounded-md border border-line px-3 text-sm font-medium text-fg transition-colors hover:bg-subtle"
           title="כניסה ללוח מורה מרכזי"
         >
-          <Sparkles className="w-3.5 h-3.5" />
+          <LayoutDashboard className="h-4 w-4 text-fg-muted" strokeWidth={1.75} />
           <span>לוח מורה</span>
         </Link>
       )}
 
       {/* User Info Badge */}
-      <div className="flex items-center gap-2 bg-surface/90 border border-border-custom rounded-xl px-3 py-1.5 text-xs text-zinc-200 shadow-sm">
+      <div className="flex h-9 items-center gap-2 rounded-md px-2 text-sm">
         {user.photoURL ? (
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={user.photoURL}
             alt={user.displayName || "משתמש"}
-            className="w-5 h-5 rounded-full object-cover border border-cyan-500/40"
+            className="h-6 w-6 rounded-full object-cover"
           />
         ) : (
-          <div className="w-5 h-5 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
-            <User className="w-3 h-3" />
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-subtle text-fg-muted">
+            <User className="h-3.5 w-3.5" strokeWidth={1.75} />
           </div>
         )}
-        <div className="flex items-center gap-1.5">
-          <span className="font-bold max-w-[130px] truncate text-white" title={user.displayName || user.email || ""}>
+        <div className="hidden items-center gap-1.5 sm:flex">
+          <span className="max-w-[130px] truncate font-medium text-fg" title={user.displayName || user.email || ""}>
             {user.displayName || user.email?.split("@")[0] || "משתמש"}
           </span>
           {isTeacher && (
-            <span className="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30">
+            <span className="rounded border border-line px-1.5 py-0.5 text-[11px] font-medium text-fg-muted">
               מורה
             </span>
           )}
@@ -76,10 +75,10 @@ export default function NavbarUser() {
             console.error("Logout failed:", err);
           }
         }}
-        className="px-3 py-1.5 rounded-xl border border-red-500/30 bg-red-950/20 hover:bg-red-900/30 text-red-400 hover:text-red-300 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer hover:scale-[1.02]"
+        className="inline-flex h-9 items-center gap-1.5 rounded-md px-2.5 text-sm font-medium text-fg-muted transition-colors hover:bg-subtle hover:text-fg cursor-pointer"
         title="התנתקות מהחשבון"
       >
-        <LogOut className="w-3.5 h-3.5" />
+        <LogOut className="h-4 w-4" strokeWidth={1.75} />
         <span className="hidden sm:inline">התנתק</span>
       </button>
     </div>

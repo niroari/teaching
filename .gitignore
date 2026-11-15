@@ -46,3 +46,4 @@ next-env.d.ts
 /grading/
 mission-export-*.json
 mission-ai-grades.json
+.content-snapshot.json

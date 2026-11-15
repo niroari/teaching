@@ -27,7 +27,6 @@ import {
 import { colorMap, colorsList } from "@/lib/colors";
 import { sounds } from "@/lib/sounds";
 import { useAuth } from "@/lib/context/AuthContext";
-import { loadScopedLocalWords } from "@/lib/vocab-storage";
 import { PRESET_PACKS, PresetPack } from "@/lib/crossword/presets";
 import { generateCrosswordGrid, dealTeamRack } from "@/lib/crossword/generator";
 import { saveActiveGame } from "@/lib/crossword/game-storage";
@@ -94,19 +93,10 @@ export default function CrosswordClashSetupPage() {
 
   // Custom / Imported Words
   const [customWordsText, setCustomWordsText] = useState("");
-  const [userSavedWords, setUserSavedWords] = useState<any[]>([]);
 
   // Settings
   const [roundTimer, setRoundTimer] = useState<number>(90);
   const [showHebrewHints, setShowHebrewHints] = useState(false);
-
-  // Load saved words from Vocab Trainer on mount
-  useEffect(() => {
-    const words = loadScopedLocalWords(user?.uid);
-    if (words && words.length > 0) {
-      setUserSavedWords(words);
-    }
-  }, [user?.uid]);
 
   // Add Team
   const handleAddTeam = () => {
@@ -133,18 +123,6 @@ export default function CrosswordClashSetupPage() {
       return;
     }
     setTeams(teams.filter(t => t.id !== id));
-  };
-
-  const handleImportVocabTrainer = () => {
-    if (userSavedWords.length === 0) {
-      alert("No saved words found in your Vocab Trainer yet!");
-      return;
-    }
-    const formatted = userSavedWords
-      .slice(0, 15)
-      .map(w => `${w.english} - ${w.hebrew}`)
-      .join("\n");
-    setCustomWordsText(formatted);
   };
 
   // Launch Game
@@ -266,37 +244,29 @@ export default function CrosswordClashSetupPage() {
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-300 ${
-        isLight ? "bg-slate-50 text-slate-900" : "bg-zinc-950 text-zinc-100"
-      }`}
+      className={`min-h-screen transition-colors duration-300 bg-subtle text-fg`}
     >
       {/* Top Navigation */}
       <header
-        className={`border-b sticky top-0 z-30 backdrop-blur-md px-6 py-4 transition-colors ${
-          isLight ? "bg-white/80 border-slate-200" : "bg-zinc-900/80 border-zinc-800"
-        }`}
+        className={`border-b sticky top-0 z-30 px-6 py-4 transition-colors bg-card border-line`}
       >
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
               href="/english"
-              className={`p-2 rounded-xl border transition-all ${
-                isLight
-                  ? "bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700"
-                  : "bg-zinc-800/80 hover:bg-zinc-700 border-zinc-700 text-zinc-300"
-              }`}
+              className={`p-2 rounded-xl border transition-all bg-subtle hover:bg-subtle-hover border-line text-fg`}
             >
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-indigo-500/20">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-sm bg-indigo-500">
                 #
               </div>
               <div>
-                <h1 className="text-xl font-black tracking-tight bg-gradient-to-r from-indigo-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent">
+                <h1 className="text-xl font-bold tracking-tight">
                   CROSSWORD CLASH
                 </h1>
-                <p className={`text-xs ${isLight ? "text-slate-500" : "text-zinc-400"}`}>
+                <p className={`text-xs text-fg-muted`}>
                   קרב התשבצים הכיתתי • לוח 8x10
                 </p>
               </div>
@@ -307,31 +277,23 @@ export default function CrosswordClashSetupPage() {
             {/* Audio Toggle */}
             <button
               onClick={toggleSound}
-              className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
-                isLight
-                  ? "bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700"
-                  : "bg-zinc-800/80 hover:bg-zinc-700 border-zinc-700 text-zinc-300"
-              }`}
+              className={`p-2.5 rounded-xl border transition-all cursor-pointer bg-subtle hover:bg-subtle-hover border-line text-fg`}
               title={soundEnabled ? "השתק צלילים" : "הפעל צלילים"}
             >
               {soundEnabled ? (
-                <Volume2 className="w-5 h-5 text-cyan-400" />
+                <Volume2 className="w-5 h-5 text-cyan-700 dark:text-cyan-400" />
               ) : (
-                <VolumeX className="w-5 h-5 text-zinc-500" />
+                <VolumeX className="w-5 h-5 text-fg-muted" />
               )}
             </button>
 
             {/* Comfort Reading Mode Toggle */}
             <button
               onClick={toggleComfortMode}
-              className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
-                isLight
-                  ? "bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700"
-                  : "bg-zinc-800/80 hover:bg-zinc-700 border-zinc-700 text-zinc-300"
-              }`}
+              className={`p-2.5 rounded-xl border transition-all cursor-pointer bg-subtle hover:bg-subtle-hover border-line text-fg`}
               title="Comfort Reading Mode (מצב תצוגה)"
             >
-              {isLight ? <Moon className="w-5 h-5 text-indigo-500" /> : <Sun className="w-5 h-5 text-amber-400" />}
+              {isLight ? <Moon className="w-5 h-5 text-indigo-500" /> : <Sun className="w-5 h-5 text-amber-700 dark:text-amber-400" />}
             </button>
           </div>
         </div>
@@ -341,21 +303,17 @@ export default function CrosswordClashSetupPage() {
       <main className="max-w-6xl mx-auto px-6 py-8 space-y-8">
         {/* Hero Banner */}
         <div
-          className={`p-6 md:p-8 rounded-3xl border relative overflow-hidden transition-all ${
-            isLight
-              ? "bg-gradient-to-br from-indigo-50 via-cyan-50 to-white border-indigo-100 shadow-sm"
-              : "bg-gradient-to-br from-indigo-950/40 via-zinc-900/60 to-zinc-950 border-indigo-500/20"
-          }`}
+          className={`p-6 md:p-8 rounded-xl border relative overflow-hidden transition-all bg-gradient-to-br from-indigo-50 via-cyan-50 to-white border-indigo-100 shadow-sm dark:from-indigo-950/40 dark:via-zinc-900/60 dark:to-zinc-950 dark:border-indigo-500/20`}
         >
           <div className="max-w-2xl space-y-3 relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 border border-indigo-500/30 text-indigo-400">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 border border-indigo-500/30 text-indigo-700 dark:text-indigo-400">
               <Sparkles className="w-3.5 h-3.5" />
               משחק כיתתי אינטראקטיבי בהשראת Crossword Master
             </div>
-            <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
               התאימו אותיות, השלימו הגדרות וצברו נקודות!
             </h2>
-            <p className={`text-sm md:text-base leading-relaxed ${isLight ? "text-slate-600" : "text-zinc-300"}`}>
+            <p className={`text-sm md:text-base leading-relaxed text-fg-muted`}>
               חלקו את הכיתה ל-2 עד 6 קבוצות. כל קבוצה מקבלת 5 אותיות ועליה לזהות היכן למקם אותן בלוח התשבץ לפי ההגדרות.
               אות נכונה מעניקה 10 נקודות, אך אות שגויה מפחיתה 5 נקודות!
             </p>
@@ -365,7 +323,7 @@ export default function CrosswordClashSetupPage() {
         {/* Section 1: Choose Game Mode */}
         <section className="space-y-3">
           <div className="flex items-center gap-2">
-            <Flame className="w-5 h-5 text-indigo-400" />
+            <Flame className="w-5 h-5 text-indigo-700 dark:text-indigo-400" />
             <h3 className="text-lg font-bold">1. בחרו סגנון משחק כיתתי</h3>
           </div>
 
@@ -373,12 +331,10 @@ export default function CrosswordClashSetupPage() {
             {/* Mode 1: Simultaneous Clash */}
             <div
               onClick={() => setMode("simultaneous")}
-              className={`p-5 rounded-2xl border-2 cursor-pointer transition-all ${
+              className={`p-5 rounded-xl border-2 cursor-pointer transition-all ${
                 mode === "simultaneous"
-                  ? "border-cyan-500 bg-cyan-500/10 shadow-lg shadow-cyan-500/10"
-                  : isLight
-                  ? "border-slate-200 hover:border-slate-300 bg-white"
-                  : "border-zinc-800 hover:border-zinc-700 bg-zinc-900/50"
+                  ? "border-cyan-500 bg-cyan-500/10 shadow-sm"
+                  : "border-line hover:border-line bg-card"
               }`}
             >
               <div className="flex items-start justify-between">
@@ -389,16 +345,16 @@ export default function CrosswordClashSetupPage() {
                       מומלץ
                     </span>
                   </div>
-                  <p className={`text-xs ${isLight ? "text-slate-600" : "text-zinc-400"}`}>
+                  <p className={`text-xs text-fg-muted`}>
                     כל הקבוצות מקבלות 5 אותיות וחושבות יחד במקביל עם טיימר. בתום הזמן המורה מזין את המהלכים על הלוח וכל הקבוצות מקבלות ניקוד יחד.
                   </p>
                 </div>
                 <div
                   className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    mode === "simultaneous" ? "border-cyan-500 bg-cyan-500" : "border-zinc-600"
+                    mode === "simultaneous" ? "border-cyan-500 bg-cyan-500" : "border-line"
                   }`}
                 >
-                  {mode === "simultaneous" && <CheckCircle2 className="w-4 h-4 text-black" />}
+                  {mode === "simultaneous" && <CheckCircle2 className="w-4 h-4 text-fg" />}
                 </div>
               </div>
             </div>
@@ -406,27 +362,25 @@ export default function CrosswordClashSetupPage() {
             {/* Mode 2: Turn-by-Turn */}
             <div
               onClick={() => setMode("turn-by-turn")}
-              className={`p-5 rounded-2xl border-2 cursor-pointer transition-all ${
+              className={`p-5 rounded-xl border-2 cursor-pointer transition-all ${
                 mode === "turn-by-turn"
-                  ? "border-indigo-500 bg-indigo-500/10 shadow-lg shadow-indigo-500/10"
-                  : isLight
-                  ? "border-slate-200 hover:border-slate-300 bg-white"
-                  : "border-zinc-800 hover:border-zinc-700 bg-zinc-900/50"
+                  ? "border-indigo-500 bg-indigo-500/10 shadow-sm"
+                  : "border-line hover:border-line bg-card"
               }`}
             >
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
                   <span className="font-bold text-base">תור אחר תור (Turn-by-Turn)</span>
-                  <p className={`text-xs ${isLight ? "text-slate-600" : "text-zinc-400"}`}>
+                  <p className={`text-xs text-fg-muted`}>
                     כל קבוצה עולה בתורה ללוח החכם (או אומרת למורה), מניחה את האותיות שלה ומקבלת ניקוד מיידי.
                   </p>
                 </div>
                 <div
                   className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    mode === "turn-by-turn" ? "border-indigo-500 bg-indigo-500" : "border-zinc-600"
+                    mode === "turn-by-turn" ? "border-indigo-500 bg-indigo-500" : "border-line"
                   }`}
                 >
-                  {mode === "turn-by-turn" && <CheckCircle2 className="w-4 h-4 text-white" />}
+                  {mode === "turn-by-turn" && <CheckCircle2 className="w-4 h-4 text-fg" />}
                 </div>
               </div>
             </div>
@@ -437,10 +391,10 @@ export default function CrosswordClashSetupPage() {
         <section className="space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Users className="w-5 h-5 text-indigo-400" />
+              <Users className="w-5 h-5 text-indigo-700 dark:text-indigo-400" />
               <h3 className="text-lg font-bold">2. הגדרת קבוצות (2–6 קבוצות)</h3>
             </div>
-            <span className={`text-xs ${isLight ? "text-slate-500" : "text-zinc-400"}`}>
+            <span className={`text-xs text-fg-muted`}>
               {teams.length} מתוך 6 קבוצות
             </span>
           </div>
@@ -451,12 +405,10 @@ export default function CrosswordClashSetupPage() {
               return (
                 <div
                   key={team.id}
-                  className={`p-3.5 rounded-2xl border flex items-center justify-between transition-all ${
-                    isLight ? "bg-white border-slate-200" : "bg-zinc-900/60 border-zinc-800"
-                  }`}
+                  className={`p-3.5 rounded-xl border flex items-center justify-between transition-all bg-card border-line`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-xl ${theme.solidBg} flex items-center justify-center text-white font-bold text-sm shadow-md`}>
+                    <div className={`w-8 h-8 rounded-xl ${theme.solidBg} flex items-center justify-center text-fg font-bold text-sm shadow-md`}>
                       {idx + 1}
                     </div>
                     <div>
@@ -468,18 +420,16 @@ export default function CrosswordClashSetupPage() {
                           updated[idx].name = e.target.value;
                           setTeams(updated);
                         }}
-                        className={`text-sm font-bold bg-transparent outline-none border-b border-transparent focus:border-cyan-500 w-32 ${
-                          isLight ? "text-slate-900" : "text-white"
-                        }`}
+                        className={`text-sm font-bold bg-transparent outline-none border-b border-transparent focus:border-cyan-500 w-32 text-fg`}
                       />
-                      <p className="text-[10px] text-zinc-500 capitalize">{team.color}</p>
+                      <p className="text-[10px] text-fg-muted capitalize">{team.color}</p>
                     </div>
                   </div>
 
                   {teams.length > 2 && (
                     <button
                       onClick={() => handleRemoveTeam(team.id)}
-                      className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                      className="p-1.5 rounded-lg text-fg-muted hover:text-rose-700 dark:hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
                       title="הסר קבוצה"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -491,9 +441,7 @@ export default function CrosswordClashSetupPage() {
 
             {teams.length < 6 && (
               <div
-                className={`p-3.5 rounded-2xl border border-dashed flex items-center gap-2 ${
-                  isLight ? "border-slate-300 bg-slate-50/50" : "border-zinc-700 bg-zinc-900/30"
-                }`}
+                className={`p-3.5 rounded-xl border border-dashed flex items-center gap-2 border-line bg-subtle`}
               >
                 <input
                   type="text"
@@ -501,9 +449,7 @@ export default function CrosswordClashSetupPage() {
                   value={newTeamName}
                   onChange={e => setNewTeamName(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && handleAddTeam()}
-                  className={`text-xs px-2.5 py-1.5 rounded-xl border flex-1 bg-transparent outline-none ${
-                    isLight ? "border-slate-300 text-slate-800" : "border-zinc-700 text-zinc-200"
-                  }`}
+                  className={`text-xs px-2.5 py-1.5 rounded-xl border flex-1 bg-transparent outline-none border-line text-fg`}
                 />
                 <button
                   onClick={handleAddTeam}
@@ -520,24 +466,20 @@ export default function CrosswordClashSetupPage() {
         {/* Section 3: Vocabulary Source */}
         <section className="space-y-4">
           <div className="flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-indigo-400" />
+            <BookOpen className="w-5 h-5 text-indigo-700 dark:text-indigo-400" />
             <h3 className="text-lg font-bold">3. בחירת אוצר מילים לתשבץ</h3>
           </div>
 
           {/* Source Tabs */}
           <div
-            className={`p-1 rounded-2xl border inline-flex gap-1 ${
-              isLight ? "bg-slate-100 border-slate-200" : "bg-zinc-900 border-zinc-800"
-            }`}
+            className={`p-1 rounded-xl border inline-flex gap-1 bg-subtle border-line`}
           >
             <button
               onClick={() => setVocabTab("ai")}
               className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
                 vocabTab === "ai"
                   ? "bg-indigo-600 text-white shadow-md"
-                  : isLight
-                  ? "text-slate-600 hover:text-slate-900"
-                  : "text-zinc-400 hover:text-zinc-200"
+                  : "text-fg-muted hover:text-fg"
               }`}
             >
               <Wand2 className="w-3.5 h-3.5" />
@@ -549,9 +491,7 @@ export default function CrosswordClashSetupPage() {
               className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
                 vocabTab === "presets"
                   ? "bg-indigo-600 text-white shadow-md"
-                  : isLight
-                  ? "text-slate-600 hover:text-slate-900"
-                  : "text-zinc-400 hover:text-zinc-200"
+                  : "text-fg-muted hover:text-fg"
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
@@ -563,9 +503,7 @@ export default function CrosswordClashSetupPage() {
               className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
                 vocabTab === "custom"
                   ? "bg-indigo-600 text-white shadow-md"
-                  : isLight
-                  ? "text-slate-600 hover:text-slate-900"
-                  : "text-zinc-400 hover:text-zinc-200"
+                  : "text-fg-muted hover:text-fg"
               }`}
             >
               <Grid className="w-3.5 h-3.5" />
@@ -576,9 +514,7 @@ export default function CrosswordClashSetupPage() {
           {/* AI Generator Tab Panel */}
           {vocabTab === "ai" && (
             <div
-              className={`p-5 rounded-2xl border space-y-4 ${
-                isLight ? "bg-white border-slate-200" : "bg-zinc-900/60 border-zinc-800"
-              }`}
+              className={`p-5 rounded-xl border space-y-4 bg-card border-line`}
             >
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
@@ -588,9 +524,7 @@ export default function CrosswordClashSetupPage() {
                     value={aiTopic}
                     onChange={e => setAiTopic(e.target.value)}
                     placeholder="למשל: Space, Food, Jobs..."
-                    className={`w-full text-xs px-3 py-2 rounded-xl border bg-transparent outline-none focus:border-indigo-500 ${
-                      isLight ? "border-slate-300 text-slate-800" : "border-zinc-700 text-zinc-100"
-                    }`}
+                    className={`w-full text-xs px-3 py-2 rounded-xl border bg-transparent outline-none focus:border-indigo-500 border-line text-fg`}
                   />
                 </div>
 
@@ -599,9 +533,7 @@ export default function CrosswordClashSetupPage() {
                   <select
                     value={aiGrade}
                     onChange={e => setAiGrade(e.target.value)}
-                    className={`w-full text-xs px-3 py-2 rounded-xl border bg-transparent outline-none focus:border-indigo-500 ${
-                      isLight ? "border-slate-300 text-slate-800" : "border-zinc-700 text-zinc-100 bg-zinc-900"
-                    }`}
+                    className={`w-full text-xs px-3 py-2 rounded-xl border bg-transparent outline-none focus:border-indigo-500 border-line text-fg bg-card`}
                   >
                     <option value="5th grade">כיתה ה׳ (5th Grade)</option>
                     <option value="6th grade">כיתה ו׳ (6th Grade)</option>
@@ -623,9 +555,7 @@ export default function CrosswordClashSetupPage() {
                         className={`py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                           aiDifficulty === diff
                             ? "bg-indigo-600 text-white"
-                            : isLight
-                            ? "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                            : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                            : "bg-subtle text-fg hover:bg-subtle-hover"
                         }`}
                       >
                         {diff === "Easy" ? "קל" : diff === "Medium" ? "בינוני" : "מאתגר"}
@@ -636,7 +566,7 @@ export default function CrosswordClashSetupPage() {
               </div>
 
               {aiError && (
-                <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs">
+                <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-400 text-xs">
                   {aiError}
                 </div>
               )}
@@ -650,24 +580,22 @@ export default function CrosswordClashSetupPage() {
                 <div
                   key={pack.id}
                   onClick={() => setSelectedPresetId(pack.id)}
-                  className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${
+                  className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
                     selectedPresetId === pack.id
-                      ? "border-indigo-500 bg-indigo-500/10 shadow-lg shadow-indigo-500/10"
-                      : isLight
-                      ? "border-slate-200 hover:border-slate-300 bg-white"
-                      : "border-zinc-800 hover:border-zinc-700 bg-zinc-900/50"
+                      ? "border-indigo-500 bg-indigo-500/10 shadow-sm"
+                      : "border-line hover:border-line bg-card"
                   }`}
                 >
                   <div className="flex items-center gap-2 mb-1.5">
                     <span className="text-xl">{pack.icon}</span>
                     <span className="font-bold text-sm">{pack.name}</span>
                   </div>
-                  <p className={`text-xs mb-2 ${isLight ? "text-slate-600" : "text-zinc-400"}`}>
+                  <p className={`text-xs mb-2 text-fg-muted`}>
                     {pack.description}
                   </p>
-                  <div className="flex items-center justify-between text-[11px] text-zinc-500">
+                  <div className="flex items-center justify-between text-[11px] text-fg-muted">
                     <span>{pack.words.length} מילים</span>
-                    <span className="px-1.5 py-0.5 rounded bg-zinc-500/10 border border-zinc-500/20">
+                    <span className="px-1.5 py-0.5 rounded bg-subtle border border-line">
                       {pack.difficulty}
                     </span>
                   </div>
@@ -679,20 +607,10 @@ export default function CrosswordClashSetupPage() {
           {/* Custom Words Tab Panel */}
           {vocabTab === "custom" && (
             <div
-              className={`p-5 rounded-2xl border space-y-3 ${
-                isLight ? "bg-white border-slate-200" : "bg-zinc-900/60 border-zinc-800"
-              }`}
+              className={`p-5 rounded-xl border space-y-3 bg-card border-line`}
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold">הזינו מילים (מילה אחת בכל שורה - פורמט: WORD - DEFINITION)</span>
-                {userSavedWords.length > 0 && (
-                  <button
-                    onClick={handleImportVocabTrainer}
-                    className="text-xs text-indigo-400 hover:text-indigo-300 underline font-semibold cursor-pointer"
-                  >
-                    ייבא ממאגר אוצר המילים שלי ({userSavedWords.length} מילים)
-                  </button>
-                )}
               </div>
               <textarea
                 rows={5}
@@ -700,9 +618,7 @@ export default function CrosswordClashSetupPage() {
                 value={customWordsText}
                 onChange={e => setCustomWordsText(e.target.value)}
                 placeholder={"TIGER - A wild cat with stripes\nMONKEY - Loves climbing and bananas\nEAGLE - Bird with sharp eyes"}
-                className={`w-full text-xs p-3 rounded-xl border bg-transparent font-mono outline-none focus:border-indigo-500 text-left ${
-                  isLight ? "border-slate-300 text-slate-800" : "border-zinc-700 text-zinc-100"
-                }`}
+                className={`w-full text-xs p-3 rounded-xl border bg-transparent font-mono outline-none focus:border-indigo-500 text-left border-line text-fg`}
               />
             </div>
           )}
@@ -711,14 +627,12 @@ export default function CrosswordClashSetupPage() {
         {/* Section 4: Rules & Settings */}
         <section className="space-y-3">
           <div className="flex items-center gap-2">
-            <Clock className="w-5 h-5 text-indigo-400" />
+            <Clock className="w-5 h-5 text-indigo-700 dark:text-indigo-400" />
             <h3 className="text-lg font-bold">4. טיימר והגדרות ניקוד</h3>
           </div>
 
           <div
-            className={`p-5 rounded-2xl border grid grid-cols-1 md:grid-cols-2 gap-6 ${
-              isLight ? "bg-white border-slate-200" : "bg-zinc-900/60 border-zinc-800"
-            }`}
+            className={`p-5 rounded-xl border grid grid-cols-1 md:grid-cols-2 gap-6 bg-card border-line`}
           >
             <div>
               <label className="text-xs font-bold block mb-2">זמן לסיבוב / Round Timer</label>
@@ -736,9 +650,7 @@ export default function CrosswordClashSetupPage() {
                     className={`py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       roundTimer === opt.val
                         ? "bg-cyan-500 text-black shadow-md"
-                        : isLight
-                        ? "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                        : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                        : "bg-subtle text-fg hover:bg-subtle-hover"
                     }`}
                   >
                     {opt.label}
@@ -749,10 +661,10 @@ export default function CrosswordClashSetupPage() {
 
             <div>
               <label className="text-xs font-bold block mb-2">שיטת ניקוד</label>
-              <div className="text-xs text-zinc-400 space-y-1">
-                <p>• אות נכונה: <span className="text-emerald-400 font-bold">+10 נקודות</span></p>
-                <p>• אות שגויה: <span className="text-rose-400 font-bold">-5 נקודות</span></p>
-                <p>• השלמת מילה: <span className="text-amber-400 font-bold">+30 נקודות בונוס</span></p>
+              <div className="text-xs text-fg-muted space-y-1">
+                <p>• אות נכונה: <span className="text-emerald-700 dark:text-emerald-400 font-bold">+10 נקודות</span></p>
+                <p>• אות שגויה: <span className="text-rose-700 dark:text-rose-400 font-bold">-5 נקודות</span></p>
+                <p>• השלמת מילה: <span className="text-amber-700 dark:text-amber-400 font-bold">+30 נקודות בונוס</span></p>
               </div>
             </div>
           </div>
@@ -763,7 +675,7 @@ export default function CrosswordClashSetupPage() {
           <button
             onClick={handleStartGame}
             disabled={isGeneratingAi}
-            className="w-full md:w-auto px-12 py-4 rounded-2xl bg-gradient-to-r from-indigo-500 via-cyan-500 to-teal-500 hover:opacity-95 text-white font-black text-lg shadow-xl shadow-cyan-500/25 flex items-center justify-center gap-3 transition-all transform hover:scale-[1.02] cursor-pointer disabled:opacity-50"
+            className="w-full md:w-auto px-12 py-4 rounded-xl hover:opacity-95 text-white font-bold text-lg shadow-sm flex items-center justify-center gap-3 transition-all transform hover:scale-[1.02] cursor-pointer disabled:opacity-50 bg-indigo-500"
           >
             {isGeneratingAi ? (
               <>

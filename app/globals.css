@@ -161,6 +161,27 @@ body {
   border-radius: 4px;
 }
 
+/* Printed pages (worksheets) are always black on white, whatever the screen theme. */
+@media print {
+  html,
+  html[data-theme="dark"] {
+    --canvas: #ffffff;
+    --card: #ffffff;
+    --subtle: #f4f4f5;
+    --fg: #000000;
+    --fg-muted: #3f3f46;
+    --fg-subtle: #71717a;
+    --line: #a1a1aa;
+    --line-strong: #71717a;
+    --accent-earth-c: oklch(0.47 0.085 195);
+    color-scheme: light;
+  }
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

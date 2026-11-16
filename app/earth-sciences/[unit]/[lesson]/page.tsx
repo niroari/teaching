@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { 
-  ArrowRight, 
-  Moon, 
-  Sun, 
-  Presentation, 
+import { useParams } from "next/navigation";
+import {
+  ArrowRight,
+  Printer,
+  FileText,
+  Target,
+  Presentation,
   BookOpen, 
   Play, 
   CheckCircle, 
@@ -22,7 +23,7 @@ import {
   BookCopy,
   X
 } from "lucide-react";
-import { EARTH_SCIENCES_UNITS, NotebookConcept } from "@/lib/data/earth-sciences-lessons";
+import { EARTH_SCIENCES_UNITS, type NotebookConcept, type Lesson, type LessonStage } from "@/lib/data/earth-sciences-lessons";
 import { TOPICS_CONTENT } from "@/lib/data/earth-sciences-topics-content";
 
 interface Slide {
@@ -42,37 +43,22 @@ import TectonicsWidget from "@/components/earth-sciences/TectonicsWidget";
 import FootprintWidget from "@/components/earth-sciences/FootprintWidget";
 import EarthExplorerWidget from "@/components/earth-sciences/EarthExplorerWidget";
 import TriviaJeopardyWidget from "@/components/earth-sciences/TriviaJeopardyWidget";
+import { DigitalWorksheet, AnswerKey } from "@/components/earth-sciences/Worksheet";
+import ActivityBar from "@/components/site/ActivityBar";
+import { btn } from "@/components/site/ui";
+
+/** Stage lengths of a 40-minute lesson, used when a lesson has no detailed plan of its own. */
+const DEFAULT_STAGE_MINUTES = [10, 20, 10] as const;
 
 export default function LessonPresenterConsolePage() {
   const { unit, lesson } = useParams();
-  const router = useRouter();
 
-  // Theme states
-  const [comfortMode, setComfortMode] = useState<"dark" | "light">("dark");
   const [cinemaMode, setCinemaMode] = useState(false);
   const [activeTab, setActiveTab] = useState<"slides" | "activity" | "teacherGuide">("slides");
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [showInlineWidget, setShowInlineWidget] = useState(false);
   const [showNotebookOverlay, setShowNotebookOverlay] = useState(false);
   const [lightboxImageUrl, setLightboxImageUrl] = useState<string | null>(null);
-
-  // Load theme from localStorage
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedTheme = localStorage.getItem("teaching-site-comfort-mode");
-      if (storedTheme === "light" || storedTheme === "dark") {
-        setComfortMode(storedTheme);
-      }
-    }
-  }, []);
-
-  const toggleComfortMode = () => {
-    const nextTheme = comfortMode === "dark" ? "light" : "dark";
-    setComfortMode(nextTheme);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("teaching-site-comfort-mode", nextTheme);
-    }
-  };
 
   // Keyboard navigation for slides
   useEffect(() => {
@@ -107,34 +93,45 @@ export default function LessonPresenterConsolePage() {
   const generateSlides = (): Slide[] => {
     if (!lessonData) return [];
     
-    const slides: Slide[] = [
-      {
-        title: lessonData.hookTitle || lessonData.title,
-        content: lessonData.hook,
-        visualType: "hook"
-      }
-    ];
+    const slides: Slide[] = [];
 
-    lessonData.topics.forEach((topic, idx) => {
-      const richTopics = TOPICS_CONTENT[lessonId];
-      const richTopic = richTopics && richTopics[idx];
+    // Every lesson opens with a short, striking video.
+    if (lessonData.openingVideos && lessonData.openingVideos.length > 0) {
+      slides.push({ title: "סרטון פתיחה", content: "", visualType: "video" });
+    }
 
-      slides.push({
-        title: richTopic ? richTopic.title : `נושא למידה ${idx + 1}: ${topic.split(":")[0] || "מושג יסוד"}`,
-        content: richTopic ? richTopic.subtitle : topic,
-        bullets: richTopic ? richTopic.bullets : [],
-        imageUrl: richTopic ? richTopic.imageUrl : undefined,
-        videoDetailId: richTopic ? richTopic.videoDetailId : undefined,
-        layout: richTopic ? richTopic.layout : undefined,
-        visualType: "topic"
-      });
+    slides.push({
+      title: lessonData.hookTitle || lessonData.title,
+      content: lessonData.hook,
+      visualType: "hook"
     });
+
+    const topicSlides = lessonData.topics.map((topic, idx) => {
+      const richTopic = TOPICS_CONTENT[lessonId]?.[idx];
+      return {
+        afterTask: richTopic?.afterTask ?? false,
+        slide: {
+          title: richTopic ? richTopic.title : `נושא למידה ${idx + 1}: ${topic.split(":")[0] || "מושג יסוד"}`,
+          content: richTopic ? richTopic.subtitle : topic,
+          bullets: richTopic ? richTopic.bullets : [],
+          imageUrl: richTopic ? richTopic.imageUrl : undefined,
+          videoDetailId: richTopic ? richTopic.videoDetailId : undefined,
+          layout: richTopic ? richTopic.layout : undefined,
+          visualType: "topic"
+        } as Slide
+      };
+    });
+
+    slides.push(...topicSlides.filter((t) => !t.afterTask).map((t) => t.slide));
 
     slides.push({
       title: "משימה ועבודה עצמית בכיתה",
       content: lessonData.task.description,
       visualType: "task"
     });
+
+    // Slides for the class summary (stage 3) come after the task.
+    slides.push(...topicSlides.filter((t) => t.afterTask).map((t) => t.slide));
 
     if (lessonData.notebookSummary && lessonData.notebookSummary.length > 0) {
       slides.push({
@@ -169,8 +166,8 @@ export default function LessonPresenterConsolePage() {
     );
   }
 
-  // Intercept and render a beautiful "Under Construction" placeholder page for Units 3, 4
-  if (unitData.id !== 1 && unitData.id !== 2) {
+  // Lessons that are not ready for class yet show an "in development" placeholder.
+  if (lessonData.draft) {
     return (
       <div className="min-h-screen bg-canvas text-fg flex items-center justify-center p-6 text-right font-sans">
         <div className="bg-card border-line max-w-lg w-full rounded-xl p-8 md:p-10 border border-amber-500/20 text-center space-y-6 relative overflow-hidden">
@@ -243,7 +240,6 @@ export default function LessonPresenterConsolePage() {
     }
   };
 
-  const isLight = comfortMode === "light";
   const bgTheme = "bg-canvas text-fg";
   const borderTheme = "border-line";
   const cardTheme = "bg-card border-line shadow-sm";
@@ -255,46 +251,18 @@ export default function LessonPresenterConsolePage() {
       {/* Background Glow */}
       {/* HEADER: Hide in cinema mode to maximize projector space */}
       {!cinemaMode && (
-        <header className={`w-full border-b ${borderTheme} py-4 relative z-20 bg-subtle shrink-0`}>
-          <div className="max-w-6xl mx-auto px-6 flex justify-between items-center">
-            {/* Back to Earth Hub */}
-            <Link
-              href="/earth-sciences"
-              className={`inline-flex items-center gap-1.5 text-xs font-bold ${textMuted} hover:text-accent transition-colors cursor-pointer`}
-            >
-              <ArrowRight className="w-3.5 h-3.5" />
-              <span>חזרה לתוכנית הלימודים</span>
-            </Link>
-
-            {/* Title display */}
-            <div className="hidden md:block text-right">
-              <span className={`text-[10px] font-bold text-accent`}>
-                יחידה {unitData.id}: {unitData.title.split(" - ")[0]}
-              </span>
-              <h2 className={`text-sm font-bold ${titleText}`}>
-                {lessonData.title}
-              </h2>
-            </div>
-
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleComfortMode}
-              className={`p-2 rounded-xl border ${borderTheme} bg-subtle hover:bg-subtle-hover transition-all cursor-pointer flex items-center gap-2 text-xs font-bold`}
-            >
-              {isLight ? (
-                <>
-                  <Moon className="w-4 h-4 text-purple-600" />
-                  <span className="text-fg">מצב כיתה חשוך</span>
-                </>
-              ) : (
-                <>
-                  <Sun className="w-4 h-4 text-amber-700 dark:text-amber-400" />
-                  <span className="text-fg">מצב קריאה בהיר</span>
-                </>
-              )}
-            </button>
-          </div>
-        </header>
+        <ActivityBar
+          backHref="/earth-sciences"
+          backLabel="תוכנית הלימודים"
+          sticky={false}
+          title={
+            <>
+              <span className="text-accent">יחידה {unitData.id}</span>
+              <span className="text-fg-subtle"> · </span>
+              {lessonData.title}
+            </>
+          }
+        />
       )}
 
       {/* Main Container */}
@@ -448,7 +416,59 @@ export default function LessonPresenterConsolePage() {
                     }`}>
                       
                       {/* HOOK SLIDE WITH YOUTUBE OR IMAGE MEDIA */}
-                      {slides[currentSlideIndex].visualType === "hook" && (lessonData.hookVideoId || lessonData.hookImageUrl) ? (
+                      {slides[currentSlideIndex].visualType === "video" && lessonData.openingVideos ? (
+                        <div className={`w-full grid gap-5 ${lessonData.openingVideos.length > 1 ? "md:grid-cols-2" : "max-w-3xl mx-auto"}`}>
+                          {lessonData.openingVideos.map((video) => (
+                            <figure key={video.youtubeId} className="space-y-2 text-right">
+                              <div className="aspect-video overflow-hidden rounded-lg border border-line bg-subtle">
+                                <iframe
+                                  src={`https://www.youtube-nocookie.com/embed/${video.youtubeId}?rel=0&modestbranding=1`}
+                                  title={video.title}
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                  allowFullScreen
+                                  className="h-full w-full border-0"
+                                />
+                              </div>
+                              <figcaption className="space-y-1">
+                                <p className={`font-semibold text-fg ${cinemaMode ? "text-lg" : "text-sm"}`}>{video.title}</p>
+                                <p className={`text-fg-muted ${cinemaMode ? "text-base" : "text-sm"}`}>
+                                  בזמן הצפייה: {video.watchFor}
+                                </p>
+                                <a
+                                  href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 text-xs font-medium text-accent underline-offset-4 hover:underline"
+                                >
+                                  פתיחה ב-YouTube · {Math.floor(video.seconds / 60)}:{String(video.seconds % 60).padStart(2, "0")} דק׳
+                                </a>
+                              </figcaption>
+                            </figure>
+                          ))}
+                        </div>
+                      ) : slides[currentSlideIndex].visualType === "hook" && lessonData.hookImages && lessonData.hookImages.length > 0 ? (
+                        <div className="w-full space-y-4">
+                          <p className={`whitespace-pre-line leading-relaxed text-right ${
+                            cinemaMode ? "text-xl md:text-2xl font-semibold text-fg" : "text-base md:text-lg font-bold text-fg"
+                          }`}>
+                            {slides[currentSlideIndex].content}
+                          </p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {lessonData.hookImages.map((img) => (
+                              <figure key={img.src} className="space-y-1.5">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={img.src}
+                                  alt={img.caption}
+                                  className={`w-full object-cover rounded-lg border border-line cursor-zoom-in ${cinemaMode ? "aspect-[16/10]" : "aspect-[16/9]"}`}
+                                  onClick={() => setLightboxImageUrl(img.src)}
+                                />
+                                <figcaption className="text-sm text-fg-muted text-right">{img.caption}</figcaption>
+                              </figure>
+                            ))}
+                          </div>
+                        </div>
+                      ) : slides[currentSlideIndex].visualType === "hook" && (lessonData.hookVideoId || lessonData.hookImageUrl) ? (
                         <>
                           {/* Text on Right */}
                           <div className="flex-1 text-right space-y-4">
@@ -796,12 +816,21 @@ export default function LessonPresenterConsolePage() {
         {/* TAB 2: ACTIVE WIDGET / DIRECT TASK ACTIVITY */}
         {activeTab === "activity" && (
           <div className="flex-1 flex flex-col justify-start space-y-6">
+            {/* The lesson's worksheet, filled in on the site */}
+            {lessonData.worksheet && (
+              <DigitalWorksheet
+                worksheet={lessonData.worksheet}
+                lessonId={lessonId}
+                printHref={`/earth-sciences/${unitSlug}/${lessonId}/worksheet`}
+              />
+            )}
+
             {/* Widget Container */}
             {lessonData.widgetId ? (
               <div className="w-full animate-fade-in">
                 {renderWidget()}
               </div>
-            ) : (
+            ) : lessonData.worksheet ? null : (
               <div className={`p-8 border ${borderTheme} rounded-xl ${cardTheme} text-center space-y-4`}>
                 <HelpCircle className="w-12 h-12 text-fg-muted mx-auto" />
                 <h4 className={`text-base font-bold ${titleText}`}>אין יישומון דיגיטלי מובנה לשיעור זה</h4>
@@ -811,7 +840,8 @@ export default function LessonPresenterConsolePage() {
               </div>
             )}
 
-            {/* Task guidelines card */}
+            {/* Task guidelines card (the worksheet carries its own instructions) */}
+            {!lessonData.worksheet && (
             <div className={`p-5 rounded-xl border ${borderTheme} ${cardTheme} text-right space-y-3`}>
               <h4 className={`text-base font-bold ${titleText} flex items-center gap-1.5 justify-start`}>
                 <CheckCircle className="w-4 h-4 text-accent shrink-0" />
@@ -831,6 +861,7 @@ export default function LessonPresenterConsolePage() {
                 ))}
               </ol>
             </div>
+            )}
           </div>
         )}
 
@@ -838,55 +869,31 @@ export default function LessonPresenterConsolePage() {
         {activeTab === "teacherGuide" && (
           <div className="flex-1 flex flex-col justify-start space-y-6 text-right">
             
-            {/* Pedagogical 3-Step Lesson Plan */}
-            <div className={`p-5 rounded-xl border ${borderTheme} ${cardTheme} space-y-4`}>
-              <div className="flex justify-between items-center border-b border-line pb-2">
-                <span className={`text-[10px] ${textMuted} font-semibold flex items-center gap-1`}>
-                  <Clock className="w-3.5 h-3.5 text-accent" />
-                  <span>שיעור תלת-שלבי מומלץ (50 דקות)</span>
-                </span>
-                <h4 className={`text-base font-bold ${titleText}`}>מערך השיעור</h4>
+            {/* 40-minute lesson plan: three stages */}
+            <LessonPlanView lessonData={lessonData} />
+
+            {/* Worksheet: print links and answer key */}
+            {lessonData.worksheet && (
+              <div className="p-5 rounded-lg border border-line bg-card space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3">
+                  <h4 className="flex items-center gap-1.5 text-base font-semibold text-fg">
+                    <FileText className="w-4 h-4 text-accent shrink-0" strokeWidth={1.75} />
+                    <span>דף העבודה: {lessonData.worksheet.title}</span>
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    <Link href={`/earth-sciences/${unitSlug}/${lessonId}/worksheet`} target="_blank" className={btn.secondary}>
+                      <Printer className="w-4 h-4" strokeWidth={1.75} aria-hidden />
+                      <span>דף לתלמידים</span>
+                    </Link>
+                    <Link href={`/earth-sciences/${unitSlug}/${lessonId}/worksheet?key=1`} target="_blank" className={btn.secondary}>
+                      <Printer className="w-4 h-4" strokeWidth={1.75} aria-hidden />
+                      <span>מחוון להדפסה</span>
+                    </Link>
+                  </div>
+                </div>
+                <AnswerKey worksheet={lessonData.worksheet} />
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Step 1 */}
-                <div className="space-y-2 bg-subtle p-4 border border-line rounded-xl flex flex-col justify-between">
-                  <div>
-                    <span className="text-[10px] font-bold text-accent block">שלב א׳ (15 דקות)</span>
-                    <h5 className={`font-bold text-xs ${titleText} mt-1`}>הצגת הנושא וגירוי חזותי</h5>
-                    <p className={`text-[11px] ${textMuted} leading-relaxed mt-2`}>
-                      {lessonData.hook}
-                    </p>
-                  </div>
-                  <span className={`text-[9px] font-bold ${textMuted} mt-4`}>מטרת השלב: חיבור אינטואיטיבי של התלמידים.</span>
-                </div>
-
-                {/* Step 2 */}
-                <div className="space-y-2 bg-subtle p-4 border border-line rounded-xl flex flex-col justify-between">
-                  <div>
-                    <span className="text-[10px] font-bold text-accent block">שלב ב׳ (25 דקות)</span>
-                    <h5 className={`font-bold text-xs ${titleText} mt-1`}>עבודה עצמית וחקר פעיל</h5>
-                    <p className={`text-[11px] ${textMuted} leading-relaxed mt-2`}>
-                      {lessonData.task.description} המשימה כוללת עבודה קבוצתית או מילוי שאלונים ביישומון.
-                    </p>
-                  </div>
-                  <span className={`text-[9px] font-bold ${textMuted} mt-4`}>מטרת השלב: התמודדות עצמאית ומיון נתונים.</span>
-                </div>
-
-                {/* Step 3 */}
-                <div className="space-y-2 bg-subtle p-4 border border-line rounded-xl flex flex-col justify-between">
-                  <div>
-                    <span className="text-[10px] font-bold text-accent block">שלב ג׳ (10 דקות)</span>
-                    <h5 className={`font-bold text-xs ${titleText} mt-1`}>סיכום כיתתי במליאה</h5>
-                    <p className={`text-[11px] ${textMuted} leading-relaxed mt-2`}>
-                      הצגת הממצאים במליאה, דיון טיעוני כיתתי וחיזוק המושגים המדעיים: 
-                      {lessonData.summary.slice(0, 2).join(" · ")}
-                    </p>
-                  </div>
-                  <span className={`text-[9px] font-bold ${textMuted} mt-4`}>מטרת השלב: הבנייה רשמית של ידע והגדרות.</span>
-                </div>
-              </div>
-            </div>
+            )}
 
             {/* Notebook Copied Concepts Guide for Teacher */}
             {lessonData.notebookSummary && lessonData.notebookSummary.length > 0 && (
@@ -1025,6 +1032,77 @@ export default function LessonPresenterConsolePage() {
           </span>
         </div>
       )}
+    </div>
+  );
+}
+
+/** The teacher's 40-minute plan: goals, preparation and the three stages. */
+function LessonPlanView({ lessonData }: { lessonData: Lesson }) {
+  const plan = lessonData.plan;
+  const stages: LessonStage[] = plan
+    ? plan.stages
+    : [
+        { minutes: DEFAULT_STAGE_MINUTES[0], title: "פתיחה וגירוי חזותי", steps: [lessonData.hook] },
+        { minutes: DEFAULT_STAGE_MINUTES[1], title: "עבודה עצמית", steps: [lessonData.task.description, ...lessonData.task.instructions] },
+        { minutes: DEFAULT_STAGE_MINUTES[2], title: "סיכום במליאה ומושגים למחברת", steps: lessonData.summary },
+      ];
+  const total = stages.reduce((sum, s) => sum + s.minutes, 0);
+
+  return (
+    <div className="p-5 rounded-lg border border-line bg-card space-y-5">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line pb-3">
+        <h4 className="text-base font-semibold text-fg">מערך השיעור</h4>
+        <span className="flex items-center gap-1 text-xs text-fg-muted">
+          <Clock className="w-3.5 h-3.5 text-accent" strokeWidth={1.75} />
+          <span>שיעור של {total} דקות</span>
+          {plan?.textbookPages && <span>· ספר הלימוד: {plan.textbookPages}</span>}
+        </span>
+      </div>
+
+      {plan && (
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <h5 className="flex items-center gap-1.5 text-sm font-semibold text-fg">
+              <Target className="w-4 h-4 text-accent" strokeWidth={1.75} />
+              <span>מטרות</span>
+            </h5>
+            <ul className="list-disc space-y-1 pr-5 text-sm leading-relaxed text-fg-muted">
+              {plan.goals.map((g) => (
+                <li key={g}>{g}</li>
+              ))}
+            </ul>
+          </div>
+          {plan.preparation && plan.preparation.length > 0 && (
+            <div className="space-y-2">
+              <h5 className="flex items-center gap-1.5 text-sm font-semibold text-fg">
+                <CheckCircle className="w-4 h-4 text-accent" strokeWidth={1.75} />
+                <span>הכנה לפני השיעור</span>
+              </h5>
+              <ul className="list-disc space-y-1 pr-5 text-sm leading-relaxed text-fg-muted">
+                {plan.preparation.map((p) => (
+                  <li key={p}>{p}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+
+      <ol className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        {stages.map((stage, i) => (
+          <li key={i} className="space-y-2 rounded-lg border border-line bg-subtle p-4">
+            <span className="block text-xs font-semibold text-accent">
+              שלב {["א׳", "ב׳", "ג׳"][i]} · {stage.minutes} דקות
+            </span>
+            <h5 className="text-sm font-semibold text-fg">{stage.title}</h5>
+            <ul className="list-disc space-y-1.5 pr-4 text-sm leading-relaxed text-fg-muted">
+              {stage.steps.map((step, s) => (
+                <li key={s} className="whitespace-pre-line">{step}</li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }

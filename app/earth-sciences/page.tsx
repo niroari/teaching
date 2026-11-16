@@ -414,7 +414,7 @@ export default function EarthSciencesHubPage() {
                         </Link>
 
                         {/* Middle row: Badges of completed classes (only in "all classes" view) */}
-                        {showTeacherTools && (unit.id === 1 || unit.id === 2) && selectedClassFilter === "all" && doneClasses.length > 0 && (
+                        {showTeacherTools && !lesson.draft && selectedClassFilter === "all" && doneClasses.length > 0 && (
                           <div className="mt-3 flex flex-wrap gap-1.5 justify-start select-none">
                             {isAllDone ? (
                               <span className="px-2 py-0.5 bg-success-soft text-success border border-success/25 text-xs font-semibold rounded-md">
@@ -435,7 +435,7 @@ export default function EarthSciencesHubPage() {
                           {/* Completion Selector / Popover */}
                           {!showTeacherTools ? (
                             <span />
-                          ) : (unit.id === 1 || unit.id === 2) ? (
+                          ) : !lesson.draft ? (
                             selectedClassFilter === "all" ? (
                               <div className="relative">
                                 {/* Toggle Popover Button */}
@@ -514,14 +514,14 @@ export default function EarthSciencesHubPage() {
                               </button>
                             )
                           ) : (
-                            /* Under Development Badge for Units 2, 3, 4 */
+                            /* Under Development Badge for lessons not ready yet */
                             <span className="flex items-center gap-1 text-xs font-semibold text-warning bg-warning-soft border border-warning/25 rounded-lg px-2.5 py-1">
                               <span>בתהליך פיתוח 🛠️</span>
                             </span>
                           )}
 
                           {/* Indicator for interactive widget */}
-                          {(unit.id === 1 || unit.id === 2) && lesson.widgetId && (
+                          {!lesson.draft && lesson.widgetId && (
                             <span className="flex items-center gap-1 text-xs font-semibold text-accent bg-accent-soft border border-line rounded-md px-1.5 py-0.5">
                               <Activity className="w-2.5 h-2.5 animate-pulse" />
                               <span>יישומון אינטראקטיבי</span>

@@ -23,8 +23,13 @@ function subscribe(cb: () => void) {
   };
 }
 
-/** A string kept in localStorage / sessionStorage, shared live across components. Null on the server. */
-export function useStoredValue(key: string, kind: Area = "local"): [string | null, (v: string | null) => void] {
+type Update = string | null | ((prev: string | null) => string | null);
+
+/**
+ * A string kept in localStorage / sessionStorage, shared live across components. Null on the server.
+ * The setter also takes an updater, which reads the latest stored value (safe for quick successive writes).
+ */
+export function useStoredValue(key: string, kind: Area = "local"): [string | null, (v: Update) => void] {
   const value = useSyncExternalStore(
     subscribe,
     () => {
@@ -38,9 +43,10 @@ export function useStoredValue(key: string, kind: Area = "local"): [string | nul
   );
 
   const set = useCallback(
-    (v: string | null) => {
+    (update: Update) => {
       try {
         const s = area(kind);
+        const v = typeof update === "function" ? update(s?.getItem(key) ?? null) : update;
         if (v === null) s?.removeItem(key);
         else s?.setItem(key, v);
       } catch {

@@ -128,7 +128,11 @@ export default function TectonicsWidget() {
           {/* Earth's Core/Mantle Background Glow */}
           <div className="absolute bottom-0 inset-x-0 h-10 blur-md pointer-events-none bg-red-600/20" />
 
-          <div 
+          {/* The stage is laid out left-to-right on purpose: the plate positions and the
+              translate-x motions below are physical directions, and in the page's RTL flow
+              they would swap places, so divergence would look like convergence and vice versa. */}
+          <div
+            dir="ltr"
             className={`w-full max-w-md h-40 relative flex items-center justify-center transition-all ${
               triggerShake ? "animate-[bounce_0.1s_infinite]" : ""
             }`}
@@ -225,7 +229,7 @@ export default function TectonicsWidget() {
                     animState === "animating" || animState === "finished" ? "-translate-x-12" : ""
                   }`}
                 >
-                  הלוח הערבי (נע צפונה)
+                  הלוח הערבי
                   <span className="absolute top-1 left-4 text-red-500 text-sm">←</span>
                 </div>
 
@@ -250,12 +254,18 @@ export default function TectonicsWidget() {
                     animState === "animating" || animState === "finished" ? "translate-x-12" : ""
                   }`}
                 >
-                  הלוח האפריקאי (סטטי/איטי)
+                  הלוח האפריקאי
                   <span className="absolute bottom-1 right-4 text-red-500 text-sm">→</span>
                 </div>
               </div>
             )}
           </div>
+
+          {activeBoundary === "transform" && (
+            <p className="mt-3 text-xs text-fg-muted text-center z-10">
+              מבט מלמעלה. במציאות הגבול עובר מצפון לדרום, לאורך הערבה ובקעת הירדן, והלוח הערבי נע צפונה ביחס ללוח האפריקאי.
+            </p>
+          )}
 
           {/* Action buttons */}
           <div className="flex gap-4 mt-4 z-10">

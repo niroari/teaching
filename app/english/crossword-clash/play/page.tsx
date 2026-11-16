@@ -5,31 +5,28 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import confetti from "canvas-confetti";
 import {
-  ArrowLeft,
   Volume2,
   VolumeX,
-  Sun,
-  Moon,
   Clock,
   Play,
   Pause,
   RotateCcw,
   Sparkles,
-  Trophy,
   CheckCircle2,
   XCircle,
   HelpCircle,
   Printer,
-  ChevronRight,
   Shuffle,
   Award,
-  Layers,
   Check,
-  Plus,
-  Minus,
-  AlertCircle,
-  Volume1
+  Volume1,
+  Maximize,
+  Minimize,
+  Scale,
+  Zap,
+  Star
 } from "lucide-react";
+import ActivityBar from "@/components/site/ActivityBar";
 import { colorMap } from "@/lib/colors";
 import { sounds } from "@/lib/sounds";
 import { loadActiveGame, saveActiveGame } from "@/lib/crossword/game-storage";
@@ -46,21 +43,20 @@ import {
 export default function CrosswordClashPlayPage() {
   const router = useRouter();
 
-  // Comfort Reading Mode
-  const [comfortMode, setComfortMode] = useState<"dark" | "light">("dark");
+  // Fullscreen (projector)
+  const [isFullscreen, setIsFullscreen] = useState(false);
   useEffect(() => {
-    const stored = localStorage.getItem("teaching-site-comfort-mode");
-    if (stored === "dark" || stored === "light") {
-      setComfortMode(stored);
-    }
+    const onChange = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
   }, []);
-
-  const toggleComfortMode = () => {
-    const next = comfortMode === "dark" ? "light" : "dark";
-    setComfortMode(next);
-    localStorage.setItem("teaching-site-comfort-mode", next);
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
   };
-  const isLight = comfortMode === "light";
 
   // Audio state
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -93,6 +89,29 @@ export default function CrosswordClashPlayPage() {
 
   // Timer Ref
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Board sizing: cells grow to fill the space available on the screen
+  const boardRef = useRef<HTMLDivElement | null>(null);
+  const [cellSize, setCellSize] = useState(44);
+  const gridRows = gameState?.grid.rows ?? 0;
+  const gridCols = gameState?.grid.cols ?? 0;
+  useEffect(() => {
+    const el = boardRef.current;
+    if (!el || !gridRows || !gridCols) return;
+    const GAP = 6;
+    const PAD = 26; // grid padding + border
+    const measure = () => {
+      const fitsHeight = window.matchMedia("(min-width: 1024px)").matches;
+      const byWidth = (el.clientWidth - PAD - GAP * (gridCols - 1)) / gridCols;
+      const byHeight = (el.clientHeight - PAD - GAP * (gridRows - 1)) / gridRows;
+      const size = fitsHeight ? Math.min(byWidth, byHeight) : byWidth;
+      setCellSize(Math.max(24, Math.min(88, Math.floor(size))));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [gridRows, gridCols]);
 
   // Manual Score Adjustment Modal
   const [scoreAdjustTeam, setScoreAdjustTeam] = useState<Team | null>(null);
@@ -553,540 +572,377 @@ export default function CrosswordClashPlayPage() {
     }
   };
 
-  return (
-    <div
-      className={`min-h-screen transition-colors duration-300 flex flex-col justify-between bg-subtle text-fg`}
-    >
-      {/* Top Navbar */}
-      <header
-        className={`border-b sticky top-0 z-30 px-6 py-3 transition-colors bg-card border-line`}
+  const placedCount = Object.keys(turnPlacements).length;
+  const letterFont = Math.round(cellSize * 0.5);
+  const numberFont = Math.max(9, Math.round(cellSize * 0.2));
+
+  const renderClue = (w: CrosswordWord, tone: "across" | "down") => {
+    const isActive = activeWordId === w.id;
+    const toneNum = tone === "across" ? "text-indigo-700 dark:text-indigo-400" : "text-cyan-700 dark:text-cyan-400";
+    const toneActive = tone === "across" ? "border-indigo-500 bg-indigo-500/15" : "border-cyan-500 bg-cyan-500/15";
+    return (
+      <div
+        key={w.id}
+        dir="ltr"
+        onClick={() => {
+          setActiveWordId(w.id);
+          setSelectedCell({ row: w.row, col: w.col });
+          sounds.playPop();
+        }}
+        className={`px-2.5 py-1.5 rounded-lg border text-sm cursor-pointer transition-colors flex items-start gap-2 text-left ${
+          isActive
+            ? `${toneActive} font-semibold`
+            : w.solved
+            ? "border-emerald-500/20 bg-emerald-500/5 opacity-70"
+            : "border-line bg-subtle hover:border-line-strong"
+        }`}
       >
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link
-              href="/english/crossword-clash"
-              className={`p-2 rounded-xl border transition-all bg-subtle hover:bg-subtle-hover border-line text-fg`}
-              title="חזרה להגדרות"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </Link>
+        <span className={`font-bold shrink-0 ${toneNum}`}>{w.number}.</span>
+        <p className={`flex-1 leading-snug ${w.solved ? "line-through text-fg-muted" : ""}`}>{w.clue}</p>
+        <span className="text-xs text-fg-muted shrink-0">({w.word.length})</span>
+      </div>
+    );
+  };
 
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-sm tracking-wide">
-                  CROSSWORD CLASH
-                </span>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-700 dark:text-indigo-400 font-semibold">
-                  סיבוב {gameState.roundNumber}
-                </span>
-                <span className="text-xs text-fg-muted">• {gameState.topic}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Classroom Toolbar */}
-          <div className="flex items-center gap-2">
-            {/* Teacher Reveal Hint */}
-            <button
-              onClick={handleTeacherRevealHint}
-              className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer bg-amber-50 hover:bg-amber-100 border-amber-200 text-amber-800 dark:bg-amber-500/10 dark:hover:bg-amber-500/20 dark:border-amber-500/30 dark:text-amber-300`}
-              title="גלה אות רמז למשבצת הנבחרת"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
-              <span>רמז מורה</span>
-            </button>
-
-            {/* Printable Student Worksheet */}
-            <Link
-              href="/english/crossword-clash/printable"
-              target="_blank"
-              className={`p-2 rounded-xl border transition-all text-xs font-bold flex items-center gap-1.5 bg-subtle hover:bg-subtle-hover border-line text-fg`}
-              title="הדפס דף עבודה לתלמידים"
-            >
-              <Printer className="w-4 h-4" />
-              <span className="hidden sm:inline">דף לתלמיד</span>
-            </Link>
-
-            {/* Audio Toggle */}
-            <button
-              onClick={toggleSound}
-              className={`p-2 rounded-xl border transition-all cursor-pointer bg-subtle hover:bg-subtle-hover border-line text-fg`}
-              title={soundEnabled ? "השתק" : "הפעל צליל"}
-            >
-              {soundEnabled ? (
-                <Volume2 className="w-4 h-4 text-cyan-700 dark:text-cyan-400" />
-              ) : (
-                <VolumeX className="w-4 h-4 text-fg-muted" />
-              )}
-            </button>
-
-            {/* Comfort Mode */}
-            <button
-              onClick={toggleComfortMode}
-              className={`p-2 rounded-xl border transition-all cursor-pointer bg-subtle hover:bg-subtle-hover border-line text-fg`}
-              title="Comfort Reading Mode"
-            >
-              {isLight ? <Moon className="w-4 h-4 text-indigo-500" /> : <Sun className="w-4 h-4 text-amber-700 dark:text-amber-400" />}
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-4 py-4 w-full flex-1 flex flex-col gap-4">
-        {/* Teams Scoreboard Bar */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
-          {gameState.teams.map((team, idx) => {
-            const theme = colorMap[team.color] || colorMap.sky;
-            const isTurn = team.id === currentTeam.id;
-
-            return (
-              <div
-                key={team.id}
-                onClick={() => {
-                  if (gameState.mode === "simultaneous") {
-                    setActiveTeamId(team.id);
-                  }
-                }}
-                className={`p-2.5 rounded-2xl border-2 transition-all cursor-pointer relative overflow-hidden ${
-                  isTurn
-                    ? `${theme.border} ${theme.bg} shadow-lg scale-[1.02]`
-                    : "bg-card border-line opacity-80"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div
-                      className={`w-6 h-6 rounded-lg ${theme.solidBg} flex items-center justify-center text-fg text-xs font-bold`}
-                    >
-                      {idx + 1}
-                    </div>
-                    <span className="font-bold text-xs truncate max-w-[85px]">{team.name}</span>
-                  </div>
-                  <span className="font-bold text-sm text-cyan-700 dark:text-cyan-400">{team.score}</span>
-                </div>
-
-                <div className="flex items-center justify-between text-[10px] text-fg-muted mt-1">
-                  <span>מילים: {team.wordsCompleted}</span>
-                  <button
-                    onClick={e => {
-                      e.stopPropagation();
-                      setScoreAdjustTeam(team);
-                    }}
-                    className="hover:text-fg px-1 py-0.5 rounded"
-                    title="עדכן ניקוד ידנית"
-                  >
-                    ⚖️
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Feedback Alert Toast */}
-        {turnFeedback && (
-          <div
-            className={`px-4 py-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition-all shadow-md animate-in fade-in slide-in-from-top-2 ${
-              turnFeedback.type === "word"
-                ? "bg-amber-500/15 border-amber-500/40 text-amber-700 dark:text-amber-300"
-                : turnFeedback.type === "penalty"
-                ? "bg-rose-500/15 border-rose-500/40 text-rose-700 dark:text-rose-300"
-                : "bg-emerald-500/15 border-emerald-500/40 text-emerald-700 dark:text-emerald-300"
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              {turnFeedback.type === "word" ? (
-                <Award className="w-4 h-4 text-amber-700 dark:text-amber-400" />
-              ) : turnFeedback.type === "penalty" ? (
-                <XCircle className="w-4 h-4 text-rose-700 dark:text-rose-400" />
-              ) : (
-                <CheckCircle2 className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
-              )}
-              <span>{turnFeedback.message}</span>
-            </div>
-            <span className="text-sm font-bold">
-              {turnFeedback.points > 0 ? `+${turnFeedback.points}` : turnFeedback.points} נק׳
+  return (
+    <div className="flex min-h-dvh flex-col bg-subtle text-fg lg:h-dvh lg:overflow-hidden">
+      <ActivityBar
+        backHref="/english/crossword-clash"
+        backLabel="הגדרות"
+        title={
+          <span className="flex items-center gap-2">
+            <span>Crossword Clash</span>
+            <span className="rounded-full border border-line px-2 py-0.5 text-xs font-semibold text-fg-muted">
+              סיבוב {gameState.roundNumber}
             </span>
-          </div>
-        )}
+            <span className="truncate text-xs font-normal text-fg-muted">{gameState.topic}</span>
+          </span>
+        }
+      >
+        <button
+          onClick={handleTeacherRevealHint}
+          className="inline-flex h-9 items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-3 text-xs font-bold text-amber-800 transition-colors hover:bg-amber-100 cursor-pointer dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300 dark:hover:bg-amber-500/20"
+          title="גלה אות רמז למשבצת הנבחרת"
+        >
+          <Sparkles className="h-4 w-4" strokeWidth={1.75} />
+          <span className="hidden sm:inline">רמז מורה</span>
+        </button>
+        <Link
+          href="/english/crossword-clash/printable"
+          target="_blank"
+          className="inline-flex h-9 items-center gap-1.5 rounded-md border border-line px-2.5 text-xs font-bold text-fg-muted transition-colors hover:bg-subtle hover:text-fg"
+          title="הדפס דף עבודה לתלמידים"
+        >
+          <Printer className="h-4 w-4" strokeWidth={1.75} />
+          <span className="hidden md:inline">דף לתלמיד</span>
+        </Link>
+        <button
+          onClick={toggleSound}
+          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-line text-fg-muted transition-colors hover:bg-subtle hover:text-fg cursor-pointer"
+          title={soundEnabled ? "השתק" : "הפעל צליל"}
+        >
+          {soundEnabled ? <Volume2 className="h-4 w-4" strokeWidth={1.75} /> : <VolumeX className="h-4 w-4" strokeWidth={1.75} />}
+        </button>
+        <button
+          onClick={toggleFullscreen}
+          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-line text-fg-muted transition-colors hover:bg-subtle hover:text-fg cursor-pointer"
+          title={isFullscreen ? "יציאה ממסך מלא" : "מסך מלא (למקרן)"}
+        >
+          {isFullscreen ? <Minimize className="h-4 w-4" strokeWidth={1.75} /> : <Maximize className="h-4 w-4" strokeWidth={1.75} />}
+        </button>
+      </ActivityBar>
 
-        {/* Board & Clues Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1">
-          {/* Left/Center: 8x10 Crossword Grid (8 cols on lg) */}
-          <div
+      <main className="mx-auto flex w-full max-w-[1800px] flex-1 flex-col gap-3 px-3 py-3 lg:min-h-0">
+        {/* Board + sidebar */}
+        <div className="grid grid-cols-1 gap-3 lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(0,1fr)_minmax(300px,26rem)]">
+          {/* Board */}
+          <section
             dir="ltr"
-            className={`lg:col-span-7 p-4 md:p-6 rounded-xl border flex flex-col items-center justify-center transition-all bg-card border-line shadow-sm`}
+            className="relative flex flex-col gap-3 rounded-xl border border-line bg-card p-3 shadow-sm lg:min-h-0"
           >
-            {/* Active Selected Clue Highlight Header */}
             {activeWord ? (
-              <div
-                dir="ltr"
-                className={`w-full mb-4 px-4 py-2.5 rounded-xl border flex items-center justify-between text-xs text-left bg-indigo-50 border-indigo-200 dark:bg-indigo-950/30 dark:border-indigo-500/30`}
-              >
-                <div className="flex items-center gap-2 text-left">
-                  <span className="font-bold text-indigo-700 dark:text-indigo-400 shrink-0">
+              <div className="flex shrink-0 items-center justify-between gap-3 rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2 text-left dark:border-indigo-500/30 dark:bg-indigo-950/30">
+                <div className="flex min-w-0 items-baseline gap-2 text-base lg:text-lg">
+                  <span className="shrink-0 font-bold text-indigo-700 dark:text-indigo-400">
                     {activeWord.number} {activeWord.direction === "across" ? "Across" : "Down"}:
                   </span>
                   <span className="font-semibold">{activeWord.clue}</span>
                 </div>
                 <button
                   onClick={() => speakWord(activeWord.word)}
-                  className="p-1 rounded-lg hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 transition-colors shrink-0"
+                  className="shrink-0 rounded-md p-1.5 text-indigo-700 transition-colors hover:bg-indigo-500/20 dark:text-indigo-400"
                   title="הקרא הגדרה באנגלית"
                 >
-                  <Volume1 className="w-4 h-4" />
+                  <Volume1 className="h-5 w-5" strokeWidth={1.75} />
                 </button>
               </div>
             ) : (
-              <div className="w-full mb-4 text-center text-xs text-fg-muted">
+              <div dir="rtl" className="shrink-0 py-2 text-center text-sm text-fg-muted">
                 לחצו על משבצת או הגדרה כדי לראות את המילה המתאימה בלוח
               </div>
             )}
 
-            {/* The Grid Matrix */}
-            <div
-              dir="ltr"
-              className="inline-grid gap-1.5 p-3 rounded-xl bg-subtle border border-line select-none"
-              style={{
-                gridTemplateColumns: `repeat(${gameState.grid.cols}, minmax(0, 1fr))`
-              }}
-            >
-              {gameState.grid.cells.map((row, r) =>
-                row.map((cell, c) => {
-                  const cellKey = `${r},${c}`;
-                  const isSelected = selectedCell?.row === r && selectedCell?.col === c;
-                  const isHighlighted = isCellInActiveWord(r, c);
-                  const placedTile = turnPlacements[cellKey];
+            {/* Feedback toast: overlays the board so it does not push the layout */}
+            {turnFeedback && (
+              <div
+                dir="rtl"
+                className={`absolute inset-x-3 top-3 z-20 flex items-center justify-between gap-3 rounded-lg border px-4 py-3 text-sm font-bold shadow-md animate-in fade-in slide-in-from-top-2 ${
+                  turnFeedback.type === "word"
+                    ? "border-amber-500/40 bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
+                    : turnFeedback.type === "penalty"
+                    ? "border-rose-500/40 bg-rose-50 text-rose-800 dark:bg-rose-950 dark:text-rose-300"
+                    : "border-emerald-500/40 bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  {turnFeedback.type === "word" ? (
+                    <Award className="h-5 w-5" strokeWidth={1.75} />
+                  ) : turnFeedback.type === "penalty" ? (
+                    <XCircle className="h-5 w-5" strokeWidth={1.75} />
+                  ) : (
+                    <CheckCircle2 className="h-5 w-5" strokeWidth={1.75} />
+                  )}
+                  <span>{turnFeedback.message}</span>
+                </div>
+                <span className="shrink-0 text-base">
+                  {turnFeedback.points > 0 ? `+${turnFeedback.points}` : turnFeedback.points} נק׳
+                </span>
+              </div>
+            )}
 
-                  if (!cell.isActive) {
+            <div ref={boardRef} className="flex flex-1 items-center justify-center lg:min-h-0">
+              <div
+                className="inline-grid select-none rounded-xl border border-line bg-subtle p-3"
+                style={{
+                  gap: 6,
+                  gridTemplateColumns: `repeat(${gameState.grid.cols}, ${cellSize}px)`
+                }}
+              >
+                {gameState.grid.cells.map((row, r) =>
+                  row.map((cell, c) => {
+                    const cellKey = `${r},${c}`;
+                    const isSelected = selectedCell?.row === r && selectedCell?.col === c;
+                    const isHighlighted = isCellInActiveWord(r, c);
+                    const placedTile = turnPlacements[cellKey];
+                    const sizeStyle = { width: cellSize, height: cellSize };
+
+                    if (!cell.isActive) {
+                      return <div key={cellKey} style={sizeStyle} className="rounded-lg bg-subtle-hover" />;
+                    }
+
+                    const revealingTeam = cell.revealedByTeamId
+                      ? gameState.teams.find(t => t.id === cell.revealedByTeamId)
+                      : null;
+                    const revealingTheme = revealingTeam ? colorMap[revealingTeam.color] || colorMap.sky : null;
+                    const placingTeam = placedTile ? gameState.teams.find(t => t.id === placedTile.teamId) : null;
+                    const placingTheme = placingTeam ? colorMap[placingTeam.color] || colorMap.sky : null;
+
                     return (
                       <div
                         key={cellKey}
-                        className={`w-8 h-8 sm:w-11 sm:h-11 md:w-13 md:h-13 rounded-xl transition-all bg-subtle-hover`}
-                      />
+                        onClick={() => handleCellClick(r, c)}
+                        style={sizeStyle}
+                        className={`relative flex items-center justify-center rounded-lg border-2 font-black select-none cursor-pointer transition-colors ${
+                          isSelected
+                            ? "border-cyan-400 ring-2 ring-cyan-400/50"
+                            : placedTile
+                            ? `${placingTheme ? placingTheme.border : "border-amber-400"} ${
+                                placingTheme ? placingTheme.bg : "bg-amber-500/20"
+                              } animate-pulse`
+                            : isHighlighted
+                            ? "border-indigo-400/80 bg-indigo-500/15"
+                            : "border-line bg-card hover:border-line-strong"
+                        }`}
+                      >
+                        {cell.number && (
+                          <span
+                            className="absolute left-1 top-0.5 font-bold leading-none text-fg-muted"
+                            style={{ fontSize: numberFont }}
+                          >
+                            {cell.number}
+                          </span>
+                        )}
+
+                        {placedTile && placingTeam && (
+                          <span
+                            className={`absolute right-1 top-0.5 rounded px-1 font-bold leading-tight ${
+                              placingTheme ? placingTheme.badge : "bg-amber-500/20 text-amber-700 dark:text-amber-300"
+                            }`}
+                            style={{ fontSize: Math.max(8, numberFont - 1) }}
+                          >
+                            ק{gameState.teams.indexOf(placingTeam) + 1}
+                          </span>
+                        )}
+
+                        {cell.isRevealed ? (
+                          <span
+                            className={`font-bold ${revealingTheme ? revealingTheme.text : "text-emerald-700 dark:text-emerald-400"}`}
+                            style={{ fontSize: letterFont }}
+                          >
+                            {cell.letter}
+                          </span>
+                        ) : placedTile ? (
+                          <span
+                            className={`font-bold ${placingTheme ? placingTheme.text : "text-amber-700 dark:text-amber-300"}`}
+                            style={{ fontSize: letterFont }}
+                          >
+                            {placedTile.letter}
+                          </span>
+                        ) : null}
+                      </div>
                     );
-                  }
-
-                  // Team who revealed this cell
-                  const revealingTeam = cell.revealedByTeamId
-                    ? gameState.teams.find(t => t.id === cell.revealedByTeamId)
-                    : null;
-                  const revealingTheme = revealingTeam
-                    ? colorMap[revealingTeam.color] || colorMap.sky
-                    : null;
-
-                  const placingTeam = placedTile
-                    ? gameState.teams.find(t => t.id === placedTile.teamId)
-                    : null;
-                  const placingTheme = placingTeam
-                    ? colorMap[placingTeam.color] || colorMap.sky
-                    : null;
-
-                  return (
-                    <div
-                      key={cellKey}
-                      onClick={() => handleCellClick(r, c)}
-                      className={`w-8 h-8 sm:w-11 sm:h-11 md:w-13 md:h-13 rounded-xl border-2 relative flex items-center justify-center font-black select-none cursor-pointer transition-all transform hover:scale-[1.04] ${
-                        isSelected
-                          ? "border-cyan-400 ring-2 ring-cyan-400/50"
-                          : placedTile
-                          ? `${placingTheme ? placingTheme.border : "border-amber-400"} ${
-                              placingTheme ? placingTheme.bg : "bg-amber-500/20"
-                            } animate-pulse`
-                          : isHighlighted
-                          ? "border-indigo-400/80 bg-indigo-500/15"
-                          : "border-line bg-card hover:border-line"
-                      }`}
-                    >
-                      {/* Cell Clue Number */}
-                      {cell.number && (
-                        <span className="absolute top-0.5 left-1 text-[9px] sm:text-[10px] font-bold text-fg-muted leading-none">
-                          {cell.number}
-                        </span>
-                      )}
-
-                      {/* Team indicator for pending placed tile */}
-                      {placedTile && placingTeam && (
-                        <span
-                          className={`absolute top-0.5 right-1 text-[8px] font-bold ${
-                            placingTheme ? placingTheme.badge : "bg-amber-500/20 text-amber-700 dark:text-amber-300"
-                          } px-1 rounded`}
-                        >
-                          ק{gameState.teams.indexOf(placingTeam) + 1}
-                        </span>
-                      )}
-
-                      {/* Display Letter */}
-                      {cell.isRevealed ? (
-                        <span
-                          className={`text-base sm:text-xl md:text-2xl font-bold ${
-                            revealingTheme ? revealingTheme.text : "text-emerald-700 dark:text-emerald-400"
-                          }`}
-                        >
-                          {cell.letter}
-                        </span>
-                      ) : placedTile ? (
-                        <span
-                          className={`text-base sm:text-xl md:text-2xl font-bold ${
-                            placingTheme ? placingTheme.text : "text-amber-700 dark:text-amber-300"
-                          }`}
-                        >
-                          {placedTile.letter}
-                        </span>
-                      ) : null}
-                    </div>
-                  );
-                })
-              )}
+                  })
+                )}
+              </div>
             </div>
-          </div>
+          </section>
 
-          {/* Right Column: Clues List & Round Controls (5 cols on lg) */}
-          <div className="lg:col-span-5 flex flex-col gap-4">
-            {/* Clues Accordion Box */}
-            <div
-              dir="ltr"
-              className={`p-4 rounded-xl border flex-1 flex flex-col transition-all overflow-hidden text-left bg-card border-line shadow-sm`}
-            >
-              <div className="flex items-center justify-between pb-3 border-b mb-3">
+          {/* Sidebar: scores, timer, clues */}
+          <aside className="flex flex-col gap-3 lg:min-h-0">
+            <div className="grid shrink-0 grid-cols-2 gap-2">
+              {gameState.teams.map((team, idx) => {
+                const theme = colorMap[team.color] || colorMap.sky;
+                const isTurn = team.id === currentTeam.id;
+                return (
+                  <div
+                    key={team.id}
+                    onClick={() => {
+                      if (gameState.mode === "simultaneous") setActiveTeamId(team.id);
+                    }}
+                    className={`flex items-center gap-2 rounded-lg border-2 px-2.5 py-1.5 transition-colors cursor-pointer ${
+                      isTurn ? `${theme.border} ${theme.bg}` : "border-line bg-card"
+                    }`}
+                  >
+                    <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-xs font-bold text-fg ${theme.solidBg}`}>
+                      {idx + 1}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-bold leading-tight">{team.name}</div>
+                      <div className="text-[11px] leading-tight text-fg-muted">מילים: {team.wordsCompleted}</div>
+                    </div>
+                    <span className="text-lg font-bold text-cyan-700 dark:text-cyan-400">{team.score}</span>
+                    <button
+                      onClick={e => {
+                        e.stopPropagation();
+                        setScoreAdjustTeam(team);
+                      }}
+                      className="rounded p-1 text-fg-subtle transition-colors hover:bg-subtle hover:text-fg"
+                      title="עדכן ניקוד ידנית"
+                    >
+                      <Scale className="h-3.5 w-3.5" strokeWidth={1.75} />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+
+            {gameState.settings.roundTimerSeconds > 0 && (
+              <div className="flex shrink-0 items-center justify-between rounded-xl border border-line bg-card px-3 py-2">
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`flex h-9 w-9 items-center justify-center rounded-lg border ${
+                      gameState.timeLeft <= 10
+                        ? "animate-pulse border-rose-500/40 bg-rose-500/20 text-rose-700 dark:text-rose-400"
+                        : "border-cyan-500/30 bg-cyan-500/10 text-cyan-700 dark:text-cyan-400"
+                    }`}
+                  >
+                    <Clock className="h-5 w-5" strokeWidth={1.75} />
+                  </div>
+                  <span className="text-2xl font-bold tabular-nums">{gameState.timeLeft} שנ׳</span>
+                </div>
                 <div className="flex items-center gap-2">
-                  <HelpCircle className="w-4 h-4 text-indigo-700 dark:text-indigo-400" />
-                  <span className="font-bold text-sm">Clues (הגדרות התשבץ)</span>
+                  <button
+                    onClick={toggleTimer}
+                    className={`rounded-lg border p-2 transition-colors cursor-pointer ${
+                      gameState.isTimerRunning
+                        ? "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                        : "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                    }`}
+                    title={gameState.isTimerRunning ? "השהה טיימר" : "הפעל טיימר"}
+                  >
+                    {gameState.isTimerRunning ? <Pause className="h-4 w-4" strokeWidth={1.75} /> : <Play className="h-4 w-4" strokeWidth={1.75} />}
+                  </button>
+                  <button
+                    onClick={resetTimer}
+                    className="rounded-lg border border-line bg-subtle p-2 text-fg transition-colors hover:bg-subtle-hover cursor-pointer"
+                    title="אפס טיימר"
+                  >
+                    <RotateCcw className="h-4 w-4" strokeWidth={1.75} />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div dir="ltr" className="flex flex-col rounded-xl border border-line bg-card p-3 text-left shadow-sm lg:min-h-0 lg:flex-1">
+              <div className="mb-2 flex shrink-0 items-center justify-between border-b border-line pb-2">
+                <div className="flex items-center gap-2">
+                  <HelpCircle className="h-4 w-4 text-indigo-700 dark:text-indigo-400" strokeWidth={1.75} />
+                  <span className="text-sm font-bold">Clues</span>
                 </div>
                 <span className="text-xs text-fg-muted">
                   {gameState.grid.words.filter(w => w.solved).length} / {gameState.grid.words.length} solved
                 </span>
               </div>
-
-              <div className="space-y-4 overflow-y-auto max-h-[360px] pr-1" dir="ltr">
-                {/* Across Clues */}
+              <div className="max-h-[360px] space-y-3 overflow-y-auto pr-1 lg:max-h-none lg:min-h-0 lg:flex-1">
                 <div>
-                  <h4 className="text-xs font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider mb-2 text-left">
+                  <h4 className="mb-1.5 text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-400">
                     Across (מאוזן)
                   </h4>
-                  <div className="space-y-2">
-                    {gameState.grid.words
-                      .filter(w => w.direction === "across")
-                      .map(w => {
-                        const isActive = activeWordId === w.id;
-                        return (
-                          <div
-                            key={w.id}
-                            dir="ltr"
-                            onClick={() => {
-                              setActiveWordId(w.id);
-                              setSelectedCell({ row: w.row, col: w.col });
-                              sounds.playPop();
-                            }}
-                            className={`p-2.5 rounded-xl border text-xs cursor-pointer transition-all flex items-start gap-2 text-left ${
-                              isActive
-                                ? "border-indigo-500 bg-indigo-500/15 font-semibold"
-                                : w.solved
-                                ? "border-emerald-500/20 bg-emerald-500/5 line-through opacity-70"
-                                : "border-line hover:border-line bg-subtle"
-                            }`}
-                          >
-                            <span className="font-bold text-indigo-700 dark:text-indigo-400 shrink-0">{w.number}.</span>
-                            <div className="flex-1 text-left">
-                              <p className={w.solved ? "line-through text-fg-muted" : ""}>{w.clue}</p>
-                            </div>
-                            <span className="text-[10px] text-fg-muted shrink-0">
-                              ({w.word.length} letters)
-                            </span>
-                          </div>
-                        );
-                      })}
+                  <div className="space-y-1.5">
+                    {gameState.grid.words.filter(w => w.direction === "across").map(w => renderClue(w, "across"))}
                   </div>
                 </div>
-
-                {/* Down Clues */}
                 <div>
-                  <h4 className="text-xs font-bold text-cyan-700 dark:text-cyan-400 uppercase tracking-wider mb-2 text-left">
+                  <h4 className="mb-1.5 text-xs font-bold uppercase tracking-wider text-cyan-700 dark:text-cyan-400">
                     Down (מאונך)
                   </h4>
-                  <div className="space-y-2">
-                    {gameState.grid.words
-                      .filter(w => w.direction === "down")
-                      .map(w => {
-                        const isActive = activeWordId === w.id;
-                        return (
-                          <div
-                            key={w.id}
-                            dir="ltr"
-                            onClick={() => {
-                              setActiveWordId(w.id);
-                              setSelectedCell({ row: w.row, col: w.col });
-                              sounds.playPop();
-                            }}
-                            className={`p-2.5 rounded-xl border text-xs cursor-pointer transition-all flex items-start gap-2 text-left ${
-                              isActive
-                                ? "border-cyan-500 bg-cyan-500/15 font-semibold"
-                                : w.solved
-                                ? "border-emerald-500/20 bg-emerald-500/5 line-through opacity-70"
-                                : "border-line hover:border-line bg-subtle"
-                            }`}
-                          >
-                            <span className="font-bold text-cyan-700 dark:text-cyan-400 shrink-0">{w.number}.</span>
-                            <div className="flex-1 text-left">
-                              <p className={w.solved ? "line-through text-fg-muted" : ""}>{w.clue}</p>
-                            </div>
-                            <span className="text-[10px] text-fg-muted shrink-0">
-                              ({w.word.length} letters)
-                            </span>
-                          </div>
-                        );
-                      })}
+                  <div className="space-y-1.5">
+                    {gameState.grid.words.filter(w => w.direction === "down").map(w => renderClue(w, "down"))}
                   </div>
                 </div>
               </div>
             </div>
-
-            {/* Timer & Turn Controller */}
-            {gameState.settings.roundTimerSeconds > 0 && (
-              <div
-                className={`p-4 rounded-xl border flex items-center justify-between transition-all bg-card border-line`}
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg ${
-                      gameState.timeLeft <= 10
-                        ? "bg-rose-500/20 text-rose-700 dark:text-rose-400 animate-pulse border border-rose-500/40"
-                        : "bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border border-cyan-500/30"
-                    }`}
-                  >
-                    <Clock className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <span className="text-xl font-bold">{gameState.timeLeft} שנ׳</span>
-                    <p className="text-[10px] text-fg-muted">טיימר סיבוב</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={toggleTimer}
-                    className={`p-2 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
-                      gameState.isTimerRunning
-                        ? "bg-amber-500/10 border-amber-500/30 text-amber-700 dark:text-amber-400"
-                        : "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-400"
-                    }`}
-                  >
-                    {gameState.isTimerRunning ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                  </button>
-
-                  <button
-                    onClick={resetTimer}
-                    className="p-2 rounded-xl border border-line bg-subtle hover:bg-subtle text-fg transition-all cursor-pointer"
-                    title="אפס טיימר"
-                  >
-                    <RotateCcw className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+          </aside>
         </div>
 
-        {/* Bottom Interactive Area */}
+        {/* Rack bar */}
         {gameState.mode === "simultaneous" ? (
-          /* Simultaneous Mode: ALL TEAMS RACKS DISPLAYED SIMULTANEOUSLY */
-          <div
-            className={`p-4 md:p-5 rounded-xl border-2 transition-all shadow-sm bg-card border-line`}
-          >
-            {/* Action Bar Above All Racks */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pb-3 mb-3 border-b border-line">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-700 dark:text-cyan-400 font-bold">
-                  ⚡
-                </div>
-                <div>
-                  <h3 className="font-bold text-sm md:text-base leading-tight">
-                    אותיות כל הקבוצות לסיבוב {gameState.roundNumber} (All Teams&apos; Letters)
-                  </h3>
-                  <p className={`text-[11px] text-fg-muted`}>
-                    כל הקבוצות רואות את האותיות שלהן יחד. לחצו על אות של קבוצה כדי לשבץ אותה בלוח
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                <button
-                  onClick={handleSwapAllRacks}
-                  className="px-3.5 py-2.5 rounded-xl border border-line hover:border-line bg-subtle hover:bg-subtle text-fg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
-                  title="החלף 5 אותיות עבור כל הקבוצות"
-                >
-                  <Shuffle className="w-3.5 h-3.5" />
-                  <span>החלף לכולם</span>
-                </button>
-
-                <button
-                  onClick={handleSubmitTurn}
-                  className="flex-1 sm:flex-none px-6 py-2.5 rounded-xl hover:opacity-95 text-white font-bold text-xs md:text-sm shadow-sm flex items-center justify-center gap-2 transition-all transform hover:scale-[1.02] cursor-pointer bg-emerald-500"
-                >
-                  <Check className="w-4 h-4" />
-                  <span>בדוק והזן סיבוב ({Object.keys(turnPlacements).length} שובצו)</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Grid of All Teams and their 5 Letters */}
+          <div className="flex shrink-0 flex-col gap-3 rounded-xl border-2 border-line bg-card p-3 shadow-sm lg:flex-row lg:items-stretch">
             <div
-              className={`grid gap-3 ${
-                gameState.teams.length <= 3
-                  ? "grid-cols-1 md:grid-cols-3"
-                  : gameState.teams.length === 4
-                  ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
-                  : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-              }`}
+              className="grid flex-1 grid-cols-2 gap-2 sm:grid-cols-3 lg:[grid-template-columns:repeat(var(--teams),minmax(0,1fr))]"
+              style={{ "--teams": gameState.teams.length } as React.CSSProperties}
             >
               {gameState.teams.map((team, tIdx) => {
                 const tTheme = colorMap[team.color] || colorMap.sky;
                 const isSelectedTeam = activeTeamId === team.id;
-                const placedByThisTeamCount = Object.values(turnPlacements).filter(
-                  p => p.teamId === team.id
-                ).length;
-
+                const placedByThisTeamCount = Object.values(turnPlacements).filter(p => p.teamId === team.id).length;
                 return (
                   <div
                     key={team.id}
                     onClick={() => setActiveTeamId(team.id)}
-                    className={`p-3 rounded-2xl border-2 transition-all cursor-pointer relative overflow-hidden ${
-                      isSelectedTeam
-                        ? `${tTheme.border} ${tTheme.bg} shadow-md`
-                        : "bg-subtle border-line hover:border-line"
+                    className={`rounded-lg border-2 p-2 transition-colors cursor-pointer ${
+                      isSelectedTeam ? `${tTheme.border} ${tTheme.bg}` : "border-line bg-subtle"
                     }`}
                   >
-                    {/* Header */}
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={`w-6 h-6 rounded-lg ${tTheme.solidBg} flex items-center justify-center text-fg text-xs font-bold shadow-sm`}
-                        >
+                    <div className="mb-1.5 flex items-center justify-between gap-1">
+                      <div className="flex min-w-0 items-center gap-1.5">
+                        <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded text-[11px] font-bold text-fg ${tTheme.solidBg}`}>
                           {tIdx + 1}
                         </div>
-                        <span className="font-bold text-xs md:text-sm truncate max-w-[110px]">
-                          {team.name}
+                        <span className="truncate text-sm font-bold">{team.name}</span>
+                      </div>
+                      {placedByThisTeamCount > 0 && (
+                        <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-bold ${tTheme.badge}`}>
+                          {placedByThisTeamCount} בלוח
                         </span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        {placedByThisTeamCount > 0 && (
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${tTheme.badge} font-bold`}>
-                            {placedByThisTeamCount} בלוח
-                          </span>
-                        )}
-                        <span className="font-bold text-xs text-cyan-700 dark:text-cyan-400">{team.score} נק׳</span>
-                      </div>
+                      )}
                     </div>
-
-                    {/* 5 Letters Row */}
-                    <div className="grid grid-cols-5 gap-1.5" dir="ltr">
+                    <div className="grid grid-cols-5 gap-1" dir="ltr">
                       {team.rack.map((letter, lIdx) => {
                         const isSelected = isSelectedTeam && selectedRackIndex === lIdx;
                         const isPlaced = Object.values(turnPlacements).some(
                           p => p.rackIndex === lIdx && p.teamId === team.id
                         );
-
                         return (
                           <button
                             key={`${team.id}-${lIdx}`}
@@ -1096,12 +952,12 @@ export default function CrosswordClashPlayPage() {
                               setActiveTeamId(team.id);
                               handleRackTileClick(lIdx);
                             }}
-                            className={`h-11 sm:h-12 rounded-xl border-2 flex items-center justify-center font-bold text-lg md:text-xl transition-all cursor-pointer select-none ${
+                            className={`flex h-10 items-center justify-center rounded-lg border-2 text-xl font-bold transition-all select-none cursor-pointer xl:h-12 xl:text-2xl ${
                               isPlaced
-                                ? "opacity-25 border-dashed border-line scale-90"
+                                ? "scale-90 border-dashed border-line opacity-25"
                                 : isSelected
-                                ? "border-cyan-400 bg-cyan-400 text-black shadow-sm scale-110 -translate-y-1"
-                                : "border-line bg-card hover:border-line text-fg hover:scale-105"
+                                ? "-translate-y-0.5 border-cyan-400 bg-cyan-400 text-black"
+                                : "border-line bg-card text-fg hover:border-line-strong"
                             }`}
                           >
                             {letter}
@@ -1113,81 +969,85 @@ export default function CrosswordClashPlayPage() {
                 );
               })}
             </div>
+
+            <div className="flex shrink-0 items-center gap-2 lg:w-52 lg:flex-col lg:items-stretch lg:justify-center">
+              <button
+                onClick={handleSubmitTurn}
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-base font-bold text-white transition-opacity hover:opacity-95 cursor-pointer lg:flex-none"
+              >
+                <Check className="h-5 w-5" strokeWidth={1.75} />
+                <span>בדוק סיבוב ({placedCount})</span>
+              </button>
+              <button
+                onClick={handleSwapAllRacks}
+                className="flex items-center justify-center gap-1.5 rounded-lg border border-line bg-subtle px-3 py-2.5 text-sm font-bold text-fg transition-colors hover:bg-subtle-hover cursor-pointer"
+                title="החלף 5 אותיות עבור כל הקבוצות"
+              >
+                <Shuffle className="h-4 w-4" strokeWidth={1.75} />
+                <span>החלף לכולם</span>
+              </button>
+              <p className="hidden items-center justify-center gap-1 text-[11px] text-fg-muted lg:flex">
+                <Zap className="h-3 w-3" strokeWidth={1.75} />
+                כל הקבוצות משחקות יחד
+              </p>
+            </div>
           </div>
         ) : (
-          /* Turn-by-Turn Mode: Active Team 5-Letter Rack */
-          <div
-            className={`p-4 md:p-5 rounded-xl border-2 transition-all shadow-sm ${
-              currentTeamTheme.border
-            } bg-card`}
-          >
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              {/* Active Team Indicator */}
-              <div className="flex items-center gap-3">
-                <div
-                  className={`w-10 h-10 rounded-xl ${currentTeamTheme.solidBg} flex items-center justify-center text-fg font-bold text-lg shadow-md`}
-                >
-                  ★
+          <div className={`flex shrink-0 flex-col items-center justify-between gap-3 rounded-xl border-2 bg-card px-4 py-3 shadow-sm md:flex-row ${currentTeamTheme.border}`}>
+            <div className="flex items-center gap-3">
+              <div className={`flex h-10 w-10 items-center justify-center rounded-lg text-fg ${currentTeamTheme.solidBg}`}>
+                <Star className="h-5 w-5" strokeWidth={1.75} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg font-bold">{currentTeam.name}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${currentTeamTheme.badge}`}>תור פעיל</span>
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-base md:text-lg">{currentTeam.name}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${currentTeamTheme.badge} font-bold`}>
-                      תור פעיל
-                    </span>
-                  </div>
-                  <p className={`text-xs text-fg-muted`}>
-                    בחרו אות מהמגש והניחו במשבצת המתאימה בלוח
-                  </p>
-                </div>
+                <p className="text-xs text-fg-muted">בחרו אות מהמגש והניחו במשבצת המתאימה בלוח</p>
               </div>
+            </div>
 
-              {/* 5-Letter Rack */}
-              <div className="flex items-center gap-2" dir="ltr">
-                {currentTeam.rack.map((letter, idx) => {
-                  const isSelected = selectedRackIndex === idx;
-                  const isPlaced = Object.values(turnPlacements).some(
-                    p => p.rackIndex === idx && p.teamId === currentTeam.id
-                  );
+            <div className="flex items-center gap-2" dir="ltr">
+              {currentTeam.rack.map((letter, idx) => {
+                const isSelected = selectedRackIndex === idx;
+                const isPlaced = Object.values(turnPlacements).some(
+                  p => p.rackIndex === idx && p.teamId === currentTeam.id
+                );
+                return (
+                  <button
+                    key={`${currentTeam.id}-${idx}`}
+                    disabled={isPlaced}
+                    onClick={() => handleRackTileClick(idx)}
+                    className={`flex h-12 w-12 items-center justify-center rounded-lg border-2 text-2xl font-bold transition-all cursor-pointer xl:h-14 xl:w-14 xl:text-3xl ${
+                      isPlaced
+                        ? "scale-90 cursor-not-allowed border-dashed border-line opacity-30"
+                        : isSelected
+                        ? "-translate-y-1 border-cyan-400 bg-cyan-400 text-black"
+                        : "border-line bg-subtle text-fg hover:border-line-strong"
+                    }`}
+                  >
+                    {letter}
+                  </button>
+                );
+              })}
+            </div>
 
-                  return (
-                    <button
-                      key={`${currentTeam.id}-${idx}`}
-                      disabled={isPlaced}
-                      onClick={() => handleRackTileClick(idx)}
-                      className={`w-11 h-11 sm:w-13 sm:h-13 rounded-xl border-2 flex items-center justify-center font-bold text-xl md:text-2xl transition-all transform cursor-pointer ${
-                        isPlaced
-                          ? "opacity-30 border-dashed border-line cursor-not-allowed scale-90"
-                          : isSelected
-                          ? "border-cyan-400 bg-cyan-400 text-black shadow-sm scale-110 -translate-y-1"
-                          : "border-line bg-subtle text-fg hover:border-line hover:scale-105"
-                      }`}
-                    >
-                      {letter}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Actions: Submit & Swap */}
-              <div className="flex items-center gap-2 w-full md:w-auto">
-                <button
-                  onClick={handleSwapRack}
-                  className="px-3.5 py-3 rounded-xl border border-line hover:border-line bg-subtle hover:bg-subtle text-fg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
-                  title="החלף את כל 5 האותיות והעבר תור"
-                >
-                  <Shuffle className="w-4 h-4" />
-                  <span className="hidden sm:inline">החלף אותיות</span>
-                </button>
-
-                <button
-                  onClick={handleSubmitTurn}
-                  className="flex-1 md:flex-none px-6 py-3 rounded-xl hover:opacity-95 text-white font-bold text-sm md:text-base shadow-sm flex items-center justify-center gap-2 transition-all transform hover:scale-[1.02] cursor-pointer bg-emerald-500"
-                >
-                  <Check className="w-5 h-5" />
-                  <span>בדוק והזן מהלך ({Object.keys(turnPlacements).length})</span>
-                </button>
-              </div>
+            <div className="flex w-full items-center gap-2 md:w-auto">
+              <button
+                onClick={handleSwapRack}
+                className="flex items-center gap-1.5 rounded-lg border border-line bg-subtle px-3.5 py-3 text-sm font-bold text-fg transition-colors hover:bg-subtle-hover cursor-pointer"
+                title="החלף את כל 5 האותיות והעבר תור"
+              >
+                <Shuffle className="h-4 w-4" strokeWidth={1.75} />
+                <span className="hidden sm:inline">החלף אותיות</span>
+              </button>
+              <button
+                onClick={handleSubmitTurn}
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-6 py-3 text-base font-bold text-white transition-opacity hover:opacity-95 cursor-pointer md:flex-none"
+              >
+                <Check className="h-5 w-5" strokeWidth={1.75} />
+                <span>בדוק והזן מהלך ({placedCount})</span>
+              </button>
             </div>
           </div>
         )}

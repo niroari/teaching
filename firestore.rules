@@ -95,6 +95,26 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    // Parent-teacher meeting slots (/parents/meetings). One document per booked slot, id = slot id,
+    // so a slot can only be created once: first come, first served. Parents use an anonymous session.
+    match /parent_meetings/{slotId} {
+      function validName(n) {
+        return n is string && n.size() >= 2 && n.size() <= 60;
+      }
+      allow read: if true;
+      allow create: if request.auth != null &&
+        request.resource.data.ownerUid == request.auth.uid &&
+        request.resource.data.keys().hasOnly(["day", "time", "studentName", "parentName", "ownerUid", "createdAt"]) &&
+        request.resource.data.day is string &&
+        request.resource.data.time is string &&
+        validName(request.resource.data.studentName) &&
+        validName(request.resource.data.parentName) &&
+        request.resource.data.createdAt == request.time;
+      allow update: if isAdmin();
+      allow delete: if isAdmin() ||
+        (request.auth != null && resource.data.ownerUid == request.auth.uid);
+    }
+
     match /writing_assignments/{assignmentId} {
       allow create: if request.auth != null && 
         request.resource.data.studentId == request.auth.uid;

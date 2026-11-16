@@ -25,7 +25,7 @@ export default function PageShell({ children, subject, crumbs, width = "wide", d
   return (
     <div data-subject={subject} className="site flex min-h-screen flex-col bg-canvas text-fg">
       <SiteHeader crumbs={crumbs} />
-      <main dir={dir} className={`mx-auto w-full flex-1 px-4 py-10 sm:px-6 sm:py-14 ${WIDTHS[width]} ${className}`}>
+      <main dir={dir} className={`mx-auto w-full flex-1 px-4 py-10 sm:px-6 sm:py-14 print:p-0 ${WIDTHS[width]} ${className}`}>
         {children}
       </main>
       <SiteFooter>{footer}</SiteFooter>

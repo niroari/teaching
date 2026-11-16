@@ -11,6 +11,7 @@ import {
   Sun,
   Moon,
   ArrowRight,
+  CalendarClock,
   X,
   LucideIcon,
 } from "lucide-react";
@@ -207,6 +208,16 @@ export default function AdminSidebar({
               </ul>
             </div>
           ))}
+          <div>
+            <div className={`px-2.5 pb-1.5 text-[11px] font-medium ${muted}`}>כלי מחנך</div>
+            <Link
+              href="/parents/meetings"
+              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-[13px] font-medium ${itemBase}`}
+            >
+              <CalendarClock className="w-4 h-4 shrink-0" strokeWidth={1.75} />
+              <span className="flex-1 text-right truncate">ימי הורים: שיבוץ</span>
+            </Link>
+          </div>
         </nav>
 
         {/* Footer */}

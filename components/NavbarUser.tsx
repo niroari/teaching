@@ -14,7 +14,8 @@ export default function NavbarUser() {
     return <div className="h-9 w-24 animate-pulse rounded-md bg-subtle" />;
   }
 
-  if (!user) {
+  // Anonymous sessions (parents booking a meeting) are not real accounts.
+  if (!user || user.isAnonymous) {
     return (
       <Link
         href="/login"

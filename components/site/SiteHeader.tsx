@@ -12,7 +12,7 @@ export interface Crumb {
 /** The one header every regular page shares: brand, where-am-I trail, theme toggle, account. */
 export default function SiteHeader({ crumbs = [] }: { crumbs?: Crumb[] }) {
   return (
-    <header dir="rtl" className="sticky top-0 z-40 border-b border-line bg-canvas/95 supports-[backdrop-filter]:bg-canvas/85 supports-[backdrop-filter]:backdrop-blur-sm">
+    <header dir="rtl" className="sticky top-0 z-40 print:hidden border-b border-line bg-canvas/95 supports-[backdrop-filter]:bg-canvas/85 supports-[backdrop-filter]:backdrop-blur-sm">
       <div className="mx-auto flex h-14 w-full max-w-6xl items-center gap-3 px-4 sm:px-6">
         <Link href="/" className="flex shrink-0 items-center gap-2.5 rounded-md" aria-label="דף הבית">
           <span className="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-xs font-semibold text-primary-foreground">

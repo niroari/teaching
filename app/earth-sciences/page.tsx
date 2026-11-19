@@ -14,6 +14,8 @@ import {
   Settings,
   Users,
   ChevronDown,
+  ChevronsDownUp,
+  ChevronsUpDown,
   X,
   Layers,
   Edit2,
@@ -35,6 +37,18 @@ export default function EarthSciencesHubPage() {
   const [editingClasses, setEditingClasses] = useState<string[]>(['ח׳1', 'ח׳2', 'ח׳3', 'ח׳4', 'ח׳5']);
   const [activePopoverLesson, setActivePopoverLesson] = useState<string | null>(null);
 
+  // Collapsible sections (units + resources). Everything starts collapsed on each visit.
+  const [openSections, setOpenSections] = useState<Set<string>>(new Set());
+  const toggleSection = (key: string) =>
+    setOpenSections(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+  const openSection = (key: string) =>
+    setOpenSections(prev => (prev.has(key) ? prev : new Set(prev).add(key)));
+  const isSearching = searchQuery.trim().length > 0;
+
   // Students only see lessons the teacher made visible; class tracking is a teacher tool.
   const { canSee, bypass: showTeacherTools } = useVisibility();
   const visibleUnits = EARTH_SCIENCES_UNITS.map(unit => ({
@@ -43,6 +57,13 @@ export default function EarthSciencesHubPage() {
   })).filter(unit => unit.lessons.length > 0);
   const showMission = canSee("earth.mission");
   const showResources = canSee("earth.resources");
+  const showAtlas = canSee("earth.tectonics");
+  const showResourcesSection = showMission || showResources || showAtlas;
+  const sectionKeys = [
+    ...visibleUnits.map(u => `unit-${u.id}`),
+    ...(showResourcesSection ? ["resources"] : []),
+  ];
+  const allOpen = sectionKeys.length > 0 && sectionKeys.every(k => openSections.has(k));
 
   // Load state from localStorage
   useEffect(() => {
@@ -212,11 +233,13 @@ export default function EarthSciencesHubPage() {
     <div data-subject="earth" className={`site relative min-h-screen ${bgTheme} flex flex-col`}>
       <ActivityBar backHref="/" backLabel="חזרה לפורטל" title="מדעי כדור הארץ">
         {/* Resources Button */}
-        {(showMission || showResources) && (
+        {showResourcesSection && (
           <button
             onClick={() => {
-              const el = document.getElementById("resources-section");
-              if (el) el.scrollIntoView({ behavior: "smooth" });
+              openSection("resources");
+              requestAnimationFrame(() => {
+                document.getElementById("resources-section")?.scrollIntoView({ behavior: "smooth" });
+              });
             }}
             className="inline-flex h-9 items-center gap-1.5 rounded-md border border-line px-3 text-sm font-medium text-fg transition-colors hover:bg-subtle cursor-pointer"
             title="משאבים ועזרים דיגיטליים"
@@ -327,7 +350,10 @@ export default function EarthSciencesHubPage() {
             {visibleUnits.map(unit => (
               <button
                 key={unit.id}
-                onClick={() => setActiveUnitFilter(unit.id)}
+                onClick={() => {
+                  setActiveUnitFilter(unit.id);
+                  openSection(`unit-${unit.id}`);
+                }}
                 className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors cursor-pointer border whitespace-nowrap ${
                   activeUnitFilter === unit.id
                     ? "bg-accent text-primary-foreground border-accent shadow-sm"
@@ -337,31 +363,65 @@ export default function EarthSciencesHubPage() {
                 יחידה {unit.id}: {getShortUnitTitle(unit.id)} ({unit.lessons.length})
               </button>
             ))}
+
+            {/* Expand / collapse every section at once */}
+            {sectionKeys.length > 0 && (
+              <button
+                onClick={() => setOpenSections(allOpen ? new Set() : new Set(sectionKeys))}
+                className="ms-auto inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-fg-muted hover:text-fg hover:bg-subtle transition-colors cursor-pointer whitespace-nowrap"
+              >
+                {allOpen ? (
+                  <ChevronsDownUp className="w-4 h-4" strokeWidth={1.75} aria-hidden />
+                ) : (
+                  <ChevronsUpDown className="w-4 h-4" strokeWidth={1.75} aria-hidden />
+                )}
+                <span>{allOpen ? "סגירת הכל" : "פתיחת הכל"}</span>
+              </button>
+            )}
           </div>
         </div>
 
         {/* Units & Lessons Content */}
         {filteredUnits.length > 0 ? (
           <div className="space-y-10">
-            {filteredUnits.map(unit => (
+            {filteredUnits.map(unit => {
+              const unitKey = `unit-${unit.id}`;
+              // While searching, matching units open on their own so results are visible.
+              const unitOpen = isSearching || openSections.has(unitKey);
+              return (
               <div key={unit.id} className="space-y-4">
-                {/* Unit Header */}
-                <div className={`border-b ${borderTheme} pb-2 text-right`}>
-                  <div className="flex justify-between items-end">
-                    <h3 className={`text-xl font-semibold ${titleText}`}>
-                      יחידה {unit.id}: {unit.title}
+                {/* Unit Header (click to expand / collapse) */}
+                <button
+                  type="button"
+                  onClick={() => toggleSection(unitKey)}
+                  aria-expanded={unitOpen}
+                  aria-controls={`${unitKey}-lessons`}
+                  className={`group/unit w-full border-b ${borderTheme} pb-2 text-right cursor-pointer`}
+                >
+                  <div className="flex justify-between items-end gap-4">
+                    <h3 className={`text-xl font-semibold ${titleText} flex items-center gap-2 group-hover/unit:text-accent transition-colors`}>
+                      <ChevronDown
+                        className={`w-5 h-5 text-fg-muted shrink-0 transition-transform ${unitOpen ? "" : "rotate-90"}`}
+                        strokeWidth={1.75}
+                        aria-hidden
+                      />
+                      <span>יחידה {unit.id}: {unit.title}</span>
+                      <span className={`text-sm font-medium ${textMuted} whitespace-nowrap`}>({unit.lessons.length} שיעורים)</span>
                     </h3>
-                    <span className={`text-xs ${textMuted} font-semibold`}>
+                    <span className={`hidden sm:inline text-xs ${textMuted} font-semibold shrink-0`}>
                       מסגרת הוראה: {unit.hours} שעות שנתיות
                     </span>
                   </div>
-                  <p className={`${textMuted} text-[13px] mt-1 max-w-4xl`}>
-                    {unit.description}
-                  </p>
-                </div>
+                  {unitOpen && (
+                    <p className={`${textMuted} text-[13px] mt-1 max-w-4xl`}>
+                      {unit.description}
+                    </p>
+                  )}
+                </button>
 
                 {/* Lessons Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {unitOpen && (
+                <div id={`${unitKey}-lessons`} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {unit.lessons.map((lesson, index) => {
                     const doneClasses = completedByClass[lesson.id] || [];
                     const isAllDone = classes.every(c => doneClasses.includes(c));
@@ -532,8 +592,10 @@ export default function EarthSciencesHubPage() {
                     );
                   })}
                 </div>
+                )}
               </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           /* Empty search state */
@@ -556,16 +618,30 @@ export default function EarthSciencesHubPage() {
         )}
 
         {/* Section: משאבים ועזרים */}
-        {(showMission || showResources) && (
+        {showResourcesSection && (
         <div id="resources-section" className={`w-full mt-16 border-t ${borderTheme} pt-12 text-right space-y-8`}>
-          <div className="text-center sm:text-right space-y-2">
-            <h2 className={`text-2xl font-semibold tracking-tight ${titleText}`}>משאבים ועזרים 🛠️</h2>
+          <button
+            type="button"
+            onClick={() => toggleSection("resources")}
+            aria-expanded={openSections.has("resources")}
+            aria-controls="resources-content"
+            className="group/res w-full text-center sm:text-right space-y-2 cursor-pointer"
+          >
+            <h2 className={`text-2xl font-semibold tracking-tight ${titleText} flex items-center justify-center sm:justify-start gap-2 group-hover/res:text-accent transition-colors`}>
+              <ChevronDown
+                className={`w-6 h-6 text-fg-muted shrink-0 transition-transform ${openSections.has("resources") ? "" : "rotate-90"}`}
+                strokeWidth={1.75}
+                aria-hidden
+              />
+              <span>משאבים ועזרים 🛠️</span>
+            </h2>
             <p className={`${textMuted} text-[13px]`}>
               כלים אינטראקטיביים, סימולטורים ומקורות מידע חיצוניים להעשרת הלמידה במהלך השנה.
             </p>
-          </div>
+          </button>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+          {openSections.has("resources") && (
+          <div id="resources-content" className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
             {/* Research assignment: Mission New Home (Unit 1) */}
             {showMission && (
             <Link
@@ -584,6 +660,28 @@ export default function EarthSciencesHubPage() {
               </div>
               <span className="shrink-0 self-start sm:self-center px-4 py-2 rounded-md bg-accent text-primary-foreground text-sm font-semibold group-hover:bg-accent transition-colors">
                 לכניסה למשימה ←
+              </span>
+            </Link>
+            )}
+
+            {/* Interactive atlas: Earth in Motion (plate tectonics) */}
+            {showAtlas && (
+            <Link
+              href="/earth-sciences/tectonics"
+              className={`lg:col-span-2 group ${cardTheme} rounded-lg border ${borderTheme} p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-line-strong transition-colors`}
+            >
+              <div className="space-y-2">
+                <h3 className={`text-lg font-semibold ${titleText} flex items-center gap-2`}>
+                  <span className="w-2 h-2 rounded-full bg-warning animate-pulse" />
+                  כדור הארץ בתנועה
+                </h3>
+                <p className={`${textMuted} text-[13px] leading-relaxed`}>
+                  אטלס אינטראקטיבי של הלוחות הטקטוניים על גלובוס תלת-ממדי: גבולות לוחות, רעידות אדמה והרי געש,
+                  סיורים מודרכים, חידון, ופרק מיוחד על ישראל וים המלח.
+                </p>
+              </div>
+              <span className="shrink-0 self-start sm:self-center px-4 py-2 rounded-md bg-accent text-primary-foreground text-sm font-semibold group-hover:bg-accent transition-colors">
+                לפתיחת האטלס ←
               </span>
             </Link>
             )}
@@ -638,6 +736,7 @@ export default function EarthSciencesHubPage() {
             </div>
             </>)}
           </div>
+          )}
         </div>
         )}
       </main>

@@ -1,0 +1,1093 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>כדור הארץ בתנועה</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Karantina:wght@400;700&family=IBM+Plex+Sans+Hebrew:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Concept: a survey atlas beside a globe. The panel is a printed map legend — hairline rules,
+   legend keys, instrument readouts in mono. The globe sits in deep space with a faint graticule.
+   Single deliberate dark look (projector-friendly). */
+:root {
+  --space: #05070B;        /* page / sky */
+  --sheet: #0B0E13;        /* the legend sheet */
+  --sheet-2: #12161D;      /* pressed / hover rows */
+  --rule: #232A35;         /* hairlines */
+  --rule-2: #39424F;       /* stronger rules */
+  --ink: #E8E6E1;          /* primary text, slightly warm white */
+  --ink-2: #8E959F;        /* secondary text */
+  --ink-3: #5D6570;        /* tertiary, captions */
+  --amber: #F2B33D;        /* accent = divergent / magma */
+  --div: #F2B33D; --con: #E8467C; --tra: #3BC4DB;
+  --quake: #F3F1EA; --volcano: #FF7A2E;
+  --magma: #FF6A2B; --crust: #7E6D59; --crust-2: #5E5143; --ocean: #24527C; --mantle: #2A1610;
+  --f-display: "Karantina", "IBM Plex Sans Hebrew", "Arial Hebrew", sans-serif;
+  --f-body: "IBM Plex Sans Hebrew", "Arial Hebrew", "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --panel-w: 392px;
+  --fs: 1;                 /* projector mode bumps this */
+  color-scheme: dark;
+}
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--space); color: var(--ink);
+  font-family: var(--f-body); font-size: calc(15px * var(--fs)); line-height: 1.55;
+  overflow: hidden; -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 1.5px solid var(--amber); outline-offset: 2px; }
+
+/* ---------- Stage ---------- */
+#stage {
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(circle at 38% 50%, #0B1424 0%, transparent 55%),
+    var(--space);
+}
+#globe { position: absolute; top: 0; left: 0; }
+#loading {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  font: 500 .8em var(--f-mono); letter-spacing: .14em; color: var(--ink-3);
+}
+/* Corner marks on the stage, like a plate in an atlas */
+.corner { position: absolute; width: 14px; height: 14px; border-color: var(--rule-2); border-style: solid; border-width: 0; pointer-events: none; }
+.corner.tl { top: calc(18px + env(safe-area-inset-top, 0px)); left: max(18px, env(safe-area-inset-left, 0px)); border-top-width: 1px; border-left-width: 1px; }
+.corner.bl { bottom: calc(18px + env(safe-area-inset-bottom, 0px)); left: max(18px, env(safe-area-inset-left, 0px)); border-bottom-width: 1px; border-left-width: 1px; }
+.stage-caption {
+  position: absolute; left: max(40px, calc(env(safe-area-inset-left, 0px) + 24px)); bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  font: 400 .72em var(--f-mono); letter-spacing: .08em; color: var(--ink-3); direction: ltr; pointer-events: none;
+}
+
+/* ---------- Legend sheet (panel) ---------- */
+#panel {
+  position: fixed; top: 0; bottom: 0; right: 0; width: var(--panel-w);
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--sheet);
+  border-left: 1px solid var(--rule);
+  display: flex; flex-direction: column;
+}
+.masthead { padding: 26px 28px 0; }
+.masthead .kicker {
+  font: 500 .7em var(--f-mono); letter-spacing: .16em; color: var(--ink-3);
+  display: flex; justify-content: space-between; direction: ltr;
+}
+.masthead h1 {
+  margin: 10px 0 0; font-family: var(--f-display); font-weight: 700;
+  font-size: 4.1em; line-height: .82; letter-spacing: -.005em;
+}
+.masthead h1 em { font-style: normal; color: var(--amber); }
+.masthead .sub { margin: 10px 0 0; color: var(--ink-2); font-size: .93em; max-width: 30ch; }
+
+/* Live instrument readout */
+.readout {
+  margin: 20px 28px 0; padding: 10px 0; border-top: 1px solid var(--rule-2); border-bottom: 1px solid var(--rule);
+  display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline;
+}
+.readout .lbl { font: 500 .66em var(--f-mono); letter-spacing: .14em; color: var(--ink-3); grid-column: 1 / -1; }
+.readout .plate { font-weight: 500; min-height: 1.5em; }
+.readout .coords { font: 400 .82em var(--f-mono); color: var(--ink-2); direction: ltr; font-variant-numeric: tabular-nums; }
+
+/* Chapter nav */
+nav.tabs { display: flex; gap: 22px; padding: 16px 28px 0; border-bottom: 1px solid var(--rule); }
+nav.tabs button {
+  appearance: none; border: 0; background: none; cursor: pointer; padding: 0 0 10px;
+  font-family: var(--f-display); font-weight: 700; font-size: 1.75em; line-height: 1; color: var(--ink-3);
+  border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color .15s;
+}
+nav.tabs button:hover { color: var(--ink-2); }
+nav.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--amber); }
+
+.tab-body { flex: 1; overflow-y: auto; padding: 22px 28px 28px; min-height: 0; scrollbar-width: thin; scrollbar-color: var(--rule-2) transparent; }
+.tab-body h2 { font-family: var(--f-display); font-weight: 700; font-size: 2.1em; line-height: .95; margin: 0 0 10px; text-wrap: balance; }
+.tab-body p { margin: 0 0 14px; }
+.soon { color: var(--ink-3); }
+.note { color: var(--ink-2); font-size: .9em; border-right: 2px solid var(--amber); padding-right: 12px; margin-top: 18px; }
+.section-label { font: 500 .66em var(--f-mono); letter-spacing: .16em; color: var(--ink-3); margin: 22px 0 6px; direction: ltr; text-align: right; }
+
+/* Legend entries (layer toggles) */
+.legend { display: grid; border-top: 1px solid var(--rule); }
+.lg {
+  appearance: none; background: none; border: 0; border-bottom: 1px solid var(--rule); cursor: pointer;
+  display: grid; grid-template-columns: 34px 1fr auto; gap: 14px; align-items: start;
+  padding: 13px 0; text-align: right; transition: opacity .2s;
+}
+.lg:hover .lg-name { text-decoration: underline; text-decoration-color: var(--rule-2); text-underline-offset: 4px; }
+.lg-key { width: 34px; height: 24px; display: grid; place-items: center; margin-top: 1px; }
+.lg-name { display: block; font-weight: 500; }
+.lg-desc { display: block; color: var(--ink-2); font-size: .86em; line-height: 1.5; margin-top: 2px; }
+.lg-state {
+  font: 500 .64em var(--f-mono); letter-spacing: .12em; padding: 3px 0 0; color: var(--amber); white-space: nowrap;
+}
+.lg[aria-pressed="false"] { opacity: .42; }
+.lg[aria-pressed="false"] .lg-state { color: var(--ink-3); }
+.lg-sub { display: grid; gap: 3px; margin-top: 8px; }
+.lg-sub span { display: flex; gap: 8px; align-items: center; font-size: .84em; color: var(--ink-2); }
+.lg-sub i { display: inline-block; width: 18px; height: 3px; flex: none; }
+
+/* ---------- Specimen card ---------- */
+#card {
+  position: fixed; left: max(40px, calc(env(safe-area-inset-left, 0px) + 24px)); bottom: calc(44px + env(safe-area-inset-bottom, 0px));
+  width: min(372px, calc(100vw - var(--panel-w) - 80px));
+  max-height: calc(100% - 88px); overflow-y: auto;
+  background: var(--sheet); border: 1px solid var(--rule-2);
+  padding: 0 0 18px; animation: card-in .22s ease-out;
+}
+@keyframes card-in { from { transform: translateY(8px); opacity: 0; } }
+#card .card-top {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 10px 18px; border-bottom: 1px solid var(--rule);
+}
+#card .kind { display: flex; align-items: center; gap: 8px; font-weight: 500; font-size: .86em; }
+#card .kind i { width: 10px; height: 10px; flex: none; }
+#card .code { font: 400 .74em var(--f-mono); color: var(--ink-3); direction: ltr; letter-spacing: .04em; }
+#card .close {
+  appearance: none; border: 0; background: none; cursor: pointer; color: var(--ink-2);
+  width: 28px; height: 28px; margin: -4px -8px -4px 0; font-size: 1.05em; line-height: 1;
+}
+#card .close:hover { color: var(--ink); }
+#card .card-body { padding: 14px 18px 0; }
+#card h3 { font-family: var(--f-display); font-weight: 700; font-size: 2em; line-height: .95; margin: 0 0 12px; text-wrap: balance; }
+#card p { margin: 0 0 12px; }
+#card .facts { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin: 4px 0 12px; font-size: .9em; border-top: 1px solid var(--rule); padding-top: 10px; }
+#card .facts dt { color: var(--ink-3); }
+#card .facts dd { margin: 0; font-variant-numeric: tabular-nums; }
+#card .diagram { border: 1px solid var(--rule); margin: 0 0 14px; }
+#card .diagram svg { display: block; width: 100%; height: auto; }
+#card .stat { display: grid; grid-template-columns: auto 1fr; gap: 0 14px; align-items: baseline; border-top: 1px solid var(--rule); padding-top: 12px; }
+#card .stat .num { font-family: var(--f-display); font-weight: 700; font-size: 2.6em; line-height: .9; color: var(--amber); font-variant-numeric: tabular-nums; }
+#card .stat .unit { font-size: .86em; color: var(--ink-2); }
+#card .stat p { grid-column: 1 / -1; margin: 8px 0 0; font-size: .9em; color: var(--ink-2); }
+#card .hint { color: var(--ink-2); font-size: .88em; }
+
+/* ---------- Animated diagrams ---------- */
+.dg-text { font: 500 11px var(--f-body); fill: var(--ink); }
+.dg-cap { font: 400 9px var(--f-mono); fill: var(--ink-3); letter-spacing: .08em; }
+.dg-l { animation: dg-left 4s ease-in-out infinite alternate; }
+.dg-r { animation: dg-right 4s ease-in-out infinite alternate; }
+.dg-rise { animation: dg-rise 4s ease-in-out infinite alternate; }
+.dg-dive { animation: dg-dive 4s ease-in-out infinite alternate; }
+.dg-up { animation: dg-up 4s linear infinite; }
+.dg-down { animation: dg-down 4s linear infinite; }
+.dg-smoke { animation: dg-smoke 2.4s ease-out infinite; }
+@keyframes dg-left { to { transform: translateX(-14px); } }
+@keyframes dg-right { to { transform: translateX(14px); } }
+@keyframes dg-rise { from { transform: scaleY(.55); } to { transform: scaleY(1); } }
+@keyframes dg-dive { to { transform: translate(14px, 0); } }
+@keyframes dg-up { from { transform: translateY(18px); } to { transform: translateY(-18px); } }
+@keyframes dg-down { from { transform: translateY(-18px); } to { transform: translateY(18px); } }
+@keyframes dg-smoke { from { transform: translateY(0); opacity: .9; } to { transform: translateY(-14px); opacity: 0; } }
+
+/* Hover tooltips from the globe library */
+.scene-tooltip { font-family: var(--f-body) !important; }
+.tip { background: var(--sheet); border: 1px solid var(--rule-2); padding: 6px 10px; line-height: 1.45; direction: rtl; font-size: 13px; }
+.tip .t-kind { display: flex; align-items: center; gap: 6px; font-weight: 500; }
+.tip .t-kind i { width: 8px; height: 8px; display: inline-block; }
+.tip .t-sub { color: var(--ink-2); }
+
+/* Plate name labels on the globe */
+.plate-label {
+  font-family: var(--f-display); font-weight: 700; font-size: calc(22px * var(--fs)); line-height: 1;
+  color: rgba(232, 230, 225, .92); letter-spacing: .01em;
+  text-shadow: 0 0 8px rgba(0,0,0,.9), 0 0 2px rgba(0,0,0,.9);
+  white-space: nowrap; pointer-events: none; direction: rtl;
+}
+
+/* Tour stop crosshair on the globe */
+.site-marker { position: relative; width: 44px; height: 44px; pointer-events: none; }
+.site-marker svg { display: block; filter: drop-shadow(0 0 3px rgba(0,0,0,.9)); }
+.site-marker span {
+  position: absolute; left: 50px; top: 50%; transform: translateY(-50%); white-space: nowrap; direction: rtl;
+  font: 500 calc(13px * var(--fs)) var(--f-body); color: var(--ink); background: rgba(5,7,11,.82); border: 1px solid var(--c); padding: 3px 8px;
+}
+
+/* ---------- Tours ---------- */
+.tour-list { display: grid; border-top: 1px solid var(--rule); }
+.tour-item {
+  appearance: none; background: none; border: 0; border-bottom: 1px solid var(--rule); cursor: pointer;
+  display: grid; grid-template-columns: 4px 1fr auto; gap: 16px; align-items: center; padding: 16px 0; text-align: right;
+}
+.tour-item .bar { align-self: stretch; }
+.tour-item .t-title { display: block; font-family: var(--f-display); font-weight: 700; font-size: 2em; line-height: .95; }
+.tour-item .t-sub { display: block; color: var(--ink-2); font-size: .9em; margin-top: 3px; }
+.tour-item .t-count { font: 500 .66em var(--f-mono); letter-spacing: .12em; color: var(--ink-3); white-space: nowrap; }
+.tour-item:hover .t-title { color: var(--amber); }
+
+.tour-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+.linkish { appearance: none; background: none; border: 0; padding: 0; cursor: pointer; color: var(--ink-2); font-size: .88em; }
+.linkish:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+.tour-name { font-weight: 500; font-size: .88em; color: var(--ink-2); }
+.ticks { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; margin-bottom: 18px; }
+.ticks button { appearance: none; border: 0; padding: 0; height: 4px; background: var(--rule-2); cursor: pointer; }
+.ticks button[aria-current="step"] { background: var(--ink); }
+.ticks button.done { background: var(--ink-3); }
+.stop-meta { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.stop-count { font: 500 .78em var(--f-mono); color: var(--ink-2); direction: ltr; font-variant-numeric: tabular-nums; }
+.stop-place { font-size: .88em; color: var(--ink-2); }
+.stop h2 { font-size: 2.5em; margin: 8px 0 12px; }
+.fact { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 12px 0; margin: 16px 0; }
+.fact .lbl { display: block; font: 500 .66em var(--f-mono); letter-spacing: .14em; color: var(--amber); margin-bottom: 4px; direction: ltr; text-align: right; }
+.video-link {
+  display: grid; grid-template-columns: 40px 1fr; gap: 12px; align-items: center; padding: 10px 0;
+  color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--rule);
+}
+.video-link .play { width: 40px; height: 40px; border: 1px solid var(--rule-2); display: grid; place-items: center; }
+.video-link b { display: block; font-weight: 500; }
+.video-link small { display: block; color: var(--ink-2); font-size: .82em; }
+.video-link:hover b { text-decoration: underline; text-underline-offset: 3px; }
+.stepper { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 22px; }
+.stepper button {
+  appearance: none; cursor: pointer; padding: 12px 14px; font-weight: 500; font-size: 1em;
+  border: 1px solid var(--rule-2); background: none; color: var(--ink);
+}
+.stepper button.primary { background: var(--ink); color: var(--space); border-color: var(--ink); }
+.stepper button:disabled { opacity: .35; cursor: default; }
+.kbd-hint { font: 400 .7em var(--f-mono); color: var(--ink-3); margin-top: 10px; letter-spacing: .04em; }
+
+/* ---------- Projector mode ---------- */
+.proj-btn {
+  appearance: none; cursor: pointer; background: none; color: var(--ink-3); border: 1px solid var(--rule-2);
+  font: 500 1em var(--f-mono); letter-spacing: .14em; padding: 3px 8px; margin: -4px 0;
+}
+.proj-btn:hover { color: var(--ink); border-color: var(--ink-3); }
+.proj-btn[aria-pressed="true"] { color: var(--space); background: var(--amber); border-color: var(--amber); }
+:root.projector { --fs: 1.3; --panel-w: 480px; }
+:root.projector .masthead .sub { display: none; }
+:root.projector .stage-caption { display: none; }
+
+/* ---------- Challenge ---------- */
+.ticks button.ok { background: var(--amber); }
+.ticks button.bad { background: var(--ink-3); }
+.score { font: 500 .78em var(--f-mono); color: var(--ink-2); direction: ltr; font-variant-numeric: tabular-nums; }
+.clue { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 12px 0; margin: 4px 0 16px; }
+.clue .lbl { display: block; font: 500 .66em var(--f-mono); letter-spacing: .14em; color: var(--ink-3); margin-bottom: 4px; direction: ltr; text-align: right; }
+.answers { display: grid; gap: 8px; }
+.ans {
+  appearance: none; cursor: pointer; text-align: right; padding: 12px 14px; background: none; color: var(--ink);
+  border: 1px solid var(--rule-2); display: grid; grid-template-columns: 22px 1fr auto; gap: 12px; align-items: center;
+}
+.ans:hover:not(:disabled) { border-color: var(--ink-2); }
+.ans i { width: 22px; height: 4px; }
+.ans b { font-weight: 500; }
+.ans small { display: block; color: var(--ink-2); font-size: .84em; }
+.ans kbd { font: 400 .72em var(--f-mono); color: var(--ink-3); border: 1px solid var(--rule-2); padding: 1px 6px; }
+.ans:disabled { cursor: default; }
+.ans.is-answer { border-color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); }
+.ans.is-wrong { border-style: dashed; opacity: .55; }
+.ans.dim { opacity: .35; }
+.verdict { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--rule); }
+.verdict h3 { font-family: var(--f-display); font-weight: 700; font-size: 2.2em; line-height: .95; margin: 0 0 6px; }
+.verdict h3.right { color: var(--amber); }
+.verdict .where { font-size: .88em; color: var(--ink-2); margin: 0 0 8px; }
+.result { text-align: right; }
+.result .big { font-family: var(--f-display); font-weight: 700; font-size: 7em; line-height: .8; color: var(--amber); direction: ltr; text-align: right; font-variant-numeric: tabular-nums; }
+.result .big span { color: var(--ink-3); font-size: .5em; }
+.stack { display: grid; gap: 8px; margin-top: 18px; }
+.stack button { appearance: none; cursor: pointer; padding: 12px 14px; font-weight: 500; border: 1px solid var(--rule-2); background: none; color: var(--ink); text-align: right; }
+.stack button.primary { background: var(--ink); color: var(--space); border-color: var(--ink); }
+.reveal-stat { display: grid; grid-template-columns: auto 1fr; gap: 0 14px; align-items: baseline; border-top: 1px solid var(--rule); padding-top: 14px; margin-top: 4px; }
+.reveal-stat .num { font-family: var(--f-display); font-weight: 700; font-size: 4em; line-height: .85; color: var(--amber); font-variant-numeric: tabular-nums; }
+.reveal-stat p { margin: 0; color: var(--ink-2); font-size: .92em; }
+
+/* ---------- Israel chapter ---------- */
+.rows { display: grid; border-top: 1px solid var(--rule); }
+.row {
+  appearance: none; background: none; border: 0; border-bottom: 1px solid var(--rule); cursor: pointer; color: var(--ink);
+  display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: baseline; padding: 11px 0; text-align: right;
+}
+.row .idx { font: 500 .78em var(--f-mono); color: var(--ink-3); direction: ltr; text-align: right; font-variant-numeric: tabular-nums; }
+.row.year .idx { font-family: var(--f-display); font-weight: 700; font-size: 1.6em; line-height: 1; color: var(--ink-2); }
+.row b { font-weight: 500; }
+.row p { margin: 4px 0 0; color: var(--ink-2); font-size: .9em; }
+.row:not([aria-expanded="true"]) p { display: none; }
+.row[aria-expanded="true"] b { color: var(--amber); }
+.row[aria-expanded="true"] .idx { color: var(--amber); }
+.calc { border: 1px solid var(--rule-2); padding: 16px; margin-top: 8px; }
+.calc label { display: block; font-weight: 500; margin-bottom: 8px; }
+.calc .in { display: flex; align-items: center; gap: 10px; }
+.calc input {
+  width: 5.5em; font: 700 1.6em var(--f-display); color: var(--ink); background: var(--sheet-2);
+  border: 1px solid var(--rule-2); padding: 4px 10px; text-align: center;
+}
+.calc .out { display: grid; grid-template-columns: auto 1fr; gap: 0 14px; align-items: baseline; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--rule); }
+.calc .out .num { font-family: var(--f-display); font-weight: 700; font-size: 4em; line-height: .85; color: var(--amber); font-variant-numeric: tabular-nums; }
+.calc .out p { margin: 0; color: var(--ink-2); font-size: .92em; }
+.calc dl { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; margin: 14px 0 0; font-size: .9em; }
+.calc dt { color: var(--ink-2); }
+.calc dd { margin: 0; font-variant-numeric: tabular-nums; font-weight: 500; }
+
+/* ---------- Phone: the sheet becomes a bottom drawer ---------- */
+@media (max-width: 760px) {
+  #panel {
+    top: auto; left: 0; width: auto; height: 50%;
+    border-left: 0; border-top: 1px solid var(--rule-2);
+    padding-left: env(safe-area-inset-left, 0px);
+  }
+  .masthead { padding: 14px max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px)); display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .masthead h1 { font-size: 2.6em; margin: 0; }
+  .masthead .sub, .masthead .kicker { display: none; }
+  .readout { margin: 10px max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px)); padding: 6px 0; }
+  .readout .lbl { display: none; }
+  nav.tabs { padding: 10px max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px)); gap: 18px; }
+  nav.tabs button { font-size: 1.5em; padding-bottom: 8px; }
+  .tab-body { padding: 16px max(16px, env(safe-area-inset-right, 0px)) 20px max(16px, env(safe-area-inset-left, 0px)); }
+  #card {
+    left: max(12px, env(safe-area-inset-left, 0px)); right: max(12px, env(safe-area-inset-right, 0px));
+    width: auto; bottom: auto; top: calc(12px + env(safe-area-inset-top, 0px)); max-height: 46%;
+  }
+  .corner, .stage-caption { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+
+<div id="stage" lang="he" dir="rtl">
+  <div id="globe" dir="ltr" aria-label="כדור הארץ התלת-ממדי"></div>
+  <div id="loading">LOADING EARTH…</div>
+  <span class="corner tl"></span><span class="corner bl"></span>
+  <div class="stage-caption">PB2002 · USGS · SMITHSONIAN GVP</div>
+</div>
+
+<aside id="panel" lang="he" dir="rtl">
+  <header class="masthead">
+    <div class="kicker"><span>PLATE TECTONICS ATLAS</span><button id="projector" class="proj-btn" aria-pressed="false" title="מצב מקרן: טקסט גדול ומסך מלא">PROJECTOR</button></div>
+    <h1>כדור הארץ <em>בתנועה</em></h1>
+    <p class="sub">אטלס חי של הלוחות הטקטוניים, רעידות האדמה והרי הגעש.</p>
+  </header>
+
+  <div class="readout" aria-live="off">
+    <span class="lbl">UNDER THE CURSOR</span>
+    <span class="plate" id="ro-plate">העבירו את העכבר מעל הגלובוס</span>
+    <span class="coords" id="ro-coords">—</span>
+  </div>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" id="tab-explore" aria-selected="true">לחקור</button>
+    <button role="tab" id="tab-tours" aria-selected="false">סיורים</button>
+    <button role="tab" id="tab-quiz" aria-selected="false">אתגר</button>
+    <button role="tab" id="tab-israel" aria-selected="false">ישראל</button>
+  </nav>
+
+  <section class="tab-body" id="body-explore">
+    <h2>הקרום של כדור הארץ שבור לחתיכות</h2>
+    <p>החתיכות נקראות <b>לוחות טקטוניים</b>, והן זזות כל הזמן, לאט מאוד. הציגו שכבות במקרא, סובבו את הגלובוס ולחצו על קו או על לוח.</p>
+    <div class="section-label">LEGEND</div>
+    <div class="legend" id="legend"></div>
+    <p class="note">הציגו את רעידות האדמה ואת הרי הגעש. איפה רובם נמצאים?</p>
+  </section>
+  <section class="tab-body" id="body-tours" hidden>
+    <div id="tour-pick">
+      <h2>סיורים מודרכים</h2>
+      <p>בחרו סיור. הגלובוס יטוס לכל תחנה, ואתם מחליטים מתי ממשיכים.</p>
+      <div class="tour-list" id="tour-list"></div>
+    </div>
+    <div id="tour-run" hidden></div>
+  </section>
+  <section class="tab-body" id="body-quiz" hidden>
+    <div id="quiz-pick">
+      <h2>אתגר</h2>
+      <p>שני סבבים לכיתה. בסבב הראשון מנחשים איזה גבול מסתתר במקום מסתורי. בסבב השני מגלים לבד איפה עוברים הגבולות.</p>
+      <div class="tour-list">
+        <button class="tour-item" id="quiz-start-1">
+          <span class="bar" style="background:var(--ink)"></span>
+          <span><span class="t-title">מה קורה כאן?</span><span class="t-sub">הגלובוס טס למקום מסתורי. איזה גבול יש שם?</span></span>
+          <span class="t-count">8 QUESTIONS</span>
+        </button>
+        <button class="tour-item" id="quiz-start-2">
+          <span class="bar" style="background:var(--quake)"></span>
+          <span><span class="t-title">גלו את הגבולות</span><span class="t-sub">רק רעידות אדמה והרי געש. איפה הלוחות נפגשים?</span></span>
+          <span class="t-count">1 REVEAL</span>
+        </button>
+      </div>
+    </div>
+    <div id="quiz-run" hidden></div>
+  </section>
+  <section class="tab-body" id="body-israel" hidden>
+    <h2 id="il-title"></h2>
+    <p id="il-intro"></p>
+    <p class="note" id="il-why"></p>
+    <div class="section-label">ALONG THE FAULT · SOUTH TO NORTH</div>
+    <div class="rows" id="il-places"></div>
+    <div class="section-label">HISTORIC EARTHQUAKES</div>
+    <div class="rows" id="il-quakes"></div>
+    <div class="section-label">IN YOUR LIFETIME</div>
+    <div class="calc">
+      <label for="il-age">בני כמה אתם?</label>
+      <div class="in"><input id="il-age" type="number" min="1" max="120" value="13" inputmode="numeric"><span>שנים</span></div>
+      <div class="out"><span class="num" id="il-cm"></span><p id="il-cm-text"></p></div>
+      <dl id="il-more"></dl>
+    </div>
+  </section>
+</aside>
+
+<div id="card" lang="he" dir="rtl" hidden role="dialog" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/globe.gl@2.32.0/dist/globe.gl.min.js"></script>
+<script src="content.js"></script>
+<script src="data/boundaries.js"></script>
+<script src="data/motion.js"></script>
+<script src="data/plates.js"></script>
+<script src="data/quakes.js"></script>
+<script src="data/volcanoes.js"></script>
+<script>
+(function () {
+  const C = window.CONTENT;
+  const stage = document.getElementById('globe');
+  const panel = document.getElementById('panel');
+  const card = document.getElementById('card');
+  const esc = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+  const plateName = code => C.plates[code] || `לוח ${code}`;
+  const fmtCoord = (lat, lng) =>
+    `${Math.abs(lat).toFixed(1)}°${lat >= 0 ? 'N' : 'S'}  ${Math.abs(((lng + 540) % 360) - 180).toFixed(1)}°${(((lng + 540) % 360) - 180) >= 0 ? 'E' : 'W'}`;
+
+  // ---------------- Data ----------------
+  const boundaries = window.DATA_BOUNDARIES.map(b => ({ ...b, kind: 'boundary' }));
+  const motion = window.DATA_MOTION.map(m => ({ ...m, kind: 'motion' }));
+  const quakes = window.DATA_QUAKES.map(([lat, lng, mag, year, depth, place]) => ({ lat, lng, mag, year, depth, place }));
+  const volcanoes = window.DATA_VOLCANOES.map(([lat, lng, name, country, last, elev]) => ({ lat, lng, name, country, last, elev }));
+  const plateLabels = C.plateLabels.map(p => ({ ...p, name: plateName(p.c) }));
+
+  // Faint latitude / longitude grid, like an atlas
+  const graticule = [];
+  for (let lng = -180; lng < 180; lng += 30) graticule.push({ kind: 'grid', p: Array.from({ length: 37 }, (_, i) => [-90 + i * 5, lng]) });
+  for (let lat = -60; lat <= 60; lat += 30) graticule.push({ kind: 'grid', p: Array.from({ length: 73 }, (_, i) => [lat, -180 + i * 5]) });
+
+  // Projector mode: bigger text, thicker lines, full screen. Remembered on this computer.
+  let projector = false;
+  try { projector = localStorage.getItem('projector') === '1'; } catch (e) {}
+
+  // Which layers are on. Only boundaries at the start, to keep the first view clean.
+  const layers = { boundaries: true, motion: false, names: false, quakes: false, volcanoes: false };
+  let siteMarker = null;   // the crosshair on the current tour stop
+
+  // ---------------- Globe ----------------
+  const world = Globe()(stage)
+    .backgroundColor('rgba(0,0,0,0)')
+    .globeImageUrl('data/earth.jpg')
+    .showAtmosphere(true)
+    .atmosphereColor('#8DB6E8')
+    .atmosphereAltitude(0.12)
+    // Boundaries, motion dashes and the grid share the "paths" layer
+    .pathPoints('p')
+    .pathPointLat(p => p[0])
+    .pathPointLng(p => p[1])
+    .pathPointAlt(d => d.kind === 'grid' ? 0.001 : 0.002)
+    .pathColor(d => d.kind === 'motion' ? ['rgba(243,241,234,0.04)', 'rgba(243,241,234,0.95)']
+      : d.kind === 'grid' ? 'rgba(200,215,235,0.16)' : C.types[d.t].color)
+    .pathStroke(d => d.kind === 'grid' ? null : projector ? 4 : 2.6)
+    .pathDashLength(d => d.kind === 'motion' ? 0.45 : 1)
+    .pathDashGap(d => d.kind === 'motion' ? 0.25 : 0)
+    .pathDashInitialGap(d => d.kind === 'motion' ? Math.random() : 0)
+    .pathDashAnimateTime(d => d.kind === 'motion' ? Math.max(700, 3200 - d.v * 22) : 0)
+    .pathTransitionDuration(0)
+    .pathLabel(d => d.kind === 'boundary'
+      ? `<div class="tip"><div class="t-kind"><i style="background:${C.types[d.t].color}"></i>${C.types[d.t].full}</div><div class="t-sub">${esc(plateName(d.a))} · ${esc(plateName(d.b))}</div></div>` : '')
+    .onPathClick(d => { if (d.kind === 'boundary') showBoundaryCard(d); })
+    // Earthquakes as thin columns: taller = stronger
+    .pointLat('lat').pointLng('lng')
+    .pointColor(() => 'rgba(243,241,234,0.85)')
+    .pointAltitude(d => 0.01 + (d.mag - 7) * 0.06)
+    .pointRadius(d => 0.12 + (d.mag - 7) * 0.12)
+    .pointResolution(6)
+    .pointsMerge(false)
+    .pointsTransitionDuration(0)
+    .pointLabel(d => `<div class="tip"><div class="t-kind">רעידת אדמה · ${d.mag.toFixed(1)}</div><div class="t-sub">${d.year} · ${esc(d.place || '')}</div></div>`)
+    .onPointClick(showQuakeCard)
+    // Volcanoes as dots (the "labels" layer, with no text)
+    .labelLat('lat').labelLng('lng')
+    .labelText(() => '')
+    .labelSize(0)
+    .labelDotRadius(0.3)
+    .labelColor(() => '#FF7A2E')
+    .labelAltitude(0.003)
+    .labelResolution(4)
+    .labelsTransitionDuration(0)
+    .labelLabel(d => `<div class="tip"><div class="t-kind">הר געש · ${esc(d.name)}</div><div class="t-sub">${esc(d.country)}</div></div>`)
+    .onLabelClick(showVolcanoCard)
+    // Plate names as HTML (so Hebrew renders properly)
+    .htmlLat('lat').htmlLng('lng').htmlAltitude(0.01)
+    .htmlElement(d => {
+      const el = document.createElement('div');
+      if (d.kind === 'marker') {
+        el.className = 'site-marker';
+        el.style.setProperty('--c', d.color);
+        el.innerHTML = `<svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="9" fill="none" stroke="var(--c)" stroke-width="2"/><path d="M22 2v10M22 32v10M2 22h10M32 22h10" stroke="var(--c)" stroke-width="1.5"/></svg><span>${esc(d.name)}</span>`;
+      } else { el.className = 'plate-label'; el.textContent = d.name; }
+      return el;
+    })
+    .onGlobeClick(({ lat, lng }) => {
+      updateReadout(lat, lng);
+      const p = plateAt(lat, lng);
+      if (p) showPlateCard(p); else hideCard();
+    })
+    .onGlobeReady(() => { document.getElementById('loading').hidden = true; });
+
+  function refreshLayers() {
+    world.pathsData([...graticule, ...(layers.boundaries ? boundaries : []), ...(layers.motion ? motion : [])]);
+    world.pointsData(layers.quakes ? quakes : []);
+    world.labelsData(layers.volcanoes ? volcanoes : []);
+    world.htmlElementsData([...(layers.names ? plateLabels : []), ...(siteMarker ? [siteMarker] : [])]);
+  }
+
+  // Keep the globe centered in the space not covered by the panel
+  function resize() {
+    const phone = window.innerWidth <= 760;
+    const w = phone ? window.innerWidth : window.innerWidth - panel.offsetWidth;
+    const h = phone ? window.innerHeight - panel.offsetHeight : window.innerHeight;
+    stage.style.width = w + 'px'; stage.style.height = h + 'px';
+    world.width(w).height(h);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // Gentle spin until someone touches the globe
+  const controls = world.controls();
+  controls.autoRotate = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  controls.autoRotateSpeed = 0.35;
+  stage.addEventListener('pointerdown', () => { controls.autoRotate = false; });
+  world.pointOfView({ lat: 20, lng: 35, altitude: 2.4 }, 0);
+
+  // ---------------- Live readout: where is the cursor? ----------------
+  const roPlate = document.getElementById('ro-plate');
+  if (matchMedia('(hover: none)').matches) roPlate.textContent = 'הקישו על הגלובוס';
+  const roCoords = document.getElementById('ro-coords');
+  function updateReadout(lat, lng) {
+    const p = plateAt(lat, lng);
+    roPlate.textContent = p ? plateName(p.c) : '—';
+    roCoords.textContent = fmtCoord(lat, lng);
+  }
+  let pending = null;
+  stage.addEventListener('mousemove', e => {
+    const r = stage.getBoundingClientRect();
+    pending = [e.clientX - r.left, e.clientY - r.top];
+    requestAnimationFrame(() => {
+      if (!pending) return;
+      const c = world.toGlobeCoords(pending[0], pending[1]);
+      pending = null;
+      if (c) updateReadout(c.lat, c.lng);
+    });
+  });
+
+  // ---------------- Which plate is at this spot? ----------------
+  function inRing(lat, lng, ring) {
+    let inside = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const [xi, yi] = ring[i], [xj, yj] = ring[j];
+      if ((yi > lat) !== (yj > lat) && lng < (xj - xi) * (lat - yi) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+  }
+  function plateAt(lat, lng) {
+    for (const p of window.DATA_PLATES) {
+      for (const ring of p.r) {
+        for (const shift of [0, 360, -360]) if (inRing(lat, lng + shift, ring)) return p;
+      }
+    }
+    return null;
+  }
+
+  // ---------------- Cards ----------------
+  function openCard({ color, kind, code, body }) {
+    card.innerHTML = `
+      <div class="card-top">
+        <span class="kind"><i style="background:${color}"></i>${kind}</span>
+        <span style="display:flex;align-items:center;gap:12px"><span class="code">${code || ''}</span>
+        <button class="close" aria-label="סגירה">✕</button></span>
+      </div>
+      <div class="card-body">${body}</div>`;
+    card.hidden = false;
+    card.querySelector('.close').addEventListener('click', hideCard);
+  }
+  function hideCard() { card.hidden = true; }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') hideCard(); });
+
+  function showBoundaryCard(d) {
+    const t = C.types[d.t];
+    const cm = d.v / 10;
+    openCard({
+      color: t.color, kind: t.full, code: `${d.a}–${d.b} · ${d.v} MM/YR`,
+      body: `
+        <h3>${esc(plateName(d.a))} ו${esc(plateName(d.b))}</h3>
+        <div class="diagram">${DIAGRAMS[d.t]}</div>
+        <p>${t.explain}</p>
+        <div class="stat"><span class="num">${cm.toFixed(1)}</span><span class="unit">ס״מ בשנה, זה ביחס לזה</span>
+          <p>${C.compare(cm)} במיליון שנה זה ${Math.round(cm * 10).toLocaleString('he-IL')} ק״מ.</p></div>`,
+    });
+  }
+
+  function showPlateCard(p) {
+    const speed = C.plateSpeeds[p.c];
+    const neighbors = [...new Set(boundaries.filter(b => b.a === p.c || b.b === p.c).map(b => b.a === p.c ? b.b : b.a))];
+    openCard({
+      color: 'var(--ink)', kind: 'לוח טקטוני', code: p.c,
+      body: `
+        <h3>${esc(plateName(p.c))}</h3>
+        ${speed ? `<div class="stat" style="border-top:0;padding-top:0;margin-bottom:12px"><span class="num">${speed}</span><span class="unit">ס״מ בשנה</span></div>` : ''}
+        <dl class="facts"><dt>שכנים</dt><dd>${neighbors.slice(0, 6).map(n => esc(plateName(n))).join(' · ')}${neighbors.length > 6 ? ' ועוד' : ''}</dd></dl>
+        <p class="hint">לחצו על אחד הקווים הצבעוניים סביב הלוח כדי לראות מה קורה בגבול.</p>`,
+    });
+  }
+
+  function showQuakeCard(d) {
+    openCard({
+      color: 'var(--quake)', kind: 'רעידת אדמה', code: `M${d.mag.toFixed(1)} · ${d.year}`,
+      body: `
+        <h3>${esc(d.place || 'מקום לא ידוע')}</h3>
+        <div class="stat" style="border-top:0;padding-top:0;margin-bottom:12px"><span class="num">${d.mag.toFixed(1)}</span><span class="unit">בסולם ריכטר · שנת ${d.year}</span></div>
+        <dl class="facts"><dt>עומק</dt><dd>${d.depth} ק״מ מתחת לפני הקרקע</dd></dl>
+        <p class="hint">כמעט כל הרעידות החזקות קורות ממש ליד גבולות הלוחות.</p>`,
+    });
+  }
+
+  function showVolcanoCard(d) {
+    const last = d.last == null || d.last === 'Unknown' ? 'לא ידוע'
+      : d.last < 0 ? `${Math.abs(d.last).toLocaleString('he-IL')} לפני הספירה` : d.last;
+    openCard({
+      color: 'var(--volcano)', kind: 'הר געש', code: `${d.elev} M`,
+      body: `
+        <h3>${esc(d.name)}</h3>
+        <dl class="facts">
+          <dt>מדינה</dt><dd>${esc(d.country)}</dd>
+          <dt>גובה</dt><dd>${Number(d.elev).toLocaleString('he-IL')} מטר</dd>
+          <dt>התפרצות אחרונה</dt><dd>${last}</dd>
+        </dl>`,
+    });
+  }
+
+  // ---------------- Animated diagrams (side views) ----------------
+  const DIAGRAMS = {
+    div: `<svg viewBox="0 0 320 140" role="img" aria-label="שני לוחות מתרחקים ומאגמה עולה ביניהם">
+      <rect width="320" height="140" fill="#07090D"/>
+      <rect y="40" width="320" height="100" fill="var(--mantle)"/>
+      <g class="dg-rise" style="transform-origin:160px 140px"><path d="M150 140 L150 52 Q160 40 170 52 L170 140 Z" fill="var(--magma)"/></g>
+      <g class="dg-l"><rect x="-20" y="40" width="172" height="34" fill="var(--crust)"/><text class="dg-text" x="60" y="62" text-anchor="middle">לוח ←</text></g>
+      <g class="dg-r"><rect x="168" y="40" width="172" height="34" fill="var(--crust-2)"/><text class="dg-text" x="260" y="62" text-anchor="middle">→ לוח</text></g>
+      <text class="dg-text" x="160" y="122" text-anchor="middle">מאגמה עולה</text>
+      <text class="dg-cap" x="8" y="16">SIDE VIEW</text>
+    </svg>`,
+    con: `<svg viewBox="0 0 320 140" role="img" aria-label="לוח אחד צולל מתחת לשני ונוצר הר געש">
+      <rect width="320" height="140" fill="#07090D"/>
+      <rect y="46" width="320" height="94" fill="var(--mantle)"/>
+      <rect x="0" y="34" width="150" height="14" fill="var(--ocean)"/>
+      <g class="dg-dive"><path d="M-10 46 L150 46 Q180 50 230 120 L205 128 Q165 66 140 60 L-10 60 Z" fill="var(--crust-2)"/>
+        <text class="dg-text" x="60" y="56" text-anchor="middle">לוח צולל →</text></g>
+      <path d="M170 46 L320 46 L320 70 L190 70 Q180 60 170 46 Z" fill="var(--crust)"/>
+      <path d="M232 46 L250 18 L268 46 Z" fill="var(--crust)"/>
+      <path d="M245 26 L250 18 L255 26 Z" fill="var(--magma)"/>
+      <circle class="dg-smoke" cx="250" cy="14" r="4" fill="#8E959F"/>
+      <path d="M230 118 Q245 80 250 30" stroke="var(--magma)" stroke-width="3" fill="none" stroke-dasharray="4 4"/>
+      <text class="dg-text" x="290" y="62" text-anchor="middle">← לוח</text>
+      <text class="dg-cap" x="8" y="16">SIDE VIEW</text>
+    </svg>`,
+    tra: `<svg viewBox="0 0 320 140" role="img" aria-label="מבט מלמעלה: שני לוחות מחליקים זה לצד זה">
+      <rect width="320" height="140" fill="#07090D"/>
+      <g class="dg-up"><rect x="40" y="-20" width="118" height="180" fill="var(--crust)"/>
+        <path d="M70 -20 L70 160" stroke="#4E7A4A" stroke-width="6"/><text class="dg-text" x="104" y="74" text-anchor="middle">↑ לוח</text></g>
+      <g class="dg-down"><rect x="162" y="-20" width="118" height="180" fill="var(--crust-2)"/>
+        <path d="M250 -20 L250 160" stroke="#4E7A4A" stroke-width="6"/><text class="dg-text" x="216" y="74" text-anchor="middle">לוח ↓</text></g>
+      <path d="M160 0 L160 140" stroke="var(--tra)" stroke-width="2" stroke-dasharray="6 5"/>
+      <text class="dg-cap" x="8" y="16" style="fill:var(--ink-2)">TOP VIEW</text>
+    </svg>`,
+  };
+
+  // ---------------- Explore tab: the legend ----------------
+  const keys = {
+    boundaries: `<svg width="34" height="24" viewBox="0 0 34 24"><path d="M2 6h30" stroke="var(--div)" stroke-width="2.5"/><path d="M2 12h30" stroke="var(--con)" stroke-width="2.5"/><path d="M2 18h30" stroke="var(--tra)" stroke-width="2.5"/></svg>`,
+    motion: `<svg width="34" height="24" viewBox="0 0 34 24"><path d="M2 12h5M10 12h6M19 12h7" stroke="var(--quake)" stroke-width="2"/><path d="M27 8l5 4-5 4" stroke="var(--quake)" stroke-width="1.6" fill="none"/></svg>`,
+    names: `<span style="font:700 22px var(--f-display);line-height:1">אב</span>`,
+    quakes: `<svg width="34" height="24" viewBox="0 0 34 24"><rect x="9" y="12" width="2.5" height="10" fill="var(--quake)"/><rect x="16" y="3" width="2.5" height="19" fill="var(--quake)"/><rect x="23" y="15" width="2.5" height="7" fill="var(--quake)"/></svg>`,
+    volcanoes: `<svg width="34" height="24" viewBox="0 0 34 24"><circle cx="17" cy="12" r="5" fill="var(--volcano)"/></svg>`,
+  };
+  const legend = document.getElementById('legend');
+  legend.innerHTML = Object.keys(layers).map(k => `
+    <button class="lg" id="lg-${k}" data-k="${k}" aria-pressed="${layers[k]}">
+      <span class="lg-key">${keys[k]}</span>
+      <span><span class="lg-name">${C.layers[k].name}</span><span class="lg-desc">${C.layers[k].desc}</span>
+        ${k === 'boundaries' ? `<span class="lg-sub">${Object.values(C.types).map(t => `<span><i style="background:${t.color}"></i>${t.full}: ${t.short}</span>`).join('')}</span>` : ''}
+      </span>
+      <span class="lg-state">${layers[k] ? 'ON' : 'OFF'}</span>
+    </button>`).join('');
+  legend.addEventListener('click', e => {
+    const b = e.target.closest('.lg'); if (!b) return;
+    const k = b.dataset.k;
+    layers[k] = !layers[k];
+    b.setAttribute('aria-pressed', layers[k]);
+    b.querySelector('.lg-state').textContent = layers[k] ? 'ON' : 'OFF';
+    refreshLayers();
+  });
+
+  // ---------------- Tabs ----------------
+  const tabs = ['explore', 'tours', 'quiz', 'israel'];
+  tabs.forEach(name => {
+    document.getElementById('tab-' + name).addEventListener('click', () => {
+      tabs.forEach(n => {
+        document.getElementById('tab-' + n).setAttribute('aria-selected', n === name);
+        document.getElementById('body-' + n).hidden = n !== name;
+      });
+      onTabShown(name);
+    });
+  });
+
+  function setLayer(k, on) {
+    layers[k] = on;
+    const b = document.getElementById('lg-' + k);
+    b.setAttribute('aria-pressed', on);
+    b.querySelector('.lg-state').textContent = on ? 'ON' : 'OFF';
+  }
+
+  // ---------------- Camera flights ----------------
+  // Lift up, glide across, then dive down onto the target — so long trips arc over the Earth.
+  let flightToken = 0;
+  function flyTo({ lat, lng, alt }) {
+    const token = ++flightToken;
+    controls.autoRotate = false;
+    const cur = world.pointOfView();
+    const far = Math.abs(cur.lat - lat) + Math.abs(((cur.lng - lng + 540) % 360) - 180) > 25;
+    const later = (ms, fn) => setTimeout(() => { if (token === flightToken) fn(); }, ms);
+    if (!far) { world.pointOfView({ lat, lng, altitude: alt }, 1600); return; }
+    const high = Math.max(cur.altitude, 2.3);
+    world.pointOfView({ lat: cur.lat, lng: cur.lng, altitude: high }, 900);
+    later(900, () => world.pointOfView({ lat, lng, altitude: high }, 1900));
+    later(2850, () => world.pointOfView({ lat, lng, altitude: alt }, 1500));
+  }
+  const typeColor = t => t === 'hot' ? '#FF7A2E' : C.types[t] ? C.types[t].color : '#E8E6E1';
+  function markSpot(stop, type) {
+    const hex = typeColor(type);
+    const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+    world.ringsData(stop ? [{ lat: stop.lat, lng: stop.lng }] : [])
+      .ringColor(() => t => `rgba(${r},${g},${b},${1 - t})`)
+      .ringMaxRadius(stop && stop.alt > 1 ? 6 : 2.2)
+      .ringPropagationSpeed(stop && stop.alt > 1 ? 4 : 1.4)
+      .ringRepeatPeriod(1100)
+      .ringAltitude(0.004);
+    siteMarker = stop ? { kind: 'marker', lat: stop.lat, lng: stop.lng, name: stop.place, color: hex } : null;
+    refreshLayers();
+  }
+
+  // ---------------- Tours ----------------
+  const tourPick = document.getElementById('tour-pick');
+  const tourRun = document.getElementById('tour-run');
+  let tour = null, stopIdx = 0;
+
+  document.getElementById('tour-list').innerHTML = C.tours.map(t => `
+    <button class="tour-item" data-tour="${t.id}">
+      <span class="bar" style="background:${typeColor(t.type)}"></span>
+      <span><span class="t-title">${t.title}</span><span class="t-sub">${t.sub}</span></span>
+      <span class="t-count">${t.stops.length} STOPS</span>
+    </button>`).join('');
+  document.getElementById('tour-list').addEventListener('click', e => {
+    const b = e.target.closest('.tour-item'); if (b) startTour(b.dataset.tour);
+  });
+
+  function startTour(id) {
+    tour = C.tours.find(t => t.id === id);
+    hideCard();
+    // Show what this tour is about, and leave the rest as the student had it
+    setLayer('boundaries', true);
+    if (tour.type === 'hot') setLayer('volcanoes', true);
+    refreshLayers();
+    tourPick.hidden = true; tourRun.hidden = false;
+    showStop(0);
+  }
+  function endTour() {
+    tour = null; markSpot(null);
+    tourRun.hidden = true; tourPick.hidden = false;
+    world.pointOfView({ altitude: 2.4 }, 1400);
+  }
+
+  function showStop(i) {
+    stopIdx = i;
+    const s = tour.stops[i], n = tour.stops.length, last = i === n - 1;
+    const pad = x => String(x).padStart(2, '0');
+    tourRun.innerHTML = `
+      <div class="tour-head">
+        <button class="linkish" id="tour-exit">→ כל הסיורים</button>
+        <span class="tour-name">${tour.title}</span>
+      </div>
+      <div class="ticks">${tour.stops.map((_, k) => `<button aria-label="תחנה ${k + 1}" data-k="${k}" ${k === i ? 'aria-current="step"' : ''} class="${k < i ? 'done' : ''}"></button>`).join('')}</div>
+      <article class="stop">
+        <div class="stop-meta"><span class="stop-place">${s.place}</span><span class="stop-count">${pad(i + 1)} / ${pad(n)}</span></div>
+        <h2>${s.title}</h2>
+        <p>${s.text}</p>
+        <div class="fact"><span class="lbl">DID YOU KNOW</span>${s.fact}</div>
+        ${s.video ? `<a class="video-link" href="${esc(s.video.url)}" target="_blank" rel="noopener">
+            <span class="play"><svg width="14" height="16" viewBox="0 0 14 16"><path d="M13 8 1 15V1z" fill="var(--ink)"/></svg></span>
+            <span><b>צפו בסרטון${s.video.minutes ? ' · ' + esc(s.video.minutes) : ''}</b><small>${esc(s.video.title)} · ${esc(s.video.channel)} · נפתח ביוטיוב</small></span>
+          </a>` : ''}
+      </article>
+      <div class="stepper">
+        <button id="stop-prev" ${i === 0 ? 'disabled' : ''}>→ הקודם</button>
+        <button id="stop-next" class="primary">${last ? 'סיום הסיור' : 'התחנה הבאה ←'}</button>
+      </div>
+      <div class="kbd-hint">שלט מצגת או מקשי החצים עובדים גם כאן</div>`;
+    document.getElementById('tour-exit').onclick = endTour;
+    document.getElementById('stop-prev').onclick = () => i > 0 && showStop(i - 1);
+    document.getElementById('stop-next').onclick = () => last ? endTour() : showStop(i + 1);
+    tourRun.querySelectorAll('.ticks button').forEach(b => b.onclick = () => showStop(+b.dataset.k));
+    tourRun.closest('.tab-body').scrollTop = 0;
+    markSpot(s, tour.type);
+    flyTo(s);
+  }
+
+  // Presentation clicker / keyboard: next & back (Hebrew reads right-to-left, so ← is "next")
+  document.addEventListener('keydown', e => {
+    if (!tour || tourRun.hidden || document.getElementById('body-tours').hidden) return;
+    if (['PageDown', 'ArrowLeft', 'ArrowDown', ' '].includes(e.key)) {
+      e.preventDefault();
+      if (stopIdx < tour.stops.length - 1) showStop(stopIdx + 1);
+    } else if (['PageUp', 'ArrowRight', 'ArrowUp'].includes(e.key)) {
+      e.preventDefault();
+      if (stopIdx > 0) showStop(stopIdx - 1);
+    }
+  });
+
+  // ---------------- Challenge ----------------
+  const quizPick = document.getElementById('quiz-pick');
+  const quizRun = document.getElementById('quiz-run');
+  const Q = C.quiz;
+  let quiz = null;   // { round: 1|2, i, results: [true/false...], answered }
+  const pad2 = x => String(x).padStart(2, '0');
+
+  function quizExit() {
+    quiz = null; markSpot(null);
+    setLayer('boundaries', true); refreshLayers();
+    quizRun.hidden = true; quizPick.hidden = false;
+    world.pointOfView({ altitude: 2.4 }, 1400);
+  }
+  function quizHead() {
+    const total = quiz.round === 1 ? Q.length : 0;
+    const score = quiz.results.filter(Boolean).length;
+    return `<div class="tour-head">
+        <button class="linkish" data-act="exit">→ חזרה לאתגר</button>
+        ${quiz.round === 1 ? `<span class="score">SCORE ${score} / ${total}</span>` : ''}
+      </div>`;
+  }
+
+  // Round 1: what is happening here?
+  function startRound1() {
+    hideCard();
+    quiz = { round: 1, i: 0, results: [], answered: false };
+    ['boundaries', 'motion', 'names', 'quakes', 'volcanoes'].forEach(k => setLayer(k, false));
+    quizPick.hidden = true; quizRun.hidden = false;
+    showQuestion(0);
+  }
+  function showQuestion(i) {
+    quiz.i = i; quiz.answered = false;
+    setLayer('boundaries', false);
+    const q = Q[i];
+    markSpot({ lat: q.lat, lng: q.lng, alt: q.alt, place: '?' }, 'q');
+    flyTo(q);
+    quizRun.innerHTML = `${quizHead()}
+      <div class="ticks">${Q.map((_, k) => `<button tabindex="-1" aria-label="שאלה ${k + 1}" ${k === i ? 'aria-current="step"' : ''} class="${k < i ? (quiz.results[k] ? 'ok' : 'bad') : ''}"></button>`).join('')}</div>
+      <div class="stop-meta"><span class="stop-place">הגבולות מוסתרים</span><span class="stop-count">${pad2(i + 1)} / ${pad2(Q.length)}</span></div>
+      <h2 style="font-size:2.5em;margin:8px 0 12px">מה קורה כאן?</h2>
+      <div class="clue"><span class="lbl">CLUE</span>${q.clue}</div>
+      <div class="answers">${['div', 'con', 'tra'].map((t, k) => `
+        <button class="ans" data-ans="${t}" style="--c:${C.types[t].color}">
+          <i style="background:${C.types[t].color}"></i>
+          <span><b>${C.types[t].name}</b><small>${C.types[t].short}</small></span>
+          <kbd>${k + 1}</kbd>
+        </button>`).join('')}</div>
+      <div id="verdict"></div>`;
+    quizRun.closest('.tab-body').scrollTop = 0;
+  }
+  function answer(t) {
+    if (!quiz || quiz.round !== 1 || quiz.answered) return;
+    const q = Q[quiz.i], right = t === q.answer, last = quiz.i === Q.length - 1;
+    quiz.answered = true; quiz.results[quiz.i] = right;
+    quizRun.querySelectorAll('.ans').forEach(b => {
+      b.disabled = true;
+      if (b.dataset.ans === q.answer) b.classList.add('is-answer');
+      else if (b.dataset.ans === t) b.classList.add('is-wrong');
+      else b.classList.add('dim');
+    });
+    // Reveal: boundaries appear and the marker shows the place in the answer's color
+    setLayer('boundaries', true);
+    markSpot({ lat: q.lat, lng: q.lng, alt: q.alt, place: q.place }, q.answer);
+    quizRun.querySelector('.score').textContent = `SCORE ${quiz.results.filter(Boolean).length} / ${Q.length}`;
+    document.getElementById('verdict').innerHTML = `
+      <div class="verdict">
+        <h3 class="${right ? 'right' : ''}">${right ? 'נכון!' : 'לא בדיוק'}</h3>
+        <p class="where">${q.place} · ${C.types[q.answer].full}</p>
+        <p>${q.reveal}</p>
+        <div class="stack"><button class="primary" data-act="next">${last ? 'לתוצאות ←' : 'השאלה הבאה ←'}</button></div>
+      </div>`;
+  }
+  function nextQuestion() {
+    if (!quiz.answered) return;
+    if (quiz.i < Q.length - 1) showQuestion(quiz.i + 1); else showResults();
+  }
+  function showResults() {
+    markSpot(null);
+    world.pointOfView({ lat: 15, lng: 20, altitude: 2.4 }, 1800);
+    const score = quiz.results.filter(Boolean).length;
+    quizRun.innerHTML = `${quizHead()}
+      <div class="ticks">${Q.map((_, k) => `<button tabindex="-1" class="${quiz.results[k] ? 'ok' : 'bad'}"></button>`).join('')}</div>
+      <div class="result">
+        <div class="big">${score}<span>/${Q.length}</span></div>
+        <h2 style="margin-top:14px">${C.scoreMessage(score, Q.length)}</h2>
+      </div>
+      <div class="stack">
+        <button class="primary" data-act="round2">לסבב השני: גלו את הגבולות ←</button>
+        <button data-act="again">לשחק שוב</button>
+      </div>`;
+  }
+
+  // Round 2: find the borders from earthquakes and volcanoes alone
+  let nearShare = null;
+  function shareNearBoundaries() {
+    if (nearShare != null) return nearShare;
+    const pts = boundaries.flatMap(b => b.p.map(([la, lo]) => [la * Math.PI / 180, lo * Math.PI / 180]));
+    const R = 6371, maxKm = 250;
+    let near = 0;
+    for (const q of quakes) {
+      const la = q.lat * Math.PI / 180, lo = q.lng * Math.PI / 180;
+      for (const [pla, plo] of pts) {
+        let dl = Math.abs(lo - plo) % (2 * Math.PI); if (dl > Math.PI) dl = 2 * Math.PI - dl;
+        const x = dl * Math.cos((la + pla) / 2), y = la - pla;
+        if (Math.sqrt(x * x + y * y) * R < maxKm) { near++; break; }
+      }
+    }
+    return (nearShare = Math.round(100 * near / quakes.length));
+  }
+  function startRound2() {
+    hideCard(); markSpot(null);
+    quiz = { round: 2, i: 0, results: [], answered: false };
+    setLayer('boundaries', false); setLayer('motion', false); setLayer('names', false);
+    setLayer('quakes', true); setLayer('volcanoes', true);
+    refreshLayers();
+    world.pointOfView({ lat: 10, lng: 170, altitude: 2.5 }, 2200);
+    quizPick.hidden = true; quizRun.hidden = false;
+    const R2 = C.reveal;
+    quizRun.innerHTML = `${quizHead()}
+      <h2 style="font-size:2.5em;margin:4px 0 12px">${R2.title}</h2>
+      <p>${R2.intro}</p>
+      <div class="clue"><span class="lbl">YOUR TASK</span>${R2.task}</div>
+      <div class="stack"><button class="primary" data-act="reveal">חשיפה</button></div>
+      <div id="reveal-out"></div>`;
+  }
+  function doReveal() {
+    const on = !layers.boundaries;
+    setLayer('boundaries', on); refreshLayers();
+    quizRun.querySelector('[data-act="reveal"]').textContent = on ? 'הסתרת הגבולות' : 'חשיפה';
+    document.getElementById('reveal-out').innerHTML = on ? `
+      <div class="verdict">
+        <p>${C.reveal.after}</p>
+        <div class="reveal-stat"><span class="num">${shareNearBoundaries()}%</span>
+          <p>מתוך ${quakes.length.toLocaleString('he-IL')} רעידות האדמה החזקות במפה נמצאות במרחק של עד 250 ק״מ מגבול בין לוחות.</p></div>
+      </div>` : '';
+  }
+
+  document.getElementById('quiz-start-1').onclick = startRound1;
+  document.getElementById('quiz-start-2').onclick = startRound2;
+  quizRun.addEventListener('click', e => {
+    const a = e.target.closest('[data-ans]'); if (a) return answer(a.dataset.ans);
+    const act = e.target.closest('[data-act]')?.dataset.act;
+    if (act === 'exit') quizExit();
+    else if (act === 'next') nextQuestion();
+    else if (act === 'again') startRound1();
+    else if (act === 'round2') startRound2();
+    else if (act === 'reveal') doReveal();
+  });
+  // Keyboard / clicker: 1-2-3 to answer, Page Down or Enter for the next question
+  document.addEventListener('keydown', e => {
+    if (!quiz || quiz.round !== 1 || document.getElementById('body-quiz').hidden) return;
+    const k = { '1': 'div', '2': 'con', '3': 'tra' }[e.key];
+    if (k) { e.preventDefault(); answer(k); }
+    else if (['PageDown', 'Enter', 'ArrowLeft'].includes(e.key) && quiz.answered) { e.preventDefault(); nextQuestion(); }
+  });
+
+  // ---------------- Israel chapter ----------------
+  const IL = C.israel;
+  document.getElementById('il-title').textContent = IL.title;
+  document.getElementById('il-intro').textContent = IL.intro;
+  document.getElementById('il-why').textContent = IL.why;
+  const rowList = (items, cls, idx) => items.map((x, k) => `
+    <button class="row ${cls}" data-k="${k}" aria-expanded="false">
+      <span class="idx">${idx(x, k)}</span>
+      <span><b>${x.name}</b><p>${x.text}</p></span>
+    </button>`).join('');
+  const ilPlaces = document.getElementById('il-places');
+  const ilQuakes = document.getElementById('il-quakes');
+  ilPlaces.innerHTML = rowList(IL.places, '', (x, k) => pad2(k + 1));
+  ilQuakes.innerHTML = rowList(IL.quakes, 'year', x => x.year);
+  let ilPick = null;   // { list: 'places'|'quakes', k }
+  function ilSelect(list, k) {
+    ilPick = { list, k };
+    document.querySelectorAll('#body-israel .row').forEach(r => r.setAttribute('aria-expanded', 'false'));
+    const host = list === 'places' ? ilPlaces : ilQuakes;
+    host.querySelector(`[data-k="${k}"]`).setAttribute('aria-expanded', 'true');
+    const x = (list === 'places' ? IL.places : IL.quakes)[k];
+    const far = list === 'quakes' && x.lat > 36;
+    markSpot({ lat: x.lat, lng: x.lng, alt: far ? 1.2 : 0.5, place: list === 'quakes' ? `${x.year} · ${x.name}` : x.name }, list === 'quakes' ? 'q' : 'tra');
+    flyTo({ lat: x.lat, lng: x.lng, alt: far ? 1.2 : 0.5 });
+  }
+  ilPlaces.addEventListener('click', e => { const r = e.target.closest('.row'); if (r) ilSelect('places', +r.dataset.k); });
+  ilQuakes.addEventListener('click', e => { const r = e.target.closest('.row'); if (r) ilSelect('quakes', +r.dataset.k); });
+
+  // "In your lifetime" calculator
+  const ageIn = document.getElementById('il-age');
+  function calc() {
+    const age = Math.max(0, Math.min(120, parseFloat(ageIn.value) || 0));
+    const cm = age * IL.cmPerYear;
+    document.getElementById('il-cm').textContent = cm.toLocaleString('he-IL', { maximumFractionDigits: 1 });
+    document.getElementById('il-cm-text').textContent =
+      `ס״מ. זה המרחק שירדן (על הלוח הערבי) זזה צפונה לעומת ישראל (על הלוח האפריקאי) מאז שנולדתם, לפי מדידות GPS: כחצי ס״מ בשנה.`;
+    document.getElementById('il-more').innerHTML = `
+      <dt>מאז ימי דוד המלך (כ-3,000 שנה)</dt><dd>כ-${(3000 * IL.cmPerYear / 100).toLocaleString('he-IL')} מטר</dd>
+      <dt>מאז שנבנתה העיר העתיקה ביריחו (כ-10,000 שנה)</dt><dd>כ-${(10000 * IL.cmPerYear / 100).toLocaleString('he-IL')} מטר</dd>
+      <dt>מאז שהשבר נוצר (כ-18 מיליון שנה)</dt><dd>כ-105 ק״מ</dd>`;
+  }
+  ageIn.addEventListener('input', calc);
+  calc();
+
+  // When switching tabs, show the marker that belongs to that tab (or none)
+  function onTabShown(name) {
+    if (name === 'israel') {
+      hideCard();
+      setLayer('boundaries', true); refreshLayers();
+      if (ilPick) return ilSelect(ilPick.list, ilPick.k);
+      markSpot(null);
+      return flyTo(IL.view);
+    }
+    if (name === 'tours' && tour) markSpot(tour.stops[stopIdx], tour.type);
+    else if (name === 'quiz' && quiz && quiz.round === 1) {
+      const q = Q[quiz.i];
+      markSpot({ lat: q.lat, lng: q.lng, alt: q.alt, place: quiz.answered ? q.place : '?' }, quiz.answered ? q.answer : 'q');
+    } else markSpot(null);
+  }
+
+  // ---------------- Projector mode ----------------
+  const projBtn = document.getElementById('projector');
+  function applyProjector() {
+    document.documentElement.classList.toggle('projector', projector);
+    projBtn.setAttribute('aria-pressed', projector);
+    world.pathStroke(world.pathStroke());   // re-apply line widths
+    refreshLayers();
+    requestAnimationFrame(resize);
+  }
+  projBtn.addEventListener('click', () => {
+    projector = !projector;
+    try { localStorage.setItem('projector', projector ? '1' : '0'); } catch (e) {}
+    applyProjector();
+    // Full screen is a bonus: some browsers and app views don't allow it
+    try {
+      if (projector && !document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
+      if (!projector && document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+    } catch (e) {}
+  });
+  document.addEventListener('fullscreenchange', () => requestAnimationFrame(resize));
+  applyProjector();
+
+  refreshLayers();
+  window.app = { world, layers, refreshLayers, showBoundaryCard, plateAt, openCard, hideCard, startTour, startRound1, startRound2, answer, shareNearBoundaries }; // handy for debugging
+})();
+</script>
+</body>
+</html>

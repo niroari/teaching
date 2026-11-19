@@ -56,6 +56,7 @@ export const CONTENT_ITEMS: ContentItem[] = [
   // ── Earth Sciences ──
   { id: "earth.mission", title: "עבודת חקר: משימת בית חדש 🚀", subject: "earth", kind: "assignment", path: "/earth-sciences/mission", group: "משימות ומשאבים" },
   { id: "earth.resources", title: "משאבים ועזרים (סימולטורים וקישורים)", subject: "earth", kind: "tool", group: "משימות ומשאבים" },
+  { id: "earth.tectonics", title: "כדור הארץ בתנועה (אטלס הלוחות הטקטוניים)", subject: "earth", kind: "tool", path: "/earth-sciences/tectonics", group: "משימות ומשאבים" },
   ...earthLessons,
 
   // ── English ──

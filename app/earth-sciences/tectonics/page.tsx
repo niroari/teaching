@@ -23,7 +23,7 @@ export default function TectonicsAtlasPage() {
       <iframe
         src={ATLAS_SRC}
         title="כדור הארץ בתנועה: אטלס אינטראקטיבי של הלוחות הטקטוניים"
-        allow="fullscreen"
+        allow="fullscreen; autoplay; encrypted-media; picture-in-picture"
         allowFullScreen
         className="w-full flex-1 border-0"
       />

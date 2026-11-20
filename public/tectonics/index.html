@@ -232,14 +232,56 @@ nav.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: 
 .stop h2 { font-size: 2.5em; margin: 8px 0 12px; }
 .fact { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 12px 0; margin: 16px 0; }
 .fact .lbl { display: block; font: 500 .66em var(--f-mono); letter-spacing: .14em; color: var(--amber); margin-bottom: 4px; direction: ltr; text-align: right; }
+.video-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; border-bottom: 1px solid var(--rule); }
 .video-link {
+  appearance: none; background: none; border: 0; cursor: pointer; text-align: right; width: 100%;
   display: grid; grid-template-columns: 40px 1fr; gap: 12px; align-items: center; padding: 10px 0;
-  color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--rule);
+  color: var(--ink);
 }
 .video-link .play { width: 40px; height: 40px; border: 1px solid var(--rule-2); display: grid; place-items: center; }
+.video-link:hover .play { border-color: var(--ink-2); }
 .video-link b { display: block; font-weight: 500; }
+.video-link b span { font-family: var(--f-mono); font-weight: 400; font-size: .86em; color: var(--ink-2); }
 .video-link small { display: block; color: var(--ink-2); font-size: .82em; }
 .video-link:hover b { text-decoration: underline; text-underline-offset: 3px; }
+.yt-out { font-size: .78em; color: var(--ink-3); text-decoration: none; white-space: nowrap; }
+.yt-out:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+
+/* Video player overlay (one, reused for every tour stop) */
+#video-modal {
+  position: fixed; inset: 0; z-index: 50;
+  display: grid; place-items: center;
+  padding: max(24px, env(safe-area-inset-top, 0px)) max(24px, env(safe-area-inset-right, 0px)) max(24px, env(safe-area-inset-bottom, 0px)) max(24px, env(safe-area-inset-left, 0px));
+  background: rgba(3, 4, 7, .9);
+}
+.vm-sheet {
+  width: min(calc(1100px * var(--fs)), 100%, calc((100dvh - 150px) * 16 / 9));
+  background: var(--sheet); border: 1px solid var(--rule-2);
+}
+.vm-head {
+  display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  padding: 10px 14px; border-bottom: 1px solid var(--rule);
+}
+.vm-kicker { font: 500 .7em var(--f-mono); letter-spacing: .16em; color: var(--ink-3); direction: ltr; }
+.vm-close {
+  appearance: none; background: none; border: 1px solid var(--rule-2); color: var(--ink); cursor: pointer;
+  width: 36px; height: 36px; display: grid; place-items: center; flex: none;
+}
+.vm-close:hover { border-color: var(--ink-2); }
+.vm-frame { position: relative; aspect-ratio: 16 / 9; background: #000; }
+.vm-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.vm-foot {
+  display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; align-items: baseline;
+  padding: 12px 14px; border-top: 1px solid var(--rule);
+}
+.vm-title { font-weight: 500; }
+.vm-meta { grid-column: 1; color: var(--ink-2); font-size: .86em; }
+.vm-note { grid-column: 1; color: var(--amber); font-size: .86em; }
+.vm-foot .yt-out { grid-column: 2; grid-row: 1; }
+@media (max-width: 760px) {
+  #video-modal { padding: 12px; }
+  .vm-sheet { width: 100%; }
+}
 .stepper { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 22px; }
 .stepper button {
   appearance: none; cursor: pointer; padding: 12px 14px; font-weight: 500; font-size: 1em;
@@ -427,6 +469,24 @@ nav.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: 
 </aside>
 
 <div id="card" lang="he" dir="rtl" hidden role="dialog" aria-live="polite"></div>
+
+<div id="video-modal" lang="he" dir="rtl" hidden role="dialog" aria-modal="true" aria-labelledby="vm-title">
+  <div class="vm-sheet">
+    <div class="vm-head">
+      <span class="vm-kicker" id="vm-kicker">FIELD FOOTAGE</span>
+      <button class="vm-close" id="vm-close" aria-label="סגירת הסרטון" title="סגירה (Esc)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="vm-frame" id="vm-frame"></div>
+    <div class="vm-foot">
+      <span class="vm-title" id="vm-title"></span>
+      <span class="vm-meta" id="vm-meta"></span>
+      <span class="vm-note" id="vm-note" hidden></span>
+      <a class="yt-out" id="vm-yt" target="_blank" rel="noopener">פתיחה ביוטיוב ↗</a>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/globe.gl@2.32.0/dist/globe.gl.min.js"></script>
 <script src="content.js"></script>
@@ -816,10 +876,13 @@ nav.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: 
         <h2>${s.title}</h2>
         <p>${s.text}</p>
         <div class="fact"><span class="lbl">DID YOU KNOW</span>${s.fact}</div>
-        ${s.video ? `<a class="video-link" href="${esc(s.video.url)}" target="_blank" rel="noopener">
-            <span class="play"><svg width="14" height="16" viewBox="0 0 14 16"><path d="M13 8 1 15V1z" fill="var(--ink)"/></svg></span>
-            <span><b>צפו בסרטון${s.video.minutes ? ' · ' + esc(s.video.minutes) : ''}</b><small>${esc(s.video.title)} · ${esc(s.video.channel)} · נפתח ביוטיוב</small></span>
-          </a>` : ''}
+        ${s.video ? `<div class="video-row">
+            <button class="video-link" id="stop-video">
+              <span class="play"><svg width="14" height="16" viewBox="0 0 14 16" aria-hidden="true"><path d="M13 8 1 15V1z" fill="var(--ink)"/></svg></span>
+              <span><b>צפו בסרטון${clipLength(s.video) ? ` <span>${clipLength(s.video)}</span>` : ''}</b><small>${esc(s.video.title)} · ${esc(s.video.channel)}</small></span>
+            </button>
+            <a class="yt-out" href="${esc(youtubeUrl(s.video))}" target="_blank" rel="noopener">ביוטיוב ↗</a>
+          </div>` : ''}
       </article>
       <div class="stepper">
         <button id="stop-prev" ${i === 0 ? 'disabled' : ''}>→ הקודם</button>
@@ -830,10 +893,73 @@ nav.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: 
     document.getElementById('stop-prev').onclick = () => i > 0 && showStop(i - 1);
     document.getElementById('stop-next').onclick = () => last ? endTour() : showStop(i + 1);
     tourRun.querySelectorAll('.ticks button').forEach(b => b.onclick = () => showStop(+b.dataset.k));
+    const vBtn = document.getElementById('stop-video');
+    if (vBtn) vBtn.onclick = () => openVideo(s.video, vBtn);
     tourRun.closest('.tab-body').scrollTop = 0;
     markSpot(s, tour.type);
     flyTo(s);
   }
+
+  // ---------------- Video player (tour stops) ----------------
+  // video: { id, start, end, title, channel, note } — start/end in seconds (the clip to show).
+  const vModal = document.getElementById('video-modal');
+  const vFrame = document.getElementById('vm-frame');
+  let vReturnFocus = null;
+  const mmss = sec => `${Math.floor(sec / 60)}:${String(Math.round(sec % 60)).padStart(2, '0')}`;
+  function clipLength(v) {
+    return Number.isFinite(v.end) ? mmss(v.end - (v.start || 0)) : '';
+  }
+  function youtubeUrl(v) {
+    return `https://www.youtube.com/watch?v=${encodeURIComponent(v.id)}${v.start ? `&t=${Math.floor(v.start)}s` : ''}`;
+  }
+  function openVideo(v, returnTo) {
+    const q = new URLSearchParams({ autoplay: '1', rel: '0', modestbranding: '1', playsinline: '1' });
+    if (v.start) q.set('start', String(Math.floor(v.start)));
+    if (Number.isFinite(v.end)) q.set('end', String(Math.floor(v.end)));
+    const f = document.createElement('iframe');
+    f.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(v.id)}?${q}`;
+    f.title = v.title;
+    f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    f.allowFullscreen = true;
+    f.referrerPolicy = 'strict-origin-when-cross-origin';
+    vFrame.replaceChildren(f);
+    document.getElementById('vm-kicker').textContent = clipLength(v) ? `FIELD FOOTAGE · ${clipLength(v)}` : 'FIELD FOOTAGE';
+    document.getElementById('vm-title').textContent = v.title;
+    document.getElementById('vm-meta').textContent = v.channel;
+    const note = document.getElementById('vm-note');
+    note.textContent = v.note || ''; note.hidden = !v.note;
+    document.getElementById('vm-yt').href = youtubeUrl(v);
+    vReturnFocus = returnTo || null;
+    vModal.hidden = false;
+    document.getElementById('vm-close').focus();
+  }
+  function closeVideo() {
+    if (vModal.hidden) return;
+    vModal.hidden = true;
+    vFrame.replaceChildren();          // removing the iframe stops the sound
+    if (vReturnFocus && document.contains(vReturnFocus)) vReturnFocus.focus();
+    vReturnFocus = null;
+  }
+  document.getElementById('vm-close').onclick = closeVideo;
+  vModal.addEventListener('click', e => { if (e.target === vModal) closeVideo(); });
+  // While the video is open it owns the keyboard: Esc and the presentation clicker's
+  // next/back keys close it (instead of moving the tour). Runs before every other key handler.
+  window.addEventListener('keydown', e => {
+    if (vModal.hidden) return;
+    if (e.key === 'Tab') {             // keep focus inside the dialog
+      const items = [...vModal.querySelectorAll('button, a[href]')];
+      const i = items.indexOf(document.activeElement);
+      e.preventDefault();
+      items[(i + (e.shiftKey ? items.length - 1 : 1)) % items.length].focus();
+      return;
+    }
+    if (e.key === ' ' || e.key === 'Enter') { if (document.activeElement && vModal.contains(document.activeElement)) { e.stopImmediatePropagation(); return; } }
+    e.stopImmediatePropagation();
+    if (['Escape', 'PageDown', 'PageUp', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+      e.preventDefault();
+      closeVideo();
+    }
+  }, true);
 
   // Presentation clicker / keyboard: next & back (Hebrew reads right-to-left, so ← is "next")
   document.addEventListener('keydown', e => {

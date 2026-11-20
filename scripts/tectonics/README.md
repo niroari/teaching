@@ -26,7 +26,14 @@ Preview: run the site's dev server and open `/earth-sciences/tectonics`
 1. **לחקור**: legend-style layer toggles: boundaries (3 types), motion dashes, plate names,
    M7+ earthquakes, volcanoes. Click a boundary/plate/quake/volcano for an info card with an animated diagram.
 2. **סיורים**: 4 tours, 14 stops, teacher-paced (Next/Back, presentation clicker, arrow keys).
-   Each stop has a "did you know" fact and a YouTube video (opens in a new tab).
+   Each stop has a "did you know" fact and a short YouTube clip that plays **inside the atlas**
+   (overlay player, `youtube-nocookie.com`, with a "ביוטיוב ↗" fallback link).
+   - Video fields in `content.js`: `{ id, start, end, title, channel, note }`. `start`/`end` are seconds, so
+     only the WOW moment plays. `note` is an optional Hebrew line, e.g. where the footage was filmed.
+   - While a clip is open, Esc and the clicker's next/back keys close it (they don't move the tour).
+   - Clips must be **WOW moments**: real footage first (drone, diving, eruptions), animation only where nothing
+     can be filmed, no narration needed. The teacher approves every video and segment.
+   - The site page's iframe needs `allow="fullscreen; autoplay; encrypted-media; picture-in-picture"` for this.
 3. **אתגר**: Round 1: 8 mystery spots, guess the boundary type (keys 1/2/3). Round 2: only quakes + volcanoes,
    then "reveal" the boundaries (shows the computed 86% of M7+ quakes within 250 km of a boundary).
 4. **ישראל**: 6 places along the Dead Sea fault, 5 historic earthquakes, "in your lifetime" calculator (0.5 cm/yr, GPS).
@@ -55,5 +62,6 @@ Preview: run the site's dev server and open `/earth-sciences/tectonics`
 - **RTL:** the globe container must be `dir="ltr"`, otherwise floating labels drift right under the panel.
 - **Dead Sea fault colors:** PB2002 marks a few stretches (e.g. north of the Kinneret) as "colliding" (slight squeeze), explained in the Israel chapter.
   The model's speed there (~1 cm/yr) differs from GPS (~0.5 cm/yr); the calculator uses GPS.
-- Videos were chosen from titles, channels and verified lengths, not watched. Two National Geographic lengths are unchecked.
+- Video candidates are checked (exists, embeddable) through YouTube's oEmbed endpoint, but not watched:
+  the teacher picks the clip and segment.
 - An older copy was published as a claude.ai artifact (https://claude.ai/artifact/UhC2cmPrqb6xZK6iYKExhe). It does not update from this project.

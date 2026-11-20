@@ -1,9 +1,8 @@
 import { ExternalLink } from "lucide-react";
 import ActivityBar from "@/components/site/ActivityBar";
 
-// The atlas itself is a self-contained static page copied from
-// "Map Projects/Tectonics_Web" into public/tectonics/ (that folder is the source of truth:
-// re-copy it here whenever its texts change). This page just frames it full-height.
+// The atlas itself is a self-contained static page in public/tectonics/ (its only home;
+// see scripts/tectonics/README.md). This page just frames it full-height.
 const ATLAS_SRC = "/tectonics/index.html";
 
 export default function TectonicsAtlasPage() {

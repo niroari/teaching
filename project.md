@@ -74,6 +74,7 @@ This document serves as a comprehensive index of the site's architecture, pages,
   * *Lesson 1: The 4 Spheres & Interactions (`intro-spheres`):* Features 8 detailed slides covering individual spheres with engaging student-facing trivia (such as the "mycelium internet" and "meteor shield"), detailed interaction definitions, and a White Island volcano image.
   * *Lesson 2: Universe & Solar System (`universe-solar-system`):* Slide 2 features a YouTube video about universe scale, Slide 3 holds a looping solar system orbit GIF, Slide 4 shows a planets comparison image, and Slide 5 shows a local gravity concept illustration.
   * *Lesson 3: Earth & Moon Movements (`earth-moon-movements`):* Embeds local earth rotation, season orbit, and moon orbit GIFs. Slide 5 features a physical "Human Planetarium" classroom roleplay demonstration task.
+* **Plate Tectonics Atlas "כדור הארץ בתנועה" (`/earth-sciences/tectonics`):** Self-contained interactive Hebrew atlas (3D globe, 4 tabs, tours, quiz, projector mode) in `public/tectonics/`, framed by the site page. Its build script, raw data and full notes are in `scripts/tectonics/` (see `README.md` there).
 
 ### 4. Interactive Classroom Games
 * **Values Auction (`/values-auction`):** Interactive group game bidding on different core values using Firebase Realtime Database.

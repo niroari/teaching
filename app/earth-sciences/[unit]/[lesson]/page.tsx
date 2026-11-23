@@ -41,7 +41,6 @@ import AstronomyWidget from "@/components/earth-sciences/AstronomyWidget";
 import AtmosphereWidget from "@/components/earth-sciences/AtmosphereWidget";
 import TectonicsWidget from "@/components/earth-sciences/TectonicsWidget";
 import FootprintWidget from "@/components/earth-sciences/FootprintWidget";
-import EarthExplorerWidget from "@/components/earth-sciences/EarthExplorerWidget";
 import TriviaJeopardyWidget from "@/components/earth-sciences/TriviaJeopardyWidget";
 import { DigitalWorksheet, AnswerKey } from "@/components/earth-sciences/Worksheet";
 import ActivityBar from "@/components/site/ActivityBar";
@@ -218,10 +217,8 @@ export default function LessonPresenterConsolePage() {
   // Select widget to render based on widgetId
   const renderWidget = () => {
     switch (lessonData.widgetId) {
-      case "earth-explorer":
-        return <EarthExplorerWidget />;
       case "astronomy":
-        return <AstronomyWidget />;
+        return <AstronomyWidget initialTab={lessonData.widgetTab ?? 0} />;
       case "atmosphere":
         return <AtmosphereWidget initialTab={lessonData.widgetTab ?? 0} />;
       case "tectonics":
@@ -229,7 +226,7 @@ export default function LessonPresenterConsolePage() {
       case "footprint":
         return <FootprintWidget />;
       case "trivia-jeopardy":
-        return <TriviaJeopardyWidget bank={lessonData.trivia} />;
+        return lessonData.trivia ? <TriviaJeopardyWidget bank={lessonData.trivia} /> : null;
       default:
         return null;
     }

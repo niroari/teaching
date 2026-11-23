@@ -17,12 +17,14 @@ import {
   Minimize2
 } from "lucide-react";
 
+import type { TriviaBank } from "@/lib/data/earth-sciences-trivia";
+
 interface Question {
   q: string;
   a: string;
 }
 
-const CATEGORIES = [
+const ASTRONOMY_CATEGORIES = [
   "ספירות ויחסי גומלין",
   "היקום ומערכת השמש",
   "תנועות כדור הארץ והירח",
@@ -31,7 +33,7 @@ const CATEGORIES = [
 
 const VALUES = [100, 200, 300, 400, 500];
 
-const QUESTIONS: Record<string, Question[]> = {
+const ASTRONOMY_QUESTIONS: Record<string, Question[]> = {
   // Category 0: ספירות ויחסי גומלין
   "0": [
     { q: "מהי ה'ספירה' הכוללת את כל המים בכדור הארץ במצבי הצבירה השונים?", a: "הידרוספרה (ספירת המים)" },
@@ -71,7 +73,14 @@ interface Team {
   score: number;
 }
 
-export default function TriviaJeopardyWidget() {
+/** Unit 1 (astronomy) questions: the default bank. */
+const ASTRONOMY_BANK: TriviaBank = {
+  categories: ASTRONOMY_CATEGORIES,
+  questions: ASTRONOMY_CATEGORIES.map((_, i) => ASTRONOMY_QUESTIONS[String(i)]),
+};
+
+export default function TriviaJeopardyWidget({ bank = ASTRONOMY_BANK }: { bank?: TriviaBank }) {
+  const CATEGORIES = bank.categories;
   const [gameStarted, setGameStarted] = useState(false);
   const [numTeams, setNumTeams] = useState<number>(3);
   const [teams, setTeams] = useState<Team[]>([]);
@@ -142,7 +151,7 @@ export default function TriviaJeopardyWidget() {
     const cellKey = `${col}-${rowIdx}`;
     if (playedCells[cellKey]) return;
 
-    const questionData = QUESTIONS[String(col)][rowIdx];
+    const questionData = bank.questions[col][rowIdx];
     setActiveQuestion({
       col,
       rowIdx,

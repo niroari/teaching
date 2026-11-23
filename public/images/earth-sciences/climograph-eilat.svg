@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" font-family="Arial, Helvetica, sans-serif" font-size="13" direction="rtl">
+<rect width="640" height="420" fill="#ffffff"/>
+<text x="320.0" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#1f2937">קלימוגרף: אילת</text>
+<line x1="70" y1="360.0" x2="570" y2="360.0" stroke="#e5e7eb"/>
+<text x="62" y="364.0" text-anchor="end" direction="ltr" fill="#b91c1c">-30</text>
+<line x1="70" y1="315.7" x2="570" y2="315.7" stroke="#e5e7eb"/>
+<text x="62" y="319.7" text-anchor="end" direction="ltr" fill="#b91c1c">-20</text>
+<line x1="70" y1="271.4" x2="570" y2="271.4" stroke="#e5e7eb"/>
+<text x="62" y="275.4" text-anchor="end" direction="ltr" fill="#b91c1c">-10</text>
+<line x1="70" y1="227.1" x2="570" y2="227.1" stroke="#e5e7eb"/>
+<text x="62" y="231.1" text-anchor="end" direction="ltr" fill="#b91c1c">0</text>
+<line x1="70" y1="182.9" x2="570" y2="182.9" stroke="#e5e7eb"/>
+<text x="62" y="186.9" text-anchor="end" direction="ltr" fill="#b91c1c">10</text>
+<line x1="70" y1="138.6" x2="570" y2="138.6" stroke="#e5e7eb"/>
+<text x="62" y="142.6" text-anchor="end" direction="ltr" fill="#b91c1c">20</text>
+<line x1="70" y1="94.3" x2="570" y2="94.3" stroke="#e5e7eb"/>
+<text x="62" y="98.3" text-anchor="end" direction="ltr" fill="#b91c1c">30</text>
+<line x1="70" y1="50.0" x2="570" y2="50.0" stroke="#e5e7eb"/>
+<text x="62" y="54.0" text-anchor="end" direction="ltr" fill="#b91c1c">40</text>
+<text x="578" y="364.0" text-anchor="start" direction="ltr" fill="#1d4ed8">0</text>
+<text x="578" y="319.7" text-anchor="start" direction="ltr" fill="#1d4ed8">50</text>
+<text x="578" y="275.4" text-anchor="start" direction="ltr" fill="#1d4ed8">100</text>
+<text x="578" y="231.1" text-anchor="start" direction="ltr" fill="#1d4ed8">150</text>
+<text x="578" y="186.9" text-anchor="start" direction="ltr" fill="#1d4ed8">200</text>
+<text x="578" y="142.6" text-anchor="start" direction="ltr" fill="#1d4ed8">250</text>
+<text x="578" y="98.3" text-anchor="start" direction="ltr" fill="#1d4ed8">300</text>
+<text x="578" y="54.0" text-anchor="start" direction="ltr" fill="#1d4ed8">350</text>
+<line x1="70" y1="227.1" x2="570" y2="227.1" stroke="#9ca3af" stroke-dasharray="4 3"/>
+<rect x="76.2" y="356.5" width="29.2" height="3.5" fill="#60a5fa"/>
+<text x="90.8" y="378" text-anchor="middle" fill="#374151">ינו</text>
+<rect x="117.9" y="357.3" width="29.2" height="2.7" fill="#60a5fa"/>
+<text x="132.5" y="378" text-anchor="middle" fill="#374151">פבר</text>
+<rect x="159.6" y="357.3" width="29.2" height="2.7" fill="#60a5fa"/>
+<text x="174.2" y="378" text-anchor="middle" fill="#374151">מרץ</text>
+<rect x="201.2" y="358.2" width="29.2" height="1.8" fill="#60a5fa"/>
+<text x="215.8" y="378" text-anchor="middle" fill="#374151">אפר</text>
+<rect x="242.9" y="359.1" width="29.2" height="0.9" fill="#60a5fa"/>
+<text x="257.5" y="378" text-anchor="middle" fill="#374151">מאי</text>
+<rect x="284.6" y="360.0" width="29.2" height="0.0" fill="#60a5fa"/>
+<text x="299.2" y="378" text-anchor="middle" fill="#374151">יונ</text>
+<rect x="326.2" y="360.0" width="29.2" height="0.0" fill="#60a5fa"/>
+<text x="340.8" y="378" text-anchor="middle" fill="#374151">יול</text>
+<rect x="367.9" y="360.0" width="29.2" height="0.0" fill="#60a5fa"/>
+<text x="382.5" y="378" text-anchor="middle" fill="#374151">אוג</text>
+<rect x="409.6" y="360.0" width="29.2" height="0.0" fill="#60a5fa"/>
+<text x="424.2" y="378" text-anchor="middle" fill="#374151">ספט</text>
+<rect x="451.2" y="356.5" width="29.2" height="3.5" fill="#60a5fa"/>
+<text x="465.8" y="378" text-anchor="middle" fill="#374151">אוק</text>
+<rect x="492.9" y="358.2" width="29.2" height="1.8" fill="#60a5fa"/>
+<text x="507.5" y="378" text-anchor="middle" fill="#374151">נוב</text>
+<rect x="534.6" y="355.6" width="29.2" height="4.4" fill="#60a5fa"/>
+<text x="549.2" y="378" text-anchor="middle" fill="#374151">דצמ</text>
+<polyline points="90.8,157.2 132.5,150.1 174.2,136.4 215.8,117.8 257.5,98.3 299.2,85.4 340.8,77.5 382.5,77.9 424.2,88.5 465.8,105.8 507.5,129.7 549.2,151.4" fill="none" stroke="#dc2626" stroke-width="3"/>
+<circle cx="90.8" cy="157.2" r="3.5" fill="#dc2626"/>
+<circle cx="132.5" cy="150.1" r="3.5" fill="#dc2626"/>
+<circle cx="174.2" cy="136.4" r="3.5" fill="#dc2626"/>
+<circle cx="215.8" cy="117.8" r="3.5" fill="#dc2626"/>
+<circle cx="257.5" cy="98.3" r="3.5" fill="#dc2626"/>
+<circle cx="299.2" cy="85.4" r="3.5" fill="#dc2626"/>
+<circle cx="340.8" cy="77.5" r="3.5" fill="#dc2626"/>
+<circle cx="382.5" cy="77.9" r="3.5" fill="#dc2626"/>
+<circle cx="424.2" cy="88.5" r="3.5" fill="#dc2626"/>
+<circle cx="465.8" cy="105.8" r="3.5" fill="#dc2626"/>
+<circle cx="507.5" cy="129.7" r="3.5" fill="#dc2626"/>
+<circle cx="549.2" cy="151.4" r="3.5" fill="#dc2626"/>
+<rect x="70" y="50" width="500" height="310" fill="none" stroke="#6b7280"/>
+<text x="22" y="205.0" text-anchor="middle" fill="#b91c1c" transform="rotate(-90 22 205.0)">טמפרטורה במעלות צלזיוס</text>
+<text x="622" y="205.0" text-anchor="middle" fill="#1d4ed8" transform="rotate(90 622 205.0)">משקעים במילימטרים</text>
+<text x="320.0" y="408" text-anchor="middle" fill="#6b7280" font-size="12">סך המשקעים בשנה: 24 מ"מ. ממוצעים של השירות המטאורולוגי</text>
+</svg>

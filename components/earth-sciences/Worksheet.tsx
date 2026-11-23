@@ -114,7 +114,7 @@ function SectionHeader({ index, section }: { index: number; section: WorksheetDa
       {section.image && (
         <figure className="space-y-1">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={section.image.src} alt={section.image.alt} className="max-h-72 w-full rounded-md border border-line object-cover" />
+          <img src={section.image.src} alt={section.image.alt} className={section.image.diagram ? "mx-auto max-h-[32rem] w-full rounded-md border border-line bg-white object-contain" : "max-h-72 w-full rounded-md border border-line object-cover"} />
           {section.image.caption && <figcaption className="text-xs text-fg-subtle">{section.image.caption}</figcaption>}
         </figure>
       )}
@@ -318,7 +318,7 @@ export function PrintWorksheet({ worksheet, lessonTitle, unitTitle, showAnswers 
           {section.image && (
             <figure className="space-y-1 break-inside-avoid">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={section.image.src} alt={section.image.alt} className="max-h-64 w-full border border-line object-cover" />
+              <img src={section.image.src} alt={section.image.alt} className={section.image.diagram ? "mx-auto max-h-[26rem] w-full border border-line object-contain" : "max-h-64 w-full border border-line object-cover"} />
               {section.image.caption && <figcaption className="text-xs text-fg-muted">{section.image.caption}</figcaption>}
             </figure>
           )}

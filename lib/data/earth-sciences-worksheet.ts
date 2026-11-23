@@ -48,7 +48,8 @@ export interface WorksheetSection {
   title: string;
   /** A short reading passage shown before the questions. Paragraphs split by blank lines. */
   text?: string;
-  image?: { src: string; alt: string; caption?: string };
+  /** `diagram`: a chart or map, shown whole and never cropped (photos are cropped to a strip). */
+  image?: { src: string; alt: string; caption?: string; diagram?: boolean };
   items: WorksheetItem[];
 }
 

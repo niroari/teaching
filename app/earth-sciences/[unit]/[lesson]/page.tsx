@@ -222,19 +222,14 @@ export default function LessonPresenterConsolePage() {
         return <EarthExplorerWidget />;
       case "astronomy":
         return <AstronomyWidget />;
-      case "atmosphere": {
-        let initialTab = 0;
-        if (lessonId === "weather-phenomena") initialTab = 1;
-        else if (lessonId === "climate-zones") initialTab = 2;
-        else if (lessonId === "human-atmosphere-impact") initialTab = 3;
-        return <AtmosphereWidget initialTab={initialTab} />;
-      }
+      case "atmosphere":
+        return <AtmosphereWidget initialTab={lessonData.widgetTab ?? 0} />;
       case "tectonics":
         return <TectonicsWidget />;
       case "footprint":
         return <FootprintWidget />;
       case "trivia-jeopardy":
-        return <TriviaJeopardyWidget />;
+        return <TriviaJeopardyWidget bank={lessonData.trivia} />;
       default:
         return null;
     }
@@ -453,7 +448,7 @@ export default function LessonPresenterConsolePage() {
                           }`}>
                             {slides[currentSlideIndex].content}
                           </p>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className={`grid gap-4 ${lessonData.hookImages.length > 1 ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 max-w-3xl mx-auto"}`}>
                             {lessonData.hookImages.map((img) => (
                               <figure key={img.src} className="space-y-1.5">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}

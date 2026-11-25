@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 480" font-family="Arial, Helvetica, sans-serif" font-size="15" direction="rtl">
+<defs></defs>
+<rect width="600" height="480" fill="#fafaf9"/>
+<text x="580" y="40" text-anchor="start" font-size="17" font-weight="bold" fill="#1f2937">כמה אנרגיה צריך לפחית אחת</text><text x="580" y="62" text-anchor="start" font-size="13" fill="#57534e">אלומיניום</text><rect x="340" y="120" width="120" height="280" rx="0" fill="#57534e"/><text x="400" y="424" text-anchor="middle" font-size="15" font-weight="bold" fill="#1f2937">מהמכרה</text><text x="400" y="444" text-anchor="middle" font-size="13" fill="#57534e" direction="ltr">100%</text><rect x="160" y="386" width="120" height="14" rx="0" fill="#047857"/><text x="220" y="424" text-anchor="middle" font-size="15" font-weight="bold" fill="#1f2937">ממיחזור</text><text x="220" y="444" text-anchor="middle" font-size="13" fill="#57534e">כ־5%</text><line x1="120" y1="400" x2="500" y2="400" stroke="#1f2937" stroke-width="1.5"/><text x="220" y="340" text-anchor="middle" font-size="17" font-weight="bold" fill="#047857">חוסכים כ־95%</text>
+</svg>

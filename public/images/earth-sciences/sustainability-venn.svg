@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 480" font-family="Arial, Helvetica, sans-serif" font-size="15" direction="rtl">
+<defs></defs>
+<rect width="600" height="480" fill="#fafaf9"/>
+<text x="580" y="40" text-anchor="start" font-size="17" font-weight="bold" fill="#1f2937">פיתוח בר־קיימא</text><text x="580" y="62" text-anchor="start" font-size="13" fill="#57534e">פיתוח שפוגע באחד מהם לא יחזיק</text><circle cx="300" cy="175" r="105" fill="#86b97e" fill-opacity="0.35"/><text x="300" y="140" text-anchor="middle" font-size="17" font-weight="bold" fill="#1f2937">סביבה</text><circle cx="230" cy="295" r="105" fill="#60a5fa" fill-opacity="0.35"/><text x="190" y="330" text-anchor="middle" font-size="17" font-weight="bold" fill="#1f2937">חברה</text><circle cx="370" cy="295" r="105" fill="#f59e0b" fill-opacity="0.35"/><text x="410" y="330" text-anchor="middle" font-size="17" font-weight="bold" fill="#1f2937">כלכלה</text><text x="300" y="262" text-anchor="middle" font-size="15" font-weight="bold" fill="#1f2937">קיימות</text>
+</svg>

@@ -199,6 +199,7 @@ export const slides: TopicSlideContent[] = [
       "שימוש חוזר ותיקון: טלפון שמחזיק עוד שנתיים הוא פחות כרייה.",
       "שיקום מחצבות: מחצבות ישנות הופכות לפארקים, לאגמים ולשמורות."
     ],
+    imageUrl: "/images/earth-sciences/aluminium-recycling.svg",
     afterTask: true
   }
 ];

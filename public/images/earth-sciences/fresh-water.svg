@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 480" font-family="Arial, Helvetica, sans-serif" font-size="15" direction="rtl">
+<rect width="600" height="480" fill="#fafaf9"/>
+
+<!-- All water: bar fills from the right -->
+<text x="560" y="52" text-anchor="start" font-size="17" font-weight="bold" fill="#1f2937">כל המים בכדור הארץ</text>
+<rect x="56" y="70" width="504" height="56" fill="#2563eb"/>
+<rect x="40" y="70" width="16" height="56" fill="#93c5fd"/>
+<text x="308" y="96" text-anchor="middle" font-weight="bold" fill="#ffffff">מלוחים</text>
+<text x="308" y="116" text-anchor="middle" font-size="13" fill="#dbeafe" direction="ltr">97%</text>
+<text x="48" y="62" text-anchor="middle" font-size="13" font-weight="bold" fill="#1f2937" direction="ltr">3%</text>
+
+<!-- Zoom into the fresh 3% -->
+<path d="M40,126 L56,126 L560,236 L40,236 z" fill="#dbeafe" opacity="0.7"/>
+<text x="560" y="222" text-anchor="start" font-size="17" font-weight="bold" fill="#1f2937">המים המתוקים</text>
+
+<rect x="214" y="240" width="346" height="64" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="1.5"/>
+<rect x="46" y="240" width="168" height="64" fill="#93c5fd"/>
+<rect x="40" y="240" width="6" height="64" fill="#2563eb"/>
+<text x="387" y="268" text-anchor="middle" font-weight="bold" fill="#1f2937">קפואים בקרחונים</text>
+<text x="387" y="290" text-anchor="middle" font-size="13" fill="#57534e" direction="ltr">69%</text>
+<text x="130" y="268" text-anchor="middle" font-weight="bold" fill="#1f2937">מי תהום</text>
+<text x="130" y="290" text-anchor="middle" font-size="13" fill="#1e3a8a" direction="ltr">30%</text>
+
+<line x1="43" y1="304" x2="43" y2="352" stroke="#1f2937" stroke-width="1"/>
+<circle cx="43" cy="304" r="3" fill="#1f2937"/>
+<text x="54" y="350" text-anchor="end" font-weight="bold" fill="#1f2937">אגמים ונהרות</text>
+<text x="54" y="370" text-anchor="start" font-size="13" fill="#57534e" direction="ltr">1%</text>
+
+<!-- Takeaway -->
+<rect x="40" y="404" width="520" height="52" rx="10" fill="#ffffff" stroke="#d6d3d1" stroke-width="1.5"/>
+<text x="300" y="436" text-anchor="middle" font-weight="bold" fill="#1f2937">מכל המים, פחות מאחוז אחד זמין לשתייה</text>
+</svg>

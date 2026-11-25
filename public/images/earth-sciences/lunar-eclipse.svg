@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 480" font-family="Arial, Helvetica, sans-serif" font-size="15" direction="rtl">
+<rect width="600" height="480" fill="#fafaf9"/>
+<text x="580" y="44" text-anchor="start" font-size="17" font-weight="bold" fill="#1f2937">שמש, כדור הארץ וירח בקו אחד</text>
+
+<!-- penumbra and umbra behind Earth -->
+<polygon points="300,192 600,53 600,427 300,288" fill="#eeeceb"/>
+<polygon points="300,192 563,240 300,288" fill="#a8a29e"/>
+<line x1="-40" y1="130" x2="563" y2="240" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4 4"/>
+<line x1="-40" y1="350" x2="563" y2="240" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4 4"/>
+
+<!-- bodies -->
+<circle cx="-40" cy="240" r="110" fill="#fbbf24"/>
+<circle cx="300" cy="240" r="48" fill="#3b82f6"/>
+<circle cx="470" cy="240" r="14" fill="#b45309"/>
+
+<!-- labels -->
+<text x="36" y="384" text-anchor="middle" font-weight="bold" fill="#1f2937">השמש</text>
+<text x="300" y="318" text-anchor="middle" font-weight="bold" fill="#1f2937">כדור הארץ</text>
+<line x1="470" y1="258" x2="470" y2="330" stroke="#1f2937" stroke-width="1"/>
+<text x="470" y="350" text-anchor="middle" font-weight="bold" fill="#1f2937">הירח</text>
+<text x="470" y="370" text-anchor="middle" font-size="13" fill="#57534e">נצבע באדום</text>
+<line x1="400" y1="236" x2="400" y2="160" stroke="#1f2937" stroke-width="1"/>
+<circle cx="400" cy="236" r="3" fill="#1f2937"/>
+<text x="400" y="150" text-anchor="middle" font-weight="bold" fill="#1f2937">הצל של כדור הארץ</text>
+
+<text x="580" y="456" text-anchor="start" font-size="13" fill="#57534e">הגדלים והמרחקים לא בקנה מידה</text>
+</svg>

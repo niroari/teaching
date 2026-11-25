@@ -210,7 +210,7 @@ export const slides: TopicSlideContent[] = [
       "התכנסות: לוח כבד שוקע מתחת לשני (הפחתה: האנדים, יפן), או ששתי יבשות מתנגשות ויוצרות הרים (ההימלאיה).",
       "החלקה: הלוחות נעים זה לצד זה. קרום לא נוצר ולא נהרס, אבל יש רעידות אדמה. סן אנדראס, ים המלח."
     ],
-    imageUrl: "/images/enrichment-google-earth.jpg"
+    imageUrl: "/images/earth-sciences/plate-boundaries.svg"
   },
   {
     title: "ישראל על גבול: העתק ים המלח",

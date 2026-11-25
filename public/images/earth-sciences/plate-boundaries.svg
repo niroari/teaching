@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 480" font-family="Arial, Helvetica, sans-serif" font-size="15" direction="rtl">
+<defs>
+<marker id="g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#047857"/></marker>
+</defs>
+<rect width="600" height="480" fill="#fafaf9"/>
+<line x1="20" y1="158" x2="580" y2="158" stroke="#d6d3d1"/>
+<line x1="20" y1="322" x2="580" y2="322" stroke="#d6d3d1"/>
+
+<!-- 1. Divergent -->
+<g>
+<text x="580" y="52" text-anchor="start" font-size="17" font-weight="bold" fill="#1f2937">התרחקות</text>
+<text x="580" y="76" text-anchor="start" font-size="13" fill="#57534e">נוצר קרום חדש</text>
+<text x="580" y="98" text-anchor="start" font-size="13" fill="#57534e">איסלנד, ים סוף</text>
+<rect x="20" y="95" width="400" height="50" fill="#fde7d1"/>
+<rect x="20" y="70" width="185" height="25" fill="#d6d3d1" stroke="#a8a29e" stroke-width="1.5"/>
+<rect x="235" y="70" width="185" height="25" fill="#d6d3d1" stroke="#a8a29e" stroke-width="1.5"/>
+<path d="M196,145 C204,120 212,98 214,70 L226,70 C228,98 236,120 244,145 z" fill="#c2410c"/>
+<line x1="190" y1="48" x2="100" y2="48" stroke="#047857" stroke-width="4" marker-end="url(#g)"/>
+<line x1="250" y1="48" x2="340" y2="48" stroke="#047857" stroke-width="4" marker-end="url(#g)"/>
+<text x="345" y="128" text-anchor="middle" font-size="13" fill="#9a3412">מאגמה עולה</text>
+</g>
+
+<!-- 2. Convergent (subduction) -->
+<g>
+<text x="580" y="216" text-anchor="start" font-size="17" font-weight="bold" fill="#1f2937">התכנסות</text>
+<text x="580" y="240" text-anchor="start" font-size="13" fill="#57534e">הפחתה: האנדים, יפן</text>
+<text x="580" y="262" text-anchor="start" font-size="13" fill="#57534e">התנגשות: ההימלאיה</text>
+<rect x="20" y="259" width="400" height="50" fill="#fde7d1"/>
+<path d="M20,234 L192,234 C240,234 270,262 300,300 L284,309 C256,274 232,254 190,254 L20,254 z" fill="#d6d3d1" stroke="#a8a29e" stroke-width="1.5"/>
+<path d="M205,226 L238,226 L262,200 L282,214 L300,196 L326,226 L420,226 L420,262 L300,262 C270,262 240,250 215,240 z" fill="#e7dcc6" stroke="#a8a29e" stroke-width="1.5"/>
+<line x1="50" y1="212" x2="150" y2="212" stroke="#047857" stroke-width="4" marker-end="url(#g)"/>
+<line x1="410" y1="212" x2="345" y2="212" stroke="#047857" stroke-width="4" marker-end="url(#g)"/>
+<text x="110" y="290" text-anchor="middle" font-size="13" fill="#57534e">הלוח הכבד שוקע</text>
+</g>
+
+<!-- 3. Transform (map view) -->
+<g>
+<text x="580" y="380" text-anchor="start" font-size="17" font-weight="bold" fill="#1f2937">החלקה</text>
+<text x="580" y="404" text-anchor="start" font-size="13" fill="#57534e">סן אנדראס, ים המלח</text>
+<text x="580" y="426" text-anchor="start" font-size="13" fill="#57534e">מבט מלמעלה</text>
+<rect x="20" y="340" width="200" height="124" fill="#e7e5e4"/>
+<rect x="220" y="340" width="200" height="124" fill="#d6d3d1"/>
+<line x1="220" y1="340" x2="220" y2="464" stroke="#1f2937" stroke-width="2.5"/>
+<line x1="120" y1="440" x2="120" y2="364" stroke="#047857" stroke-width="4" marker-end="url(#g)"/>
+<line x1="320" y1="364" x2="320" y2="440" stroke="#047857" stroke-width="4" marker-end="url(#g)"/>
+</g>
+</svg>

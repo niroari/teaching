@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 480" font-family="Arial, Helvetica, sans-serif" font-size="15" direction="rtl">
+<defs><marker id="2563eb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker><marker id="7c3aed" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#7c3aed"/></marker><marker id="c2410c" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#c2410c"/></marker></defs>
+<rect width="600" height="480" fill="#fafaf9"/>
+<line x1="320.6" y1="134.4" x2="433.8" y2="284.8" stroke="#2563eb" stroke-width="3" marker-end="url(#2563eb)"/><line x1="215.0" y1="327.0" x2="383.0" y2="327.0" stroke="#2563eb" stroke-width="3" marker-end="url(#2563eb)"/><line x1="265.0" y1="123.6" x2="151.8" y2="274.0" stroke="#7c3aed" stroke-width="3" marker-end="url(#7c3aed)"/><line x1="385.0" y1="309.0" x2="217.0" y2="309.0" stroke="#7c3aed" stroke-width="3" marker-end="url(#7c3aed)"/><line x1="449.4" y1="275.6" x2="336.2" y2="125.2" stroke="#c2410c" stroke-width="3" marker-end="url(#c2410c)"/><line x1="165.0" y1="286.4" x2="278.2" y2="136.0" stroke="#c2410c" stroke-width="3" marker-end="url(#c2410c)"/>
+<rect x="225" y="63" width="150" height="58" rx="12" fill="#fde7d1" stroke="#c2410c" stroke-width="1.5"/><text x="300" y="98" text-anchor="middle" font-size="17" font-weight="bold" fill="#1f2937">סלע יסוד</text>
+<rect x="395" y="289" width="150" height="58" rx="12" fill="#f3e3cc" stroke="#a8a29e" stroke-width="1.5"/><text x="470" y="324" text-anchor="middle" font-size="17" font-weight="bold" fill="#1f2937">סלע משקע</text>
+<rect x="55" y="289" width="150" height="58" rx="12" fill="#e7e5e4" stroke="#78716c" stroke-width="1.5"/><text x="130" y="324" text-anchor="middle" font-size="17" font-weight="bold" fill="#1f2937">סלע תמורה</text>
+<line x1="20" y1="378" x2="580" y2="378" stroke="#d6d3d1" stroke-width="1"/>
+<line x1="575" y1="403" x2="535" y2="403" stroke="#2563eb" stroke-width="3" marker-end="url(#2563eb)"/><text x="520" y="408" text-anchor="start" fill="#1f2937" font-weight="bold">בליה, סחיפה והשקעה</text>
+<line x1="575" y1="431" x2="535" y2="431" stroke="#7c3aed" stroke-width="3" marker-end="url(#7c3aed)"/><text x="520" y="436" text-anchor="start" fill="#1f2937" font-weight="bold">חום ולחץ בעומק</text>
+<line x1="575" y1="459" x2="535" y2="459" stroke="#c2410c" stroke-width="3" marker-end="url(#c2410c)"/><text x="520" y="464" text-anchor="start" fill="#1f2937" font-weight="bold">התכה והתקררות</text>
+<text x="20" y="408" text-anchor="end" font-size="13" fill="#57534e">כל סלע יכול להפוך</text>
+<text x="20" y="428" text-anchor="end" font-size="13" fill="#57534e">לכל סלע אחר</text>
+</svg>

@@ -209,7 +209,8 @@ export const slides: TopicSlideContent[] = [
       "החלק העליון: שיפוע תלול, זרם מהיר. הנהר חופר כלפי מטה ויוצר עמק צר בצורת V.",
       "החלק התחתון: שיפוע מתון. הנהר מתפתל, שוחק לצדדים ומשקיע.",
       "בשפך הזרם כמעט נעצר, וכל הסחף שוקע: נוצרת דלתא, כמו דלתת הנילוס."
-    ]
+    ],
+    imageUrl: "/images/earth-sciences/river-profile.svg"
   },
   {
     title: "נפתולים ואגם פרסה",
@@ -219,6 +220,7 @@ export const slides: TopicSlideContent[] = [
       "כך העיקול מתהדק, עד שהנהר פורץ את הצוואר הצר וממשיך בדרך הקצרה.",
       "העיקול הישן נשאר מנותק: אגם פרסה. גם נהר הירדן מתפתל בנפתולים רבים בדרכו לים המלח."
     ],
+    imageUrl: "/images/earth-sciences/meander-oxbow.svg",
     afterTask: true
   },
   {

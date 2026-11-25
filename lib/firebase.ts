@@ -3,9 +3,23 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 import { getFirestore } from "firebase/firestore";
 
+const FIREBASE_AUTH_DOMAIN = "values-auction-ed09c.firebaseapp.com";
+
+// Hosts that proxy /__/auth/* to Firebase (see next.config.ts) and are listed
+// as an authorized redirect URI (https://<host>/__/auth/handler) on the Google
+// OAuth client. On these, sign-in runs same-origin, which mobile browsers need.
+const SAME_ORIGIN_AUTH_HOSTS = ["teaching-blond.vercel.app"];
+
+function resolveAuthDomain() {
+  if (typeof window !== "undefined" && SAME_ORIGIN_AUTH_HOSTS.includes(window.location.host)) {
+    return window.location.host;
+  }
+  return FIREBASE_AUTH_DOMAIN;
+}
+
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyDMwQXeiDibuy6q0q_emHGAmxB3xSqRVbU",
-  authDomain: "values-auction-ed09c.firebaseapp.com",
+  authDomain: resolveAuthDomain(),
   databaseURL: "https://values-auction-ed09c-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "values-auction-ed09c",
   storageBucket: "values-auction-ed09c.firebasestorage.app",

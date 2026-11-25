@@ -211,7 +211,8 @@ export const slides: TopicSlideContent[] = [
       "הירח רחוק מאיתנו כ-384,000 ק\"מ, וקוטרו כרבע מקוטר כדור הארץ.",
       "הוא מקיף את כדור הארץ, ומירח מלא אחד לבא עוברים כ-29.5 ימים.",
       "הירח מסתובב סביב עצמו באותו קצב שבו הוא מקיף אותנו, ולכן תמיד אותו צד שלו פונה אלינו."
-    ]
+    ],
+    imageUrl: "/images/earth-sciences/earth-moon-scale.svg"
   },
   {
     title: "חצי מואר תמיד: למה הצורה משתנה",
@@ -232,6 +233,7 @@ export const slides: TopicSlideContent[] = [
       "ירח מלא: כדור הארץ בין השמש לירח. נראה כל הלילה.",
       "ירח מתמעט ← רבע אחרון (חצי שמאלי מואר) ← סהר מתמעט ← מולד חדש."
     ],
+    imageUrl: "/images/earth-sciences/moon-phases-row.svg",
     afterTask: true
   },
   {
@@ -242,6 +244,7 @@ export const slides: TopicSlideContent[] = [
       "12 חודשי ירח הם כ-354 ימים, כ-11 ימים פחות משנת שמש.",
       "כדי שפסח יישאר באביב, מוסיפים את אדר ב' בשבע שנים מתוך כל 19 שנים: שנה מעוברת."
     ],
+    imageUrl: "/images/earth-sciences/lunar-month.svg",
     afterTask: true
   }
 ];

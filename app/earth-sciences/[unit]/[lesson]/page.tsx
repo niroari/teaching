@@ -733,9 +733,11 @@ export default function LessonPresenterConsolePage() {
                               </div>
                             ) : slides[currentSlideIndex].imageUrl ? (
                               <div className={`shrink-0 relative flex items-center justify-center ${
-                                cinemaMode 
-                                  ? "w-full md:w-6/12 lg:w-7/12" 
-                                  : "w-full md:w-5/12"
+                                cinemaMode
+                                  ? "w-full md:w-6/12 lg:w-7/12"
+                                  : slides[currentSlideIndex].imageUrl?.endsWith(".svg")
+                                    ? "w-full md:w-1/2 lg:w-7/12"
+                                    : "w-full md:w-5/12"
                               }`}>
                                 <img
                                   src={slides[currentSlideIndex].imageUrl}

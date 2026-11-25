@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
@@ -45,35 +45,58 @@ import TriviaJeopardyWidget from "@/components/earth-sciences/TriviaJeopardyWidg
 import { DigitalWorksheet, AnswerKey } from "@/components/earth-sciences/Worksheet";
 import ActivityBar from "@/components/site/ActivityBar";
 import { btn } from "@/components/site/ui";
+import { useHistorySteps } from "@/lib/hooks/useHistorySteps";
 
 /** Stage lengths of a 40-minute lesson, used when a lesson has no detailed plan of its own. */
 const DEFAULT_STAGE_MINUTES = [10, 20, 10] as const;
 
+type LessonTab = "slides" | "activity" | "teacherGuide";
+
+function parseTab(value: string | null): LessonTab {
+  return value === "activity" || value === "teacherGuide" ? value : "slides";
+}
+
+/** Only site images and https images may be shown from the `image` query parameter. */
+function safeImageSrc(value: string | null): string | null {
+  if (!value) return null;
+  if (value.startsWith("/") && !value.startsWith("//")) return value;
+  return value.startsWith("https://") ? value : null;
+}
+
 export default function LessonPresenterConsolePage() {
   const { unit, lesson } = useParams();
 
-  const [cinemaMode, setCinemaMode] = useState(false);
-  const [activeTab, setActiveTab] = useState<"slides" | "activity" | "teacherGuide">("slides");
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-  const [showInlineWidget, setShowInlineWidget] = useState(false);
-  const [showNotebookOverlay, setShowNotebookOverlay] = useState(false);
-  const [lightboxImageUrl, setLightboxImageUrl] = useState<string | null>(null);
+  const { params, go, open, close } = useHistorySteps();
 
-  // Keyboard navigation for slides
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (activeTab !== "slides") return;
-      if (e.key === "ArrowRight") {
-        handlePrevSlide(); // Hebrew RTL direction: Prev slide is on the right
-      } else if (e.key === "ArrowLeft") {
-        handleNextSlide(); // Next slide is on the left
-      } else if (e.key === "Escape" && cinemaMode) {
-        setCinemaMode(false);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeTab, currentSlideIndex, cinemaMode]);
+  // The view lives in the URL, one history entry per step, so the browser's Back
+  // button walks back through slides, tabs and open panels instead of leaving the lesson.
+  const activeTab = parseTab(params.get("tab"));
+  const requestedSlide = Number(params.get("slide")) - 1;
+  const cinemaMode = params.get("cinema") === "1";
+  const layer = params.get("open");
+  const showInlineWidget = layer === "widget";
+  const showNotebookOverlay = layer === "notebook";
+  const lightboxImageUrl = layer === "image" ? safeImageSrc(params.get("image")) : null;
+
+  const setActiveTab = (tab: LessonTab) => {
+    if (tab !== activeTab) go({ tab: tab === "slides" ? null : tab, open: null, image: null });
+  };
+  const setCinemaMode = (on: boolean) => {
+    if (on) open("cinema", { cinema: "1" });
+    else close("cinema", { cinema: null });
+  };
+  const setShowInlineWidget = (on: boolean) => {
+    if (on) open("widget", { open: "widget" });
+    else close("widget", { open: null });
+  };
+  const setShowNotebookOverlay = (on: boolean) => {
+    if (on) open("notebook", { open: "notebook" });
+    else close("notebook", { open: null });
+  };
+  const setLightboxImageUrl = (src: string | null) => {
+    if (src) open("image", { open: "image", image: src });
+    else close("image", { open: null, image: null });
+  };
 
   // Find Unit and Lesson data
   const unitSlug = typeof unit === "string" ? unit : "";
@@ -81,12 +104,6 @@ export default function LessonPresenterConsolePage() {
 
   const unitData = EARTH_SCIENCES_UNITS.find(u => u.slug === unitSlug);
   const lessonData = unitData?.lessons.find(l => l.id === lessonId);
-
-  // Reset slide and widget state when changing lesson
-  useEffect(() => {
-    setCurrentSlideIndex(0);
-    setShowInlineWidget(false);
-  }, [lessonId]);
 
   // Slide content generator
   const generateSlides = (): Slide[] => {
@@ -150,6 +167,36 @@ export default function LessonPresenterConsolePage() {
   };
 
   const slides = generateSlides();
+  const lastSlide = Math.max(slides.length - 1, 0);
+  const currentSlideIndex = Number.isInteger(requestedSlide) ? Math.min(Math.max(requestedSlide, 0), lastSlide) : 0;
+
+  // Moving to another slide closes the inline widget; the cinema mode stays as it is.
+  const goToSlide = (index: number) => {
+    if (index < 0 || index > lastSlide || index === currentSlideIndex) return;
+    go({ slide: index === 0 ? null : String(index + 1), open: null, image: null });
+  };
+  const handleNextSlide = () => goToSlide(currentSlideIndex + 1);
+  const handlePrevSlide = () => goToSlide(currentSlideIndex - 1);
+
+  // Keyboard: arrows move between slides, Escape closes the topmost panel.
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (lightboxImageUrl) setLightboxImageUrl(null);
+        else if (showNotebookOverlay) setShowNotebookOverlay(false);
+        else if (cinemaMode) setCinemaMode(false);
+        return;
+      }
+      if (activeTab !== "slides" || lightboxImageUrl || showNotebookOverlay) return;
+      if (e.key === "ArrowRight") {
+        handlePrevSlide(); // Hebrew RTL direction: Prev slide is on the right
+      } else if (e.key === "ArrowLeft") {
+        handleNextSlide(); // Next slide is on the left
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  });
 
   if (!unitData || !lessonData) {
     return (
@@ -199,20 +246,6 @@ export default function LessonPresenterConsolePage() {
       </div>
     );
   }
-
-  const handleNextSlide = () => {
-    if (currentSlideIndex < slides.length - 1) {
-      setCurrentSlideIndex(prev => prev + 1);
-      setShowInlineWidget(false);
-    }
-  };
-
-  const handlePrevSlide = () => {
-    if (currentSlideIndex > 0) {
-      setCurrentSlideIndex(prev => prev - 1);
-      setShowInlineWidget(false);
-    }
-  };
 
   // Select widget to render based on widgetId
   const renderWidget = () => {
@@ -1006,7 +1039,10 @@ export default function LessonPresenterConsolePage() {
         >
           {/* Close Button */}
           <button 
-            onClick={() => setLightboxImageUrl(null)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setLightboxImageUrl(null);
+            }}
             className="fixed top-6 left-6 p-2 rounded-xl bg-subtle border border-line hover:bg-subtle text-fg cursor-pointer z-[110]"
           >
             <X className="w-6 h-6" />

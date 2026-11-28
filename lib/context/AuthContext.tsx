@@ -5,6 +5,8 @@ import {
   User,
   onAuthStateChanged,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signOut
 } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase";
@@ -14,6 +16,13 @@ interface AuthContextType {
   loading: boolean;
   signInWithGoogle: () => Promise<any>;
   logout: () => Promise<void>;
+}
+
+function isMobileBrowser() {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent;
+  // iPadOS reports a desktop Mac user agent, so check for touch as well.
+  return /android|iphone|ipad|ipod|mobile/i.test(ua) || (/macintosh/i.test(ua) && navigator.maxTouchPoints > 1);
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,24 +37,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     });
 
+    // Finish a mobile redirect sign-in. The user itself arrives through
+    // onAuthStateChanged; this only surfaces errors.
+    getRedirectResult(auth).catch((err) => {
+      console.error("Google redirect sign-in failed:", err);
+    });
+
     return () => unsubscribe();
   }, []);
 
   const signInWithGoogle = async () => {
+    // Mobile browsers block the sign-in popup silently (no error, the promise
+    // just never settles), so on phones and tablets go straight to a full-page
+    // redirect. It works because sign-in runs on our own domain (lib/firebase.ts).
+    if (isMobileBrowser()) {
+      return signInWithRedirect(auth, googleProvider);
+    }
     try {
-      // Try popup first (better UX on desktop)
       return await signInWithPopup(auth, googleProvider);
     } catch (err: any) {
-      console.warn("Google popup sign-in failed/blocked, trying redirect...", err);
-      // Fallback to redirect if popup is blocked, closed, or not supported
-      if (
-        err.code === "auth/popup-blocked" ||
-        err.code === "auth/popup-closed-by-user" ||
-        err.code === "auth/cancelled-popup-request" ||
-        (typeof window !== "undefined" && /mobile|android|iphone|ipad|ipod/i.test(window.navigator.userAgent))
-      ) {
-        const { signInWithRedirect } = await import("firebase/auth");
-        return await signInWithRedirect(auth, googleProvider);
+      if (err.code === "auth/popup-blocked") {
+        return signInWithRedirect(auth, googleProvider);
       }
       throw err;
     }
